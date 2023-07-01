@@ -19,18 +19,15 @@
     "type": "menu",
     "items": {
       "twitch": {
-        "title": "Xuruko",
-        "href": "https://piratechs.com/"
+        "title": "Twitch Xuruko",
+        "href": "https://www.twitch.tv/xuruko"
       },
-      "about": {
-        "title": "Piratechs",
-        "href": "https://piratechs.com/"
-      },
-      "contact": {
-        "title": "Text Me",
-        "href": "sms:6787903980"
+      "discord": {
+        "title": "The Bröthērhoöd",
+        "href": "https://discord.gg/FUXbKfGs29"
       }
     }
   },
-  "code-snippets": "Code Snippets"
+  "players": "Players",
+  "sign-up": "Sign Up"
 }
