@@ -1,15 +1,36 @@
 {
-  "index": "Introduction",
-  "another": "Another Page",
-  "advanced": "Advanced (A Folder)",
+  "index": {
+    "title": "Leaderboard",
+    "theme": {
+      "pagination": false,
+      "layout": "full"
+    }
+  },
   "about": {
     "title": "About",
-    "type": "page"
-  },
-  "contact": {
-    "title": "Contact ↗",
     "type": "page",
-    "href": "https://twitter.com/shuding_",
-    "newWindow": true
-  }
+    "theme": {
+      "pagination": false,
+      "layout": "full"
+    }
+  },
+  "Xuruko": {
+    "title": "Xuruko",
+    "type": "menu",
+    "items": {
+      "twitch": {
+        "title": "Xuruko",
+        "href": "https://piratechs.com/"
+      },
+      "about": {
+        "title": "Piratechs",
+        "href": "https://piratechs.com/"
+      },
+      "contact": {
+        "title": "Text Me",
+        "href": "sms:6787903980"
+      }
+    }
+  },
+  "code-snippets": "Code Snippets"
 }
