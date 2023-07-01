@@ -1,4 +1,40 @@
+:root {
+    --smasherscapeBrown: #473d32;
+}
+
+@font-face {
+    font-family: 'RuneScape Chat';
+    src: url('./RuneScapeFonts/runescape-chat-07-webfont.woff2') format('woff2'),
+         url('./RuneScapeFonts/runescape-chat-07-webfont.woff') format('woff');
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'RuneScape Chat Bold';
+    src: url('./RuneScapeFonts/runescape-chat-bold-07-webfont.woff2') format('woff2'),
+         url('./RuneScapeFonts/runescape-chat-bold-07-webfont.woff') format('woff');
+    font-style: normal;
+}
+
 li.active a {
     background: transparent !important;
     border-bottom: 1px var(--main) solid;
+}
+
+.runescape_chat {
+    font-size: 2em;
+    font-family: "RuneScape Chat" !important;
+}
+
+.runescape_chat_bold {
+    font-size: 2em;
+    font-family: "RuneScape Chat Bold" !important;
+}
+
+.playerGrid {
+    display: flex;
+    grid-gap: 15px;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
 }
