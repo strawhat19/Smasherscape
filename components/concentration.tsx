@@ -227,7 +227,7 @@ export default function Concentration(props) {
                                         <StepContent>
                                             {step.description && step.description != `` && <Typography>{step.description}</Typography>}
                                             {step.label == `Topic` && <>
-                                                <TextField fullWidth className={`formField topic`} name={`topic`} id="standard-basic" label="Topic" variant="standard" placeholder={`Famous People that Passed Away whose First or Last Names that start with Letter`} required />
+                                                <TextField fullWidth className={`formField topic`} name={`topic`} id="standard-basic" label="Topic" variant="standard" placeholder={`Select a Topic`} required />
                                             </>}
                                             {step.label == `Players` && <>
                                                 {players.map((player, playerIndex) => {
