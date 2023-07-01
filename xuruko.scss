@@ -19,10 +19,17 @@
     font-style: normal;
 }
 
-li.active a {
-    background: transparent !important;
-    border-bottom: 1px var(--main) solid;
-}
+li {
+    a {
+        font-size: 18px !important;
+    }
+    &.active {
+        a {
+            background: transparent !important;
+            border-bottom: 1px var(--main) solid;
+        }
+    }
+} 
 
 .runescape_chat {
     font-size: 2em;
@@ -44,4 +51,17 @@ li.active a {
     .gridImage {
         max-width: 48%;
     }
+}
+
+nav {
+    h1 {
+        font-size: 25px !important;
+    }
+    a, button {
+        font-size: 18px !important;
+    }
+}
+
+button[title="Change theme"] {
+    font-size: 16px !important;
 }
