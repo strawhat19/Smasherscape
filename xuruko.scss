@@ -1,5 +1,8 @@
 :root {
+    --smasherscapeYellow: #fcfc05;
+    --smasherscapeGreen: #6ced52;
     --smasherscapeBrown: #473d32;
+    --smasherscapeBlue: #45bde9;
 }
 
 @font-face {
@@ -32,12 +35,13 @@ li.active a {
 }
 
 .playerGrid {
+    padding: 15px 0;
     display: flex;
     grid-gap: 15px;
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
     .gridImage {
-        max-width: 49%;
+        max-width: 48%;
     }
 }
