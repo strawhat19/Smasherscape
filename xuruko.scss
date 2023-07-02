@@ -3,7 +3,7 @@
     --smasherscapeGreen: #6ced52;
     --smasherscapeBrown: #473d32;
     --smasherscapeBlue: #45bde9;
-    --smasherscapeOrange: #f6cc00;
+    --smasherscapeBronze: #f6cc00;
 }
 
 @font-face {
@@ -139,7 +139,7 @@ li {
                         text-shadow: none;
                         letter-spacing: 3px;
                         font-family: "RuneScape Large";
-                        color: var(--smasherscapeOrange);
+                        color: var(--smasherscapeBronze);
                     }
                 }
                 .recordPlays {
@@ -189,6 +189,18 @@ li {
                             background: black;
                             transform: rotate(-45deg);
                         }
+                    }
+                    .xpDetail {
+                        top: 15px;
+                        width: 90%;
+                        display: flex;
+                        line-height: 1;
+                        font-size: 18px;
+                        position: relative;
+                        align-items: center;
+                        justify-content: space-between;
+                        color: var(--smasherscapeYellow);
+                        text-shadow: 1px 1px 0px black;
                     }
                 }
             }

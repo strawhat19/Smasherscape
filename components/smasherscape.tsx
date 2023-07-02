@@ -54,6 +54,20 @@ export default function Smasherscape(props) {
                                         <div className="borderSep"></div>
                                         <h4 className={`levelNum levelBot`}>99</h4>
                                     </div>
+                                    <div className="experienceDetails">
+                                        <div className="arenaXP xpDetail">
+                                            <div>Arena XP:</div>
+                                            <div>{plyr?.experience.arenaXP.toLocaleString(`en`)}</div>
+                                        </div>
+                                        <div className="nextLevelAt xpDetail">
+                                            <div>Next Level At:</div>
+                                            <div>{plyr?.experience.nextLevelAt.toLocaleString(`en`)}</div>
+                                        </div>
+                                        <div className="remainingXP xpDetail">
+                                            <div>Remaining XP:</div>
+                                            <div>{plyr?.experience.remainingXP.toLocaleString(`en`)}</div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div className="cardBottomRow">

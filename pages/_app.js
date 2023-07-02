@@ -323,9 +323,9 @@ export default function ProductIVF({ Component, pageProps, router }) {
         record: [],
         experience: {
           xp: 0,
-          arenaXP: 0,
-          nextLevelAt: 1200,
-          remainingXP: 1200
+          arenaXP: 200000000,
+          nextLevelAt: 200000000,
+          remainingXP: 200000000
         },
       },
       {
@@ -343,9 +343,9 @@ export default function ProductIVF({ Component, pageProps, router }) {
         record: [],
         experience: {
           xp: 0,
-          arenaXP: 0,
-          nextLevelAt: 1200,
-          remainingXP: 1200
+          arenaXP: 200000000,
+          nextLevelAt: 200000000,
+          remainingXP: 200000000
         },
       },
       {
@@ -363,9 +363,9 @@ export default function ProductIVF({ Component, pageProps, router }) {
         record: [],
         experience: {
           xp: 0,
-          arenaXP: 0,
-          nextLevelAt: 1200,
-          remainingXP: 1200
+          arenaXP: 200000000,
+          nextLevelAt: 200000000,
+          remainingXP: 200000000
         },
       },
     ]);
