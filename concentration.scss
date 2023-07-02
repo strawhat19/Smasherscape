@@ -195,7 +195,7 @@ form {
                 content: "" !important;
                 transform-origin: 0% 100%;
                 transition: var(--transition);
-                background: var(--gameBlueSoft);
+                background: linear-gradient(90deg, var(--smasherscapeGreen), var(--smasherscapeBlue));
             }
 
             &:hover {

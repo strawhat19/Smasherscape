@@ -62,7 +62,9 @@ const config: DocsThemeConfig = {
   <link rel="preconnect" href="https://fonts.gstatic.com" />
   <link rel="icon" href="https://github.com/strawhat19/Smasherscape/blob/main/assets/smasherscape/OSRS_Top_Hat.png?raw=true" type="image/x-icon"></link>
   </>,
-  logo: <img width={40} src={`https://github.com/strawhat19/Smasherscape/blob/main/assets/smasherscape/OSRS_Top_Hat.png?raw=true`} alt={`Tophat Logo`} />,
+  logo: <>
+  <img width={40} src={`https://github.com/strawhat19/Smasherscape/blob/main/assets/smasherscape/OSRS_Top_Hat.png?raw=true`} alt={`Tophat Logo`} /> <h1 style={{marginLeft: 15}}>Xuruko</h1>
+  </>,
   search: {
     placeholder: `Search...`
   },

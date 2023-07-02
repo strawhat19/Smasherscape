@@ -80,6 +80,12 @@ html[class~="dark"] {
          --tw-shadow: none !important;
          --tw-shadow-colored: none !important;
      }
+     .nextra-nav-container {
+        background: black !important;
+        .nextra-nav-container-blur {
+            background: black !important;
+        }
+     }
  }
 
 .titleRow {
@@ -87,8 +93,8 @@ html[class~="dark"] {
     color: white;
     font-weight: 600;
     font-size: 1.2em;
-    border-radius: var(--borderRadius);
     background: var(--gameBlueSoft);
+    border-radius: var(--borderRadius);
     .innerRow {
         background: var(--blackGlass);
         h3 {
@@ -154,6 +160,9 @@ html[class~="dark"] {
     aside {
         border-right: solid 1px var(--bg);
         background: black !important;
+        // @media (min-width: 767px) {
+        //     display: none;
+        // }
     }
 
     body {
@@ -1120,7 +1129,7 @@ textarea {
         content: "" !important;
         transform-origin: 0% 100%;
         transition: var(--transition);
-        background: var(--gameBlueSoft);
+        background: linear-gradient(90deg, var(--smasherscapeGreen), var(--smasherscapeBlue));
     }
 
     &:hover {

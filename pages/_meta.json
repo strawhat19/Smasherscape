@@ -28,6 +28,18 @@
       }
     }
   },
-  "players": "Players",
-  "sign-up": "Sign Up"
+  "players": {
+    "title": "Players",
+    "theme": {
+      "pagination": false,
+      "layout": "full"
+    }
+  },
+  "sign-up": {
+    "title": "Sign Up",
+    "theme": {
+      "pagination": false,
+      "layout": "full"
+    }
+  }
 }
