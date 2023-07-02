@@ -6,6 +6,13 @@
 }
 
 @font-face {
+    font-family: 'RuneScape Large';
+    src: url('./RuneScapeFonts/RuneScape-Large.woff2') format('woff2'),
+         url('./RuneScapeFonts/RuneScape-Large.woff') format('woff');
+    font-style: normal;
+}
+
+@font-face {
     font-family: 'RuneScape Chat';
     src: url('./RuneScapeFonts/runescape-chat-07-webfont.woff2') format('woff2'),
          url('./RuneScapeFonts/runescape-chat-07-webfont.woff') format('woff');
@@ -84,9 +91,39 @@ li {
         // background-repeat: no-repeat !important;
         // background-position: 50% 50% !important;
         // background: url(https://github.com/strawhat19/Smasherscape/blob/main/assets/smasherscape/OSRS_Card_Empty.png?raw=true);
-        h2 {
+        .playerCardContent {
             z-index: 1;
-            font-size: 2em;
+            width: 87%;
+            display: flex;
+            margin: 0 auto;
+            align-items: center;
+            flex-direction: column;
+            justify-content: space-between;
+            .cardTopRow {
+                width: 100%;
+                display: flex;
+                margin: 0 auto;
+                align-items: center;
+                justify-content: space-between;
+                .logoWithWords {
+                    width: 180px;
+                    display: flex;
+                    font-size: 31px;
+                    line-height: 0.8;
+                    align-items: center;
+                    font-family: "RuneScape Large";
+                    color: var(--smasherscapeBlue);
+                    justify-content: space-between;
+                }
+            }
+        }
+        h2 {
+            width: 40%;
+            display: flex;
+            font-size: 4em;
+            font-family: 'RuneScape Large';
+            color: var(--smasherscapeBlue);
+            text-shadow: 1px 1px 0px var(--smasherscapeGreen);
         }
     }
 }

@@ -24,11 +24,15 @@ export default function Smasherscape(props) {
                 return (
                     <div className="gridCard">
                         <img className={`cardBG`} src={`https://github.com/strawhat19/Smasherscape/blob/main/assets/smasherscape/OSRS_Card_Empty.png?raw=true`} alt={`Smasherscape Player Card`} />
-                        <h2>Grid Card</h2>
-                        <h2>Grid Card</h2>
-                        <h2>Grid Card</h2>
-                        <h2>Grid Card</h2>
-                        <h2>Grid Card</h2>
+                        <div className="playerCardContent">
+                            <div className="cardTopRow">
+                                <div className="logoWithWords">
+                                    <img width={50} src={`https://github.com/strawhat19/Smasherscape/blob/main/assets/smasherscape/OSRS_Top_Hat.png?raw=true`} alt={`Tophat Logo`} />
+                                    <h3>Xuruko's<br />SmasherScape</h3>
+                                </div>
+                                <h2>{plyr?.name}</h2>
+                            </div>
+                        </div>
                     </div>
                 )
             })}
