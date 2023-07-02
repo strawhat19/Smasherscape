@@ -54,7 +54,7 @@ export const generateUniqueID = (existingIDs, name) => {
 };
 
 export const dev = (item, source) => {
-  if (window.location.host.includes(`local`)) {
+  if (window && window.location.host.includes(`local`)) {
     if (item) {
       console.log(`Dev Log`, item);
     } else if (item && source) {
@@ -306,6 +306,66 @@ export default function ProductIVF({ Component, pageProps, router }) {
     let [rearranging, setRearranging] = useState(false);
     let [content, setContent] = useState(`defaultContent`);
     let [year, setYear] = useState(new Date().getFullYear());
+    
+    let [players, setPlayers] = useState([
+      {
+        id: 1,
+        name: `Ruko`,
+        email: ``,
+        twitch: ``,
+        discord: ``,
+        level: 1,
+        wins: [],
+        plays: [],
+        deaths: [],
+        losses: [],
+        record: [],
+        experience: {
+          xp: 0,
+          arenaXP: 0,
+          nextLevelAt: 1200,
+          remainingXP: 1200
+        },
+      },
+      {
+        id: 2,
+        name: `Kay`,
+        email: ``,
+        twitch: ``,
+        discord: ``,
+        level: 1,
+        wins: [],
+        plays: [],
+        deaths: [],
+        losses: [],
+        record: [],
+        experience: {
+          xp: 0,
+          arenaXP: 0,
+          nextLevelAt: 1200,
+          remainingXP: 1200
+        },
+      },
+      {
+        id: 3,
+        name: `Ricky`,
+        email: ``,
+        twitch: ``,
+        discord: ``,
+        level: 1,
+        wins: [],
+        plays: [],
+        deaths: [],
+        losses: [],
+        record: [],
+        experience: {
+          xp: 0,
+          arenaXP: 0,
+          nextLevelAt: 1200,
+          remainingXP: 1200
+        },
+      },
+    ]);
 
     useEffect(() => {
       setLoading(true);
@@ -368,7 +428,7 @@ export default function ProductIVF({ Component, pageProps, router }) {
       }
     }, [rte, user, users, authState, dark])
 
-    return <StateContext.Provider value={{ router, rte, setRte, updates, setUpdates, content, setContent, width, setWidth, user, setUser, page, setPage, mobileMenu, setMobileMenu, users, setUsers, authState, setAuthState, emailField, setEmailField, devEnv, setDevEnv, mobileMenuBreakPoint, platform, setPlatform, focus, setFocus, highScore, setHighScore, color, setColor, dark, setDark, colorPref, setColorPref, qotd, setQotd, alertOpen, setAlertOpen, mobile, setMobile, systemStatus, setSystemStatus, loading, setLoading, anim, setAnimComplete, IDs, setIDs, categories, setCategories, browser, setBrowser, onMac, rearranging, setRearranging, buttonText, setButtonText, gameFormStep, setGameFormStep }}>
+    return <StateContext.Provider value={{ router, rte, setRte, updates, setUpdates, content, setContent, width, setWidth, user, setUser, page, setPage, mobileMenu, setMobileMenu, users, setUsers, authState, setAuthState, emailField, setEmailField, devEnv, setDevEnv, mobileMenuBreakPoint, platform, setPlatform, focus, setFocus, highScore, setHighScore, color, setColor, dark, setDark, colorPref, setColorPref, qotd, setQotd, alertOpen, setAlertOpen, mobile, setMobile, systemStatus, setSystemStatus, loading, setLoading, anim, setAnimComplete, IDs, setIDs, categories, setCategories, browser, setBrowser, onMac, rearranging, setRearranging, buttonText, setButtonText, gameFormStep, setGameFormStep, players, setPlayers }}>
       {(browser != `chrome` || onMac) ? <AnimatePresence mode={`wait`}>
         <motion.div className={`${rte} pageWrapContainer ${page.toUpperCase()}`} key={router.route} initial="pageInitial" animate="pageAnimate" exit="pageExit" transition={{ duration: 0.35 }} variants={{
           pageInitial: {
