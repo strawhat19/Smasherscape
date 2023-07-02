@@ -22,15 +22,42 @@ export default function Smasherscape(props) {
         <div id={props.id} className={`${props.className} playerGrid`}>
             {players.length > 0 && players.map((plyr, plyrIndex) => {
                 return (
-                    <div className="gridCard">
+                    <div className="gridCard" key={plyrIndex}>
                         <img className={`cardBG`} src={`https://github.com/strawhat19/Smasherscape/blob/main/assets/smasherscape/OSRS_Card_Empty.png?raw=true`} alt={`Smasherscape Player Card`} />
+                        <img className={`cardBG border`} src={`https://github.com/strawhat19/Smasherscape/blob/main/assets/smasherscape/OSRS_Card_Template_Border_Only.png?raw=true`} alt={`Smasherscape Player Card`} />
                         <div className="playerCardContent">
                             <div className="cardTopRow">
                                 <div className="logoWithWords">
-                                    <img width={50} src={`https://github.com/strawhat19/Smasherscape/blob/main/assets/smasherscape/OSRS_Top_Hat.png?raw=true`} alt={`Tophat Logo`} />
+                                    <img width={70} src={`https://github.com/strawhat19/Smasherscape/blob/main/assets/smasherscape/OSRS_Top_Hat.png?raw=true`} alt={`Tophat Logo`} />
                                     <h3>Xuruko's<br />SmasherScape</h3>
                                 </div>
                                 <h2>{plyr?.name}</h2>
+                            </div>
+                            <div className="cardMiddleRow">
+                                <div className="imgLeftCol">
+                                    <img width={150} src={`https://github.com/strawhat19/Smasherscape/blob/main/assets/smasherscape/OSRS_Top_Hat.png?raw=true`} alt={`Tophat Logo`} />
+                                    <h4 className={`levelName`}>{plyr?.levelName}</h4>
+                                </div>
+                                <div className="recordPlays">
+                                    <div className="record">
+                                        <h3>Record</h3>
+                                        <h4>0 - 0</h4>
+                                    </div>
+                                    <div className="plays">
+                                        <h3>Plays</h3>
+                                        <h4>0 - 0</h4>
+                                    </div>
+                                </div>
+                                <div className="rightCol">
+                                    <div className="level">
+                                        <h4 className={`levelNum levelTop`}>99</h4>
+                                        <div className="borderSep"></div>
+                                        <h4 className={`levelNum levelBot`}>99</h4>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="cardBottomRow">
+                                <div className="gradient"></div>
                             </div>
                         </div>
                     </div>

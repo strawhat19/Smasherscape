@@ -1,12 +1,10 @@
-# Concentration
+# SmasherScape
 
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
-
-![License](https://img.shields.io/github/license/strawhat19/Concentration)
-![State](https://img.shields.io/github/deployments/strawhat19/Concentration/Production)
-![Total Lines](https://img.shields.io/tokei/lines/github/strawhat19/Concentration)
-![Repo Size](https://img.shields.io/github/repo-size/strawhat19/Concentration)
-![Release](https://img.shields.io/github/release/strawhat19/Concentration)
+![License](https://img.shields.io/github/license/strawhat19/Smasherscape)
+![State](https://img.shields.io/github/deployments/strawhat19/Smasherscape/Production)
+![Total Lines](https://img.shields.io/tokei/lines/github/strawhat19/Smasherscape)
+![Repo Size](https://img.shields.io/github/repo-size/strawhat19/Smasherscape)
+![Release](https://img.shields.io/github/release/strawhat19/Smasherscape)
 
 ![NextJS](https://img.shields.io/badge/next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
 ![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)
@@ -14,45 +12,32 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 ![SASS](https://img.shields.io/badge/SASS-hotpink.svg?style=for-the-badge&logo=SASS&logoColor=white)
 ![Firebase](https://img.shields.io/badge/Firebase-039BE5?style=for-the-badge&logo=Firebase&logoColor=white)
 
-![Screenshot of Application Dark Mode](./assets/screenshots/form.JPG)
+![Screenshot of SmasherScape](./assets/screenshots/SmasherScape.jpg)
 
 ## About
-I used Next js to make this site which is an alternate version of the game Concentration that me and my siblings play on road trips.
+Players can level up and gain experience while keeping a track record of their wins, defeats, deaths, characters played and level. Players can level up to gain rewards, search for their card and expand to view details, or view other player data on the leaderboard.
 
 ## Table of Contents  
 * [About](#about)
 * [Installation](#installation)
 * [Usage](#usage)
 * [Licensing](#licensing)
-* [Questions](#questions)
+* [Contact](#contact)
 
 ## Installation
 ```
-git clone git@github.com:strawhat19/Concentration.git
-cd Concentration/
+git clone git@github.com:strawhat19/Smasherscape.git
+cd Smasherscape/
 npm install
 npm run dev
 ```
 
 ## Usage
+Players can level up and gain experience while keeping a track record of their wins, defeats, deaths, characters played and level. Players can level up to gain rewards, search for their card and expand to view details, or view other player data on the leaderboard.
 
-### Add a List
+Open [http://localhost:3000](http://localhost:3000) with your browser, after installation, to see the result of the local development.
 
-#### On the Home Page or the Lists Page, you can start by making simple Draggable, Droppable To Do Lists or just Lists in General of what you would like to Track!
-
-### Add an Item
-
-#### On the Home Page or the Lists Page, you can Add Items to the List and Update Them!
-
-Prod [https://concentration.vercel.app/](https://concentration.vercel.app/) to see the prod build.
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `pages/index.mdx`. The page auto-updates as you edit the file.
-
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
-
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+Production [https://smasherscape.vercel.app/](https://smasherscape.vercel.app/) to see the production build.
 
 ## Licensing
 #### 
@@ -90,23 +75,10 @@ The `pages/api` directory is mapped to `/api/*`. Files in this directory are tre
       purpose.  It is provided "as is" without express or implied warranty.
 #### https://opensource.org/licenses/MIT
 
-## Questions
-
-#### GitHub Profile: [*strawhat19*](https://github.com/strawhat19)
-
-#### Contact me or ask me questions at [rahmed@piratechs.com](mailto:rahmed@piratechs.com).
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+## Contact
+#### Repository: [*Repo*](https://github.com/strawhat19/Smasherscape)
+#### GitHub: [*strawhat19*](https://github.com/strawhat19)
+#### Piratechs: [*Piratechs*](https://piratechs.com/)
+#### Twitch: [*Twitch.tv/Xuruko*](https://www.twitch.tv/xuruko)
+#### Discord: [*Join The Bröthērhoöd Discord*](https://discord.gg/FUXbKfGs29)
+#### Contact me or ask me questions at [rahmed@piratechs.com](mailto:rahmed@piratechs.com)
