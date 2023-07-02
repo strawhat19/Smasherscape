@@ -81,6 +81,9 @@ li {
         align-items: center;
         flex-direction: column;
         justify-content: center;
+        @media (max-width: 1230px) {
+            width: 100%;
+        }
         .cardBG {
             top: 0;
             left: 0;
@@ -140,6 +143,9 @@ li {
                         letter-spacing: 3px;
                         font-family: "RuneScape Large";
                         color: var(--smasherscapeBronze);
+                        @media (max-width: 768px) {
+                            font-size: 1.8em;
+                        }
                     }
                 }
                 .recordPlays {
@@ -159,6 +165,9 @@ li {
                         font-family: "RuneScape Chat";
                         color: var(--smasherscapeGreen);
                         text-shadow: 2px 2px 0px black;
+                        @media (max-width: 768px) {
+                            font-size: 2em;
+                        }
                     }
                 }
                 .rightCol {
@@ -179,6 +188,9 @@ li {
                             position: relative;
                             bottom: -15px;
                             right: 65px;
+                            @media (max-width: 768px) {
+                                right: 25px;
+                            }
                         }
                         .borderSep {
                             top: 35px;
@@ -201,6 +213,10 @@ li {
                         justify-content: space-between;
                         color: var(--smasherscapeYellow);
                         text-shadow: 1px 1px 0px black;
+                        @media (max-width: 768px) {
+                            top: 22px;
+                            font-size: 14px;
+                        }
                     }
                 }
             }
@@ -238,6 +254,9 @@ li {
             &.levelNum {
                 font-size: 5em;
                 text-shadow: 5px 5px 0px black;
+            }
+            @media (max-width: 768px) {
+                font-size: 1.7em;
             }
         }
     }
