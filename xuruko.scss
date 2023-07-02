@@ -8,22 +8,22 @@
 
 @font-face {
     font-family: 'RuneScape Large';
-    src: url('./RuneScapeFonts/RuneScape-Large.woff2') format('woff2'),
-         url('./RuneScapeFonts/RuneScape-Large.woff') format('woff');
+    src: url('./assets/smasherscape/fonts/RuneScapeFonts/RuneScape-Large.woff2') format('woff2'),
+         url('./assets/smasherscape/fonts/RuneScapeFonts/RuneScape-Large.woff') format('woff');
     font-style: normal;
 }
 
 @font-face {
     font-family: 'RuneScape Chat';
-    src: url('./RuneScapeFonts/runescape-chat-07-webfont.woff2') format('woff2'),
-         url('./RuneScapeFonts/runescape-chat-07-webfont.woff') format('woff');
+    src: url('./assets/smasherscape/fonts/RuneScapeFonts/runescape-chat-07-webfont.woff2') format('woff2'),
+         url('./assets/smasherscape/fonts/RuneScapeFonts/runescape-chat-07-webfont.woff') format('woff');
     font-style: normal;
 }
 
 @font-face {
     font-family: 'RuneScape Chat Bold';
-    src: url('./RuneScapeFonts/runescape-chat-bold-07-webfont.woff2') format('woff2'),
-         url('./RuneScapeFonts/runescape-chat-bold-07-webfont.woff') format('woff');
+    src: url('./assets/smasherscape/fonts/RuneScapeFonts/runescape-chat-bold-07-webfont.woff2') format('woff2'),
+         url('./assets/smasherscape/fonts/RuneScapeFonts/runescape-chat-bold-07-webfont.woff') format('woff');
     font-style: normal;
 }
 
@@ -81,6 +81,9 @@ li {
         align-items: center;
         flex-direction: column;
         justify-content: center;
+        @media (min-width: 1800px) {
+            width: 45%;
+        }
         @media (max-width: 1230px) {
             width: 100%;
         }
@@ -143,6 +146,9 @@ li {
                         letter-spacing: 3px;
                         font-family: "RuneScape Large";
                         color: var(--smasherscapeBronze);
+                        @media (max-width: 1800px) {
+                            font-size: 2.3em;
+                        }
                         @media (max-width: 768px) {
                             font-size: 1.8em;
                         }
@@ -213,6 +219,9 @@ li {
                         justify-content: space-between;
                         color: var(--smasherscapeYellow);
                         text-shadow: 1px 1px 0px black;
+                        @media (max-width: 1800px) {
+                            font-size: 17px;
+                        }
                         @media (max-width: 768px) {
                             top: 22px;
                             font-size: 14px;
@@ -263,6 +272,20 @@ li {
 }
 
 nav {
+    a.nx-text-sm {
+        position: relative;
+        &::after {
+            left: 50%;
+            content: "";
+            width: 90%;
+            bottom: 1px;
+            height: 1.1px;
+            margin: 0 auto;
+            position: absolute;
+            transform: translateX(-50%);
+            background: linear-gradient(90deg, var(--smasherscapeGreen), var(--smasherscapeBlue));
+        }
+    }
     h1 {
         font-size: 25px !important;
     }
@@ -276,14 +299,27 @@ button[title="Change theme"] {
 }
 
 @media (max-width: 768px) {
-    aside {
-        ul {
-            li {
-                button {
-                    font-size: 18px !important;
+    .dark {
+        aside {
+            backdrop-filter: blur(5px);
+            background: rgba(0, 0, 0, 0.6) !important;
+            div {
+                &:first-child {
+                    display: none;
+                }
+            }
+            ul {
+                li {
+                    button {
+                        font-size: 18px !important;
+                    }
                 }
             }
         }
+    }
+    .dark .nx-sticky:not(.nx-top-0) {
+        background: var(--menuBackground) !important;
+        display: none;
     }
 }
 
@@ -293,4 +329,11 @@ button[title="Change theme"] {
 
 input[type="search"] {
     background: var(--smasherscapeBrown) !important;
+}
+
+.fa-twitch {
+    top: 4px;
+    font-size: 24px;
+    color: #9146FF;
+    position: relative;
 }

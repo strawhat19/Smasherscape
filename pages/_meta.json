@@ -1,13 +1,6 @@
 {
   "index": {
     "title": "Leaderboard",
-    "theme": {
-      "pagination": false,
-      "layout": "full"
-    }
-  },
-  "about": {
-    "title": "About",
     "type": "page",
     "theme": {
       "pagination": false,
@@ -26,20 +19,6 @@
         "title": "The Bröthērhoöd",
         "href": "https://discord.gg/FUXbKfGs29"
       }
-    }
-  },
-  "players": {
-    "title": "Players",
-    "theme": {
-      "pagination": false,
-      "layout": "full"
-    }
-  },
-  "sign-up": {
-    "title": "Sign Up",
-    "theme": {
-      "pagination": false,
-      "layout": "full"
     }
   }
 }
