@@ -1242,7 +1242,7 @@ footer {
 
     .vertical-sep,
     i {
-        color: var(--main);
+        color: var(--smasherscapeBlue);
 
         &.fas.fa-undo {
             font-size: 0.8em;
@@ -1255,28 +1255,28 @@ footer {
 
             img,
             svg {
-                fill: var(--main);
+                fill: var(--smasherscapeBlue);
 
                 path {
-                    fill: var(--main);
+                    fill: var(--smasherscapeBlue);
                 }
             }
 
             .piratechs {
                 max-height: 15px;
-                fill: var(--main);
+                fill: var(--smasherscapeBlue);
                 margin: 0 -7px 1px 0;
 
                 path {
-                    fill: var(--main);
+                    fill: var(--smasherscapeBlue);
                 }
 
                 img,
                 svg {
-                    fill: var(--main);
+                    fill: var(--smasherscapeBlue);
 
                     path {
-                        fill: var(--main);
+                        fill: var(--smasherscapeBlue);
                     }
                 }
             }

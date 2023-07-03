@@ -63,17 +63,20 @@ li {
 }
 
 .playerGrid {
+    gap: 40px;
     padding: 15px;
-    display: flex;
-    grid-gap: 40px;
-    flex-wrap: wrap;
+    display: grid;
     align-items: center;
+    grid-template-columns: 1fr;
     justify-content: space-between;
+    @media (min-width: 1675px) {
+        grid-template-columns: 1fr 1fr;
+    }
     .gridImage {
-        max-width: 48%;
+        width: 100%;
     }
     .gridCard {
-        width: 48%;
+        width: 100%;
         height: 100%;
         display: flex;
         min-height: 500px;
@@ -81,12 +84,6 @@ li {
         align-items: center;
         flex-direction: column;
         justify-content: center;
-        @media (min-width: 1800px) {
-            width: 45%;
-        }
-        @media (max-width: 1230px) {
-            width: 100%;
-        }
         .cardBG {
             top: 0;
             left: 0;
@@ -305,7 +302,9 @@ button[title="Change theme"] {
             background: rgba(0, 0, 0, 0.6) !important;
             div {
                 &:first-child {
-                    display: none;
+                    &:not(.nx-transition-opacity) {
+                        display: none;
+                    }
                 }
             }
             ul {
