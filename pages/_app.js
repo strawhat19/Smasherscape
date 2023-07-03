@@ -310,7 +310,7 @@ export default function ProductIVF({ Component, pageProps, router }) {
     let [players, setPlayers] = useState([
       {
         id: 1,
-        name: `Ruko`,
+        name: `Xuruko`,
         email: ``,
         twitch: ``,
         discord: ``,

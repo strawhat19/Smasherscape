@@ -3,7 +3,10 @@
     --smasherscapeGreen: #6ced52;
     --smasherscapeBrown: #473d32;
     --smasherscapeBlue: #45bde9;
-    --smasherscapeBronze: #f6cc00;
+    --smasherscapeBronze: #d9bf1a;
+    --smasherscapeBronze2: #f6cc00;
+    --smasherscapeCream: #f5f581;
+    --smasherscapePurple: #7b4e9b;
 }
 
 @font-face {
@@ -64,12 +67,12 @@ li {
 
 .playerGrid {
     gap: 40px;
-    padding: 15px;
     display: grid;
     align-items: center;
+    padding: 15px 15px 50px;
     grid-template-columns: 1fr;
     justify-content: space-between;
-    @media (min-width: 1675px) {
+    @media (min-width: 1500px) {
         grid-template-columns: 1fr 1fr;
     }
     .gridImage {
@@ -114,7 +117,7 @@ li {
                 margin: 35px auto -10px;
                 justify-content: space-between;
                 .logoWithWords {
-                    width: 230px;
+                    width: 232px;
                     display: flex;
                     font-size: 35px;
                     line-height: 0.8;
@@ -214,7 +217,7 @@ li {
                         position: relative;
                         align-items: center;
                         justify-content: space-between;
-                        color: var(--smasherscapeYellow);
+                        color: var(--smasherscapeCream);
                         text-shadow: 1px 1px 0px black;
                         @media (max-width: 1800px) {
                             font-size: 17px;
@@ -248,12 +251,12 @@ li {
             width: 40%;
             display: flex;
             font-size: 6em;
-            font-family: 'RuneScape Large';
+            font-family: "RuneScape Large";
             color: var(--smasherscapeBlue);
-            text-shadow: 1px 1px 0px black;
+            text-shadow: 3px 3px 0px var(--smasherscapePurple), 0px 0px 9px black;
         }
         h4 {
-            font-size: 2.1em;
+            font-size: 3.1em;
             font-family: 'RuneScape Chat';
             color: var(--smasherscapeYellow);
             text-shadow: 2px 2px 0px black;
