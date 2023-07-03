@@ -12,7 +12,7 @@
 ![SASS](https://img.shields.io/badge/SASS-hotpink.svg?style=for-the-badge&logo=SASS&logoColor=white)
 ![Firebase](https://img.shields.io/badge/Firebase-039BE5?style=for-the-badge&logo=Firebase&logoColor=white)
 
-![Screenshot of SmasherScape](./assets/smasherscape/SmasherScape.jpg)
+![Screenshot of SmasherScape](./assets/smasherscape/SmasherScapeOSRS.jpg)
 
 ## About
 Players can level up and gain experience while keeping a track record of their wins, defeats, deaths, characters played and level. Players can level up to gain rewards, search for their card and expand to view details, or view other player data on the leaderboard.
