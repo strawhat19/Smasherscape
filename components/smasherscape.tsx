@@ -1,4 +1,5 @@
 import { db } from '../firebase';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { useContext, useEffect, useRef, useState } from 'react';
 import { collection, doc, getDocs, setDoc } from 'firebase/firestore';
 import { defaultContent, formatDate, capitalizeAllWords, createXML, StateContext, showAlert } from '../pages/_app';
@@ -23,8 +24,8 @@ export default function Smasherscape(props) {
             {players.length > 0 && players.map((plyr, plyrIndex) => {
                 return (
                     <div className="gridCard" key={plyrIndex}>
-                        <img className={`cardBG`} src={`https://github.com/strawhat19/Smasherscape/blob/main/assets/smasherscape/OSRS_Card_Empty.png?raw=true`} alt={`Smasherscape Player Card`} />
-                        <img className={`cardBG border`} src={`https://github.com/strawhat19/Smasherscape/blob/main/assets/smasherscape/OSRS_Card_Template_Border_Only.png?raw=true`} alt={`Smasherscape Player Card`} />
+                        <LazyLoadImage effect="blur" src={`https://github.com/strawhat19/Smasherscape/blob/main/assets/smasherscape/OSRS_Card_Empty.png?raw=true`} className={`cardBG`} alt={`Smasherscape Player Card`} />
+                        <LazyLoadImage effect="blur" src={`https://github.com/strawhat19/Smasherscape/blob/main/assets/smasherscape/OSRS_Card_Template_Border_Only.png?raw=true`} className={`cardBG border`} alt={`Smasherscape Player Card`} />
                         <div className="playerCardContent">
                             <div className="cardTopRow">
                                 <div className="logoWithWords">
