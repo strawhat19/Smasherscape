@@ -29,7 +29,7 @@ export default function Smasherscape(props) {
         e.preventDefault();
         // let field = e.target as HTMLInputElement;
         // if (field.name == `commands`) {
-            console.log(`Form Submit`, e);
+            console.log(`Form Submit`, e.target);
         // } else {
             // return;
         // }
@@ -37,8 +37,8 @@ export default function Smasherscape(props) {
 
     return <>
         <form onInput={(e) => formInput(e)} onSubmit={(e) => formSubmit(e)} action="submit" className="gridForm">
-            <input type="search" className="search" name={`search`} placeholder={`Search...`} />
-            <input type="text" className="commands" name={`commands`} placeholder={`Commands...`} />
+            <div className={`inputWrapper`}><div className="inputBG"></div><input type="search" className="search" name={`search`} placeholder={`Search...`} /></div>
+            <div className={`inputWrapper`}><div className="inputBG"></div><input type="text" className="commands" name={`commands`} placeholder={`Commands...`} /></div>
             <button style={{display: `none`}} type={`submit`}>Submit</button>
         </form>
         <div id={props.id} className={`${props.className} playerGrid ${filteredPlayers.length == 0 ? `empty` : `populated`}`}>
@@ -61,12 +61,12 @@ export default function Smasherscape(props) {
                             <div className="cardMiddleRow">
                                 <div className="imgLeftCol">
                                     <img width={150} src={`https://github.com/strawhat19/Smasherscape/blob/main/assets/smasherscape/OSRS_Top_Hat.png?raw=true`} alt={`Tophat Logo`} />
-                                    <h4 className={`levelName`}>{plyr?.levelName}</h4>
+                                    <h4 className={`levelName`}>Bronze Scimitar</h4>
                                 </div>
                                 <div className="recordPlays">
                                     <div className="record">
                                         <h3>Record</h3>
-                                        <h4>{plyr?.wins} - {plyr?.losses}</h4>
+                                        <h4>0 - 0</h4>
                                     </div>
                                     <div className="plays">
                                         <h3>Exp</h3>
@@ -75,9 +75,9 @@ export default function Smasherscape(props) {
                                 </div>
                                 <div className="rightCol">
                                     <div className="level">
-                                        <h4 className={`levelNum levelTop`}>99</h4>
+                                        <h4 className={`levelNum levelTop`}>{plyr?.level?.num}</h4>
                                         <div className="borderSep"></div>
-                                        <h4 className={`levelNum levelBot`}>99</h4>
+                                        <h4 className={`levelNum levelBot`}>{plyr?.level?.num}</h4>
                                     </div>
                                     <div className="experienceDetails">
                                         <div className="arenaXP xpDetail">
@@ -96,16 +96,16 @@ export default function Smasherscape(props) {
                                 </div>
                             </div>
                             <div className="cardBottomRow">
-                                <div className="gradient"></div>
+                                <div className="gradient" style={{clipPath: `polygon(0% 0, ${plyr.experience.xp / plyr.experience.remainingXP}% 0%, ${plyr.experience.xp / plyr.experience.remainingXP}% 100%, 0 100%)`}}></div>
                             </div>
                         </div>
                     </div>
                 )
             })}
+            {/* <img className={`gridImage`} width={887.38} height={521.41} src={`https://github.com/strawhat19/Smasherscape/blob/main/assets/smasherscape/SmasherScapePlayerCard.png?raw=true`} alt={`Smasherscape Player Card`} />
             <img className={`gridImage`} width={887.38} height={521.41} src={`https://github.com/strawhat19/Smasherscape/blob/main/assets/smasherscape/SmasherScapePlayerCard.png?raw=true`} alt={`Smasherscape Player Card`} />
             <img className={`gridImage`} width={887.38} height={521.41} src={`https://github.com/strawhat19/Smasherscape/blob/main/assets/smasherscape/SmasherScapePlayerCard.png?raw=true`} alt={`Smasherscape Player Card`} />
-            <img className={`gridImage`} width={887.38} height={521.41} src={`https://github.com/strawhat19/Smasherscape/blob/main/assets/smasherscape/SmasherScapePlayerCard.png?raw=true`} alt={`Smasherscape Player Card`} />
-            <img className={`gridImage`} width={887.38} height={521.41} src={`https://github.com/strawhat19/Smasherscape/blob/main/assets/smasherscape/SmasherScapePlayerCard.png?raw=true`} alt={`Smasherscape Player Card`} />
+            <img className={`gridImage`} width={887.38} height={521.41} src={`https://github.com/strawhat19/Smasherscape/blob/main/assets/smasherscape/SmasherScapePlayerCard.png?raw=true`} alt={`Smasherscape Player Card`} /> */}
         </div>
     </>
 }

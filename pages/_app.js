@@ -311,61 +311,46 @@ export default function ProductIVF({ Component, pageProps, router }) {
       {
         id: 1,
         name: `Xuruko`,
-        email: ``,
-        twitch: ``,
-        discord: ``,
-        level: 1,
-        levelName: `Bronze Scimitar`,
-        wins: 0,
         plays: [],
-        deaths: [],
-        losses: 0,
-        record: [],
+        level: {
+          num: 1,
+          name: `Bronze Scimitar`
+        },
         experience: {
           xp: 0,
-          arenaXP: 200000000,
-          nextLevelAt: 200000000,
-          remainingXP: 200000000
+          arenaXP: 0,
+          nextLevelAt: 83,
+          remainingXP: 83
         },
       },
       {
         id: 2,
         name: `Kay`,
-        email: ``,
-        twitch: ``,
-        discord: ``,
-        level: 1,
-        levelName: `Bronze Scimitar`,
-        wins: 0,
         plays: [],
-        deaths: [],
-        losses: 0,
-        record: [],
+        level: {
+          num: 1,
+          name: `Bronze Scimitar`
+        },
         experience: {
           xp: 0,
-          arenaXP: 200000000,
-          nextLevelAt: 200000000,
-          remainingXP: 200000000
+          arenaXP: 0,
+          nextLevelAt: 83,
+          remainingXP: 83
         },
       },
       {
         id: 3,
         name: `Strawhat19`,
-        email: ``,
-        twitch: ``,
-        discord: ``,
-        level: 1,
-        levelName: `Bronze Scimitar`,
-        wins: 0,
         plays: [],
-        deaths: [],
-        losses: 0,
-        record: [],
+        level: {
+          num: 1,
+          name: `Bronze Scimitar`
+        },
         experience: {
           xp: 0,
-          arenaXP: 200000000,
-          nextLevelAt: 200000000,
-          remainingXP: 200000000
+          arenaXP: 0,
+          nextLevelAt: 83,
+          remainingXP: 83
         },
       },
     ]);
