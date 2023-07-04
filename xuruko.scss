@@ -72,7 +72,7 @@ li {
     padding: 15px 15px 50px;
     grid-template-columns: 1fr;
     justify-content: space-between;
-    @media (min-width: 1500px) {
+    @media (min-width: 1366px) {
         grid-template-columns: 1fr 1fr;
     }
     .gridImage {
@@ -255,7 +255,7 @@ li {
             font-size: 6em;
             font-family: "RuneScape Large";
             color: var(--smasherscapeBlue);
-            text-shadow: 3px 3px 0px var(--smasherscapePurple), 0px 0px 9px black;
+            text-shadow: 3px 3px 0px var(--smasherscapePurple), 0px 0px 8px rgba(0, 0, 0, 0.75), 0px 1px 8px rgba(0, 0, 0, 0.69);
         }
         h4 {
             font-size: 3.1em;
