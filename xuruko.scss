@@ -445,3 +445,13 @@ form {
 .noPlayersFound {
     font-size: 5em !important;
 }
+
+.playsContainer {
+    height: 100%;
+    grid-gap: 5px;
+    display: flex;
+    min-width: 115px;
+    padding-top: 10px;
+    align-items: center;
+    justify-content: space-between;
+}

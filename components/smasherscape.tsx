@@ -3,7 +3,7 @@ import { db } from '../firebase';
 import { FormEvent, useContext, useRef } from 'react';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { collection, doc, getDocs, setDoc } from 'firebase/firestore';
-import { defaultContent, formatDate, capitalizeAllWords, createXML, StateContext, showAlert } from '../pages/_app';
+import { defaultContent, formatDate, capitalizeAllWords, createXML, StateContext, showAlert, removeDuplicateObjectFromArray } from '../pages/_app';
 
 export default function Smasherscape(props) {
 
@@ -37,9 +37,128 @@ export default function Smasherscape(props) {
 
     const renderLevelPic = (levelName) => {
         if (levelName == `Bronze Scimitar`) {
-            return `https://github.com/strawhat19/Smasherscape/blob/main/assets/smasherscape/OSRS_Top_Hat.png?raw=true`;
-        } else {
-            return `https://github.com/strawhat19/Smasherscape/blob/main/assets/smasherscape/OSRS_Top_Hat.png?raw=true`;
+            return `https://github.com/strawhat19/Smasherscape/blob/main/assets/smasherscape/Bronze_Scimmy.png?raw=true`;
+        } else if (levelName == `Iron Scimitar`) {
+            return `https://github.com/strawhat19/Smasherscape/blob/main/assets/smasherscape/Iron_Scimmy.png?raw=true`;
+        } else if (levelName == `Steel Scimitar`) {
+            return `https://github.com/strawhat19/Smasherscape/blob/main/assets/smasherscape/Steel_Scimmy.png?raw=true`;
+        }
+    }
+
+    const getUniquePlays = (plyr) => {
+        let charsPlayed = plyr.plays.map(ply => ply.character);
+        let counts = charsPlayed.reduce((acc, char) => {
+            acc[char] = (acc[char] || 0) + 1;
+            return acc;
+        }, {});
+        let sortedChars = Object.entries(counts).sort((a: any, b: any) => b[1] - a[1]).map(entry => entry[0].toLowerCase());
+        return sortedChars.slice(0,3);
+    }
+    
+
+    const renderCharPic = (char, pic) => {
+        if (char == `fox`) {
+            if (pic) {
+                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Fox.webp`;
+            } else {
+                return `Fox`;
+            }
+        } else if (char == `falco`) {
+            if (pic) {
+                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Falco.webp`;
+            } else {
+                return `Falco`;
+            }
+        } else if (char == `bowser`) {
+            if (pic) {
+                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Bowser.webp`;
+            } else {
+                return `Bowser`;
+            }
+        } else if (char == `littlemac` || char == `lm`) {
+            if (pic) {
+                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/LittleMac.webp`;
+            } else {
+                return `Little Mac`;
+            }
+        } else if (char == `bayonetta`) {
+            if (pic) {
+                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Bayonetta.webp`;
+            } else {
+                return `Bayonetta`;
+            }
+        } else if (char == `roy`) {
+            if (pic) {
+                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Roy.webp`;
+            } else {
+                return `Roy`;
+            }
+        } else if (char == `captainfalcon` || char == `cf`) {
+            if (pic) {
+                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/CaptainFalcon.webp`;
+            } else {
+                return `CaptainFalcon`;
+            }
+        } else if (char == `sora`) {
+            if (pic) {
+                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Sora.webp`;
+            } else {
+                return `Sora`;
+            }
+        } else if (char == `link`) {
+            if (pic) {
+                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Link.webp`;
+            } else {
+                return `Link`;
+            }
+        } else if (char == `donkeykong` ||char == `dk`) {
+            if (pic) {
+                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/DonkeyKong.webp`;
+            } else {
+                return `Donkey Kong`;
+            }
+        } else if (char == `ryu`) {
+            if (pic) {
+                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Ryu.webp`;
+            } else {
+                return `Ryu`;
+            }
+        } else if (char == `mario`) {
+            if (pic) {
+                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Mario.webp`;
+            } else {
+                return `Mario`;
+            }
+        } else if (char == `lucario`) {
+            if (pic) {
+                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Lucario.webp`;
+            } else {
+                return `Lucario`;
+            }
+        } else if (char == `minmin` || char == `mm`) {
+            if (pic) {
+                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/MinMin.webp`;
+            } else {
+                return `MinMin`;
+            }
+        } else if (char == `joker`) {
+            if (pic) {
+                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Joker.webp`;
+            } else {
+                return `Joker`;
+            }
+        } else if (char == `corrin`) {
+            if (pic) {
+                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Corrin.webp`;
+            } else {
+                return `Corrin`;
+            }
+        } else if (char == `cloud`) {
+            if (pic) {
+                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Cloud.webp`;
+            } else {
+                return `Cloud`;
+            }
         }
     }
 
@@ -80,6 +199,7 @@ export default function Smasherscape(props) {
             plyr.experience.remainingXP = (1154 - xp);
         } else if (xp >= 1154 && xp < 1358) {
             plyr.level.num = 10;
+            plyr.level.name = `Iron Scimitar`;
             plyr.experience.nextLevelAt = 1358;
             plyr.experience.remainingXP = (1358 - xp);
         }
@@ -192,11 +312,9 @@ export default function Smasherscape(props) {
                                     <div className="plays">
                                         <h3>Plays</h3>
                                         <div className={`playsContainer`}>
-                                            {plyr.plays.map(ply => ply.character).map((char, charIndex) => {
+                                            {getUniquePlays(plyr).map((char, charIndex) => {
                                                 return (
-                                                    <div key={charIndex} className={`charImg`}>
-                                                        {char}
-                                                    </div>
+                                                    <img key={charIndex} className={`charImg`} width={35} src={renderCharPic(char, true)} alt={renderCharPic(char, false)} title={renderCharPic(char, false)} />
                                                 )
                                             })}
                                         </div>
