@@ -4,6 +4,7 @@
     --smasherscapeBrown: #473d32;
     --smasherscapeBlue: #45bde9;
     --smasherscapeBronze: #d9bf1a;
+    --smasherscapeIron: #b1acab;
     --smasherscapeBronze2: #f6cc00;
     --smasherscapeCream: #f5f581;
     --smasherscapePurple: #7b4e9b;
@@ -156,8 +157,14 @@ li {
                         font-size: 2.5em;
                         text-shadow: none;
                         letter-spacing: 3px;
+                        transition: 300ms ease-in-out;
                         font-family: "RuneScape Large";
-                        color: var(--smasherscapeBronze);
+                        &.Bronze {
+                            color: var(--smasherscapeBronze);
+                        }
+                        &.Iron {
+                            color: var(--smasherscapeIron);
+                        }
                         @media (max-width: 1800px) {
                             font-size: 2.3em;
                         }

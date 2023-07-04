@@ -266,7 +266,6 @@ export default function Smasherscape(props) {
                             }
                         });
 
-                        console.log(`Updated Players`, updatedPlayers);
                         setPlayers(updatedPlayers);
                     }
                 }
@@ -302,7 +301,7 @@ export default function Smasherscape(props) {
                             <div className="cardMiddleRow">
                                 <div className="imgLeftCol">
                                     <img width={150} src={renderLevelPic(plyr?.level?.name)} alt={plyr?.level?.name} />
-                                    <h4 className={`levelName`}>{plyr?.level?.name}</h4>
+                                    <h4 className={`levelName ${plyr?.level?.name.split(` `)[0]}`}>{plyr?.level?.name}</h4>
                                 </div>
                                 <div className="recordPlays">
                                     <div className="record">
