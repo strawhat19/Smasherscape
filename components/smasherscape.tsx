@@ -63,13 +63,13 @@ export default function Smasherscape(props) {
             } else {
                 return `Fox`;
             }
-        } else if (char == `falco`) {
+        } else if (char == `falco` || char == `fa`) {
             if (pic) {
                 return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Falco.webp`;
             } else {
                 return `Falco`;
             }
-        } else if (char == `bowser`) {
+        } else if (char == `bowser` || char == `bow`) {
             if (pic) {
                 return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Bowser.webp`;
             } else {
@@ -81,7 +81,7 @@ export default function Smasherscape(props) {
             } else {
                 return `Little Mac`;
             }
-        } else if (char == `bayonetta`) {
+        } else if (char == `bayonetta` || char == `bayo`) {
             if (pic) {
                 return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Bayonetta.webp`;
             } else {
@@ -129,17 +129,41 @@ export default function Smasherscape(props) {
             } else {
                 return `Mario`;
             }
-        } else if (char == `lucario`) {
+        } else if (char == `lucario` || char == `luc`) {
             if (pic) {
                 return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Lucario.webp`;
             } else {
                 return `Lucario`;
             }
-        } else if (char == `minmin` || char == `mm`) {
+        } else if (char == `minmin` || char == `min`) {
             if (pic) {
                 return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/MinMin.webp`;
             } else {
                 return `MinMin`;
+            }
+        } else if (char == `megaman` || char == `mm` || char == `mega`) {
+            if (pic) {
+                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/MegaMan.webp`;
+            } else {
+                return `Mega Man`;
+            }
+        } else if (char == `pt` || char == `pokemontrainer`) {
+            if (pic) {
+                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/PokemonTrainer.webp`;
+            } else {
+                return `Pokemon Trainer`;
+            }
+        } else if (char == `aegis` || char == `pyra` || char == `mythra`) {
+            if (pic) {
+                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/PyraMythraAegis.webp`;
+            } else {
+                return `Aegis`;
+            }
+        } else if (char == `mt` || char == `mewtwo` || char == `m2`) {
+            if (pic) {
+                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Mewtwo.webp`;
+            } else {
+                return `Mewtwo`;
             }
         } else if (char == `joker`) {
             if (pic) {
@@ -153,11 +177,53 @@ export default function Smasherscape(props) {
             } else {
                 return `Corrin`;
             }
-        } else if (char == `cloud`) {
+        } else if (char == `cloud` || char == `cl`) {
             if (pic) {
                 return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Cloud.webp`;
             } else {
                 return `Cloud`;
+            }
+        } else if (char == `lucas`) {
+            if (pic) {
+                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Lucas.webp`;
+            } else {
+                return `Lucas`;
+            }
+        } else if (char == `lucina`) {
+            if (pic) {
+                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Lucina.webp`;
+            } else {
+                return `Lucina`;
+            }
+        } else if (char == `metaknight` || char == `meta` || char == `mk`) {
+            if (pic) {
+                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/MetaKnight.webp`;
+            } else {
+                return `Meta Knight`;
+            }
+        } else if (char == `palutena` || char == `palu`) {
+            if (pic) {
+                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Palutena.webp`;
+            } else {
+                return `Palutena`;
+            }
+        } else if (char == `peach` || char == `pe`) {
+            if (pic) {
+                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Peach.webp`;
+            } else {
+                return `Peach`;
+            }
+        } else if (char == `gnw` || char == `mrgame&watch` || char == `game&watch` || char == `mrgameandwatch` || char == `gameandwatch`) {
+            if (pic) {
+                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/MrGame&Watch.webp`;
+            } else {
+                return `Mr. Game & Watch`;
+            }
+        } else if (char == `luigi` || `lg`) {
+            if (pic) {
+                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Luigi.webp`;
+            } else {
+                return `Luigi`;
             }
         }
     }
@@ -202,6 +268,51 @@ export default function Smasherscape(props) {
             plyr.level.name = `Iron Scimitar`;
             plyr.experience.nextLevelAt = 1358;
             plyr.experience.remainingXP = (1358 - xp);
+        } else if (xp >= 1358 && xp < 1584) {
+            plyr.level.num = 11;
+            plyr.level.name = `Iron Scimitar`;
+            plyr.experience.nextLevelAt = 1584;
+            plyr.experience.remainingXP = (1584 - xp);
+        } else if (xp >= 1584 && xp < 1833) {
+            plyr.level.num = 12;
+            plyr.level.name = `Iron Scimitar`;
+            plyr.experience.nextLevelAt = 1833;
+            plyr.experience.remainingXP = (1833 - xp);
+        } else if (xp >= 1833 && xp < 2107) {
+            plyr.level.num = 13;
+            plyr.level.name = `Iron Scimitar`;
+            plyr.experience.nextLevelAt = 2107;
+            plyr.experience.remainingXP = (2107 - xp);
+        } else if (xp >= 2107 && xp < 2411) {
+            plyr.level.num = 14;
+            plyr.level.name = `Iron Scimitar`;
+            plyr.experience.nextLevelAt = 2411;
+            plyr.experience.remainingXP = (2411 - xp);
+        } else if (xp >= 2411 && xp < 2746) {
+            plyr.level.num = 15;
+            plyr.level.name = `Steel Scimitar`;
+            plyr.experience.nextLevelAt = 2746;
+            plyr.experience.remainingXP = (2746 - xp);
+        } else if (xp >= 2746 && xp < 3115) {
+            plyr.level.num = 16;
+            plyr.level.name = `Steel Scimitar`;
+            plyr.experience.nextLevelAt = 3115;
+            plyr.experience.remainingXP = (3115 - xp);
+        } else if (xp >= 3115 && xp < 3523) {
+            plyr.level.num = 17;
+            plyr.level.name = `Steel Scimitar`;
+            plyr.experience.nextLevelAt = 3523;
+            plyr.experience.remainingXP = (3523 - xp);
+        } else if (xp >= 3523 && xp < 3973) {
+            plyr.level.num = 18;
+            plyr.level.name = `Steel Scimitar`;
+            plyr.experience.nextLevelAt = 3973;
+            plyr.experience.remainingXP = (3973 - xp);
+        } else if (xp >= 3973 && xp < 4470) {
+            plyr.level.num = 19;
+            plyr.level.name = `Steel Scimitar`;
+            plyr.experience.nextLevelAt = 4470;
+            plyr.experience.remainingXP = (4470 - xp);
         }
 
         return plyr;
@@ -215,7 +326,7 @@ export default function Smasherscape(props) {
             let commandParams = command.split(` `);
             
             if (command != ``) {
-                if (commandParams[0] == `!upd`) {
+                if (commandParams[0].includes(`!upd`)) {
                     let playerOne = commandParams[1];
                     let playerTwo = commandParams[3];
                     let characterOne = commandParams[5];
@@ -285,7 +396,13 @@ export default function Smasherscape(props) {
             {filteredPlayers.length == 0 && <>
                 <div className="gridCard"><h1 className={`runescape_large noPlayersFound`}>No Players Found</h1></div>
             </>}
-            {filteredPlayers.length > 0 && filteredPlayers.sort((a,b) => b.experience.arenaXP - a.experience.arenaXP).map((plyr, plyrIndex) => {
+            {filteredPlayers.length > 0 && filteredPlayers.sort((a,b) => {
+                if (b.experience.arenaXP !== a.experience.arenaXP) {
+                    return b.experience.arenaXP - a.experience.arenaXP;
+                }
+            
+                return b.plays.length - a.plays.length;
+            }).map((plyr, plyrIndex) => {
                 return (
                     <div className="gridCard" key={plyrIndex}>
                         <LazyLoadImage effect="blur" src={`https://github.com/strawhat19/Smasherscape/blob/main/assets/smasherscape/OSRS_Card_Empty.png?raw=true`} className={`cardBG`} alt={`Smasherscape Player Card`} />
