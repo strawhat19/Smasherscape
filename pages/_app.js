@@ -316,10 +316,10 @@ export default function ProductIVF({ Component, pageProps, router }) {
         discord: ``,
         level: 1,
         levelName: `Bronze Scimitar`,
-        wins: [],
+        wins: 0,
         plays: [],
         deaths: [],
-        losses: [],
+        losses: 0,
         record: [],
         experience: {
           xp: 0,
@@ -336,10 +336,10 @@ export default function ProductIVF({ Component, pageProps, router }) {
         discord: ``,
         level: 1,
         levelName: `Bronze Scimitar`,
-        wins: [],
+        wins: 0,
         plays: [],
         deaths: [],
-        losses: [],
+        losses: 0,
         record: [],
         experience: {
           xp: 0,
@@ -350,16 +350,16 @@ export default function ProductIVF({ Component, pageProps, router }) {
       },
       {
         id: 3,
-        name: `Ricky`,
+        name: `Strawhat19`,
         email: ``,
         twitch: ``,
         discord: ``,
         level: 1,
         levelName: `Bronze Scimitar`,
-        wins: [],
+        wins: 0,
         plays: [],
         deaths: [],
-        losses: [],
+        losses: 0,
         record: [],
         experience: {
           xp: 0,
@@ -369,6 +369,8 @@ export default function ProductIVF({ Component, pageProps, router }) {
         },
       },
     ]);
+
+    let [filteredPlayers, setFilteredPlayers] = useState(players);
 
     useEffect(() => {
       setLoading(true);
@@ -388,6 +390,8 @@ export default function ProductIVF({ Component, pageProps, router }) {
       setOnMac(navigator.platform.includes(`Mac`));
       setPage(window.location.pathname.replace(`/`,``));
       setMobile((typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1));
+
+      dev() && console.log(`Players`, players);
 
       let toc = document.querySelector(`.nextra-toc`);
       let tocMinimized = JSON.parse(localStorage.getItem(`tocMinimized`));
@@ -431,7 +435,7 @@ export default function ProductIVF({ Component, pageProps, router }) {
       }
     }, [rte, user, users, authState, dark])
 
-    return <StateContext.Provider value={{ router, rte, setRte, updates, setUpdates, content, setContent, width, setWidth, user, setUser, page, setPage, mobileMenu, setMobileMenu, users, setUsers, authState, setAuthState, emailField, setEmailField, devEnv, setDevEnv, mobileMenuBreakPoint, platform, setPlatform, focus, setFocus, highScore, setHighScore, color, setColor, dark, setDark, colorPref, setColorPref, qotd, setQotd, alertOpen, setAlertOpen, mobile, setMobile, systemStatus, setSystemStatus, loading, setLoading, anim, setAnimComplete, IDs, setIDs, categories, setCategories, browser, setBrowser, onMac, rearranging, setRearranging, buttonText, setButtonText, gameFormStep, setGameFormStep, players, setPlayers }}>
+    return <StateContext.Provider value={{ router, rte, setRte, updates, setUpdates, content, setContent, width, setWidth, user, setUser, page, setPage, mobileMenu, setMobileMenu, users, setUsers, authState, setAuthState, emailField, setEmailField, devEnv, setDevEnv, mobileMenuBreakPoint, platform, setPlatform, focus, setFocus, highScore, setHighScore, color, setColor, dark, setDark, colorPref, setColorPref, qotd, setQotd, alertOpen, setAlertOpen, mobile, setMobile, systemStatus, setSystemStatus, loading, setLoading, anim, setAnimComplete, IDs, setIDs, categories, setCategories, browser, setBrowser, onMac, rearranging, setRearranging, buttonText, setButtonText, gameFormStep, setGameFormStep, players, setPlayers, filteredPlayers, setFilteredPlayers }}>
       {(browser != `chrome` || onMac) ? <AnimatePresence mode={`wait`}>
         <motion.div className={`${rte} pageWrapContainer ${page.toUpperCase()}`} key={router.route} initial="pageInitial" animate="pageAnimate" exit="pageExit" transition={{ duration: 0.35 }} variants={{
           pageInitial: {

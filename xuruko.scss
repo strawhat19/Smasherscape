@@ -60,6 +60,11 @@ li {
     font-family: "RuneScape Chat" !important;
 }
 
+.runescape_large {
+    font-size: 2em;
+    font-family: "RuneScape Large" !important;
+}
+
 .runescape_chat_bold {
     font-size: 2em;
     font-family: "RuneScape Chat Bold" !important;
@@ -73,7 +78,9 @@ li {
     grid-template-columns: 1fr;
     justify-content: space-between;
     @media (min-width: 1366px) {
-        grid-template-columns: 1fr 1fr;
+        &.populated {
+            grid-template-columns: 1fr 1fr;
+        }
     }
     .gridImage {
         width: 100%;
@@ -340,4 +347,31 @@ input[type="search"] {
     font-size: 24px;
     color: #9146FF;
     position: relative;
+}
+
+form {
+    gap: 35px;
+    width: 100%;
+    display: grid;
+    margin: 15px auto;
+    align-items: center;
+    justify-content: center;
+    grid-template-columns: 1fr 1fr;
+    input {
+        font-size: 18px;
+        border-radius: 8px;
+        color: black !important;
+        background: white !important;
+        &[type="search"] {
+            color: black !important;
+            background: white !important;
+        }
+        &::placeholder {
+            color: black;
+        }
+    }
+}
+
+.noPlayersFound {
+    font-size: 5em !important;
 }

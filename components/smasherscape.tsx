@@ -1,27 +1,51 @@
 import { db } from '../firebase';
+import { FormEvent, useContext } from 'react';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
-import { useContext, useEffect, useRef, useState } from 'react';
 import { collection, doc, getDocs, setDoc } from 'firebase/firestore';
 import { defaultContent, formatDate, capitalizeAllWords, createXML, StateContext, showAlert } from '../pages/_app';
 
 export default function Smasherscape(props) {
 
-    const prevPlayersRef = useRef();
-    const loadedRef = useRef(false);
-    const [loaded, setLoaded] = useState(false);
-    const { players, setPlayers } = useContext<any>(StateContext);
+    const { players, setPlayers, filteredPlayers, setFilteredPlayers } = useContext<any>(StateContext);
 
-    useEffect(() => {
-        if (loadedRef.current) return;
-        loadedRef.current = true;
-        setLoaded(true);
-    
-        console.log(`Players`, players);
-    }, [players])    
+    const formInput = (e: FormEvent) => {
+        let field = e.target as HTMLInputElement;
+        if (field.name == `search`) {
+            if (field.value != ``) {
+                setFilteredPlayers(players.filter(plyr => {
+                    return Object.values(plyr).some(val =>
+                        typeof val === "string" && val.toLowerCase().includes(field.value.toLowerCase())
+                    );
+                }));
+            } else {
+                setFilteredPlayers(players);
+            }
+        } else {
+            return;
+        }
+    }
+
+    const formSubmit = (e: FormEvent) => {
+        e.preventDefault();
+        // let field = e.target as HTMLInputElement;
+        // if (field.name == `commands`) {
+            console.log(`Form Submit`, e);
+        // } else {
+            // return;
+        // }
+    }
 
     return <>
-        <div id={props.id} className={`${props.className} playerGrid`}>
-            {players.length > 0 && players.map((plyr, plyrIndex) => {
+        <form onInput={(e) => formInput(e)} onSubmit={(e) => formSubmit(e)} action="submit" className="gridForm">
+            <input type="search" className="search" name={`search`} placeholder={`Search...`} />
+            <input type="text" className="commands" name={`commands`} placeholder={`Commands...`} />
+            <button style={{display: `none`}} type={`submit`}>Submit</button>
+        </form>
+        <div id={props.id} className={`${props.className} playerGrid ${filteredPlayers.length == 0 ? `empty` : `populated`}`}>
+            {filteredPlayers.length == 0 && <>
+                <div className="gridCard"><h1 className={`runescape_large noPlayersFound`}>No Players Found</h1></div>
+            </>}
+            {filteredPlayers.length > 0 && filteredPlayers.map((plyr, plyrIndex) => {
                 return (
                     <div className="gridCard" key={plyrIndex}>
                         <LazyLoadImage effect="blur" src={`https://github.com/strawhat19/Smasherscape/blob/main/assets/smasherscape/OSRS_Card_Empty.png?raw=true`} className={`cardBG`} alt={`Smasherscape Player Card`} />
@@ -42,11 +66,11 @@ export default function Smasherscape(props) {
                                 <div className="recordPlays">
                                     <div className="record">
                                         <h3>Record</h3>
-                                        <h4>0 - 0</h4>
+                                        <h4>{plyr?.wins} - {plyr?.losses}</h4>
                                     </div>
                                     <div className="plays">
-                                        <h3>Plays</h3>
-                                        <h4>0 - 0</h4>
+                                        <h3>Exp</h3>
+                                        <h4>{plyr?.experience?.xp}</h4>
                                     </div>
                                 </div>
                                 <div className="rightCol">
