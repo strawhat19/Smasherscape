@@ -458,7 +458,43 @@ form {
     grid-gap: 5px;
     display: flex;
     min-width: 115px;
-    padding-top: 10px;
+    padding-top: 20px;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
+}
+
+.formSubmitButton {
+    color: black;
+    width: 100%;
+    padding: 15px;
+    font-size: 18px;
+    border-radius: 8px;
+    background: linear-gradient(90deg, var(--smasherscapeGreen), var(--smasherscapeBlue)) !important;
+}
+
+@media (min-width: 768px) {
+    .formSubmitButton {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    form {
+        display: flex !important;
+        grid-gap: 25px !important;
+        margin: 1em auto !important;
+        flex-direction: column !important;
+    }
+}
+
+@media (max-width: 525px) {
+    .cardTopRow {
+        justify-content: center !important;
+        .logoWithWords {
+            display: none !important;
+        }
+    }
+    .borderSep {
+        top: 0;
+    }
 }
