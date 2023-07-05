@@ -480,18 +480,48 @@ form {
 
 @media (max-width: 768px) {
     form {
-        display: flex !important;
-        grid-gap: 25px !important;
-        margin: 1em auto !important;
-        flex-direction: column !important;
+        display: none;
+        // display: flex !important;
+        // grid-gap: 25px !important;
+        // margin: 1em auto !important;
+        // flex-direction: column !important;
     }
 }
 
 @media (max-width: 525px) {
     .cardTopRow {
+        margin: 75px auto -10px !important;
         justify-content: center !important;
+        h2 {
+            align-items: center;
+            width: 100% !important;
+            justify-content: center;
+        }
         .logoWithWords {
             display: none !important;
+        }
+    }
+    .cardMiddleRow {
+        grid-gap: 30px;
+        flex-direction: column;
+        img {
+            padding: 1em 0 0 0 !important;
+        }
+        h4 {
+            padding: 0 !important;
+        }
+        .recordPlays {
+            top: 15px !important;
+        }
+        .level {
+            top: 20px;
+            max-width: 100px !important;
+            .borderSep {
+                top: 25px !important;
+                left: -10% !important;
+                height: 4px !important;
+                width: 110px !important;
+            }
         }
     }
     .borderSep {

@@ -1,14 +1,15 @@
 import  moment from 'moment';
 import { db } from '../firebase';
 import { Badge } from '@mui/material';
-import { FormEvent, useContext, useRef } from 'react';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
+import { FormEvent, useContext, useRef, useState } from 'react';
 import { collection, doc, getDocs, setDoc } from 'firebase/firestore';
 import { defaultContent, formatDate, capitalizeAllWords, createXML, StateContext, showAlert, removeDuplicateObjectFromArray } from '../pages/_app';
 
 export default function Smasherscape(props) {
 
     const commandsInput = useRef();
+    const [publicAssetLink, setPublicAssetLink] = useState(`https://github.com/strawhat19/Smasherscape/blob/main`);
     const { players, setPlayers, filteredPlayers, setFilteredPlayers } = useContext<any>(StateContext);
 
     const searchPlayers = (e: FormEvent) => {
@@ -53,17 +54,17 @@ export default function Smasherscape(props) {
 
     const calcPlayerLevelImage = (levelName) => {
         if (levelName == `Bronze Scimitar`) {
-            return `https://github.com/strawhat19/Smasherscape/blob/main/assets/smasherscape/Bronze_Scimmy.png?raw=true`;
+            return `${publicAssetLink}/assets/smasherscape/Bronze_Scimmy.png?raw=true`;
         } else if (levelName == `Iron Scimitar`) {
-            return `https://github.com/strawhat19/Smasherscape/blob/main/assets/smasherscape/Iron_Scimmy.png?raw=true`;
+            return `${publicAssetLink}/assets/smasherscape/Iron_Scimmy.png?raw=true`;
         } else if (levelName == `Steel Scimitar`) {
-            return `https://github.com/strawhat19/Smasherscape/blob/main/assets/smasherscape/Steel_Scimmy.png?raw=true`;
+            return `${publicAssetLink}/assets/smasherscape/Steel_Scimmy.png?raw=true`;
         } else if (levelName == `Mithril Scimitar`) {
-            return `https://github.com/strawhat19/Smasherscape/blob/main/assets/smasherscape/Mithril_Scimmy.png?raw=true`;
+            return `${publicAssetLink}/assets/smasherscape/Mithril_Scimmy.png?raw=true`;
         } else if (levelName == `Adamantite Scimitar`) {
-            return `https://github.com/strawhat19/Smasherscape/blob/main/assets/smasherscape/Adamant_Scimmy.png?raw=true`;
+            return `${publicAssetLink}/assets/smasherscape/Adamant_Scimmy.png?raw=true`;
         } else if (levelName == `Rune Scimitar`) {
-            return `https://github.com/strawhat19/Smasherscape/blob/main/assets/smasherscape/Rune_Scimmy.png?raw=true`;
+            return `${publicAssetLink}/assets/smasherscape/Rune_Scimmy.png?raw=true`;
         }
     }
 
@@ -308,363 +309,364 @@ export default function Smasherscape(props) {
     }
 
     const calcPlayerCharacterIcon = (char, pic) => {
+        let publicAssetImageLink = `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters`;
         if (char == `aegis` || char == `pyra` || char == `mythra`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/PyraMythraAegis.webp`;
+                return `${publicAssetImageLink}/PyraMythraAegis.webp`;
             } else {
                 return `Aegis`;
             }
         } else if (char == `banjoandkazooie` || char == `banjo&kazooie` || char == `banjo` || char == `bk` || char == `bandk` || char == `b&k`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Banjo&Kazooie.webp`;
+                return `${publicAssetImageLink}/Banjo&Kazooie.webp`;
             } else {
                 return `Banjo & Kazooie`;
             }
         } else if (char == `bayonetta` || char == `bayo`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Bayonetta.webp`;
+                return `${publicAssetImageLink}/Bayonetta.webp`;
             } else {
                 return `Bayonetta`;
             }
         } else if (char == `bowser` || char == `bow`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Bowser.webp`;
+                return `${publicAssetImageLink}/Bowser.webp`;
             } else {
                 return `Bowser`;
             }
         } else if (char == `bowserjr` || char == `bj`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/BowserJr.webp`;
+                return `${publicAssetImageLink}/BowserJr.webp`;
             } else {
                 return `Bowser Jr`;
             }
         } else if (char == `byleth` || char == `by`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Byleth.webp`;
+                return `${publicAssetImageLink}/Byleth.webp`;
             } else {
                 return `Byleth`;
             }
         } else if (char == `captainfalcon` || char == `cf` || char == `falcon`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/CaptainFalcon.webp`;
+                return `${publicAssetImageLink}/CaptainFalcon.webp`;
             } else {
                 return `Captain Falcon`;
             }
         } else if (char == `charizard` || char == `char`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Charizard.webp`;
+                return `${publicAssetImageLink}/Charizard.webp`;
             } else {
                 return `Charizard`;
             }
         } else if (char == `chrom` || char == `ch`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Chrom.webp`;
+                return `${publicAssetImageLink}/Chrom.webp`;
             } else {
                 return `Chrom`;
             }
         } else if (char == `cloud` || char == `cl`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Cloud.webp`;
+                return `${publicAssetImageLink}/Cloud.webp`;
             } else {
                 return `Cloud`;
             }
         } else if (char == `corrin` || char == `co`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Corrin.webp`;
+                return `${publicAssetImageLink}/Corrin.webp`;
             } else {
                 return `Corrin`;
             }
         } else if (char == `daisy` || char == `da`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Daisy.webp`;
+                return `${publicAssetImageLink}/Daisy.webp`;
             } else {
                 return `Daisy`;
             }
         } else if (char == `darkpit` || char == `dp`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/DarkPit.webp`;
+                return `${publicAssetImageLink}/DarkPit.webp`;
             } else {
                 return `Dark Pit`;
             }
         } else if (char == `darksamus` || char == `ds`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/DarkSamus.webp`;
+                return `${publicAssetImageLink}/DarkSamus.webp`;
             } else {
                 return `Dark Samus`;
             }
         } else if (char == `diddykong` || char == `diddy`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/DiddyKong.webp`;
+                return `${publicAssetImageLink}/DiddyKong.webp`;
             } else {
                 return `Diddy Kong`;
             }
         } else if (char == `donkeykong` || char == `dk`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/DonkeyKong.webp`;
+                return `${publicAssetImageLink}/DonkeyKong.webp`;
             } else {
                 return `Donkey Kong`;
             }
         } else if (char == `drmario` || char == `doc` || char == `dm`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/DrMario.webp`;
+                return `${publicAssetImageLink}/DrMario.webp`;
             } else {
                 return `Dr Mario`;
             }
         } else if (char == `duckhunt` || char == `dh`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/DuckHunt.webp`;
+                return `${publicAssetImageLink}/DuckHunt.webp`;
             } else {
                 return `Duck Hunt`;
             }
         } else if (char == `falco` || char == `fa`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Falco.webp`;
+                return `${publicAssetImageLink}/Falco.webp`;
             } else {
                 return `Falco`;
             }
         } else if (char == `fox`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Fox.webp`;
+                return `${publicAssetImageLink}/Fox.webp`;
             } else {
                 return `Fox`;
             }
         } else if (char == `ganondorf` || char == `ganon` || char == `gd` || char == `gnn`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Ganondorf.webp`;
+                return `${publicAssetImageLink}/Ganondorf.webp`;
             } else {
                 return `Ganondorf`;
             }
         } else if (char == `greninja` || char == `gren` || char == `grenin`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Greninja.webp`;
+                return `${publicAssetImageLink}/Greninja.webp`;
             } else {
                 return `Greninja`;
             }
         } else if (char == `hero` || char == `he` || char == `hr`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Hero.webp`;
+                return `${publicAssetImageLink}/Hero.webp`;
             } else {
                 return `Hero`;
             }
         } else if (char == `iceclimbers` || char == `icies` || char == `ics` || char == `ic`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/IceClimbers.webp`;
+                return `${publicAssetImageLink}/IceClimbers.webp`;
             } else {
                 return `Ice Climbers`;
             }
         } else if (char == `ike`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Ike.webp`;
+                return `${publicAssetImageLink}/Ike.webp`;
             } else {
                 return `Ike`;
             }
         } else if (char == `incineroar` || char == `incin` || char == `inc`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Incineroar.webp`;
+                return `${publicAssetImageLink}/Incineroar.webp`;
             } else {
                 return `Incineroar`;
             }
         } else if (char == `inkling` || char == `inkl` || char == `ink`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Inkling.webp`;
+                return `${publicAssetImageLink}/Inkling.webp`;
             } else {
                 return `Inkling`;
             }
         } else if (char == `isabelle` || char == `isbl` || char == `isa`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Isabelle.webp`;
+                return `${publicAssetImageLink}/Isabelle.webp`;
             } else {
                 return `Isabelle`;
             }
         } else if (char == `ivysaur` || char == `ivys` || char == `ivy`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Ivysaur.webp`;
+                return `${publicAssetImageLink}/Ivysaur.webp`;
             } else {
                 return `Ivysaur`;
             }
         } else if (char == `jigglypuff` || char == `jiggly` || char == `jiggs` || char == `jp`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Jigglypuff.webp`;
+                return `${publicAssetImageLink}/Jigglypuff.webp`;
             } else {
                 return `Jigglypuff`;
             }
         } else if (char == `joker`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Joker.webp`;
+                return `${publicAssetImageLink}/Joker.webp`;
             } else {
                 return `Joker`;
             }
         } else if (char == `kazuya` || char == `kaz` || char == `kz`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Kazuya.webp`;
+                return `${publicAssetImageLink}/Kazuya.webp`;
             } else {
                 return `Kazuya`;
             }
         } else if (char == `ken` || char == `kn`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Ken.webp`;
+                return `${publicAssetImageLink}/Ken.webp`;
             } else {
                 return `Ken`;
             }
         }  else if (char == `kingdedede` || char == `ddd` || char == `kd`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/KingDedede.webp`;
+                return `${publicAssetImageLink}/KingDedede.webp`;
             } else {
                 return `King Dedede`;
             }
         }  else if (char == `kingkrool` || char == `krool` || char == `rool` || char == `kkr`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/KingKRool.webp`;
+                return `${publicAssetImageLink}/KingKRool.webp`;
             } else {
                 return `King K Rool`;
             }
         } else if (char == `kirby` || char == `krb`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Kirby.webp`;
+                return `${publicAssetImageLink}/Kirby.webp`;
             } else {
                 return `Kirby`;
             }
         } else if (char == `link` || char == `lnk`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Link.webp`;
+                return `${publicAssetImageLink}/Link.webp`;
             } else {
                 return `Link`;
             }
         } else if (char == `littlemac` || char == `lm`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/LittleMac.webp`;
+                return `${publicAssetImageLink}/LittleMac.webp`;
             } else {
                 return `Little Mac`;
             }
         } else if (char == `lucario` || char == `luc`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Lucario.webp`;
+                return `${publicAssetImageLink}/Lucario.webp`;
             } else {
                 return `Lucario`;
             }
         } else if (char == `lucas`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Lucas.webp`;
+                return `${publicAssetImageLink}/Lucas.webp`;
             } else {
                 return `Lucas`;
             }
         } else if (char == `lucina`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Lucina.webp`;
+                return `${publicAssetImageLink}/Lucina.webp`;
             } else {
                 return `Lucina`;
             }
         } else if (char == `luigi` || char == `lg`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Luigi.webp`;
+                return `${publicAssetImageLink}/Luigi.webp`;
             } else {
                 return `Luigi`;
             }
         } else if (char == `mario`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Mario.webp`;
+                return `${publicAssetImageLink}/Mario.webp`;
             } else {
                 return `Mario`;
             }
         } else if (char == `marth`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Marth.webp`;
+                return `${publicAssetImageLink}/Marth.webp`;
             } else {
                 return `Marth`;
             }
         } else if (char == `megaman` || char == `mm` || char == `mega`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/MegaMan.webp`;
+                return `${publicAssetImageLink}/MegaMan.webp`;
             } else {
                 return `Mega Man`;
             }
         } else if (char == `metaknight` || char == `meta` || char == `mk`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/MetaKnight.webp`;
+                return `${publicAssetImageLink}/MetaKnight.webp`;
             } else {
                 return `Meta Knight`;
             }
         } else if (char == `mt` || char == `mewtwo` || char == `m2`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Mewtwo.webp`;
+                return `${publicAssetImageLink}/Mewtwo.webp`;
             } else {
                 return `Mewtwo`;
             }
         } else if (char == `miibrawler` || char == `brawler` || char == `mb`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/MiiBrawler.webp`;
+                return `${publicAssetImageLink}/MiiBrawler.webp`;
             } else {
                 return `Mii Brawler`;
             }
         } else if (char == `miifighter` || char == `fighter` || char == `mf`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/MiiFighter.webp`;
+                return `${publicAssetImageLink}/MiiFighter.webp`;
             } else {
                 return `Mii Fighter`;
             }
         } else if (char == `miigunner` || char == `gunner` || char == `mg`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/MiiGunner.webp`;
+                return `${publicAssetImageLink}/MiiGunner.webp`;
             } else {
                 return `Mii Gunner`;
             }
         } else if (char == `miiswordfighter` || char == `swordfighter` || char == `ms`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/MiiSwordFighter.webp`;
+                return `${publicAssetImageLink}/MiiSwordFighter.webp`;
             } else {
                 return `Mii Sword Fighter`;
             }
         } else if (char == `minmin` || char == `min`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/MinMin.webp`;
+                return `${publicAssetImageLink}/MinMin.webp`;
             } else {
                 return `MinMin`;
             }
         } else if (char == `mrgame&watch` || char == `gnw` || char == `game&watch` || char == `mrgameandwatch` || char == `gameandwatch`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/MrGame&Watch.webp`;
+                return `${publicAssetImageLink}/MrGame&Watch.webp`;
             } else {
                 return `Mr. Game & Watch`;
             }
         } else if (char == `Ness`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Ness.webp`;
+                return `${publicAssetImageLink}/Ness.webp`;
             } else {
                 return `Ness`;
             }
         } else if (char == `palutena` || char == `palu`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Palutena.webp`;
+                return `${publicAssetImageLink}/Palutena.webp`;
             } else {
                 return `Palutena`;
             }
         } else if (char == `peach` || char == `pe`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Peach.webp`;
+                return `${publicAssetImageLink}/Peach.webp`;
             } else {
                 return `Peach`;
             }
         } else if (char == `pt` || char == `pokemontrainer`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/PokemonTrainer.webp`;
+                return `${publicAssetImageLink}/PokemonTrainer.webp`;
             } else {
                 return `Pokemon Trainer`;
             }
         } else if (char == `roy`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Roy.webp`;
+                return `${publicAssetImageLink}/Roy.webp`;
             } else {
                 return `Roy`;
             }
         } else if (char == `ryu`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Ryu.webp`;
+                return `${publicAssetImageLink}/Ryu.webp`;
             } else {
                 return `Ryu`;
             }
         } else if (char == `sora`) {
             if (pic) {
-                return `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters/Sora.webp`;
+                return `${publicAssetImageLink}/Sora.webp`;
             } else {
                 return `Sora`;
             }
@@ -779,12 +781,12 @@ export default function Smasherscape(props) {
             }).map((plyr, plyrIndex) => {
                 return (
                     <div className="gridCard" key={plyrIndex}>
-                        <LazyLoadImage effect="blur" src={`https://github.com/strawhat19/Smasherscape/blob/main/assets/smasherscape/OSRS_Card_Empty.png?raw=true`} className={`cardBG`} alt={`Smasherscape Player Card`} />
-                        <LazyLoadImage effect="blur" src={`https://github.com/strawhat19/Smasherscape/blob/main/assets/smasherscape/OSRS_Card_Template_Border_Only.png?raw=true`} className={`cardBG border`} alt={`Smasherscape Player Card`} />
+                        <LazyLoadImage effect="blur" src={`${publicAssetLink}/assets/smasherscape/OSRS_Card_Empty.png?raw=true`} className={`cardBG`} alt={`Smasherscape Player Card`} />
+                        <LazyLoadImage effect="blur" src={`${publicAssetLink}/assets/smasherscape/OSRS_Card_Template_Border_Only.png?raw=true`} className={`cardBG border`} alt={`Smasherscape Player Card`} />
                         <div className="playerCardContent">
                             <div className="cardTopRow">
                                 <div className="logoWithWords">
-                                    <img width={70} src={`https://github.com/strawhat19/Smasherscape/blob/main/assets/smasherscape/OSRS_Top_Hat.png?raw=true`} alt={`Tophat Logo`} />
+                                    <img width={70} src={`${publicAssetLink}/assets/smasherscape/OSRS_Top_Hat.png?raw=true`} alt={`Tophat Logo`} />
                                     <h3>Xuruko's<br />SmasherScape</h3>
                                 </div>
                                 <h2>{plyr?.name}</h2>
