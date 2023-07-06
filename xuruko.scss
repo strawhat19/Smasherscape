@@ -167,6 +167,7 @@ li {
                         }
                         @media (max-width: 1800px) {
                             font-size: 2.3em;
+                            letter-spacing: 2px;
                         }
                         @media (max-width: 1400px) {
                             line-height: 1;
@@ -436,9 +437,11 @@ form {
             font-size: 18px;
             border-radius: 8px;
             position: relative;
+            border: 3px solid black;
             color: black !important;
             background: rgba(255,255,255,0.65) !important;
             &[type="search"] {
+                border: 3px solid black;
                 color: black !important;
                 background: rgba(255,255,255,0.65) !important;
             }

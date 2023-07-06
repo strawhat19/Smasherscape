@@ -4,13 +4,80 @@ import { Badge } from '@mui/material';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { FormEvent, useContext, useRef, useState } from 'react';
 import { collection, doc, getDocs, setDoc } from 'firebase/firestore';
-import { defaultContent, formatDate, capitalizeAllWords, createXML, StateContext, showAlert, removeDuplicateObjectFromArray } from '../pages/_app';
+import { formatDate, createXML, StateContext, showAlert } from '../pages/_app';
+
+export enum Characters {
+    Aegis = `Aegis`,
+    BanjoAndKazooie = `Banjo & Kazooie`,
+    Bayonetta = `Bayonetta`,
+    Bowser = `Bowser`,
+    BowserJr = `Bowser Jr`,
+    Byleth = `Byleth`,
+    CaptainFalcon = `Captain Falcon`,
+    Charizard = `Charizard`,
+    Chrom = `Chrom`,
+    Cloud = `Cloud`,
+    Corrin = `Corrin`,
+    Daisy = `Daisy`,
+    DarkPit = `Dark Pit`,
+    DarkSamus = `Dark Samus`,
+    DiddyKong = `Diddy Kong`,
+    DonkeyKong = `Donkey Kong`,
+    DrMario = `Dr Mario`,
+    DuckHunt = `Duck Hunt`,
+    Falco = `Falco`,
+    Fox = `Fox`,
+    Ganondorf = `Ganondorf`,
+    Greninja = `Greninja`,
+    Hero = `Hero`,
+    IceClimbers = `Ice Climbers`,
+    Ike = `Ike`,
+    Incineroar = `Incineroar`,
+    Inkling = `Inkling`,
+    Isabelle = `Isabelle`,
+    Ivysaur = `Ivysaur`,
+    Jigglypuff = `Jigglypuff`,
+    Joker = `Joker`,
+    Kazuya = `Kazuya`,
+    Ken = `Ken`,
+    KingDedede = `King Dedede`,
+    KingKRool = `King K Rool`,
+    Kirby = `Kirby`,
+    Link = `Link`,
+    LittleMac = `Little Mac`,
+    Lucario = `Lucario`,
+    Lucas = `Lucas`,
+    Lucina = `Lucina`,
+    Luigi = `Luigi`,
+    Mario = `Mario`,
+    Marth = `Marth`,
+    MegaMan = `Mega Man`,
+    MetaKnight = `Meta Knight`,
+    Mewtwo = `Mewtwo`,
+    MiiBrawler = `Mii Brawler`,
+    MiiFighter = `Mii Fighter`,
+    MiiGunner = `Mii Gunner`,
+    MiiSwordFighter = `Mii Sword Fighter`,
+    MinMin = `MinMin`,
+    MrGameAndWatch = `Mr. Game & Watch`,
+    Ness = `Ness`,
+    Palutena = `Palutena`,
+    Peach = `Peach`,
+    PokemonTrainer = `Pokemon Trainer`,
+    Roy = `Roy`,
+    Ryu = `Ryu`,
+    Sora = `Sora`,
+}
 
 export default function Smasherscape(props) {
 
     const commandsInput = useRef();
-    const [publicAssetLink, setPublicAssetLink] = useState(`https://github.com/strawhat19/Smasherscape/blob/main`);
     const { players, setPlayers, filteredPlayers, setFilteredPlayers } = useContext<any>(StateContext);
+    const [publicAssetLink, setPublicAssetLink] = useState(`https://github.com/strawhat19/Smasherscape/blob/main`);
+
+    const calcPlayerWins = (plyr) => plyr.plays.filter(ply => ply.winner.toLowerCase() == plyr.name.toLowerCase()).length;
+    const calcPlayerLosses = (plyr) => plyr.plays.filter(ply => ply.loser.toLowerCase() == plyr.name.toLowerCase()).length;
+    const calcPlayerCharacterTimesPlayed = (plyr, char) => plyr.plays.map(ply => ply.character).filter(ply => ply.toLowerCase() == char || ply.toLowerCase().includes(char)).length;
 
     const searchPlayers = (e: FormEvent) => {
         let field = e.target as HTMLInputElement;
@@ -27,19 +94,6 @@ export default function Smasherscape(props) {
         } else {
             return;
         }
-    }
-
-    const calcPlyrWins = (plyr) => {
-        return plyr.plays.filter(ply => ply.winner.toLowerCase() == plyr.name.toLowerCase()).length;
-    }
-   
-    const calcPlyrLosses = (plyr) => {
-        return plyr.plays.filter(ply => ply.loser.toLowerCase() == plyr.name.toLowerCase()).length;
-    }
-
-    const calcPlayerCharacterTimesPlayed = (plyr, char) => {
-        let charsPlayed = plyr.plays.map(ply => ply.character);
-        return charsPlayed.filter(ply => ply.toLowerCase() == char || ply.toLowerCase().includes(char)).length;
     }
 
     const calcPlayerCharactersPlayed = (plyr) => {
@@ -65,6 +119,130 @@ export default function Smasherscape(props) {
             return `${publicAssetLink}/assets/smasherscape/Adamant_Scimmy.png?raw=true`;
         } else if (levelName == `Rune Scimitar`) {
             return `${publicAssetLink}/assets/smasherscape/Rune_Scimmy.png?raw=true`;
+        }
+    }
+
+    const calcCharacter = (char) => {
+        if (char == `aegis` || char == `pyra` || char == `mythra` || char == Characters.Aegis.toLowerCase()) {
+            return Characters.Aegis;
+        } else if (char == `banjoandkazooie` || char == `banjo&kazooie` || char == `banjo` || char == `bk` || char == `bandk` || char == `b&k` || char == Characters.BanjoAndKazooie.toLowerCase()) {
+            return Characters.BanjoAndKazooie;
+        } else if (char == `bayonetta` || char == `bayo` || char == Characters.Bayonetta.toLowerCase()) {
+            return Characters.Bayonetta;
+        } else if (char == `bowser` || char == `bow` || char == Characters.Bowser.toLowerCase()) {
+            return Characters.Bowser;
+        } else if (char == `bowserjr` || char == `bj` || char == Characters.BowserJr.toLowerCase()) {
+            return Characters.BowserJr;
+        } else if (char == `byleth` || char == `by` || char == Characters.Byleth.toLowerCase()) {
+            return Characters.Byleth;
+        } else if (char == `captainfalcon` || char == `cf` || char == `falcon` || char == Characters.CaptainFalcon.toLowerCase()) {
+            return Characters.CaptainFalcon;
+        } else if (char == `charizard` || char == `char` || char == Characters.Charizard.toLowerCase()) {
+            return Characters.Charizard;
+        } else if (char == `chrom` || char == `ch` || char == Characters.Chrom.toLowerCase()) {
+            return Characters.Chrom;
+        } else if (char == `cloud` || char == `cl` || char == Characters.Cloud.toLowerCase()) {
+            return Characters.Cloud;
+        } else if (char == `corrin` || char == `co` || char == Characters.Corrin.toLowerCase()) {
+            return Characters.Corrin;
+        } else if (char == `daisy` || char == `da` || char == Characters.Daisy.toLowerCase()) {
+            return Characters.Daisy;
+        } else if (char == `darkpit` || char == `dp` || char == Characters.DarkPit.toLowerCase()) {
+            return Characters.DarkPit;
+        } else if (char == `darksamus` || char == `ds` || char == Characters.DarkSamus.toLowerCase()) {
+            return Characters.DarkSamus;
+        } else if (char == `diddykong` || char == `diddy` || char == Characters.DiddyKong.toLowerCase()) {
+            return Characters.DiddyKong;
+        } else if (char == `donkeykong` || char == `dk` || char == Characters.DonkeyKong.toLowerCase()) {
+            return Characters.DonkeyKong;
+        } else if (char == `drmario` || char == `doc` || char == `dm` || char == Characters.DrMario.toLowerCase()) {
+            return Characters.DrMario;
+        } else if (char == `duckhunt` || char == `dh` || char == Characters.DuckHunt.toLowerCase()) {
+            return Characters.DuckHunt;
+        } else if (char == `falco` || char == `fa` || char == Characters.Falco.toLowerCase()) {
+            return Characters.Falco;
+        } else if (char == `fox` || char == Characters.Fox.toLowerCase()) {
+            return Characters.Fox;
+        } else if (char == `ganondorf` || char == `ganon` || char == `gd` || char == `gnn` || char == Characters.Ganondorf.toLowerCase()) {
+            return Characters.Ganondorf;
+        } else if (char == `greninja` || char == `gren` || char == `grenin` || char == Characters.Greninja.toLowerCase()) {
+            return Characters.Greninja;
+        } else if (char == `hero` || char == `he` || char == `hr` || char == Characters.Hero.toLowerCase()) {
+            return Characters.Hero;
+        } else if (char == `iceclimbers` || char == `icies` || char == `ics` || char == `ic` || char == Characters.IceClimbers.toLowerCase()) {
+            return Characters.IceClimbers;
+        } else if (char == `ike` || char == Characters.Ike.toLowerCase()) {
+            return Characters.Ike;
+        } else if (char == `incineroar` || char == `incin` || char == `inc` || char == Characters.Incineroar.toLowerCase()) {
+            return Characters.Incineroar;
+        } else if (char == `inkling` || char == `inkl` || char == `ink` || char == Characters.Inkling.toLowerCase()) {
+            return Characters.Inkling;
+        } else if (char == `isabelle` || char == `isbl` || char == `isa` || char == Characters.Isabelle.toLowerCase()) {
+            return Characters.Isabelle;
+        } else if (char == `ivysaur` || char == `ivys` || char == `ivy` || char == Characters.Ivysaur.toLowerCase()) {
+            return Characters.Ivysaur;
+        } else if (char == `jigglypuff` || char == `jiggly` || char == `jiggs` || char == `jp` || char == Characters.Jigglypuff.toLowerCase()) {
+            return Characters.Jigglypuff;
+        } else if (char == `joker` || char == Characters.Joker.toLowerCase()) {
+            return Characters.Joker;
+        } else if (char == `kazuya` || char == `kaz` || char == `kz` || char == Characters.Kazuya.toLowerCase()) {
+            return Characters.Kazuya;
+        } else if (char == `ken` || char == `kn` || char == Characters.Ken.toLowerCase()) {
+            return Characters.Ken;
+        }  else if (char == `kingdedede` || char == `ddd` || char == `kd` || char == Characters.KingDedede.toLowerCase()) {
+            return Characters.KingDedede;
+        }  else if (char == `kingkrool` || char == `krool` || char == `rool` || char == `kkr` || char == Characters.KingKRool.toLowerCase()) {
+            return Characters.KingKRool;
+        } else if (char == `kirby` || char == `krb` || char == Characters.Kirby.toLowerCase()) {
+            return Characters.Kirby;
+        } else if (char == `link` || char == `lnk` || char == Characters.Link.toLowerCase()) {
+            return Characters.Link;
+        } else if (char == `littlemac` || char == `lm` || char == Characters.LittleMac.toLowerCase()) {
+            return Characters.LittleMac;
+        } else if (char == `lucario` || char == `luc` || char == Characters.Lucario.toLowerCase()) {
+            return Characters.Lucario;
+        } else if (char == `lucas` || char == Characters.Lucas.toLowerCase()) {
+            return Characters.Lucas;
+        } else if (char == `lucina` || char == Characters.Lucina.toLowerCase()) {
+            return Characters.Lucina;
+        } else if (char == `luigi` || char == `lg` || char == Characters.Luigi.toLowerCase()) {
+            return Characters.Luigi;
+        } else if (char == `mario` || char == Characters.Mario.toLowerCase()) {
+            return Characters.Mario;
+        } else if (char == `marth` || char == Characters.Marth.toLowerCase()) {
+            return Characters.Marth;
+        } else if (char == `megaman` || char == `mm` || char == `mega` || char == Characters.MegaMan.toLowerCase()) {
+            return Characters.MegaMan;
+        } else if (char == `metaknight` || char == `meta` || char == `mk` || char == Characters.MetaKnight.toLowerCase()) {
+            return Characters.MetaKnight;
+        } else if (char == `mt` || char == `mewtwo` || char == `m2` || char == Characters.Mewtwo.toLowerCase()) {
+            return Characters.Mewtwo;
+        } else if (char == `miibrawler` || char == `brawler` || char == `mb` || char == Characters.MiiBrawler.toLowerCase()) {
+            return Characters.MiiBrawler;
+        } else if (char == `miifighter` || char == `fighter` || char == `mf` || char == Characters.MiiFighter.toLowerCase()) {
+            return Characters.MiiFighter;
+        } else if (char == `miigunner` || char == `gunner` || char == `mg` || char == Characters.MiiGunner.toLowerCase()) {
+            return Characters.MiiGunner;
+        } else if (char == `miiswordfighter` || char == `swordfighter` || char == `ms` || char == Characters.MiiSwordFighter.toLowerCase()) {
+            return Characters.MiiSwordFighter;
+        } else if (char == `minmin` || char == `min` || char == Characters.MinMin.toLowerCase()) {
+            return Characters.MinMin;
+        } else if (char == `mrgame&watch` || char == `gnw` || char == `game&watch` || char == `mrgameandwatch` || char == `gameandwatch` || char == Characters.MrGameAndWatch.toLowerCase()) {
+            return Characters.MrGameAndWatch;
+        } else if (char == `Ness` || char == Characters.Ness.toLowerCase()) {
+            return Characters.Ness;
+        } else if (char == `palutena` || char == `palu` || char == Characters.Palutena.toLowerCase()) {
+            return Characters.Palutena;
+        } else if (char == `peach` || char == `pe` || char == Characters.Peach.toLowerCase()) {
+            return Characters.Peach;
+        } else if (char == `pt` || char == `pokemontrainer` || char == Characters.PokemonTrainer.toLowerCase()) {
+            return Characters.PokemonTrainer;
+        } else if (char == `roy` || char == Characters.Roy.toLowerCase()) {
+            return Characters.Roy;
+        } else if (char == `ryu` || char == Characters.Ryu.toLowerCase()) {
+            return Characters.Ryu;
+        } else if (char == `sora` || char == Characters.Sora.toLowerCase()) {
+            return Characters.Sora;
         }
     }
 
@@ -308,368 +486,128 @@ export default function Smasherscape(props) {
         return plyr;
     }
 
-    const calcPlayerCharacterIcon = (char, pic) => {
+    const calcPlayerCharacterIcon = (char) => {
         let publicAssetImageLink = `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters`;
-        if (char == `aegis` || char == `pyra` || char == `mythra`) {
-            if (pic) {
-                return `${publicAssetImageLink}/PyraMythraAegis.webp`;
-            } else {
-                return `Aegis`;
-            }
-        } else if (char == `banjoandkazooie` || char == `banjo&kazooie` || char == `banjo` || char == `bk` || char == `bandk` || char == `b&k`) {
-            if (pic) {
-                return `${publicAssetImageLink}/Banjo&Kazooie.webp`;
-            } else {
-                return `Banjo & Kazooie`;
-            }
-        } else if (char == `bayonetta` || char == `bayo`) {
-            if (pic) {
-                return `${publicAssetImageLink}/Bayonetta.webp`;
-            } else {
-                return `Bayonetta`;
-            }
-        } else if (char == `bowser` || char == `bow`) {
-            if (pic) {
-                return `${publicAssetImageLink}/Bowser.webp`;
-            } else {
-                return `Bowser`;
-            }
-        } else if (char == `bowserjr` || char == `bj`) {
-            if (pic) {
-                return `${publicAssetImageLink}/BowserJr.webp`;
-            } else {
-                return `Bowser Jr`;
-            }
-        } else if (char == `byleth` || char == `by`) {
-            if (pic) {
-                return `${publicAssetImageLink}/Byleth.webp`;
-            } else {
-                return `Byleth`;
-            }
-        } else if (char == `captainfalcon` || char == `cf` || char == `falcon`) {
-            if (pic) {
-                return `${publicAssetImageLink}/CaptainFalcon.webp`;
-            } else {
-                return `Captain Falcon`;
-            }
-        } else if (char == `charizard` || char == `char`) {
-            if (pic) {
-                return `${publicAssetImageLink}/Charizard.webp`;
-            } else {
-                return `Charizard`;
-            }
-        } else if (char == `chrom` || char == `ch`) {
-            if (pic) {
-                return `${publicAssetImageLink}/Chrom.webp`;
-            } else {
-                return `Chrom`;
-            }
-        } else if (char == `cloud` || char == `cl`) {
-            if (pic) {
-                return `${publicAssetImageLink}/Cloud.webp`;
-            } else {
-                return `Cloud`;
-            }
-        } else if (char == `corrin` || char == `co`) {
-            if (pic) {
-                return `${publicAssetImageLink}/Corrin.webp`;
-            } else {
-                return `Corrin`;
-            }
-        } else if (char == `daisy` || char == `da`) {
-            if (pic) {
-                return `${publicAssetImageLink}/Daisy.webp`;
-            } else {
-                return `Daisy`;
-            }
-        } else if (char == `darkpit` || char == `dp`) {
-            if (pic) {
-                return `${publicAssetImageLink}/DarkPit.webp`;
-            } else {
-                return `Dark Pit`;
-            }
-        } else if (char == `darksamus` || char == `ds`) {
-            if (pic) {
-                return `${publicAssetImageLink}/DarkSamus.webp`;
-            } else {
-                return `Dark Samus`;
-            }
-        } else if (char == `diddykong` || char == `diddy`) {
-            if (pic) {
-                return `${publicAssetImageLink}/DiddyKong.webp`;
-            } else {
-                return `Diddy Kong`;
-            }
-        } else if (char == `donkeykong` || char == `dk`) {
-            if (pic) {
-                return `${publicAssetImageLink}/DonkeyKong.webp`;
-            } else {
-                return `Donkey Kong`;
-            }
-        } else if (char == `drmario` || char == `doc` || char == `dm`) {
-            if (pic) {
-                return `${publicAssetImageLink}/DrMario.webp`;
-            } else {
-                return `Dr Mario`;
-            }
-        } else if (char == `duckhunt` || char == `dh`) {
-            if (pic) {
-                return `${publicAssetImageLink}/DuckHunt.webp`;
-            } else {
-                return `Duck Hunt`;
-            }
-        } else if (char == `falco` || char == `fa`) {
-            if (pic) {
-                return `${publicAssetImageLink}/Falco.webp`;
-            } else {
-                return `Falco`;
-            }
-        } else if (char == `fox`) {
-            if (pic) {
-                return `${publicAssetImageLink}/Fox.webp`;
-            } else {
-                return `Fox`;
-            }
-        } else if (char == `ganondorf` || char == `ganon` || char == `gd` || char == `gnn`) {
-            if (pic) {
-                return `${publicAssetImageLink}/Ganondorf.webp`;
-            } else {
-                return `Ganondorf`;
-            }
-        } else if (char == `greninja` || char == `gren` || char == `grenin`) {
-            if (pic) {
-                return `${publicAssetImageLink}/Greninja.webp`;
-            } else {
-                return `Greninja`;
-            }
-        } else if (char == `hero` || char == `he` || char == `hr`) {
-            if (pic) {
-                return `${publicAssetImageLink}/Hero.webp`;
-            } else {
-                return `Hero`;
-            }
-        } else if (char == `iceclimbers` || char == `icies` || char == `ics` || char == `ic`) {
-            if (pic) {
-                return `${publicAssetImageLink}/IceClimbers.webp`;
-            } else {
-                return `Ice Climbers`;
-            }
-        } else if (char == `ike`) {
-            if (pic) {
-                return `${publicAssetImageLink}/Ike.webp`;
-            } else {
-                return `Ike`;
-            }
-        } else if (char == `incineroar` || char == `incin` || char == `inc`) {
-            if (pic) {
-                return `${publicAssetImageLink}/Incineroar.webp`;
-            } else {
-                return `Incineroar`;
-            }
-        } else if (char == `inkling` || char == `inkl` || char == `ink`) {
-            if (pic) {
-                return `${publicAssetImageLink}/Inkling.webp`;
-            } else {
-                return `Inkling`;
-            }
-        } else if (char == `isabelle` || char == `isbl` || char == `isa`) {
-            if (pic) {
-                return `${publicAssetImageLink}/Isabelle.webp`;
-            } else {
-                return `Isabelle`;
-            }
-        } else if (char == `ivysaur` || char == `ivys` || char == `ivy`) {
-            if (pic) {
-                return `${publicAssetImageLink}/Ivysaur.webp`;
-            } else {
-                return `Ivysaur`;
-            }
-        } else if (char == `jigglypuff` || char == `jiggly` || char == `jiggs` || char == `jp`) {
-            if (pic) {
-                return `${publicAssetImageLink}/Jigglypuff.webp`;
-            } else {
-                return `Jigglypuff`;
-            }
-        } else if (char == `joker`) {
-            if (pic) {
-                return `${publicAssetImageLink}/Joker.webp`;
-            } else {
-                return `Joker`;
-            }
-        } else if (char == `kazuya` || char == `kaz` || char == `kz`) {
-            if (pic) {
-                return `${publicAssetImageLink}/Kazuya.webp`;
-            } else {
-                return `Kazuya`;
-            }
-        } else if (char == `ken` || char == `kn`) {
-            if (pic) {
-                return `${publicAssetImageLink}/Ken.webp`;
-            } else {
-                return `Ken`;
-            }
-        }  else if (char == `kingdedede` || char == `ddd` || char == `kd`) {
-            if (pic) {
-                return `${publicAssetImageLink}/KingDedede.webp`;
-            } else {
-                return `King Dedede`;
-            }
-        }  else if (char == `kingkrool` || char == `krool` || char == `rool` || char == `kkr`) {
-            if (pic) {
-                return `${publicAssetImageLink}/KingKRool.webp`;
-            } else {
-                return `King K Rool`;
-            }
-        } else if (char == `kirby` || char == `krb`) {
-            if (pic) {
-                return `${publicAssetImageLink}/Kirby.webp`;
-            } else {
-                return `Kirby`;
-            }
-        } else if (char == `link` || char == `lnk`) {
-            if (pic) {
-                return `${publicAssetImageLink}/Link.webp`;
-            } else {
-                return `Link`;
-            }
-        } else if (char == `littlemac` || char == `lm`) {
-            if (pic) {
-                return `${publicAssetImageLink}/LittleMac.webp`;
-            } else {
-                return `Little Mac`;
-            }
-        } else if (char == `lucario` || char == `luc`) {
-            if (pic) {
-                return `${publicAssetImageLink}/Lucario.webp`;
-            } else {
-                return `Lucario`;
-            }
-        } else if (char == `lucas`) {
-            if (pic) {
-                return `${publicAssetImageLink}/Lucas.webp`;
-            } else {
-                return `Lucas`;
-            }
-        } else if (char == `lucina`) {
-            if (pic) {
-                return `${publicAssetImageLink}/Lucina.webp`;
-            } else {
-                return `Lucina`;
-            }
-        } else if (char == `luigi` || char == `lg`) {
-            if (pic) {
-                return `${publicAssetImageLink}/Luigi.webp`;
-            } else {
-                return `Luigi`;
-            }
-        } else if (char == `mario`) {
-            if (pic) {
-                return `${publicAssetImageLink}/Mario.webp`;
-            } else {
-                return `Mario`;
-            }
-        } else if (char == `marth`) {
-            if (pic) {
-                return `${publicAssetImageLink}/Marth.webp`;
-            } else {
-                return `Marth`;
-            }
-        } else if (char == `megaman` || char == `mm` || char == `mega`) {
-            if (pic) {
-                return `${publicAssetImageLink}/MegaMan.webp`;
-            } else {
-                return `Mega Man`;
-            }
-        } else if (char == `metaknight` || char == `meta` || char == `mk`) {
-            if (pic) {
-                return `${publicAssetImageLink}/MetaKnight.webp`;
-            } else {
-                return `Meta Knight`;
-            }
-        } else if (char == `mt` || char == `mewtwo` || char == `m2`) {
-            if (pic) {
-                return `${publicAssetImageLink}/Mewtwo.webp`;
-            } else {
-                return `Mewtwo`;
-            }
-        } else if (char == `miibrawler` || char == `brawler` || char == `mb`) {
-            if (pic) {
-                return `${publicAssetImageLink}/MiiBrawler.webp`;
-            } else {
-                return `Mii Brawler`;
-            }
-        } else if (char == `miifighter` || char == `fighter` || char == `mf`) {
-            if (pic) {
-                return `${publicAssetImageLink}/MiiFighter.webp`;
-            } else {
-                return `Mii Fighter`;
-            }
-        } else if (char == `miigunner` || char == `gunner` || char == `mg`) {
-            if (pic) {
-                return `${publicAssetImageLink}/MiiGunner.webp`;
-            } else {
-                return `Mii Gunner`;
-            }
-        } else if (char == `miiswordfighter` || char == `swordfighter` || char == `ms`) {
-            if (pic) {
-                return `${publicAssetImageLink}/MiiSwordFighter.webp`;
-            } else {
-                return `Mii Sword Fighter`;
-            }
-        } else if (char == `minmin` || char == `min`) {
-            if (pic) {
-                return `${publicAssetImageLink}/MinMin.webp`;
-            } else {
-                return `MinMin`;
-            }
-        } else if (char == `mrgame&watch` || char == `gnw` || char == `game&watch` || char == `mrgameandwatch` || char == `gameandwatch`) {
-            if (pic) {
-                return `${publicAssetImageLink}/MrGame&Watch.webp`;
-            } else {
-                return `Mr. Game & Watch`;
-            }
-        } else if (char == `Ness`) {
-            if (pic) {
-                return `${publicAssetImageLink}/Ness.webp`;
-            } else {
-                return `Ness`;
-            }
-        } else if (char == `palutena` || char == `palu`) {
-            if (pic) {
-                return `${publicAssetImageLink}/Palutena.webp`;
-            } else {
-                return `Palutena`;
-            }
-        } else if (char == `peach` || char == `pe`) {
-            if (pic) {
-                return `${publicAssetImageLink}/Peach.webp`;
-            } else {
-                return `Peach`;
-            }
-        } else if (char == `pt` || char == `pokemontrainer`) {
-            if (pic) {
-                return `${publicAssetImageLink}/PokemonTrainer.webp`;
-            } else {
-                return `Pokemon Trainer`;
-            }
-        } else if (char == `roy`) {
-            if (pic) {
-                return `${publicAssetImageLink}/Roy.webp`;
-            } else {
-                return `Roy`;
-            }
-        } else if (char == `ryu`) {
-            if (pic) {
-                return `${publicAssetImageLink}/Ryu.webp`;
-            } else {
-                return `Ryu`;
-            }
-        } else if (char == `sora`) {
-            if (pic) {
-                return `${publicAssetImageLink}/Sora.webp`;
-            } else {
-                return `Sora`;
-            }
+        if (char == `aegis` || char == `pyra` || char == `mythra` || char == Characters.Aegis.toLowerCase()) {
+            return `${publicAssetImageLink}/PyraMythraAegis.webp`;
+        } else if (char == `banjoandkazooie` || char == `banjo&kazooie` || char == `banjo` || char == `bk` || char == `bandk` || char == `b&k` || char == Characters.BanjoAndKazooie.toLowerCase()) {
+            return `${publicAssetImageLink}/Banjo&Kazooie.webp`;
+        } else if (char == `bayonetta` || char == `bayo` || char == Characters.Bayonetta.toLowerCase()) {
+            return `${publicAssetImageLink}/Bayonetta.webp`;
+        } else if (char == `bowser` || char == `bow` || char == Characters.Bowser.toLowerCase()) {
+            return `${publicAssetImageLink}/Bowser.webp`;
+        } else if (char == `bowserjr` || char == `bj` || char == Characters.BowserJr.toLowerCase()) {
+            return `${publicAssetImageLink}/BowserJr.webp`;
+        } else if (char == `byleth` || char == `by` || char == Characters.Byleth.toLowerCase()) {
+            return `${publicAssetImageLink}/Byleth.webp`;
+        } else if (char == `captainfalcon` || char == `cf` || char == `falcon` || char == Characters.CaptainFalcon.toLowerCase()) {
+            return `${publicAssetImageLink}/CaptainFalcon.webp`;
+        } else if (char == `charizard` || char == `char` || char == Characters.Charizard.toLowerCase()) {
+            return `${publicAssetImageLink}/Charizard.webp`;
+        } else if (char == `chrom` || char == `ch` || char == Characters.Chrom.toLowerCase()) {
+            return `${publicAssetImageLink}/Chrom.webp`;
+        } else if (char == `cloud` || char == `cl` || char == Characters.Cloud.toLowerCase()) {
+            return `${publicAssetImageLink}/Cloud.webp`;
+        } else if (char == `corrin` || char == `co` || char == Characters.Corrin.toLowerCase()) {
+            return `${publicAssetImageLink}/Corrin.webp`;
+        } else if (char == `daisy` || char == `da` || char == Characters.Daisy.toLowerCase()) {
+            return `${publicAssetImageLink}/Daisy.webp`;
+        } else if (char == `darkpit` || char == `dp` || char == Characters.DarkPit.toLowerCase()) {
+            return `${publicAssetImageLink}/DarkPit.webp`;
+        } else if (char == `darksamus` || char == `ds` || char == Characters.DarkSamus.toLowerCase()) {
+            return `${publicAssetImageLink}/DarkSamus.webp`;
+        } else if (char == `diddykong` || char == `diddy` || char == Characters.DiddyKong.toLowerCase()) {
+            return `${publicAssetImageLink}/DiddyKong.webp`;
+        } else if (char == `donkeykong` || char == `dk` || char == Characters.DonkeyKong.toLowerCase()) {
+            return `${publicAssetImageLink}/DonkeyKong.webp`;
+        } else if (char == `drmario` || char == `doc` || char == `dm` || char == Characters.DrMario.toLowerCase()) {
+            return `${publicAssetImageLink}/DrMario.webp`;
+        } else if (char == `duckhunt` || char == `dh` || char == Characters.DuckHunt.toLowerCase()) {
+            return `${publicAssetImageLink}/DuckHunt.webp`;
+        } else if (char == `falco` || char == `fa` || char == Characters.Falco.toLowerCase()) {
+            return `${publicAssetImageLink}/Falco.webp`;
+        } else if (char == `fox` || char == Characters.Fox.toLowerCase()) {
+            return `${publicAssetImageLink}/Fox.webp`;
+        } else if (char == `ganondorf` || char == `ganon` || char == `gd` || char == `gnn` || char == Characters.Ganondorf.toLowerCase()) {
+            return `${publicAssetImageLink}/Ganondorf.webp`;
+        } else if (char == `greninja` || char == `gren` || char == `grenin` || char == Characters.Greninja.toLowerCase()) {
+            return `${publicAssetImageLink}/Greninja.webp`;
+        } else if (char == `hero` || char == `he` || char == `hr` || char == Characters.Hero.toLowerCase()) {
+            return `${publicAssetImageLink}/Hero.webp`;
+        } else if (char == `iceclimbers` || char == `icies` || char == `ics` || char == `ic` || char == Characters.IceClimbers.toLowerCase()) {
+            return `${publicAssetImageLink}/IceClimbers.webp`;
+        } else if (char == `ike` || char == Characters.Ike.toLowerCase()) {
+            return `${publicAssetImageLink}/Ike.webp`;
+        } else if (char == `incineroar` || char == `incin` || char == `inc` || char == Characters.Incineroar.toLowerCase()) {
+            return `${publicAssetImageLink}/Incineroar.webp`;
+        } else if (char == `inkling` || char == `inkl` || char == `ink` || char == Characters.Inkling.toLowerCase()) {
+            return `${publicAssetImageLink}/Inkling.webp`;
+        } else if (char == `isabelle` || char == `isbl` || char == `isa` || char == Characters.Isabelle.toLowerCase()) {
+            return `${publicAssetImageLink}/Isabelle.webp`;
+        } else if (char == `ivysaur` || char == `ivys` || char == `ivy` || char == Characters.Ivysaur.toLowerCase()) {
+            return `${publicAssetImageLink}/Ivysaur.webp`;
+        } else if (char == `jigglypuff` || char == `jiggly` || char == `jiggs` || char == `jp` || char == Characters.Jigglypuff.toLowerCase()) {
+            return `${publicAssetImageLink}/Jigglypuff.webp`;
+        } else if (char == `joker` || char == Characters.Joker.toLowerCase()) {
+            return `${publicAssetImageLink}/Joker.webp`;
+        } else if (char == `kazuya` || char == `kaz` || char == `kz` || char == Characters.Kazuya.toLowerCase()) {
+            return `${publicAssetImageLink}/Kazuya.webp`;
+        } else if (char == `ken` || char == `kn` || char == Characters.Ken.toLowerCase()) {
+            return `${publicAssetImageLink}/Ken.webp`;
+        }  else if (char == `kingdedede` || char == `ddd` || char == `kd` || char == Characters.KingDedede.toLowerCase()) {
+            return `${publicAssetImageLink}/KingDedede.webp`;
+        }  else if (char == `kingkrool` || char == `krool` || char == `rool` || char == `kkr` || char == Characters.KingKRool.toLowerCase()) {
+            return `${publicAssetImageLink}/KingKRool.webp`;
+        } else if (char == `kirby` || char == `krb` || char == Characters.Kirby.toLowerCase()) {
+            return `${publicAssetImageLink}/Kirby.webp`;
+        } else if (char == `link` || char == `lnk` || char == Characters.Link.toLowerCase()) {
+            return `${publicAssetImageLink}/Link.webp`;
+        } else if (char == `littlemac` || char == `lm` || char == Characters.LittleMac.toLowerCase()) {
+            return `${publicAssetImageLink}/LittleMac.webp`;
+        } else if (char == `lucario` || char == `luc` || char == Characters.Lucario.toLowerCase()) {
+            return `${publicAssetImageLink}/Lucario.webp`;
+        } else if (char == `lucas` || char == Characters.Lucas.toLowerCase()) {
+            return `${publicAssetImageLink}/Lucas.webp`;
+        } else if (char == `lucina` || char == Characters.Lucina.toLowerCase()) {
+            return `${publicAssetImageLink}/Lucina.webp`;
+        } else if (char == `luigi` || char == `lg` || char == Characters.Luigi.toLowerCase()) {
+            return `${publicAssetImageLink}/Luigi.webp`;
+        } else if (char == `mario` || char == Characters.Mario.toLowerCase()) {
+            return `${publicAssetImageLink}/Mario.webp`;
+        } else if (char == `marth` || char == Characters.Marth.toLowerCase()) {
+            return `${publicAssetImageLink}/Marth.webp`;
+        } else if (char == `megaman` || char == `mm` || char == `mega` || char == Characters.MegaMan.toLowerCase()) {
+            return `${publicAssetImageLink}/MegaMan.webp`;
+        } else if (char == `metaknight` || char == `meta` || char == `mk` || char == Characters.MetaKnight.toLowerCase()) {
+            return `${publicAssetImageLink}/MetaKnight.webp`;
+        } else if (char == `mt` || char == `mewtwo` || char == `m2` || char == Characters.Mewtwo.toLowerCase()) {
+            return `${publicAssetImageLink}/Mewtwo.webp`;
+        } else if (char == `miibrawler` || char == `brawler` || char == `mb` || char == Characters.MiiBrawler.toLowerCase()) {
+            return `${publicAssetImageLink}/MiiBrawler.webp`;
+        } else if (char == `miifighter` || char == `fighter` || char == `mf` || char == Characters.MiiFighter.toLowerCase()) {
+            return `${publicAssetImageLink}/MiiFighter.webp`;
+        } else if (char == `miigunner` || char == `gunner` || char == `mg` || char == Characters.MiiGunner.toLowerCase()) {
+            return `${publicAssetImageLink}/MiiGunner.webp`;
+        } else if (char == `miiswordfighter` || char == `swordfighter` || char == `ms` || char == Characters.MiiSwordFighter.toLowerCase()) {
+            return `${publicAssetImageLink}/MiiSwordFighter.webp`;
+        } else if (char == `minmin` || char == `min` || char == Characters.MinMin.toLowerCase()) {
+            return `${publicAssetImageLink}/MinMin.webp`;
+        } else if (char == `mrgame&watch` || char == `gnw` || char == `game&watch` || char == `mrgameandwatch` || char == `gameandwatch` || char == Characters.MrGameAndWatch.toLowerCase()) {
+            return `${publicAssetImageLink}/MrGame&Watch.webp`;
+        } else if (char == `Ness` || char == Characters.Ness.toLowerCase()) {
+            return `${publicAssetImageLink}/Ness.webp`;
+        } else if (char == `palutena` || char == `palu` || char == Characters.Palutena.toLowerCase()) {
+            return `${publicAssetImageLink}/Palutena.webp`;
+        } else if (char == `peach` || char == `pe` || char == Characters.Peach.toLowerCase()) {
+            return `${publicAssetImageLink}/Peach.webp`;
+        } else if (char == `pt` || char == `pokemontrainer` || char == Characters.PokemonTrainer.toLowerCase()) {
+            return `${publicAssetImageLink}/PokemonTrainer.webp`;
+        } else if (char == `roy` || char == Characters.Roy.toLowerCase()) {
+            return `${publicAssetImageLink}/Roy.webp`;
+        } else if (char == `ryu` || char == Characters.Ryu.toLowerCase()) {
+            return `${publicAssetImageLink}/Ryu.webp`;
+        } else if (char == `sora` || char == Characters.Sora.toLowerCase()) {
+            return `${publicAssetImageLink}/Sora.webp`;
         }
     }
 
@@ -698,15 +636,18 @@ export default function Smasherscape(props) {
                     } else if (!characterOne || !characterTwo) {
                         alert(`Which characters did they play?`);
                         return;
+                    } else if (!calcCharacter(characterOne) || !calcCharacter(characterTwo)) {
+                        alert(`Cannot find characters with those names`);
+                        return;
                     } else {
 
                         let updatedPlayers = players.map(plyr => {
                             if (plyr?.name.toLowerCase() == playerOne || plyr?.name.toLowerCase().includes(playerOne)) {
                                 plyr.experience.arenaXP = plyr.experience.arenaXP + 400;
                                 plyr.plays.push({
+                                    character: calcCharacter(characterOne),
                                     winner: playerOneDB?.name,
                                     loser: playerTwoDB?.name,
-                                    character: characterOne,
                                     stocksTaken,
                                     date
                                 });
@@ -717,9 +658,9 @@ export default function Smasherscape(props) {
                             } else if (plyr?.name.toLowerCase() == playerTwo || plyr?.name.toLowerCase().includes(playerTwo)) {
                                 plyr.experience.arenaXP = plyr.experience.arenaXP + (100 * stocksTaken);
                                 plyr.plays.push({
+                                    character: calcCharacter(characterTwo),
                                     winner: playerOneDB?.name,
                                     loser: playerTwoDB?.name,
-                                    character: characterTwo,
                                     stocksTaken,
                                     date
                                 });
@@ -732,6 +673,7 @@ export default function Smasherscape(props) {
                             }
                         });
 
+                        console.log(`Updated Players`, updatedPlayers);
                         setPlayers(updatedPlayers);
                     }
                 } else if (commandParams[0].includes(`!add`)) {
@@ -799,7 +741,7 @@ export default function Smasherscape(props) {
                                 <div className="recordPlays">
                                     <div className="record">
                                         <h3>Record</h3>
-                                        <h4>{calcPlyrWins(plyr)} - {calcPlyrLosses(plyr)}</h4>
+                                        <h4>{calcPlayerWins(plyr)} - {calcPlayerLosses(plyr)}</h4>
                                     </div>
                                     <div className="plays">
                                         <h3>Plays</h3>
@@ -807,7 +749,7 @@ export default function Smasherscape(props) {
                                             {calcPlayerCharactersPlayed(plyr).map((char, charIndex) => {
                                                 return (
                                                     <Badge key={charIndex} badgeContent={calcPlayerCharacterTimesPlayed(plyr, char)} color="primary">
-                                                        <img className={`charImg`} width={35} src={calcPlayerCharacterIcon(char, true)} alt={calcPlayerCharacterIcon(char, false)} title={`Played ${calcPlayerCharacterIcon(char, false)} ${calcPlayerCharacterTimesPlayed(plyr, char)} Time(s)`} />
+                                                        <img className={`charImg`} width={35} src={calcPlayerCharacterIcon(char)} alt={calcCharacter(char)} title={`Played ${calcCharacter(char)} ${calcPlayerCharacterTimesPlayed(plyr, char)} Time(s)`} />
                                                     </Badge>
                                                 )
                                             })}
