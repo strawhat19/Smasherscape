@@ -61,12 +61,41 @@ export enum Characters {
     MinMin = `MinMin`,
     MrGameAndWatch = `Mr. Game & Watch`,
     Ness = `Ness`,
+    Olimar = `Olimar`,
+    PacMan = `PacMan`,
     Palutena = `Palutena`,
     Peach = `Peach`,
+    Pichu = `Pichu`,
+    Pikachu = `Pikachu`,
+    PiranhaPlant = `Piranha Plant`,
+    Pit = `Pit`,
     PokemonTrainer = `Pokemon Trainer`,
+    Richter = `Richter`,
+    Ridley = `Ridley`,
+    ROB = `ROB`,
+    Robin = `Robin`,
+    RosalinaAndLuma = `Rosalina & Luma`,
     Roy = `Roy`,
     Ryu = `Ryu`,
+    Samus = `Samus`,
+    Sephiroth = `Sephiroth`,
+    Sheik = `Sheik`,
+    Shulk = `Shulk`,
+    Simon = `Simon`,
+    Snake = `Snake`,
+    Sonic = `Sonic`,
     Sora = `Sora`,
+    Steve = `Steve`,
+    Terry = `Terry`,
+    ToonLink = `Toon Link`,
+    Villager = `Villager`,
+    Wario = `Wario`,
+    WiiFitTrainer = `Wii Fit Trainer`,
+    Wolf = `Wolf`,
+    Yoshi = `Yoshi`,
+    YoungLink = `Young Link`,
+    Zelda = `Zelda`,
+    ZeroSuitSamus = `Zero Suit Samus`,
 }
 
 export default function Smasherscape(props) {
@@ -119,130 +148,10 @@ export default function Smasherscape(props) {
             return `${publicAssetLink}/assets/smasherscape/Adamant_Scimmy.png?raw=true`;
         } else if (levelName == `Rune Scimitar`) {
             return `${publicAssetLink}/assets/smasherscape/Rune_Scimmy.png?raw=true`;
-        }
-    }
-
-    const calcCharacter = (char) => {
-        if (char == `aegis` || char == `pyra` || char == `mythra` || char == Characters.Aegis.toLowerCase()) {
-            return Characters.Aegis;
-        } else if (char == `banjoandkazooie` || char == `banjo&kazooie` || char == `banjo` || char == `bk` || char == `bandk` || char == `b&k` || char == Characters.BanjoAndKazooie.toLowerCase()) {
-            return Characters.BanjoAndKazooie;
-        } else if (char == `bayonetta` || char == `bayo` || char == Characters.Bayonetta.toLowerCase()) {
-            return Characters.Bayonetta;
-        } else if (char == `bowser` || char == `bow` || char == Characters.Bowser.toLowerCase()) {
-            return Characters.Bowser;
-        } else if (char == `bowserjr` || char == `bj` || char == Characters.BowserJr.toLowerCase()) {
-            return Characters.BowserJr;
-        } else if (char == `byleth` || char == `by` || char == Characters.Byleth.toLowerCase()) {
-            return Characters.Byleth;
-        } else if (char == `captainfalcon` || char == `cf` || char == `falcon` || char == Characters.CaptainFalcon.toLowerCase()) {
-            return Characters.CaptainFalcon;
-        } else if (char == `charizard` || char == `char` || char == Characters.Charizard.toLowerCase()) {
-            return Characters.Charizard;
-        } else if (char == `chrom` || char == `ch` || char == Characters.Chrom.toLowerCase()) {
-            return Characters.Chrom;
-        } else if (char == `cloud` || char == `cl` || char == Characters.Cloud.toLowerCase()) {
-            return Characters.Cloud;
-        } else if (char == `corrin` || char == `co` || char == Characters.Corrin.toLowerCase()) {
-            return Characters.Corrin;
-        } else if (char == `daisy` || char == `da` || char == Characters.Daisy.toLowerCase()) {
-            return Characters.Daisy;
-        } else if (char == `darkpit` || char == `dp` || char == Characters.DarkPit.toLowerCase()) {
-            return Characters.DarkPit;
-        } else if (char == `darksamus` || char == `ds` || char == Characters.DarkSamus.toLowerCase()) {
-            return Characters.DarkSamus;
-        } else if (char == `diddykong` || char == `diddy` || char == Characters.DiddyKong.toLowerCase()) {
-            return Characters.DiddyKong;
-        } else if (char == `donkeykong` || char == `dk` || char == Characters.DonkeyKong.toLowerCase()) {
-            return Characters.DonkeyKong;
-        } else if (char == `drmario` || char == `doc` || char == `dm` || char == Characters.DrMario.toLowerCase()) {
-            return Characters.DrMario;
-        } else if (char == `duckhunt` || char == `dh` || char == Characters.DuckHunt.toLowerCase()) {
-            return Characters.DuckHunt;
-        } else if (char == `falco` || char == `fa` || char == Characters.Falco.toLowerCase()) {
-            return Characters.Falco;
-        } else if (char == `fox` || char == Characters.Fox.toLowerCase()) {
-            return Characters.Fox;
-        } else if (char == `ganondorf` || char == `ganon` || char == `gd` || char == `gnn` || char == Characters.Ganondorf.toLowerCase()) {
-            return Characters.Ganondorf;
-        } else if (char == `greninja` || char == `gren` || char == `grenin` || char == Characters.Greninja.toLowerCase()) {
-            return Characters.Greninja;
-        } else if (char == `hero` || char == `he` || char == `hr` || char == Characters.Hero.toLowerCase()) {
-            return Characters.Hero;
-        } else if (char == `iceclimbers` || char == `icies` || char == `ics` || char == `ic` || char == Characters.IceClimbers.toLowerCase()) {
-            return Characters.IceClimbers;
-        } else if (char == `ike` || char == Characters.Ike.toLowerCase()) {
-            return Characters.Ike;
-        } else if (char == `incineroar` || char == `incin` || char == `inc` || char == Characters.Incineroar.toLowerCase()) {
-            return Characters.Incineroar;
-        } else if (char == `inkling` || char == `inkl` || char == `ink` || char == Characters.Inkling.toLowerCase()) {
-            return Characters.Inkling;
-        } else if (char == `isabelle` || char == `isbl` || char == `isa` || char == Characters.Isabelle.toLowerCase()) {
-            return Characters.Isabelle;
-        } else if (char == `ivysaur` || char == `ivys` || char == `ivy` || char == Characters.Ivysaur.toLowerCase()) {
-            return Characters.Ivysaur;
-        } else if (char == `jigglypuff` || char == `jiggly` || char == `jiggs` || char == `jp` || char == Characters.Jigglypuff.toLowerCase()) {
-            return Characters.Jigglypuff;
-        } else if (char == `joker` || char == Characters.Joker.toLowerCase()) {
-            return Characters.Joker;
-        } else if (char == `kazuya` || char == `kaz` || char == `kz` || char == Characters.Kazuya.toLowerCase()) {
-            return Characters.Kazuya;
-        } else if (char == `ken` || char == `kn` || char == Characters.Ken.toLowerCase()) {
-            return Characters.Ken;
-        }  else if (char == `kingdedede` || char == `ddd` || char == `kd` || char == Characters.KingDedede.toLowerCase()) {
-            return Characters.KingDedede;
-        }  else if (char == `kingkrool` || char == `krool` || char == `rool` || char == `kkr` || char == Characters.KingKRool.toLowerCase()) {
-            return Characters.KingKRool;
-        } else if (char == `kirby` || char == `krb` || char == Characters.Kirby.toLowerCase()) {
-            return Characters.Kirby;
-        } else if (char == `link` || char == `lnk` || char == Characters.Link.toLowerCase()) {
-            return Characters.Link;
-        } else if (char == `littlemac` || char == `lm` || char == Characters.LittleMac.toLowerCase()) {
-            return Characters.LittleMac;
-        } else if (char == `lucario` || char == `luc` || char == Characters.Lucario.toLowerCase()) {
-            return Characters.Lucario;
-        } else if (char == `lucas` || char == Characters.Lucas.toLowerCase()) {
-            return Characters.Lucas;
-        } else if (char == `lucina` || char == Characters.Lucina.toLowerCase()) {
-            return Characters.Lucina;
-        } else if (char == `luigi` || char == `lg` || char == Characters.Luigi.toLowerCase()) {
-            return Characters.Luigi;
-        } else if (char == `mario` || char == Characters.Mario.toLowerCase()) {
-            return Characters.Mario;
-        } else if (char == `marth` || char == Characters.Marth.toLowerCase()) {
-            return Characters.Marth;
-        } else if (char == `megaman` || char == `mm` || char == `mega` || char == Characters.MegaMan.toLowerCase()) {
-            return Characters.MegaMan;
-        } else if (char == `metaknight` || char == `meta` || char == `mk` || char == Characters.MetaKnight.toLowerCase()) {
-            return Characters.MetaKnight;
-        } else if (char == `mt` || char == `mewtwo` || char == `m2` || char == Characters.Mewtwo.toLowerCase()) {
-            return Characters.Mewtwo;
-        } else if (char == `miibrawler` || char == `brawler` || char == `mb` || char == Characters.MiiBrawler.toLowerCase()) {
-            return Characters.MiiBrawler;
-        } else if (char == `miifighter` || char == `fighter` || char == `mf` || char == Characters.MiiFighter.toLowerCase()) {
-            return Characters.MiiFighter;
-        } else if (char == `miigunner` || char == `gunner` || char == `mg` || char == Characters.MiiGunner.toLowerCase()) {
-            return Characters.MiiGunner;
-        } else if (char == `miiswordfighter` || char == `swordfighter` || char == `ms` || char == Characters.MiiSwordFighter.toLowerCase()) {
-            return Characters.MiiSwordFighter;
-        } else if (char == `minmin` || char == `min` || char == Characters.MinMin.toLowerCase()) {
-            return Characters.MinMin;
-        } else if (char == `mrgame&watch` || char == `gnw` || char == `game&watch` || char == `mrgameandwatch` || char == `gameandwatch` || char == Characters.MrGameAndWatch.toLowerCase()) {
-            return Characters.MrGameAndWatch;
-        } else if (char == `Ness` || char == Characters.Ness.toLowerCase()) {
-            return Characters.Ness;
-        } else if (char == `palutena` || char == `palu` || char == Characters.Palutena.toLowerCase()) {
-            return Characters.Palutena;
-        } else if (char == `peach` || char == `pe` || char == Characters.Peach.toLowerCase()) {
-            return Characters.Peach;
-        } else if (char == `pt` || char == `pokemontrainer` || char == Characters.PokemonTrainer.toLowerCase()) {
-            return Characters.PokemonTrainer;
-        } else if (char == `roy` || char == Characters.Roy.toLowerCase()) {
-            return Characters.Roy;
-        } else if (char == `ryu` || char == Characters.Ryu.toLowerCase()) {
-            return Characters.Ryu;
-        } else if (char == `sora` || char == Characters.Sora.toLowerCase()) {
-            return Characters.Sora;
+        } else if (levelName == `Gilded Scimitar`) {
+            return `${publicAssetLink}/assets/smasherscape/Gilded_Scimmy.png?raw=true`;
+        } else {
+            return `${publicAssetLink}/assets/smasherscape/Gilded_Scimmy.png?raw=true`;
         }
     }
 
@@ -481,9 +390,296 @@ export default function Smasherscape(props) {
             plyr.level.name = `Rune Scimitar`;
             plyr.experience.nextLevelAt = 101333;
             plyr.experience.remainingXP = (101333 - xp);
+        } else if (xp >= 101333 && xp < 111945) {
+            plyr.level.num = 50;
+            plyr.level.name = `Gilded Scimitar`;
+            plyr.experience.nextLevelAt = 111945;
+            plyr.experience.remainingXP = (111945 - xp);
+        } else if (xp >= 111945 && xp < 123660) {
+            plyr.level.num = 51;
+            plyr.level.name = `Gilded Scimitar`;
+            plyr.experience.nextLevelAt = 123660;
+            plyr.experience.remainingXP = (123660 - xp);
+        } else if (xp >= 123660 && xp < 136594) {
+            plyr.level.num = 52;
+            plyr.level.name = `Gilded Scimitar`;
+            plyr.experience.nextLevelAt = 136594;
+            plyr.experience.remainingXP = (136594 - xp);
+        } else if (xp >= 136594 && xp < 150872) {
+            plyr.level.num = 53;
+            plyr.level.name = `Gilded Scimitar`;
+            plyr.experience.nextLevelAt = 150872;
+            plyr.experience.remainingXP = (150872 - xp);
+        } else if (xp >= 150872 && xp < 166636) {
+            plyr.level.num = 54;
+            plyr.level.name = `Gilded Scimitar`;
+            plyr.experience.nextLevelAt = 166636;
+            plyr.experience.remainingXP = (166636 - xp);
+        } else if (xp >= 166636 && xp < 184040) {
+            plyr.level.num = 55;
+            plyr.level.name = `Gilded Scimitar`;
+            plyr.experience.nextLevelAt = 184040;
+            plyr.experience.remainingXP = (184040 - xp);
+        } else if (xp >= 184040 && xp < 203254) {
+            plyr.level.num = 56;
+            plyr.level.name = `Gilded Scimitar`;
+            plyr.experience.nextLevelAt = 203254;
+            plyr.experience.remainingXP = (203254 - xp);
+        } else if (xp >= 203254 && xp < 224466) {
+            plyr.level.num = 57;
+            plyr.level.name = `Gilded Scimitar`;
+            plyr.experience.nextLevelAt = 224466;
+            plyr.experience.remainingXP = (224466 - xp);
+        } else if (xp >= 224466 && xp < 247886) {
+            plyr.level.num = 58;
+            plyr.level.name = `Gilded Scimitar`;
+            plyr.experience.nextLevelAt = 247886;
+            plyr.experience.remainingXP = (247886 - xp);
+        } else if (xp >= 247886 && xp < 273742) {
+            plyr.level.num = 59;
+            plyr.level.name = `Gilded Scimitar`;
+            plyr.experience.nextLevelAt = 273742;
+            plyr.experience.remainingXP = (273742 - xp);
+        } else if (xp >= 273742 && xp < 302288) {
+            plyr.level.num = 60;
+            plyr.level.name = `Dragon Scimitar`;
+            plyr.experience.nextLevelAt = 302288;
+            plyr.experience.remainingXP = (302288 - xp);
+        } else if (xp >= 302288 && xp < 333804) {
+            plyr.level.num = 61;
+            plyr.level.name = `Dragon Scimitar`;
+            plyr.experience.nextLevelAt = 333804;
+            plyr.experience.remainingXP = (333804 - xp);
+        } else if (xp >= 333804 && xp < 368599) {
+            plyr.level.num = 62;
+            plyr.level.name = `Dragon Scimitar`;
+            plyr.experience.nextLevelAt = 368599;
+            plyr.experience.remainingXP = (368599 - xp);
+        } else if (xp >= 368599 && xp < 407015) {
+            plyr.level.num = 63;
+            plyr.level.name = `Dragon Scimitar`;
+            plyr.experience.nextLevelAt = 407015;
+            plyr.experience.remainingXP = (407015 - xp);
+        } else if (xp >= 407015 && xp < 449428) {
+            plyr.level.num = 64;
+            plyr.level.name = `Dragon Scimitar`;
+            plyr.experience.nextLevelAt = 449428;
+            plyr.experience.remainingXP = (449428 - xp);
+        } else if (xp >= 449428 && xp < 496254) {
+            plyr.level.num = 65;
+            plyr.level.name = `Dragon Scimitar`;
+            plyr.experience.nextLevelAt = 496254;
+            plyr.experience.remainingXP = (496254 - xp);
+        } else if (xp >= 496254 && xp < 547953) {
+            plyr.level.num = 66;
+            plyr.level.name = `Dragon Scimitar`;
+            plyr.experience.nextLevelAt = 547953;
+            plyr.experience.remainingXP = (547953 - xp);
+        } else if (xp >= 547953 && xp < 605032) {
+            plyr.level.num = 67;
+            plyr.level.name = `Dragon Scimitar`;
+            plyr.experience.nextLevelAt = 605032;
+            plyr.experience.remainingXP = (605032 - xp);
+        } else if (xp >= 605032 && xp < 668051) {
+            plyr.level.num = 68;
+            plyr.level.name = `Dragon Scimitar`;
+            plyr.experience.nextLevelAt = 668051;
+            plyr.experience.remainingXP = (668051 - xp);
+        } else if (xp >= 668051 && xp < 737627) {
+            plyr.level.num = 69;
+            plyr.level.name = `Dragon Scimitar`;
+            plyr.experience.nextLevelAt = 737627;
+            plyr.experience.remainingXP = (737627 - xp);
+        } else if (xp >= 737627 && xp < 814445) {
+            plyr.level.num = 70;
+            plyr.level.name = `Abyssal Whip`;
+            plyr.experience.nextLevelAt = 814445;
+            plyr.experience.remainingXP = (814445 - xp);
         }
 
         return plyr;
+    }
+
+    const calcCharacter = (char) => {
+        if (char == `aegis` || char == `pyra` || char == `mythra` || char == Characters.Aegis.toLowerCase()) {
+            return Characters.Aegis;
+        } else if (char == `banjoandkazooie` || char == `banjo&kazooie` || char == `banjo` || char == `bk` || char == `bandk` || char == `b&k` || char == Characters.BanjoAndKazooie.toLowerCase()) {
+            return Characters.BanjoAndKazooie;
+        } else if (char == `bayonetta` || char == `bayo` || char == Characters.Bayonetta.toLowerCase()) {
+            return Characters.Bayonetta;
+        } else if (char == `bowser` || char == `bow` || char == Characters.Bowser.toLowerCase()) {
+            return Characters.Bowser;
+        } else if (char == `bowserjr` || char == `bj` || char == Characters.BowserJr.toLowerCase()) {
+            return Characters.BowserJr;
+        } else if (char == `byleth` || char == `by` || char == Characters.Byleth.toLowerCase()) {
+            return Characters.Byleth;
+        } else if (char == `captainfalcon` || char == `cf` || char == `falcon` || char == Characters.CaptainFalcon.toLowerCase()) {
+            return Characters.CaptainFalcon;
+        } else if (char == `charizard` || char == `char` || char == Characters.Charizard.toLowerCase()) {
+            return Characters.Charizard;
+        } else if (char == `chrom` || char == `ch` || char == Characters.Chrom.toLowerCase()) {
+            return Characters.Chrom;
+        } else if (char == `cloud` || char == `cl` || char == Characters.Cloud.toLowerCase()) {
+            return Characters.Cloud;
+        } else if (char == `corrin` || char == `co` || char == Characters.Corrin.toLowerCase()) {
+            return Characters.Corrin;
+        } else if (char == `daisy` || char == `da` || char == Characters.Daisy.toLowerCase()) {
+            return Characters.Daisy;
+        } else if (char == `darkpit` || char == `dp` || char == Characters.DarkPit.toLowerCase()) {
+            return Characters.DarkPit;
+        } else if (char == `darksamus` || char == `ds` || char == Characters.DarkSamus.toLowerCase()) {
+            return Characters.DarkSamus;
+        } else if (char == `diddykong` || char == `diddy` || char == Characters.DiddyKong.toLowerCase()) {
+            return Characters.DiddyKong;
+        } else if (char == `donkeykong` || char == `dk` || char == Characters.DonkeyKong.toLowerCase()) {
+            return Characters.DonkeyKong;
+        } else if (char == `drmario` || char == `doc` || char == `dm` || char == Characters.DrMario.toLowerCase()) {
+            return Characters.DrMario;
+        } else if (char == `duckhunt` || char == `dh` || char == Characters.DuckHunt.toLowerCase()) {
+            return Characters.DuckHunt;
+        } else if (char == `falco` || char == `fa` || char == Characters.Falco.toLowerCase()) {
+            return Characters.Falco;
+        } else if (char == `fox` || char == Characters.Fox.toLowerCase()) {
+            return Characters.Fox;
+        } else if (char == `ganondorf` || char == `ganon` || char == `gd` || char == `gnn` || char == Characters.Ganondorf.toLowerCase()) {
+            return Characters.Ganondorf;
+        } else if (char == `greninja` || char == `gren` || char == `grenin` || char == Characters.Greninja.toLowerCase()) {
+            return Characters.Greninja;
+        } else if (char == `hero` || char == `he` || char == `hr` || char == Characters.Hero.toLowerCase()) {
+            return Characters.Hero;
+        } else if (char == `iceclimbers` || char == `icies` || char == `ics` || char == `ic` || char == Characters.IceClimbers.toLowerCase()) {
+            return Characters.IceClimbers;
+        } else if (char == `ike` || char == Characters.Ike.toLowerCase()) {
+            return Characters.Ike;
+        } else if (char == `incineroar` || char == `incin` || char == `inc` || char == Characters.Incineroar.toLowerCase()) {
+            return Characters.Incineroar;
+        } else if (char == `inkling` || char == `inkl` || char == `ink` || char == Characters.Inkling.toLowerCase()) {
+            return Characters.Inkling;
+        } else if (char == `isabelle` || char == `isbl` || char == `isa` || char == Characters.Isabelle.toLowerCase()) {
+            return Characters.Isabelle;
+        } else if (char == `ivysaur` || char == `ivys` || char == `ivy` || char == Characters.Ivysaur.toLowerCase()) {
+            return Characters.Ivysaur;
+        } else if (char == `jigglypuff` || char == `jiggly` || char == `jiggs` || char == `jp` || char == Characters.Jigglypuff.toLowerCase()) {
+            return Characters.Jigglypuff;
+        } else if (char == `joker` || char == Characters.Joker.toLowerCase()) {
+            return Characters.Joker;
+        } else if (char == `kazuya` || char == `kaz` || char == `kz` || char == Characters.Kazuya.toLowerCase()) {
+            return Characters.Kazuya;
+        } else if (char == `ken` || char == `kn` || char == Characters.Ken.toLowerCase()) {
+            return Characters.Ken;
+        }  else if (char == `kingdedede` || char == `ddd` || char == `kd` || char == Characters.KingDedede.toLowerCase()) {
+            return Characters.KingDedede;
+        }  else if (char == `kingkrool` || char == `krool` || char == `rool` || char == `kkr` || char == Characters.KingKRool.toLowerCase()) {
+            return Characters.KingKRool;
+        } else if (char == `kirby` || char == `krb` || char == Characters.Kirby.toLowerCase()) {
+            return Characters.Kirby;
+        } else if (char == `link` || char == `lnk` || char == Characters.Link.toLowerCase()) {
+            return Characters.Link;
+        } else if (char == `littlemac` || char == `lm` || char == Characters.LittleMac.toLowerCase()) {
+            return Characters.LittleMac;
+        } else if (char == `lucario` || char == `luc` || char == Characters.Lucario.toLowerCase()) {
+            return Characters.Lucario;
+        } else if (char == `lucas` || char == Characters.Lucas.toLowerCase()) {
+            return Characters.Lucas;
+        } else if (char == `lucina` || char == Characters.Lucina.toLowerCase()) {
+            return Characters.Lucina;
+        } else if (char == `luigi` || char == `lg` || char == Characters.Luigi.toLowerCase()) {
+            return Characters.Luigi;
+        } else if (char == `mario` || char == Characters.Mario.toLowerCase()) {
+            return Characters.Mario;
+        } else if (char == `marth` || char == Characters.Marth.toLowerCase()) {
+            return Characters.Marth;
+        } else if (char == `megaman` || char == `mm` || char == `mega` || char == Characters.MegaMan.toLowerCase()) {
+            return Characters.MegaMan;
+        } else if (char == `metaknight` || char == `meta` || char == `mk` || char == Characters.MetaKnight.toLowerCase()) {
+            return Characters.MetaKnight;
+        } else if (char == `mt` || char == `mewtwo` || char == `m2` || char == Characters.Mewtwo.toLowerCase()) {
+            return Characters.Mewtwo;
+        } else if (char == `miibrawler` || char == `brawler` || char == `mb` || char == Characters.MiiBrawler.toLowerCase()) {
+            return Characters.MiiBrawler;
+        } else if (char == `miifighter` || char == `fighter` || char == `mf` || char == Characters.MiiFighter.toLowerCase()) {
+            return Characters.MiiFighter;
+        } else if (char == `miigunner` || char == `gunner` || char == `mg` || char == Characters.MiiGunner.toLowerCase()) {
+            return Characters.MiiGunner;
+        } else if (char == `miiswordfighter` || char == `swordfighter` || char == `ms` || char == Characters.MiiSwordFighter.toLowerCase()) {
+            return Characters.MiiSwordFighter;
+        } else if (char == `minmin` || char == `min` || char == Characters.MinMin.toLowerCase()) {
+            return Characters.MinMin;
+        } else if (char == `mrgame&watch` || char == `gnw` || char == `game&watch` || char == `mrgameandwatch` || char == `gameandwatch` || char == Characters.MrGameAndWatch.toLowerCase()) {
+            return Characters.MrGameAndWatch;
+        } else if (char == `ness` || char == Characters.Ness.toLowerCase()) {
+            return Characters.Ness;
+        } else if (char == `olimar` || char == `oli` || char == Characters.Olimar.toLowerCase()) {
+            return Characters.Olimar;
+        } else if (char == `pacman` || char == `pac` || char == `pm` || char == Characters.PacMan.toLowerCase()) {
+            return Characters.PacMan;
+        } else if (char == `palutena` || char == `palu` || char == Characters.Palutena.toLowerCase()) {
+            return Characters.Palutena;
+        } else if (char == `peach` || char == `pe` || char == Characters.Peach.toLowerCase()) {
+            return Characters.Peach;
+        } else if (char == `pichu` || char == `pi` || char == Characters.Pichu.toLowerCase()) {
+            return Characters.Pichu;
+        } else if (char == `pikachu` || char == `pika` || char == Characters.Pikachu.toLowerCase()) {
+            return Characters.Pikachu;
+        } else if (char == `piranhaplant` || char == `plant` || char == `pp` || char == Characters.PiranhaPlant.toLowerCase()) {
+            return Characters.PiranhaPlant;
+        } else if (char == `pit` || char == Characters.Pit.toLowerCase()) {
+            return Characters.Pit;
+        } else if (char == `pokemontrainer` || char == `pt` || char == Characters.PokemonTrainer.toLowerCase()) {
+            return Characters.PokemonTrainer;
+        } else if (char == `richter` || char == `ri` || char == Characters.Richter.toLowerCase()) {
+            return Characters.Richter;
+        } else if (char == `ridley` || char == `rid` || char == Characters.Ridley.toLowerCase()) {
+            return Characters.Ridley;
+        } else if (char == `rob` || char == Characters.ROB.toLowerCase()) {
+            return Characters.ROB;
+        } else if (char == `robin` || char == `robi` || char == Characters.Robin.toLowerCase()) {
+            return Characters.Robin;
+        } else if (char == `rosalina&luma` || char == `rosalinaandluma` || char == `randl` || char == `rosa` || char == `r&l` || char == Characters.RosalinaAndLuma.toLowerCase()) {
+            return Characters.RosalinaAndLuma;
+        } else if (char == `roy` || char == Characters.Roy.toLowerCase()) {
+            return Characters.Roy;
+        } else if (char == `ryu` || char == Characters.Ryu.toLowerCase()) {
+            return Characters.Ryu;
+        } else if (char == `samus` || char == `samu` || char == Characters.Samus.toLowerCase()) {
+            return Characters.Samus;
+        } else if (char == `sephiroth` || char == `sephi` || char == `seph` || char == Characters.Sephiroth.toLowerCase()) {
+            return Characters.Sephiroth;
+        } else if (char == `sheik` || char == `she` || char == Characters.Sheik.toLowerCase()) {
+            return Characters.Sheik;
+        } else if (char == `shulk` || char == `shlk` || char == Characters.Shulk.toLowerCase()) {
+            return Characters.Shulk;
+        } else if (char == `simon` || char == `simo` || char == Characters.Simon.toLowerCase()) {
+            return Characters.Simon;
+        } else if (char == `snake` || char == `snk` || char == `ak` || char == Characters.Snake.toLowerCase()) {
+            return Characters.Snake;
+        } else if (char == `sonic` || char == `soni` || char == `snc` || char == Characters.Sonic.toLowerCase()) {
+            return Characters.Sonic;
+        } else if (char == `sora` || char == `sor` || char == Characters.Sora.toLowerCase()) {
+            return Characters.Sora;
+        } else if (char == `steve` || char == `stev` || char == `ste` || char == `stv` || char == Characters.Steve.toLowerCase()) {
+            return Characters.Steve;
+        } else if (char == `terry` || char == `terr` || char == `trry` || char == `ter` || char == `try` || char == Characters.Terry.toLowerCase()) {
+            return Characters.Terry;
+        } else if (char == `toonlink` || char == `tlink` ||  char == `toon` || char == `tl` || char == Characters.ToonLink.toLowerCase()) {
+            return Characters.ToonLink;
+        } else if (char == `villager` || char == `vill` || char == Characters.Villager.toLowerCase()) {
+            return Characters.Villager;
+        } else if (char == `wario` || char == `war` || char == Characters.Wario.toLowerCase()) {
+            return Characters.Wario;
+        } else if (char == `wiifittrainer` || char == `wft` || char == `fit` || char == Characters.WiiFitTrainer.toLowerCase()) {
+            return Characters.WiiFitTrainer;
+        } else if (char == `wolf` || char == `wlf` || char == `wol` || char == Characters.Wolf.toLowerCase()) {
+            return Characters.Wolf;
+        } else if (char == `yoshi` || char == `yosh` || char == `ysh` || char == Characters.Yoshi.toLowerCase()) {
+            return Characters.Yoshi;
+        } else if (char == `younglink` || char == `ylink` || char == `yl` || char == Characters.YoungLink.toLowerCase()) {
+            return Characters.YoungLink;
+        } else if (char == `zelda` || char == `zeld` || char == `zel` || char == Characters.Zelda.toLowerCase()) {
+            return Characters.Zelda;
+        } else if (char == `zerosuitsamus` || char == `zerosuit` || char == `zero` || char == `zss` || char == Characters.ZeroSuitSamus.toLowerCase()) {
+            return Characters.ZeroSuitSamus;
+        }
     }
 
     const calcPlayerCharacterIcon = (char) => {
@@ -594,20 +790,78 @@ export default function Smasherscape(props) {
             return `${publicAssetImageLink}/MinMin.webp`;
         } else if (char == `mrgame&watch` || char == `gnw` || char == `game&watch` || char == `mrgameandwatch` || char == `gameandwatch` || char == Characters.MrGameAndWatch.toLowerCase()) {
             return `${publicAssetImageLink}/MrGame&Watch.webp`;
-        } else if (char == `Ness` || char == Characters.Ness.toLowerCase()) {
+        } else if (char == `ness` || char == Characters.Ness.toLowerCase()) {
             return `${publicAssetImageLink}/Ness.webp`;
+        } else if (char == `olimar` || char == `oli` || char == Characters.Olimar.toLowerCase()) {
+            return `${publicAssetImageLink}/Olimar.webp`;
+        } else if (char == `pacman` || char == `pac` || char == `pm` || char == Characters.PacMan.toLowerCase()) {
+            return `${publicAssetImageLink}/Pac-Man.webp`;
         } else if (char == `palutena` || char == `palu` || char == Characters.Palutena.toLowerCase()) {
             return `${publicAssetImageLink}/Palutena.webp`;
         } else if (char == `peach` || char == `pe` || char == Characters.Peach.toLowerCase()) {
             return `${publicAssetImageLink}/Peach.webp`;
-        } else if (char == `pt` || char == `pokemontrainer` || char == Characters.PokemonTrainer.toLowerCase()) {
+        } else if (char == `pichu` || char == `pi` || char == Characters.Pichu.toLowerCase()) {
+            return `${publicAssetImageLink}/Pichu.webp`;
+        } else if (char == `pikachu` || char == `pika` || char == Characters.Pikachu.toLowerCase()) {
+            return `${publicAssetImageLink}/Pikachu.webp`;
+        } else if (char == `piranhaplant` || char == `plant` || char == `pp` || char == Characters.PiranhaPlant.toLowerCase()) {
+            return `${publicAssetImageLink}/PiranhaPlant.webp`;
+        } else if (char == `pit` || char == Characters.Pit.toLowerCase()) {
+            return `${publicAssetImageLink}/Pit.webp`;
+        } else if (char == `pokemontrainer` || char == `pt` || char == Characters.PokemonTrainer.toLowerCase()) {
             return `${publicAssetImageLink}/PokemonTrainer.webp`;
+        } else if (char == `richter` || char == `ri` || char == Characters.Richter.toLowerCase()) {
+            return `${publicAssetImageLink}/Richter.webp`;
+        } else if (char == `ridley` || char == `rid` || char == Characters.Ridley.toLowerCase()) {
+            return `${publicAssetImageLink}/Ridley.webp`;
+        } else if (char == `rob` || char == Characters.ROB.toLowerCase()) {
+            return `${publicAssetImageLink}/ROB.webp`;
+        } else if (char == `robin` || char == `robi` || char == Characters.Robin.toLowerCase()) {
+            return `${publicAssetImageLink}/Robin.webp`;
+        } else if (char == `rosalina&luma` || char == `rosalinaandluma` || char == `randl` || char == `rosa` || char == `r&l` || char == Characters.RosalinaAndLuma.toLowerCase()) {
+            return `${publicAssetImageLink}/Rosalina.webp`;
         } else if (char == `roy` || char == Characters.Roy.toLowerCase()) {
             return `${publicAssetImageLink}/Roy.webp`;
         } else if (char == `ryu` || char == Characters.Ryu.toLowerCase()) {
             return `${publicAssetImageLink}/Ryu.webp`;
+        } else if (char == `samus` || char == `samu` || char == Characters.Samus.toLowerCase()) {
+            return `${publicAssetImageLink}/Samus.webp`;
+        } else if (char == `sephiroth` || char == `sephi` || char == `seph` || char == Characters.Sephiroth.toLowerCase()) {
+            return `${publicAssetImageLink}/Sephiroth.webp`;
+        } else if (char == `sheik` || char == `she` || char == Characters.Sheik.toLowerCase()) {
+            return `${publicAssetImageLink}/Sheik.webp`;
+        } else if (char == `shulk` || char == `shlk` || char == Characters.Shulk.toLowerCase()) {
+            return `${publicAssetImageLink}/Shulk.webp`;
+        } else if (char == `simon` || char == `simo` || char == Characters.Simon.toLowerCase()) {
+            return `${publicAssetImageLink}/Simon.webp`;
+        } else if (char == `snake` || char == `snk` || char == `ak` || char == Characters.Snake.toLowerCase()) {
+            return `${publicAssetImageLink}/Snake.webp`;
+        } else if (char == `sonic` || char == `soni` || char == `snc` || char == Characters.Sonic.toLowerCase()) {
+            return `${publicAssetImageLink}/Sonic.webp`;
         } else if (char == `sora` || char == Characters.Sora.toLowerCase()) {
             return `${publicAssetImageLink}/Sora.webp`;
+        } else if (char == `steve` || char == `stev` || char == `ste` || char == `stv` || char == Characters.Steve.toLowerCase()) {
+            return `${publicAssetImageLink}/Steve.webp`;
+        } else if (char == `terry` || char == `terr` || char == `trry` || char == `ter` || char == `try` || char == Characters.Terry.toLowerCase()) {
+            return `${publicAssetImageLink}/Terry.webp`;
+        } else if (char == `toonlink` || char == `tlink` ||  char == `toon` || char == `tl` || char == Characters.ToonLink.toLowerCase()) {
+            return `${publicAssetImageLink}/ToonLink.webp`;
+        } else if (char == `villager` || char == `vill` || char == Characters.Villager.toLowerCase()) {
+            return `${publicAssetImageLink}/Villager.webp`;
+        } else if (char == `wario` || char == `war` || char == Characters.Wario.toLowerCase()) {
+            return `${publicAssetImageLink}/Wario.webp`;
+        } else if (char == `wiifittrainer` || char == `wft` || char == `fit` || char == Characters.WiiFitTrainer.toLowerCase()) {
+            return `${publicAssetImageLink}/WiiFitTrainer.webp`;
+        } else if (char == `wolf` || char == `wlf` || char == `wol` || char == Characters.Wolf.toLowerCase()) {
+            return `${publicAssetImageLink}/Wolf.webp`;
+        } else if (char == `yoshi` || char == `yosh` || char == `ysh` || char == Characters.Yoshi.toLowerCase()) {
+            return `${publicAssetImageLink}/Yoshi.webp`;
+        } else if (char == `younglink` || char == `ylink` || char == `yl` || char == Characters.YoungLink.toLowerCase()) {
+            return `${publicAssetImageLink}/YoungLink.webp`;
+        } else if (char == `zelda` || char == `zeld` || char == `zel` || char == Characters.Zelda.toLowerCase()) {
+            return `${publicAssetImageLink}/Zelda.webp`;
+        } else if (char == `zerosuitsamus` || char == `zerosuit` || char == `zero` || char == `zss` || char == Characters.ZeroSuitSamus.toLowerCase()) {
+            return `${publicAssetImageLink}/ZeroSuitSamus.webp`;
         }
     }
 
