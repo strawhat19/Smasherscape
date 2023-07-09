@@ -89,12 +89,25 @@ export default function Smasherscape(props) {
     }
 
     const deletePlayers = (commandParams) => {
-        let playerToDelete = commandParams[1].charAt(0).toUpperCase() + commandParams[1].slice(1).toLowerCase();
-        setPlayers(prevPlayers => {
-            let updatedPlayers = prevPlayers.filter(plyr => plyr.name != playerToDelete);
-            setFilteredPlayers(updatedPlayers);
-            return updatedPlayers;
+        let playersToDeleteFromDB = [];
+        let playersToDelete = commandParams.filter((comm, commIndex) => commIndex != 0 && comm);
+
+        playersToDelete.forEach(player => {
+            let playerDB = players.find(plyr => plyr?.name.toLowerCase() == player.toLowerCase() || plyr?.name.toLowerCase().includes(player.toLowerCase()));
+            if (playerDB) {
+                playersToDeleteFromDB.push(playerDB);
+            }
         });
+
+        if (playersToDeleteFromDB.length > 0) {
+            playersToDeleteFromDB.forEach(playerDB => {
+                setPlayers(prevPlayers => {
+                    let updatedPlayers = prevPlayers.filter(plyr => plyr.name.toLowerCase() != playerDB.name.toLowerCase());
+                    setFilteredPlayers(updatedPlayers);
+                    return updatedPlayers;
+                });
+            })
+        }
     }
 
     const updatePlayers = (commandParams) => {
