@@ -19,6 +19,11 @@ export default function Smasherscape(props) {
     const calcPlayerLosses = (plyr) => plyr.plays.filter(ply => ply.loser.toLowerCase() == plyr.name.toLowerCase()).length;
     const calcPlayerCharacterTimesPlayed = (plyr, char) => plyr.plays.map(ply => ply.character).filter(ply => ply.toLowerCase() == char || ply.toLowerCase().includes(char)).length;
 
+    const getCharacterTitle = (char) => {
+        if (char.split(` `).length > 1) char = char.split(` `).join(``).toLowerCase();
+        return Characters[char];
+    }
+
     const searchPlayers = (e: FormEvent) => {
         let field = e.target as HTMLInputElement;
         if (field.name == `search`) {
@@ -213,8 +218,8 @@ export default function Smasherscape(props) {
                                         <div className={`playsContainer`}>
                                             {calcPlayerCharactersPlayed(plyr).map((char, charIndex) => {
                                                 return (
-                                                    <Badge title={`Played ${Characters[char]} ${calcPlayerCharacterTimesPlayed(plyr, char)} Time(s)`} key={charIndex} badgeContent={calcPlayerCharacterTimesPlayed(plyr, char)} color="primary">
-                                                        <img className={`charImg`} width={35} src={calcPlayerCharacterIcon(char)} alt={Characters[char]} />
+                                                    <Badge title={`Played ${getCharacterTitle(char)} ${calcPlayerCharacterTimesPlayed(plyr, char)} Time(s)`} key={charIndex} badgeContent={calcPlayerCharacterTimesPlayed(plyr, char)} color="primary">
+                                                        <img className={`charImg`} width={35} src={calcPlayerCharacterIcon(char)} alt={getCharacterTitle(char)} />
                                                     </Badge>
                                                 )
                                             })}
