@@ -62,30 +62,33 @@ export default function Smasherscape(props) {
         else return `${publicAssetLink}/assets/smasherscape/OSRS_Top_Hat.png?raw=true`;
     }
 
-    const addPlayer = (commandParams) => {
-        let playerToAdd = commandParams[1].charAt(0).toUpperCase() + commandParams[1].slice(1).toLowerCase();
-        setPlayers(prevPlayers => {
-            let updatedPlayers = [...prevPlayers, {
-                id: players.length + 1,
-                name: playerToAdd,
-                plays: [],
-                level: {
-                    num: 1,
-                    name: `Bronze Scimitar`
-                },
-                experience: {
-                    xp: 0,
-                    arenaXP: 0,
-                    nextLevelAt: 83,
-                    remainingXP: 83
-                },
-            }];
-            setFilteredPlayers(updatedPlayers);
-            return updatedPlayers;
-        });
+    const addPlayers = (commandParams) => {
+        let playersToAdd = commandParams.filter((comm, commIndex) => commIndex != 0 && comm);
+
+        playersToAdd.forEach(plyr => {
+            setPlayers(prevPlayers => {
+                let updatedPlayers = [...prevPlayers, {
+                    id: players.length + 1,
+                    name: plyr.charAt(0).toUpperCase() + plyr.slice(1).toLowerCase(),
+                    plays: [],
+                    level: {
+                        num: 1,
+                        name: `Bronze Scimitar`
+                    },
+                    experience: {
+                        xp: 0,
+                        arenaXP: 0,
+                        nextLevelAt: 83,
+                        remainingXP: 83
+                    },
+                }];
+                setFilteredPlayers(updatedPlayers);
+                return updatedPlayers;
+            });
+        })
     }
 
-    const deletePlayer = (commandParams) => {
+    const deletePlayers = (commandParams) => {
         let playerToDelete = commandParams[1].charAt(0).toUpperCase() + commandParams[1].slice(1).toLowerCase();
         setPlayers(prevPlayers => {
             let updatedPlayers = prevPlayers.filter(plyr => plyr.name != playerToDelete);
@@ -164,9 +167,9 @@ export default function Smasherscape(props) {
                 if (commandParams[0].includes(`!upd`)) {
                     updatePlayers(commandParams);
                 } else if (commandParams[0].includes(`!add`)) {
-                    addPlayer(commandParams);
+                    addPlayers(commandParams);
                 } else if (commandParams[0].includes(`!del`)) {
-                    deletePlayer(commandParams);
+                    deletePlayers(commandParams);
                 }
             }
         } else {
