@@ -113,22 +113,35 @@ export default function Smasherscape(props) {
     const updatePlayers = (commandParams) => {
         let playerOne = commandParams[1].toLowerCase();
         let playerTwo = commandParams[3].toLowerCase();
-        let characterOne = commandParams[5].toLowerCase();
-        let characterTwo = commandParams[7].toLowerCase();
-        let stocksTaken = parseInt(commandParams[8]) || 0;
         let date = moment().format(`MMMM Do YYYY, h:mm:ss a`);
+
+        let characterOne;
+        let characterTwo;
+        let stocksTaken;
 
         let playerOneDB = players.find(plyr => plyr?.name.toLowerCase() == playerOne || plyr?.name.toLowerCase().includes(playerOne));
         let playerTwoDB = players.find(plyr => plyr?.name.toLowerCase() == playerTwo || plyr?.name.toLowerCase().includes(playerTwo));
 
+        if (commandParams.length >= 8) {
+            characterOne = commandParams[5].toLowerCase();
+            characterTwo = commandParams[7].toLowerCase();
+            stocksTaken = parseInt(commandParams[8]) || 0;
+        }
+
         if (!playerOneDB || !playerTwoDB) {
-            alert(`Can't find players with those names.`);
+            showAlert(`Can't Find Players`, <h1>
+                Can't find players with those names.
+            </h1>, `65%`, `35%`);
             return;
         } else if (!characterOne || !characterTwo) {
-            alert(`Which characters did they play?`);
+            showAlert(`Missing Characters`, <h1>
+                Which Charcaters Did They Play?
+            </h1>, `65%`, `35%`);
             return;
         } else if (!Characters[characterOne] || !Characters[characterTwo]) {
-            alert(`Cannot find characters with those names`);
+            showAlert(`Cannot Find Characters`, <h1>
+                Can't find characters with those names.
+            </h1>, `65%`, `35%`);
             return;
         } else {
 

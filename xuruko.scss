@@ -8,6 +8,8 @@
     --smasherscapeBronze2: #f6cc00;
     --smasherscapeCream: #f5f581;
     --smasherscapePurple: #7b4e9b;
+    --xurukoGradientGreenBlue: linear-gradient(90deg, var(--smasherscapeGreen), var(--smasherscapeBlue));
+    --xurukoGradientBlueGreen: linear-gradient(90deg, var(--smasherscapeBlue), var(--smasherscapeGreen));
 }
 
 @font-face {
@@ -50,7 +52,7 @@ li {
                 width: 100%;
                 height: 1px;
                 position: absolute;
-                background: linear-gradient(90deg, var(--smasherscapeGreen), var(--smasherscapeBlue));
+                background: var(--xurukoGradientGreenBlue);
             }
         }
     }
@@ -343,7 +345,7 @@ nav {
             margin: 0 auto;
             position: absolute;
             transform: translateX(-50%);
-            background: linear-gradient(90deg, var(--smasherscapeGreen), var(--smasherscapeBlue));
+            background: var(--xurukoGradientGreenBlue);
         }
     }
     h1 {
@@ -351,6 +353,12 @@ nav {
     }
     a, button {
         font-size: 18px !important;
+    }
+}
+
+.alert {
+    h1 {
+        font-size: 1.75em;
     }
 }
 
@@ -368,7 +376,7 @@ button[title="Change theme"] {
         content: "";
         height: 100%;
         position: absolute;
-        background: linear-gradient(-90deg, var(--smasherscapeGreen), var(--smasherscapeBlue));
+        background: var(--xurukoGradientGreenBlue);
     }
 }
 
@@ -434,7 +442,7 @@ form {
             position: absolute;
             border-radius: 8px;
             transform: scale(1.02, 1.3);
-            background: linear-gradient(90deg, var(--smasherscapeGreen), var(--smasherscapeBlue));
+            background: var(--xurukoGradientGreenBlue) !important;
         }
         input {
             font-size: 18px;
@@ -475,7 +483,7 @@ form {
     padding: 15px;
     font-size: 18px;
     border-radius: 8px;
-    background: linear-gradient(90deg, var(--smasherscapeGreen), var(--smasherscapeBlue)) !important;
+    background: var(--xurukoGradientGreenBlue) !important;
 }
 
 @media (min-width: 768px) {
