@@ -411,6 +411,7 @@ footer {
 @media (max-width: 768px) {
     .dark {
         aside {
+            max-height: max-content;
             backdrop-filter: blur(5px);
             background: rgba(0, 0, 0, 0.6) !important;
             div {
@@ -530,12 +531,23 @@ form {
 }
 
 @media (max-width: 768px) {
+    .dev {
+        display: none !important;
+    }
     form {
-        display: none;
-        // display: flex !important;
-        // grid-gap: 25px !important;
-        // margin: 1em auto !important;
-        // flex-direction: column !important;
+        display: flex !important;
+        grid-gap: 25px !important;
+        margin: 1em auto !important;
+        flex-direction: column !important;
+        .materialBGInputWrapper {
+            z-index: 10;
+            width: 100%;
+            transform: scaleX(1.01);
+        }
+        button {
+            align-items: center;
+            justify-content: center;
+        }
     }
 }
 
@@ -587,7 +599,11 @@ form {
 }
 
 div[role="presentation"] {
-    background-color: white;
+    z-index: 99 !important;
+    background: white;
+    border-radius: 8px;
+    display: flex;
+    grid-gap: 5px;
 }
 
 .MuiAutocomplete-popupIndicatorOpen {

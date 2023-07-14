@@ -252,8 +252,9 @@ html[class~="dark"] {
 article {
     padding: 1em 0;
     main {
-        max-width: 92rem !important;
+        max-width: 100% !important;
         width: 100% !important;
+        margin: 0 auto;
         padding: 0;
     }
 }
@@ -334,6 +335,12 @@ article {
 
 html[class~="dark"] .dark\:nx-border-neutral-800 {
     border-color: hsl(var(--nextra-primary-hue)100% 94%/.1) !important;
+}
+
+html[class~="dark"] .dark\:nx-bg-black\/60 {
+    backdrop-filter: blur(5px);
+    transition: var(--transition);
+    background-color: rgba(0, 0, 0, 0.2) !important;
 }
 
 nav {

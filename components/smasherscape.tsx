@@ -217,8 +217,8 @@ export default function Smasherscape(props) {
     return <main>
         <section className={`formsSection`}>
             {/* <h5 className={`heading`}>Forms</h5> */}
-            {devEnv && <form onSubmit={(e) => commandsForm(e)} action="submit" className={`gridForm commandsForm`}>
-                <div className={`inputWrapper`}>
+            {devEnv && <form onSubmit={(e) => commandsForm(e)} action="submit" className={`gridForm commandsForm ${devEnv ? `dev` : ``}`}>
+                <div className={`inputWrapper materialBGInputWrapper`}>
                     <div className="inputBG materialBG"></div>
                     <Autocomplete
                         disablePortal
@@ -231,7 +231,7 @@ export default function Smasherscape(props) {
                         renderInput={(params) => <TextField name={`search`} {...params} label="Player" />}
                     />
                 </div>
-                <div className={`inputWrapper`}>
+                <div className={`inputWrapper materialBGInputWrapper`}>
                     <div className="inputBG materialBG"></div>
                     <Autocomplete
                         disablePortal
@@ -249,7 +249,7 @@ export default function Smasherscape(props) {
             {/* <StepForm /> */}
             <form onSubmit={(e) => handleCommands(e)} action="submit" className="gridForm">
                 {/* <div className={`inputWrapper`}><div className="inputBG"></div><input type="search" className="search" name={`search`} placeholder={`Search...`} /></div> */}
-                <div className={`inputWrapper`}>
+                <div className={`inputWrapper materialBGInputWrapper`}>
                     <div className="inputBG materialBG"></div>
                     <Autocomplete
                         disablePortal
