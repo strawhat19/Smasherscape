@@ -49,6 +49,13 @@ article {
     font-family: 'Montserrat' !important;
 }
 
+.MuiStepLabel-root {
+    flex-direction: row;
+    span {
+        width: max-content;
+    }
+}
+
 .MuiPaper-root {
     background: transparent !important;
 }
@@ -80,10 +87,15 @@ article {
     }
     .MuiTextField-root {
         label {
+            display: flex;
+            flex-direction: row;
             color: white !important;
             padding-left: 1em !important;
             &:not(.Mui-focused) {
                 color: rgba(255,255,255,0.65) !important;
+            }
+            span {
+                width: max-content;
             }
         }
     }
@@ -221,3 +233,4 @@ form {
         height: 100%;
     }
 }
+

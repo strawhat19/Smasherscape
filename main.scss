@@ -62,6 +62,43 @@
     --transition: 0.24s cubic-bezier(0.77, 0.2, 0.05, 1) !important;
 }
 
+h1 {
+    font-size: 6em;
+    &.heading {
+        font-size: 6em !important;
+    }
+}
+h2 {
+    font-size: 5em;
+     &.heading {
+        font-size: 5em !important;
+    }
+}
+h3 {
+    font-size: 4em;
+     &.heading {
+        font-size: 4em !important;
+    }
+}
+h4 {
+    font-size: 3em;
+     &.heading {
+        font-size: 3em !important;
+    }
+}
+h5 {
+    font-size: 2em;
+     &.heading {
+        font-size: 2em !important;
+    }
+}
+h6 {
+    font-size: 1em;
+     &.heading {
+        font-size: 1em !important;
+    }
+}
+
 html[class~="dark"] {
      @supports (-webkit-backdrop-filter:blur(1px)) or ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
         background: rgba(0, 0, 0, 1) !important;
@@ -732,7 +769,7 @@ section {
         width: 100%;
         height: auto;
         display: flex;
-        grid-gap: 1em;
+        grid-gap: 5px;
         flex-direction: column;
     }
 }

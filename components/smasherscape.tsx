@@ -1,7 +1,11 @@
 import  moment from 'moment';
 import { db } from '../firebase';
+import StepForm from './StepForm';
 import { Badge } from '@mui/material';
 import { Characters } from './Characters';
+import Skeleton from '@mui/material/Skeleton';
+import TextField from '@mui/material/TextField';
+import Autocomplete from '@mui/material/Autocomplete';
 import { calcPlayerLevelAndExperience } from './Levels';
 import { calcPlayerCharacterIcon } from './CharacterIcons';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
@@ -24,20 +28,18 @@ export default function Smasherscape(props) {
         return Characters[char];
     }
 
-    const searchPlayers = (e: FormEvent) => {
+    const searchPlayers = (e: any, value?: any) => {
         let field = e.target as HTMLInputElement;
-        if (field.name == `search`) {
-            if (field.value != ``) {
-                setFilteredPlayers(players.filter(plyr => {
-                    return Object.values(plyr).some(val =>
-                        typeof val === `string` && val.toLowerCase().includes(field.value.toLowerCase())
-                    );
-                }));
-            } else {
-                setFilteredPlayers(players);
-            }
+        if (field && field.name == `commands`) return;
+        if (!value) value = field.value;
+        if (value && value != ``) {
+            setFilteredPlayers(players.filter(plyr => {
+                return Object.values(plyr).some(val =>
+                    typeof val === `string` && val.toLowerCase().includes(value.toLowerCase())
+                );
+            }));
         } else {
-            return;
+            setFilteredPlayers(players);
         }
     }
 
@@ -182,6 +184,11 @@ export default function Smasherscape(props) {
         }
     }
 
+    const commandsForm = (e: FormEvent) => {
+        e.preventDefault();
+        console.log(`Commands Form`, e);
+    }
+
     const handleCommands = (e: FormEvent) => {
         e.preventDefault();
         let field = commandsInput.current as HTMLInputElement;
@@ -203,12 +210,33 @@ export default function Smasherscape(props) {
         }
     }
 
-    return <>
-        <form onInput={(e) => searchPlayers(e)} onSubmit={(e) => handleCommands(e)} action="submit" className="gridForm">
-            <div className={`inputWrapper`}><div className="inputBG"></div><input type="search" className="search" name={`search`} placeholder={`Search...`} /></div>
-            <div className={`inputWrapper`}><div className="inputBG"></div><input ref={commandsInput} type="text" className="commands" name={`commands`} placeholder={`Commands...`} /></div>
-            <button className={`formSubmitButton`} type={`submit`}>Submit</button>
-        </form>
+    return <main>
+        <section className={`formsSection`}>
+            {/* <h5 className={`heading`}>Forms</h5> */}
+            <form onSubmit={(e) => commandsForm(e)} action="submit" className={`gridForm commandsForm`}>
+                <div className={`inputWrapper`}>
+                    <div className="inputBG"></div>
+                    {/* <input type="search" className="search" name={`search`} placeholder={`Search...`} /> */}
+                    <Autocomplete
+                        disablePortal
+                        autoHighlight
+                        id="combo-box-demo"
+                        sx={{ width: `100%` }}
+                        options={players.map(plyr => plyr.name)}
+                        onChange={(e, val) => searchPlayers(e, val)}
+                        onInputChange={(e, val) => searchPlayers(e, val)}
+                        renderInput={(params) => <TextField name={`search`} {...params} label="Select Player" />}
+                    />
+                </div>
+                <button className={`formSubmitButton`} type={`submit`}>Submit</button>
+            </form>
+            {/* <StepForm /> */}
+            <form onInput={(e) => searchPlayers(e)} onSubmit={(e) => handleCommands(e)} action="submit" className="gridForm">
+                <div className={`inputWrapper`}><div className="inputBG"></div><input type="search" className="search" name={`search`} placeholder={`Search...`} /></div>
+                <div className={`inputWrapper`}><div className="inputBG"></div><input ref={commandsInput} type="text" className="commands" name={`commands`} placeholder={`Commands...`} /></div>
+                <button className={`formSubmitButton`} type={`submit`}>Submit</button>
+            </form>
+        </section>
         <div id={props.id} className={`${props.className} playerGrid ${filteredPlayers.length == 0 ? `empty` : `populated`}`}>
             {filteredPlayers.length == 0 && <>
                 <div className="gridCard"><h1 className={`runescape_large noPlayersFound`}>No Players Found</h1></div>
@@ -220,70 +248,74 @@ export default function Smasherscape(props) {
             
                 return b.plays.length - a.plays.length;
             }).map((plyr, plyrIndex) => {
-                return (
-                    <div className="gridCard" key={plyrIndex}>
-                        <LazyLoadImage effect="blur" src={`${publicAssetLink}/assets/smasherscape/OSRS_Card_Empty.png?raw=true`} className={`cardBG`} alt={`Smasherscape Player Card`} />
-                        <LazyLoadImage effect="blur" src={`${publicAssetLink}/assets/smasherscape/OSRS_Card_Template_Border_Only.png?raw=true`} className={`cardBG border`} alt={`Smasherscape Player Card`} />
-                        <div className="playerCardContent">
-                            <div className="cardTopRow">
-                                <div className="logoWithWords">
-                                    <img width={70} src={`${publicAssetLink}/assets/smasherscape/OSRS_Top_Hat.png?raw=true`} alt={`Tophat Logo`} />
-                                    <h3>Xuruko's<br />SmasherScape</h3>
-                                </div>
-                                <h2>{plyr?.name}</h2>
-                            </div>
-                            <div className="cardMiddleRow">
-                                <div className="imgLeftCol">
-                                    <img width={150} src={calcPlayerLevelImage(plyr?.level?.name)} alt={plyr?.level?.name} />
-                                    <h4 className={`levelName ${plyr?.level?.name.split(` `)[0]}`}>{plyr?.level?.name}</h4>
-                                </div>
-                                <div className="recordPlays">
-                                    <div className="record">
-                                        <h3>Record</h3>
-                                        <h4>{calcPlayerWins(plyr)} - {calcPlayerLosses(plyr)}</h4>
+                if (plyr) {
+                    return (
+                        <div className="gridCard" key={plyrIndex}>
+                            <LazyLoadImage effect="blur" src={`${publicAssetLink}/assets/smasherscape/OSRS_Card_Empty.png?raw=true`} className={`cardBG`} alt={`Smasherscape Player Card`} />
+                            <LazyLoadImage effect="blur" src={`${publicAssetLink}/assets/smasherscape/OSRS_Card_Template_Border_Only.png?raw=true`} className={`cardBG border`} alt={`Smasherscape Player Card`} />
+                            <div className="playerCardContent">
+                                <div className="cardTopRow">
+                                    <div className="logoWithWords">
+                                        <img width={70} src={`${publicAssetLink}/assets/smasherscape/OSRS_Top_Hat.png?raw=true`} alt={`Tophat Logo`} />
+                                        <h3>Xuruko's<br />SmasherScape</h3>
                                     </div>
-                                    <div className="plays">
-                                        <h3>Plays</h3>
-                                        <div className={`playsContainer`}>
-                                            {calcPlayerCharactersPlayed(plyr).map((char, charIndex) => {
-                                                return (
-                                                    <Badge title={`Played ${getCharacterTitle(char)} ${calcPlayerCharacterTimesPlayed(plyr, char)} Time(s)`} key={charIndex} badgeContent={calcPlayerCharacterTimesPlayed(plyr, char)} color="primary">
-                                                        <img className={`charImg`} width={35} src={calcPlayerCharacterIcon(char)} alt={getCharacterTitle(char)} />
-                                                    </Badge>
-                                                )
-                                            })}
+                                    <h2>{plyr?.name}</h2>
+                                </div>
+                                <div className="cardMiddleRow">
+                                    <div className="imgLeftCol">
+                                        <img width={150} src={calcPlayerLevelImage(plyr?.level?.name)} alt={plyr?.level?.name} />
+                                        <h4 className={`levelName ${plyr?.level?.name.split(` `)[0]}`}>{plyr?.level?.name}</h4>
+                                    </div>
+                                    <div className="recordPlays">
+                                        <div className="record">
+                                            <h3>Record</h3>
+                                            <h4>{calcPlayerWins(plyr)} - {calcPlayerLosses(plyr)}</h4>
+                                        </div>
+                                        <div className="plays">
+                                            <h3>Plays</h3>
+                                            <div className={`playsContainer`}>
+                                                {calcPlayerCharactersPlayed(plyr).map((char, charIndex) => {
+                                                    return (
+                                                        <Badge title={`Played ${getCharacterTitle(char)} ${calcPlayerCharacterTimesPlayed(plyr, char)} Time(s)`} key={charIndex} badgeContent={calcPlayerCharacterTimesPlayed(plyr, char)} color="primary">
+                                                            <img className={`charImg`} width={35} src={calcPlayerCharacterIcon(char)} alt={getCharacterTitle(char)} />
+                                                        </Badge>
+                                                    )
+                                                })}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="rightCol">
+                                        <div className="level">
+                                            <h4 className={`levelNum levelTop`}>{plyr?.level?.num}</h4>
+                                            <div className="borderSep"></div>
+                                            <h4 className={`levelNum levelBot`}>{plyr?.level?.num}</h4>
+                                        </div>
+                                        <div className="experienceDetails">
+                                            <div className="arenaXP xpDetail">
+                                                <div>Arena XP:</div>
+                                                <div>{plyr?.experience.arenaXP.toLocaleString(`en`)}</div>
+                                            </div>
+                                            <div className="nextLevelAt xpDetail">
+                                                <div>Next Level At:</div>
+                                                <div>{plyr?.experience.nextLevelAt.toLocaleString(`en`)}</div>
+                                            </div>
+                                            <div className="remainingXP xpDetail">
+                                                <div>Remaining XP:</div>
+                                                <div>{plyr?.experience.remainingXP.toLocaleString(`en`)}</div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div className="rightCol">
-                                    <div className="level">
-                                        <h4 className={`levelNum levelTop`}>{plyr?.level?.num}</h4>
-                                        <div className="borderSep"></div>
-                                        <h4 className={`levelNum levelBot`}>{plyr?.level?.num}</h4>
-                                    </div>
-                                    <div className="experienceDetails">
-                                        <div className="arenaXP xpDetail">
-                                            <div>Arena XP:</div>
-                                            <div>{plyr?.experience.arenaXP.toLocaleString(`en`)}</div>
-                                        </div>
-                                        <div className="nextLevelAt xpDetail">
-                                            <div>Next Level At:</div>
-                                            <div>{plyr?.experience.nextLevelAt.toLocaleString(`en`)}</div>
-                                        </div>
-                                        <div className="remainingXP xpDetail">
-                                            <div>Remaining XP:</div>
-                                            <div>{plyr?.experience.remainingXP.toLocaleString(`en`)}</div>
-                                        </div>
-                                    </div>
+                                <div className="cardBottomRow">
+                                    <div className="gradient" style={{clipPath: `polygon(0% 0, ${((plyr.experience.arenaXP - plyr.experience.xp) / (plyr.experience.nextLevelAt - plyr.experience.xp)) * 100}% 0%, ${((plyr.experience.arenaXP - plyr.experience.xp) / (plyr.experience.nextLevelAt - plyr.experience.xp)) * 100}% 100%, 0 100%)`}}></div>
                                 </div>
-                            </div>
-                            <div className="cardBottomRow">
-                                <div className="gradient" style={{clipPath: `polygon(0% 0, ${((plyr.experience.arenaXP - plyr.experience.xp) / (plyr.experience.nextLevelAt - plyr.experience.xp)) * 100}% 0%, ${((plyr.experience.arenaXP - plyr.experience.xp) / (plyr.experience.nextLevelAt - plyr.experience.xp)) * 100}% 100%, 0 100%)`}}></div>
                             </div>
                         </div>
-                    </div>
-                )
+                    )
+                } else {
+                    <Skeleton variant="rectangular" width={210} height={118} />
+                }
             })}
         </div>
-    </>
+    </main>
 }
