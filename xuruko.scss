@@ -397,10 +397,11 @@ footer {
 }
 
 .formsSection {
-    grid-gap: 15px;
+    padding: 0;
+    grid-gap: 0;
     flex-direction: column;
     .commandsForm {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
         .inputWrapper {
             width: 100%;
         }
@@ -459,6 +460,7 @@ form {
     grid-template-columns: 1fr 1fr;
     .inputWrapper {
         position: relative;
+        min-height: 55px;
         display: grid;
         width: 98%;
         .inputBG {
@@ -470,6 +472,9 @@ form {
             border-radius: 8px;
             transform: scale(1.02, 1.3);
             background: var(--xurukoGradientGreenBlue) !important;
+            &.materialBG {
+                transform: scale(0.99, 0.98);
+            }
         }
         input {
             font-size: 18px;
@@ -478,6 +483,9 @@ form {
             border: 3px solid black;
             color: black !important;
             background: rgba(255,255,255,0.65) !important;
+            &.MuiAutocomplete-input {
+                min-height: 36px !important;
+            }
             &[type="search"] {
                 border: 3px solid black;
                 color: black !important;
@@ -515,7 +523,9 @@ form {
 
 @media (min-width: 768px) {
     .formSubmitButton {
-        display: none;
+        &:not(.commandsFormSubmit) {
+            display: none;
+        }
     }
 }
 
@@ -572,7 +582,7 @@ form {
 
 .Mui-focused {
     label {
-        top: -5px;
+        top: 15px;
     }
 }
 

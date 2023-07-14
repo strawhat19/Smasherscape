@@ -11,12 +11,12 @@ import { calcPlayerCharacterIcon } from './CharacterIcons';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { FormEvent, useContext, useRef, useState } from 'react';
 import { collection, doc, getDocs, setDoc } from 'firebase/firestore';
-import { formatDate, createXML, StateContext, showAlert } from '../pages/_app';
+import { formatDate, createXML, StateContext, showAlert, dev } from '../pages/_app';
 
 export default function Smasherscape(props) {
 
     const commandsInput = useRef();
-    const { players, setPlayers, filteredPlayers, setFilteredPlayers } = useContext<any>(StateContext);
+    const { players, setPlayers, filteredPlayers, setFilteredPlayers, devEnv, setDevEnv } = useContext<any>(StateContext);
     const [publicAssetLink, setPublicAssetLink] = useState(`https://github.com/strawhat19/Smasherscape/blob/main`);
 
     const calcPlayerWins = (plyr) => plyr.plays.filter(ply => ply.winner.toLowerCase() == plyr.name.toLowerCase()).length;
@@ -26,6 +26,10 @@ export default function Smasherscape(props) {
     const getCharacterTitle = (char) => {
         if (char.split(` `).length > 1) char = char.split(` `).join(``).toLowerCase();
         return Characters[char];
+    }
+
+    const setCommandPlayers = (e: any, value?: any) => {
+        console.log(`Command Players`, value);
     }
 
     const searchPlayers = (e: any, value?: any) => {
@@ -213,10 +217,40 @@ export default function Smasherscape(props) {
     return <main>
         <section className={`formsSection`}>
             {/* <h5 className={`heading`}>Forms</h5> */}
-            <form onSubmit={(e) => commandsForm(e)} action="submit" className={`gridForm commandsForm`}>
+            {devEnv && <form onSubmit={(e) => commandsForm(e)} action="submit" className={`gridForm commandsForm`}>
                 <div className={`inputWrapper`}>
-                    <div className="inputBG"></div>
-                    {/* <input type="search" className="search" name={`search`} placeholder={`Search...`} /> */}
+                    <div className="inputBG materialBG"></div>
+                    <Autocomplete
+                        disablePortal
+                        autoHighlight
+                        id="combo-box-demo"
+                        sx={{ width: `100%` }}
+                        options={players.map(plyr => plyr.name)}
+                        onChange={(e, val) => setCommandPlayers(e, val)}
+                        // onInputChange={(e, val) => searchPlayers(e, val)}
+                        renderInput={(params) => <TextField name={`search`} {...params} label="Player" />}
+                    />
+                </div>
+                <div className={`inputWrapper`}>
+                    <div className="inputBG materialBG"></div>
+                    <Autocomplete
+                        disablePortal
+                        autoHighlight
+                        id="combo-box-demo"
+                        sx={{ width: `100%` }}
+                        options={players.map(plyr => plyr.name)}
+                        onChange={(e, val) => setCommandPlayers(e, val)}
+                        // onInputChange={(e, val) => searchPlayers(e, val)}
+                        renderInput={(params) => <TextField name={`search`} {...params} label="Player" />}
+                    />
+                </div>
+                <button className={`formSubmitButton commandsFormSubmit`} type={`submit`}>Submit</button>
+            </form>}
+            {/* <StepForm /> */}
+            <form onSubmit={(e) => handleCommands(e)} action="submit" className="gridForm">
+                {/* <div className={`inputWrapper`}><div className="inputBG"></div><input type="search" className="search" name={`search`} placeholder={`Search...`} /></div> */}
+                <div className={`inputWrapper`}>
+                    <div className="inputBG materialBG"></div>
                     <Autocomplete
                         disablePortal
                         autoHighlight
@@ -225,14 +259,9 @@ export default function Smasherscape(props) {
                         options={players.map(plyr => plyr.name)}
                         onChange={(e, val) => searchPlayers(e, val)}
                         onInputChange={(e, val) => searchPlayers(e, val)}
-                        renderInput={(params) => <TextField name={`search`} {...params} label="Select Player" />}
+                        renderInput={(params) => <TextField name={`search`} {...params} label="Search..." />}
                     />
                 </div>
-                <button className={`formSubmitButton`} type={`submit`}>Submit</button>
-            </form>
-            {/* <StepForm /> */}
-            <form onInput={(e) => searchPlayers(e)} onSubmit={(e) => handleCommands(e)} action="submit" className="gridForm">
-                <div className={`inputWrapper`}><div className="inputBG"></div><input type="search" className="search" name={`search`} placeholder={`Search...`} /></div>
                 <div className={`inputWrapper`}><div className="inputBG"></div><input ref={commandsInput} type="text" className="commands" name={`commands`} placeholder={`Commands...`} /></div>
                 <button className={`formSubmitButton`} type={`submit`}>Submit</button>
             </form>
