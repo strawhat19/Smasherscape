@@ -423,6 +423,9 @@ footer {
             }
             ul {
                 li {
+                    a {
+                        color: white !important;
+                    }
                     button {
                         font-size: 18px !important;
                     }
@@ -548,7 +551,7 @@ form {
             }
         }
         .materialBGInputWrapper {
-            z-index: 10;
+            z-index: 5;
             width: 100%;
             transform: scaleX(1.01);
         }
@@ -556,6 +559,9 @@ form {
             align-items: center;
             justify-content: center;
         }
+    }
+    .gradient {
+        bottom: 48px !important;
     }
 }
 
