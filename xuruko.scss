@@ -539,6 +539,14 @@ form {
         grid-gap: 25px !important;
         margin: 1em auto !important;
         flex-direction: column !important;
+        .inputWrapper {
+            &:not(.materialBGInputWrapper) {
+                max-height: 55px;
+                input {
+                    max-height: 55px;
+                }
+            }
+        }
         .materialBGInputWrapper {
             z-index: 10;
             width: 100%;
