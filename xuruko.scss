@@ -683,17 +683,21 @@ div[role="presentation"] {
     .levelImageColumn {
         text-align: left;
     }
-    .charsPlayedColumn {
+    .playerDetailsColumn {
         display: grid;
         align-items: center;
-        grid-template-columns: 1fr 99px;
+        grid-template-columns: 1fr 1fr 99px;
+        .playerEXP {
+            text-align: right;
+        }
         .plays {
             width: 100%;
             .playsContainer {
+                gap: 0;
                 display: grid;
                 align-items: center;
                 padding-top: 0px !important;
-                grid-template-columns: 1fr 1fr 1fr;
+                grid-template-columns: auto auto auto;
                 justify-content: flex-end !important;
                 img {
                     margin: 0;
@@ -705,5 +709,13 @@ div[role="presentation"] {
     }
     .levelNumColumn {
         text-align: center;
+    }
+    @media (max-width: 855px) and (min-width: 768px) {
+        .playerDetailsColumn {
+            grid-template-columns: 1fr 99px;
+            .playerEXP {
+                display: none;
+            }
+        }
     }
 }

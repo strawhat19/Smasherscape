@@ -298,15 +298,14 @@ export default function Smasherscape(props) {
                                     <div className="autocompleteOption">
                                         <div className="levelNumColumn">{option?.level?.num}</div>
                                         <div className="levelImageColumn"><img width={30} src={calcPlayerLevelImage(option?.level?.name)} alt={option?.level?.name} /></div>
-                                        <div className="charsPlayedColumn">
+                                        <div className="playerDetailsColumn">
                                             <div className="playerName">{option?.label}</div>
+                                            <div className="playerEXP">{option?.experience?.arenaXP}</div>
                                             <div className="plays">
                                                 <div className={`playsContainer`}>
                                                     {calcPlayerCharactersPlayed(option).map((char, charIndex) => {
                                                         return (
-                                                            // <Badge title={`Played ${getCharacterTitle(char)} ${calcPlayerCharacterTimesPlayed(option, char)} Time(s)`} key={charIndex} badgeContent={calcPlayerCharacterTimesPlayed(option, char)} color="primary">
-                                                                <img key={charIndex} className={`charImg`} width={25} src={calcPlayerCharacterIcon(char)} alt={getCharacterTitle(char)} />
-                                                            // </Badge>
+                                                            <img key={charIndex} className={`charImg`} width={25} src={calcPlayerCharacterIcon(char)} alt={getCharacterTitle(char)} />
                                                         )
                                                     })}
                                                 </div>
