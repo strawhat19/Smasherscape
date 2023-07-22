@@ -256,7 +256,13 @@ export default function Smasherscape(props) {
                         autoHighlight
                         id="combo-box-demo"
                         sx={{ width: `100%` }}
-                        options={players.map(plyr => {
+                        options={players.sort((a,b) => {
+                            if (b.experience.arenaXP !== a.experience.arenaXP) {
+                                return b.experience.arenaXP - a.experience.arenaXP;
+                            }
+                        
+                            return b.plays.length - a.plays.length;
+                        }).map(plyr => {
                             return {
                                 ...plyr,
                                 label: plyr.name,
@@ -268,8 +274,21 @@ export default function Smasherscape(props) {
                         renderOption={(props: any, option: any) => {
                             return (
                                 <div key={props?.key} className={`autocompleteOption`}>
-                                    <div className="leftColumn"><img width={25} src={calcPlayerLevelImage(option?.level?.name)} alt={option?.level?.name} /></div>
-                                    <div className="middleColumn">{option?.label}</div>
+                                    <div className="leftColumn"><img width={30} src={calcPlayerLevelImage(option?.level?.name)} alt={option?.level?.name} /></div>
+                                    <div className="middleColumn">
+                                        <div className="playerName">{option?.label}</div>
+                                        <div className="plays">
+                                            <div className={`playsContainer`}>
+                                                {calcPlayerCharactersPlayed(option).map((char, charIndex) => {
+                                                    return (
+                                                        // <Badge title={`Played ${getCharacterTitle(char)} ${calcPlayerCharacterTimesPlayed(option, char)} Time(s)`} key={charIndex} badgeContent={calcPlayerCharacterTimesPlayed(option, char)} color="primary">
+                                                            <img key={charIndex} className={`charImg`} width={25} src={calcPlayerCharacterIcon(char)} alt={getCharacterTitle(char)} />
+                                                        // </Badge>
+                                                    )
+                                                })}
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div className="rightColumn">{option?.level?.num}</div>
                                 </div>
                             )

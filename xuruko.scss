@@ -664,14 +664,15 @@ div[role="presentation"] {
 
 .autocompleteOption {
     gap: 5px;
-    width: 95%;
+    width: 97%;
     padding: 5px;
     display: grid;
     margin: 0 auto;
+    cursor: pointer;
     border-radius: 8px;
     align-items: center;
     transition: var(--transition);
-    grid-template-columns: 35px 2fr 1fr;
+    grid-template-columns: 35px 1fr 35px;
     &:hover {
         background: white;
     }
@@ -679,6 +680,26 @@ div[role="presentation"] {
         Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
     .leftColumn {
         text-align: left;
+    }
+    .middleColumn {
+        display: grid;
+        align-items: center;
+        grid-template-columns: 1fr 99px;
+        .plays {
+            width: 100%;
+            .playsContainer {
+                display: grid;
+                align-items: center;
+                padding-top: 0px !important;
+                grid-template-columns: 1fr 1fr 1fr;
+                justify-content: flex-end !important;
+                img {
+                    margin: 0;
+                    padding: 0;
+                    width: 25px;
+                }
+            }
+        }
     }
     .rightColumn {
         text-align: right;
