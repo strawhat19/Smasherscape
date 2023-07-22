@@ -15,6 +15,7 @@ import { formatDate, createXML, StateContext, showAlert, dev } from '../pages/_a
 
 export default function Smasherscape(props) {
 
+    const searchInput = useRef();
     const commandsInput = useRef();
     const { players, setPlayers, filteredPlayers, setFilteredPlayers, devEnv, setDevEnv } = useContext<any>(StateContext);
     const [publicAssetLink, setPublicAssetLink] = useState(`https://github.com/strawhat19/Smasherscape/blob/main`);
@@ -46,7 +47,7 @@ export default function Smasherscape(props) {
             } else {
                 setFilteredPlayers(players.filter(plyr => {
                     return Object.values(plyr).some(val =>
-                        typeof val === `string` && val.toLowerCase().includes(value?.toLowerCase())
+                        typeof val === `string` && val.toLowerCase().includes(value?.name?.toLowerCase())
                     );
                 }));
             }
@@ -56,7 +57,7 @@ export default function Smasherscape(props) {
     }
 
     const calcPlayerCharactersPlayed = (plyr) => {
-        let charsPlayed = plyr.plays.map(ply => ply.character);
+        let charsPlayed = plyr?.plays?.map(ply => ply?.character);
         let counts = charsPlayed.reduce((acc, char) => {
             acc[char] = (acc[char] || 0) + 1;
             return acc;
@@ -201,6 +202,15 @@ export default function Smasherscape(props) {
         console.log(`Commands Form`, e);
     }
 
+    const setSearchPlayers = (e, val) => {
+        if (searchInput.current) {
+            console.log(searchInput?.current, val);
+            // let field = searchInput.current.find(`input`) as HTMLInputElement;
+            // console.log(field);
+            // field.value = val;
+        }
+    }
+
     const handleCommands = (e: FormEvent) => {
         e.preventDefault();
         let field = commandsInput.current as HTMLInputElement;
@@ -260,6 +270,7 @@ export default function Smasherscape(props) {
                 <div className={`inputWrapper materialBGInputWrapper`}>
                     <div className="inputBG materialBG"></div>
                     <Autocomplete
+                        ref={searchInput}
                         disablePortal
                         autoHighlight
                         id="combo-box-demo"
@@ -270,32 +281,41 @@ export default function Smasherscape(props) {
                             }
                         
                             return b.plays.length - a.plays.length;
-                        }).map(plyr => plyr.name)}
-                        onChange={(e, val: any) => searchPlayers(e, (typeof val == `string` ? val : val?.name))}
-                        onInputChange={(e, val: any) => searchPlayers(e, (typeof val == `string` ? val : val?.name))}
+                        }).map(plyr => {
+                            return {
+                                ...plyr,
+                                label: plyr.name,
+                            }
+                        })}
+                        getOptionLabel={(option) => option.label}
+                        onChange={(e, val: any) => searchPlayers(e, val)}
+                        onInputChange={(e, val: any) => searchPlayers(e, val)}
+                        isOptionEqualToValue={(option, value) => option.id === value.id}
                         renderInput={(params) => <TextField name={`search`} {...params} label="Search..." />}
-                        // renderOption={(props: any, option: any) => {
-                        //     return (
-                        //         <div key={props?.key} className={`autocompleteOption`}>
-                        //             <div className="leftColumn"><img width={30} src={calcPlayerLevelImage(option?.level?.name)} alt={option?.level?.name} /></div>
-                        //             <div className="middleColumn">
-                        //                 <div className="playerName">{option?.label}</div>
-                        //                 <div className="plays">
-                        //                     <div className={`playsContainer`}>
-                        //                         {calcPlayerCharactersPlayed(option).map((char, charIndex) => {
-                        //                             return (
-                        //                                 // <Badge title={`Played ${getCharacterTitle(char)} ${calcPlayerCharacterTimesPlayed(option, char)} Time(s)`} key={charIndex} badgeContent={calcPlayerCharacterTimesPlayed(option, char)} color="primary">
-                        //                                     <img key={charIndex} className={`charImg`} width={25} src={calcPlayerCharacterIcon(char)} alt={getCharacterTitle(char)} />
-                        //                                 // </Badge>
-                        //                             )
-                        //                         })}
-                        //                     </div>
-                        //                 </div>
-                        //             </div>
-                        //             <div className="rightColumn">{option?.level?.num}</div>
-                        //         </div>
-                        //     )
-                        // }}
+                        renderOption={(props: any, option: any) => {
+                            return (
+                                <div key={props?.key} {...props}>
+                                    <div className="autocompleteOption">
+                                        <div className="levelNumColumn">{option?.level?.num}</div>
+                                        <div className="levelImageColumn"><img width={30} src={calcPlayerLevelImage(option?.level?.name)} alt={option?.level?.name} /></div>
+                                        <div className="charsPlayedColumn">
+                                            <div className="playerName">{option?.label}</div>
+                                            <div className="plays">
+                                                <div className={`playsContainer`}>
+                                                    {calcPlayerCharactersPlayed(option).map((char, charIndex) => {
+                                                        return (
+                                                            // <Badge title={`Played ${getCharacterTitle(char)} ${calcPlayerCharacterTimesPlayed(option, char)} Time(s)`} key={charIndex} badgeContent={calcPlayerCharacterTimesPlayed(option, char)} color="primary">
+                                                                <img key={charIndex} className={`charImg`} width={25} src={calcPlayerCharacterIcon(char)} alt={getCharacterTitle(char)} />
+                                                            // </Badge>
+                                                        )
+                                                    })}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )
+                        }}
                     />
                 </div>
                 <div className={`inputWrapper`}><div className="inputBG"></div><input ref={commandsInput} type="text" className="commands" name={`commands`} placeholder={`Commands...`} /></div>
