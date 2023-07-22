@@ -620,11 +620,19 @@ form {
 .MuiTouchRipple-root, .MuiButtonBase-root {
     align-items: flex-end !important;
     border-radius: 8px !important;
+    transition: var(--transition);
     justify-content: center;
     max-width: 95%;
     margin: 0 auto;
     display: flex;
     left: 45px;
+}
+
+.MuiAutocomplete-hasClearIcon {
+    .MuiTouchRipple-root, .MuiButtonBase-root {
+        max-width: 90%;
+        left: 25px;
+    }
 }
 
 .MuiAutocomplete-root {
@@ -676,6 +684,7 @@ div[role="presentation"] {
     align-items: center;
     width: 100% !important;
     transition: var(--transition);
+    background: transparent !important;
     grid-template-columns: 20px 35px 1fr;
     font-family: "RuneScape Chat Bold", Montserrat, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
         Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
