@@ -662,6 +662,8 @@ div[role="presentation"] {
     display: flex;
     margin: 0 auto;
     grid-gap: 5px;
+    font-family: "RuneScape Chat Bold", Montserrat, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+        Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
 }
 
 .autocompleteOption {
@@ -675,11 +677,11 @@ div[role="presentation"] {
     width: 100% !important;
     transition: var(--transition);
     grid-template-columns: 20px 35px 1fr;
+    font-family: "RuneScape Chat Bold", Montserrat, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+        Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
     // &:hover {
     //     background: white;
     // }
-    font-family: "RuneScape Chat Bold", Montserrat, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-        Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
     .levelImageColumn {
         text-align: left;
     }
@@ -711,6 +713,14 @@ div[role="presentation"] {
         text-align: center;
     }
     @media (max-width: 855px) and (min-width: 768px) {
+        .playerDetailsColumn {
+            grid-template-columns: 1fr 99px;
+            .playerEXP {
+                display: none;
+            }
+        }
+    }
+    @media (max-width: 450px) {
         .playerDetailsColumn {
             grid-template-columns: 1fr 99px;
             .playerEXP {

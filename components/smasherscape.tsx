@@ -197,18 +197,15 @@ export default function Smasherscape(props) {
         }
     }
 
+    const searchBlur = (e: any) => {
+        if (filteredPlayers?.length == 0) {
+            e.target.value = ``;
+        }
+    }
+
     const commandsForm = (e: FormEvent) => {
         e.preventDefault();
         console.log(`Commands Form`, e);
-    }
-
-    const setSearchPlayers = (e, val) => {
-        if (searchInput.current) {
-            console.log(searchInput?.current, val);
-            // let field = searchInput.current.find(`input`) as HTMLInputElement;
-            // console.log(field);
-            // field.value = val;
-        }
     }
 
     const handleCommands = (e: FormEvent) => {
@@ -266,7 +263,6 @@ export default function Smasherscape(props) {
             </form>} */}
             {/* <StepForm /> */}
             <form onSubmit={(e) => handleCommands(e)} action="submit" className="gridForm">
-                {/* <div className={`inputWrapper`}><div className="inputBG"></div><input type="search" className="search" name={`search`} placeholder={`Search...`} /></div> */}
                 <div className={`inputWrapper materialBGInputWrapper`}>
                     <div className="inputBG materialBG"></div>
                     <Autocomplete
@@ -279,7 +275,6 @@ export default function Smasherscape(props) {
                             if (b.experience.arenaXP !== a.experience.arenaXP) {
                                 return b.experience.arenaXP - a.experience.arenaXP;
                             }
-                        
                             return b.plays.length - a.plays.length;
                         }).map(plyr => {
                             return {
@@ -291,7 +286,7 @@ export default function Smasherscape(props) {
                         onChange={(e, val: any) => searchPlayers(e, val)}
                         onInputChange={(e, val: any) => searchPlayers(e, val)}
                         isOptionEqualToValue={(option, value) => option.id === value.id}
-                        renderInput={(params) => <TextField name={`search`} {...params} label="Search..." />}
+                        renderInput={(params) => <TextField name={`search`} onBlur={(e) => searchBlur(e)} {...params} label="Search..." />}
                         renderOption={(props: any, option: any) => {
                             return (
                                 <div key={props?.key} {...props}>
