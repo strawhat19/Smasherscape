@@ -37,11 +37,19 @@ export default function Smasherscape(props) {
         if (field && field.name == `commands`) return;
         if (!value) value = field.value;
         if (value && value != ``) {
-            setFilteredPlayers(players.filter(plyr => {
-                return Object.values(plyr).some(val =>
-                    typeof val === `string` && val.toLowerCase().includes(value.toLowerCase())
-                );
-            }));
+            if (typeof value == `string`) {
+                setFilteredPlayers(players.filter(plyr => {
+                    return Object.values(plyr).some(val =>
+                        typeof val === `string` && val.toLowerCase().includes(value?.toLowerCase())
+                    );
+                }));
+            } else {
+                setFilteredPlayers(players.filter(plyr => {
+                    return Object.values(plyr).some(val =>
+                        typeof val === `string` && val.toLowerCase().includes(value?.toLowerCase())
+                    );
+                }));
+            }
         } else {
             setFilteredPlayers(players);
         }
@@ -262,37 +270,32 @@ export default function Smasherscape(props) {
                             }
                         
                             return b.plays.length - a.plays.length;
-                        }).map(plyr => {
-                            return {
-                                ...plyr,
-                                label: plyr.name,
-                            }
-                        })}
-                        onChange={(e, val) => searchPlayers(e, val)}
-                        onInputChange={(e, val) => searchPlayers(e, val)}
+                        }).map(plyr => plyr.name)}
+                        onChange={(e, val: any) => searchPlayers(e, (typeof val == `string` ? val : val?.name))}
+                        onInputChange={(e, val: any) => searchPlayers(e, (typeof val == `string` ? val : val?.name))}
                         renderInput={(params) => <TextField name={`search`} {...params} label="Search..." />}
-                        renderOption={(props: any, option: any) => {
-                            return (
-                                <div key={props?.key} className={`autocompleteOption`}>
-                                    <div className="leftColumn"><img width={30} src={calcPlayerLevelImage(option?.level?.name)} alt={option?.level?.name} /></div>
-                                    <div className="middleColumn">
-                                        <div className="playerName">{option?.label}</div>
-                                        <div className="plays">
-                                            <div className={`playsContainer`}>
-                                                {calcPlayerCharactersPlayed(option).map((char, charIndex) => {
-                                                    return (
-                                                        // <Badge title={`Played ${getCharacterTitle(char)} ${calcPlayerCharacterTimesPlayed(option, char)} Time(s)`} key={charIndex} badgeContent={calcPlayerCharacterTimesPlayed(option, char)} color="primary">
-                                                            <img key={charIndex} className={`charImg`} width={25} src={calcPlayerCharacterIcon(char)} alt={getCharacterTitle(char)} />
-                                                        // </Badge>
-                                                    )
-                                                })}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="rightColumn">{option?.level?.num}</div>
-                                </div>
-                            )
-                        }}
+                        // renderOption={(props: any, option: any) => {
+                        //     return (
+                        //         <div key={props?.key} className={`autocompleteOption`}>
+                        //             <div className="leftColumn"><img width={30} src={calcPlayerLevelImage(option?.level?.name)} alt={option?.level?.name} /></div>
+                        //             <div className="middleColumn">
+                        //                 <div className="playerName">{option?.label}</div>
+                        //                 <div className="plays">
+                        //                     <div className={`playsContainer`}>
+                        //                         {calcPlayerCharactersPlayed(option).map((char, charIndex) => {
+                        //                             return (
+                        //                                 // <Badge title={`Played ${getCharacterTitle(char)} ${calcPlayerCharacterTimesPlayed(option, char)} Time(s)`} key={charIndex} badgeContent={calcPlayerCharacterTimesPlayed(option, char)} color="primary">
+                        //                                     <img key={charIndex} className={`charImg`} width={25} src={calcPlayerCharacterIcon(char)} alt={getCharacterTitle(char)} />
+                        //                                 // </Badge>
+                        //                             )
+                        //                         })}
+                        //                     </div>
+                        //                 </div>
+                        //             </div>
+                        //             <div className="rightColumn">{option?.level?.num}</div>
+                        //         </div>
+                        //     )
+                        // }}
                     />
                 </div>
                 <div className={`inputWrapper`}><div className="inputBG"></div><input ref={commandsInput} type="text" className="commands" name={`commands`} placeholder={`Commands...`} /></div>
