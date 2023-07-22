@@ -612,26 +612,19 @@ form {
     }
 }
 
-div[role="presentation"] {
-    z-index: 99 !important;
-    background: white;
-    border-radius: 8px;
-    display: flex;
-    grid-gap: 5px;
-}
-
 .MuiAutocomplete-popupIndicatorOpen {
     justify-content: flex-end !important;
     flex-direction: row-reverse;
 }
 
 .MuiTouchRipple-root, .MuiButtonBase-root {
-    border-radius: 8px;
-    justify-content: center;
     align-items: flex-end !important;
-    display: flex;
-    margin: 0 auto;
+    border-radius: 8px !important;
+    justify-content: center;
     max-width: 95%;
+    margin: 0 auto;
+    display: flex;
+    left: 45px;
 }
 
 .MuiAutocomplete-root {
@@ -657,5 +650,37 @@ div[role="presentation"] {
     justify-content: space-between;
     button:nth-child(2) {
         max-width: max-content;
+    }
+}
+
+div[role="presentation"] {
+    background: var(--softWhite);
+    backdrop-filter: blur(5px);
+    z-index: 99 !important;
+    border-radius: 8px;
+    display: flex;
+    grid-gap: 5px;
+}
+
+.autocompleteOption {
+    gap: 5px;
+    width: 95%;
+    padding: 5px;
+    display: grid;
+    margin: 0 auto;
+    border-radius: 8px;
+    align-items: center;
+    transition: var(--transition);
+    grid-template-columns: 35px 2fr 1fr;
+    &:hover {
+        background: white;
+    }
+    font-family: "RuneScape Chat Bold", Montserrat, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+        Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+    .leftColumn {
+        text-align: left;
+    }
+    .rightColumn {
+        text-align: right;
     }
 }

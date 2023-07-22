@@ -217,7 +217,7 @@ export default function Smasherscape(props) {
     return <main>
         <section className={`formsSection`}>
             {/* <h5 className={`heading`}>Forms</h5> */}
-            {devEnv && <form onSubmit={(e) => commandsForm(e)} action="submit" className={`gridForm commandsForm ${devEnv ? `dev` : ``}`}>
+            {/* {devEnv && <form onSubmit={(e) => commandsForm(e)} action="submit" className={`gridForm commandsForm ${devEnv ? `dev` : ``}`}>
                 <div className={`inputWrapper materialBGInputWrapper`}>
                     <div className="inputBG materialBG"></div>
                     <Autocomplete
@@ -245,7 +245,7 @@ export default function Smasherscape(props) {
                     />
                 </div>
                 <button className={`formSubmitButton commandsFormSubmit`} type={`submit`}>Submit</button>
-            </form>}
+            </form>} */}
             {/* <StepForm /> */}
             <form onSubmit={(e) => handleCommands(e)} action="submit" className="gridForm">
                 {/* <div className={`inputWrapper`}><div className="inputBG"></div><input type="search" className="search" name={`search`} placeholder={`Search...`} /></div> */}
@@ -256,10 +256,24 @@ export default function Smasherscape(props) {
                         autoHighlight
                         id="combo-box-demo"
                         sx={{ width: `100%` }}
-                        options={players.map(plyr => plyr.name)}
+                        options={players.map(plyr => {
+                            return {
+                                ...plyr,
+                                label: plyr.name,
+                            }
+                        })}
                         onChange={(e, val) => searchPlayers(e, val)}
                         onInputChange={(e, val) => searchPlayers(e, val)}
                         renderInput={(params) => <TextField name={`search`} {...params} label="Search..." />}
+                        renderOption={(props: any, option: any) => {
+                            return (
+                                <div key={props?.key} className={`autocompleteOption`}>
+                                    <div className="leftColumn"><img width={25} src={calcPlayerLevelImage(option?.level?.name)} alt={option?.level?.name} /></div>
+                                    <div className="middleColumn">{option?.label}</div>
+                                    <div className="rightColumn">{option?.level?.num}</div>
+                                </div>
+                            )
+                        }}
                     />
                 </div>
                 <div className={`inputWrapper`}><div className="inputBG"></div><input ref={commandsInput} type="text" className="commands" name={`commands`} placeholder={`Commands...`} /></div>
