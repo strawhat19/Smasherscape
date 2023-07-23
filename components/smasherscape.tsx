@@ -143,6 +143,31 @@ export default function Smasherscape(props) {
         return updatedPlayers;
     }
 
+    const getActivePlayers = (players) => {
+        return players.sort((a,b) => {
+            if (b.experience.arenaXP !== a.experience.arenaXP) {
+                return b.experience.arenaXP - a.experience.arenaXP;
+            }
+            return b.plays.length - a.plays.length;
+        }).filter(plyr => !plyr.disabled);
+    }
+
+    const calcPlayerKills = (player, plays) => {
+        let wins = plays.filter(ply => ply?.winner == player?.name)?.length;
+        let losses = plays.filter(ply => ply?.winner != player?.name);
+        let lossKills = losses?.map(loss => loss?.stocksTaken)?.reduce((partialSum, a) => partialSum + a, 0);
+        let winKills = wins * 3;
+        return winKills + lossKills;
+    }
+
+    const calcPlayerDeaths = (player, plays) => {
+        let losses = plays.filter(ply => ply?.winner != player?.name)?.length;
+        let wins = plays.filter(ply => ply?.winner == player?.name);
+        let winDeaths = wins?.map(win => win?.stocksTaken)?.reduce((partialSum, a) => partialSum + a, 0);
+        let lossDeaths = losses * 3;
+        return lossDeaths + winDeaths;
+    }
+
     const addPlayers = (commandParams) => {
         let playersToAdd = commandParams.filter((comm, commIndex) => commIndex != 0 && comm);
 
@@ -208,15 +233,6 @@ export default function Smasherscape(props) {
         setPlayers(defaultPlayers);
         setFilteredPlayers(defaultPlayers);
         useLocalStorage && localStorage.setItem(`players`, JSON.stringify(defaultPlayers));
-    }
-
-    const getActivePlayers = (players) => {
-        return players.sort((a,b) => {
-            if (b.experience.arenaXP !== a.experience.arenaXP) {
-                return b.experience.arenaXP - a.experience.arenaXP;
-            }
-            return b.plays.length - a.plays.length;
-        }).filter(plyr => !plyr.disabled);
     }
 
     const updatePlayers = (commandParams) => {
@@ -475,7 +491,7 @@ export default function Smasherscape(props) {
                                     </div>
                                     <div className="cardMiddleRow">
                                         <div className="imgLeftCol">
-                                            <img width={300} src={calcPlayerLevelImage(plyr?.level?.name)} alt={plyr?.level?.name} />
+                                            <img width={200} src={calcPlayerLevelImage(plyr?.level?.name)} alt={plyr?.level?.name} />
                                             <h4 className={`levelName ${plyr?.level?.name.split(` `)[0]}`}>{plyr?.level?.name}</h4>
                                         </div>
                                         <div className="recordPlays">
@@ -529,9 +545,13 @@ export default function Smasherscape(props) {
                                 <ul className="recordList">
                                     <h3 className={`greenRecordText`}>
                                         Player Record
-                                        <span className="recordPlays">Plays: {plyr?.plays?.length > 0 && plyr?.plays?.length}</span>
+                                        <span className="recordPlays">
+                                            <span className={`blueText`}>Plays: <span className="whiteText">{plyr?.plays?.length}</span></span>
+                                            <span className={`greenText`}>Kills: <span className="whiteText">{calcPlayerKills(plyr, plyr?.plays)}</span></span>
+                                            <span className={`redText`}>Deaths: <span className="whiteText">{calcPlayerDeaths(plyr, plyr?.plays)}</span></span>
+                                        </span>
                                     </h3>
-                                    {plyr?.plays?.length > 0 && plyr?.plays?.sort((a: any, b: any) => parseDate(b.date) - parseDate(a.date)).map((ply, plyIndex) => {
+                                    {plyr?.plays?.length > 0 ? plyr?.plays?.sort((a: any, b: any) => parseDate(b.date) - parseDate(a.date)).map((ply, plyIndex) => {
                                         let isWinner = ply?.winner == plyr?.name;
                                         return (
                                             <li className={`playerPlay`} key={plyIndex}>
@@ -584,7 +604,9 @@ export default function Smasherscape(props) {
                                                </div>
                                             </li>
                                         )
-                                    })}
+                                    }) : <div className={`noPlaysYet`}>
+                                    No Plays Yet
+                                </div>}
                                 </ul>
                             </div>
                         </div>

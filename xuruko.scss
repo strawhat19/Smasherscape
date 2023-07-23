@@ -1,15 +1,19 @@
 :root {
+    --red: #f63460;
     --smasherscapeYellow: #fcfc05;
     --smasherscapeGreen: #6ced52;
+    --smasherscapeGreen2: #1edc78;
     --smasherscapeBrown: #473d32;
     --smasherscapeBlue: #45bde9;
+    --smasherscapeBlue2: #31a8e5;
     --smasherscapeBronze: #d9bf1a;
     --smasherscapeIron: #b1acab;
     --smasherscapeBronze2: #f6cc00;
     --smasherscapeCream: #f5f581;
     --smasherscapePurple: #7b4e9b;
-    --xurukoGradientGreenBlue: linear-gradient(90deg, var(--smasherscapeGreen), var(--smasherscapeBlue));
-    --xurukoGradientBlueGreen: linear-gradient(90deg, var(--smasherscapeBlue), var(--smasherscapeGreen));
+    --win: var(--smasherscapeGreen2);
+    --xurukoGradientGreenBlue: linear-gradient(90deg, var(--smasherscapeGreen2), var(--smasherscapeBlue2));
+    --xurukoGradientBlueGreen: linear-gradient(90deg, var(--smasherscapeBlue2), var(--smasherscapeGreen2));
 }
 
 @font-face {
@@ -148,8 +152,10 @@ li {
                         }
                     }
                     .levelName {
+                        top: -15px;
                         font-size: 2.5em;
                         text-shadow: none;
+                        position: relative;
                         letter-spacing: 3px;
                         transition: 300ms ease-in-out;
                         font-family: "RuneScape Large";
@@ -261,7 +267,7 @@ li {
                     justify-content: center;
                     max-width: 97% !important;
                     transition: 300ms ease-in-out;
-                    background: linear-gradient(90deg, red, yellow, lime);
+                    background: linear-gradient(90deg, var(--red), yellow, lime);
                 }
             }
         }
@@ -270,7 +276,7 @@ li {
             display: flex;
             font-size: 6em;
             font-family: "RuneScape Large";
-            color: var(--smasherscapeBlue);
+            color: var(--smasherscapeBlue2);
             text-shadow: 3px 3px 0px var(--smasherscapePurple), 0px 0px 8px rgba(0, 0, 0, 0.75), 0px 1px 8px rgba(0, 0, 0, 0.69);
             @media (max-width: 1800px) {
                 font-size: 5em;
@@ -354,6 +360,10 @@ li {
         z-index: 2;
         top: 0;
         span {
+            color: white;
+            display: flex;
+            grid-gap: 5px;
+            font-size: 0.9em;
             padding-right: 10px;
         }
     }
@@ -372,6 +382,7 @@ li {
             padding: 5px 0;
             margin: 0 10px 0 0;
             align-items: center;
+            text-shadow: 2px 2px 0px black;
             &:not(:last-child) {
                 border-bottom: 2px solid black;
             }
@@ -865,7 +876,7 @@ div[role="presentation"] {
         width: 100%;
         height: 100%;
         content: "";
-        color: red;
+        color: var(--red);
         display: flex;
         // content: "X";
         font-size: 1.3em;
@@ -888,14 +899,26 @@ div[role="presentation"] {
     }
 }
 
-.winner, .positive {
+.greenText {
+    color: var(--smasherscapeGreen2) !important;
+}
+
+.blueText {
+    color: var(--smasherscapeBlue2) !important;
+}
+
+.redText {
+    color: var(--red) !important;
+}
+
+.win, .winner, .positive {
     transition: var(--transition);
-    color: var(--smasherscapeGreen);
+    color: var(--win);
 }
 
 .loser, .negative {
     transition: var(--transition);
-    color: red;
+    color: var(--red);
 }
 
 .challenger {
@@ -904,7 +927,7 @@ div[role="presentation"] {
 }
 
 .perfect {
-    color: var(--smasherscapeBlue);
+    color: var(--smasherscapeBlue2);
     transition: var(--transition);
 }
 
@@ -916,4 +939,26 @@ div[role="presentation"] {
 
 .commandsList {
     text-align: left;
+}
+
+.whiteText {
+    text-shadow: 2px 2px 0px black;
+    color: white !important;
+}
+
+.blackText {
+    text-shadow: 2px 2px 0px white;
+    color: black !important;
+}
+
+.noPlaysYet {
+    width: 100%;
+    font-size: 1.5em;
+    padding-top: 35px;
+    text-align: center;
+    text-shadow: 2px 2px 0px black;
+}
+
+.yellowText {
+    color: var(--smasherscapeBronze2) !important;
 }
