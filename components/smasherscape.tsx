@@ -17,7 +17,7 @@ export default function Smasherscape(props) {
 
     const searchInput = useRef();
     const commandsInput = useRef();
-    const { players, setPlayers, filteredPlayers, setFilteredPlayers, devEnv, setDevEnv } = useContext<any>(StateContext);
+    const { players, setPlayers, filteredPlayers, setFilteredPlayers, devEnv, setDevEnv, useLocalStorage } = useContext<any>(StateContext);
     const [publicAssetLink, setPublicAssetLink] = useState(`https://github.com/strawhat19/Smasherscape/blob/main`);
 
     const calcPlayerWins = (plyr) => plyr.plays.filter(ply => ply.winner.toLowerCase() == plyr.name.toLowerCase()).length;
@@ -109,8 +109,8 @@ export default function Smasherscape(props) {
                     },
                 }];
                 setFilteredPlayers(updatedPlayers);
-                console.log(`Updated Players`, updatedPlayers);
-                localStorage.setItem(`players`, JSON.stringify(updatedPlayers));
+                devEnv && console.log(`Updated Players`, updatedPlayers);
+                useLocalStorage && localStorage.setItem(`players`, JSON.stringify(updatedPlayers));
                 return updatedPlayers;
             });
         })
@@ -132,8 +132,8 @@ export default function Smasherscape(props) {
                 setPlayers(prevPlayers => {
                     let updatedPlayers = prevPlayers.filter(plyr => plyr.name.toLowerCase() != playerDB.name.toLowerCase());
                     setFilteredPlayers(updatedPlayers);
-                    console.log(`Updated Players`, updatedPlayers);
-                    localStorage.setItem(`players`, JSON.stringify(updatedPlayers));
+                    devEnv && console.log(`Updated Players`, updatedPlayers);
+                    useLocalStorage && localStorage.setItem(`players`, JSON.stringify(updatedPlayers));
                     return updatedPlayers;
                 });
             })
@@ -143,7 +143,7 @@ export default function Smasherscape(props) {
     const resetPlayers = (commandParams) => {
         setPlayers(defaultPlayers);
         setFilteredPlayers(defaultPlayers);
-        localStorage.setItem(`players`, JSON.stringify(defaultPlayers));
+        useLocalStorage && localStorage.setItem(`players`, JSON.stringify(defaultPlayers));
     }
 
     const updatePlayers = (commandParams) => {
@@ -213,8 +213,8 @@ export default function Smasherscape(props) {
                 }
             });
 
-            console.log(`Updated Players`, updatedPlayers);
-            localStorage.setItem(`players`, JSON.stringify(updatedPlayers));
+            devEnv && console.log(`Updated Players`, updatedPlayers);
+            useLocalStorage && localStorage.setItem(`players`, JSON.stringify(updatedPlayers));
             setPlayers(updatedPlayers);
         }
     }

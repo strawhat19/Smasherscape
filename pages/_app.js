@@ -354,6 +354,7 @@ export default function ProductIVF({ Component, pageProps, router }) {
     let [rearranging, setRearranging] = useState(false);
     let [content, setContent] = useState(`defaultContent`);
     let [year, setYear] = useState(new Date().getFullYear());
+    let [useLocalStorage, setUseLocalStorage] = useState(true);
     
     let [players, setPlayers] = useState(defaultPlayers);
     let [filteredPlayers, setFilteredPlayers] = useState(players);
@@ -406,9 +407,8 @@ export default function ProductIVF({ Component, pageProps, router }) {
         brwser = `opera`;
         setBrowser(`opera`);
       }
-
       
-      if (storedPlayers) {
+      if (storedPlayers && useLocalStorage) {
         setPlayers(storedPlayers);
         setFilteredPlayers(storedPlayers);
       } else {
@@ -430,7 +430,7 @@ export default function ProductIVF({ Component, pageProps, router }) {
       }
     }, [rte, user, users, authState, dark])
 
-    return <StateContext.Provider value={{ router, rte, setRte, updates, setUpdates, content, setContent, width, setWidth, user, setUser, page, setPage, mobileMenu, setMobileMenu, users, setUsers, authState, setAuthState, emailField, setEmailField, devEnv, setDevEnv, mobileMenuBreakPoint, platform, setPlatform, focus, setFocus, highScore, setHighScore, color, setColor, dark, setDark, colorPref, setColorPref, qotd, setQotd, alertOpen, setAlertOpen, mobile, setMobile, systemStatus, setSystemStatus, loading, setLoading, anim, setAnimComplete, IDs, setIDs, categories, setCategories, browser, setBrowser, onMac, rearranging, setRearranging, buttonText, setButtonText, gameFormStep, setGameFormStep, players, setPlayers, filteredPlayers, setFilteredPlayers }}>
+    return <StateContext.Provider value={{ router, rte, setRte, updates, setUpdates, content, setContent, width, setWidth, user, setUser, page, setPage, mobileMenu, setMobileMenu, users, setUsers, authState, setAuthState, emailField, setEmailField, devEnv, setDevEnv, mobileMenuBreakPoint, platform, setPlatform, focus, setFocus, highScore, setHighScore, color, setColor, dark, setDark, colorPref, setColorPref, qotd, setQotd, alertOpen, setAlertOpen, mobile, setMobile, systemStatus, setSystemStatus, loading, setLoading, anim, setAnimComplete, IDs, setIDs, categories, setCategories, browser, setBrowser, onMac, rearranging, setRearranging, buttonText, setButtonText, gameFormStep, setGameFormStep, players, setPlayers, filteredPlayers, setFilteredPlayers, useLocalStorage, setUseLocalStorage }}>
       {(browser != `chrome` || onMac) ? <AnimatePresence mode={`wait`}>
         <motion.div className={`${rte} pageWrapContainer ${page.toUpperCase()}`} key={router.route} initial="pageInitial" animate="pageAnimate" exit="pageExit" transition={{ duration: 0.35 }} variants={{
           pageInitial: {
