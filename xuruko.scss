@@ -565,9 +565,9 @@ form {
     }
 }
 
-@media (max-width: 525px) {
+@media (max-width: 676px) {
     .cardTopRow {
-        margin: 75px auto -10px !important;
+        margin: 90px auto -10px !important;
         justify-content: center !important;
         h2 {
             align-items: center;
@@ -582,16 +582,24 @@ form {
         grid-gap: 30px;
         flex-direction: column;
         img {
-            padding: 1em 0 0 0 !important;
+            padding: 0 0 0 0 !important;
         }
         h4 {
             padding: 0 !important;
         }
         .recordPlays {
-            top: 15px !important;
+            top: 0px !important;
+            grid-gap: 10px !important;
+            .playsContainer {
+                right: 5px;
+                grid-gap: 0px;
+                min-width: auto;
+                position: relative;
+                padding-top: 10px;
+            }
         }
         .level {
-            top: 20px;
+            top: 25px;
             max-width: 100px !important;
             .borderSep {
                 top: 25px !important;
@@ -599,10 +607,27 @@ form {
                 height: 4px !important;
                 width: 110px !important;
             }
+            .levelBot {
+                right: 5px !important;
+                top: 0;
+            }
         }
     }
     .borderSep {
         top: 0;
+    }
+    .experienceDetails {
+        margin-top: -10px;
+    }
+    .cardBottomRow {
+        height: 190px !important;
+        .gradient {
+            bottom: 65px !important;
+        }
+    }
+    .MuiBadge-badge {
+        top: 3px;
+        right: 5px;
     }
 }
 

@@ -11,7 +11,7 @@ import { calcPlayerCharacterIcon } from './CharacterIcons';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { FormEvent, useContext, useRef, useState } from 'react';
 import { collection, doc, getDocs, setDoc } from 'firebase/firestore';
-import { formatDate, createXML, StateContext, showAlert, dev } from '../pages/_app';
+import { formatDate, createXML, StateContext, showAlert, dev, defaultPlayers } from '../pages/_app';
 
 export default function Smasherscape(props) {
 
@@ -31,6 +31,17 @@ export default function Smasherscape(props) {
 
     const setCommandPlayers = (e: any, value?: any) => {
         console.log(`Command Players`, value);
+    }
+
+    const searchBlur = (e: any) => {
+        if (filteredPlayers?.length == 0) {
+            e.target.value = ``;
+        }
+    }
+
+    const commandsForm = (e: FormEvent) => {
+        e.preventDefault();
+        console.log(`Commands Form`, e);
     }
 
     const searchPlayers = (e: any, value?: any) => {
@@ -98,6 +109,8 @@ export default function Smasherscape(props) {
                     },
                 }];
                 setFilteredPlayers(updatedPlayers);
+                console.log(`Updated Players`, updatedPlayers);
+                localStorage.setItem(`players`, JSON.stringify(updatedPlayers));
                 return updatedPlayers;
             });
         })
@@ -119,10 +132,18 @@ export default function Smasherscape(props) {
                 setPlayers(prevPlayers => {
                     let updatedPlayers = prevPlayers.filter(plyr => plyr.name.toLowerCase() != playerDB.name.toLowerCase());
                     setFilteredPlayers(updatedPlayers);
+                    console.log(`Updated Players`, updatedPlayers);
+                    localStorage.setItem(`players`, JSON.stringify(updatedPlayers));
                     return updatedPlayers;
                 });
             })
         }
+    }
+
+    const resetPlayers = (commandParams) => {
+        setPlayers(defaultPlayers);
+        setFilteredPlayers(defaultPlayers);
+        localStorage.setItem(`players`, JSON.stringify(defaultPlayers));
     }
 
     const updatePlayers = (commandParams) => {
@@ -193,19 +214,9 @@ export default function Smasherscape(props) {
             });
 
             console.log(`Updated Players`, updatedPlayers);
+            localStorage.setItem(`players`, JSON.stringify(updatedPlayers));
             setPlayers(updatedPlayers);
         }
-    }
-
-    const searchBlur = (e: any) => {
-        if (filteredPlayers?.length == 0) {
-            e.target.value = ``;
-        }
-    }
-
-    const commandsForm = (e: FormEvent) => {
-        e.preventDefault();
-        console.log(`Commands Form`, e);
     }
 
     const handleCommands = (e: FormEvent) => {
@@ -214,14 +225,17 @@ export default function Smasherscape(props) {
         if (field.name == `commands`) {
             let command = field?.value.toLowerCase();
             let commandParams = command.split(` `);
+            let firstCommand = commandParams[0];
             
             if (command != ``) {
-                if (commandParams[0].includes(`!upd`)) {
+                if (firstCommand.includes(`!upd`)) {
                     updatePlayers(commandParams);
-                } else if (commandParams[0].includes(`!add`)) {
+                } else if (firstCommand.includes(`!add`)) {
                     addPlayers(commandParams);
-                } else if (commandParams[0].includes(`!del`)) {
+                } else if (firstCommand.includes(`!del`)) {
                     deletePlayers(commandParams);
+                } else if (firstCommand.includes(`!res`)) {
+                    resetPlayers(commandParams);
                 }
             }
         } else {

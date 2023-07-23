@@ -15,6 +15,54 @@ export const getCurrentPageName = () => {
   return window.location.hash.slice(window.location.hash.lastIndexOf(`/`)).replace(`/`, ``);
 };
 
+export const defaultPlayers = [
+  {
+    id: 1,
+    name: `Xuruko`,
+    plays: [],
+    level: {
+      num: 1,
+      name: `Bronze Scimitar`
+    },
+    experience: {
+      xp: 0,
+      arenaXP: 0,
+      nextLevelAt: 83,
+      remainingXP: 83
+    },
+  },
+  {
+    id: 2,
+    name: `Kay`,
+    plays: [],
+    level: {
+      num: 1,
+      name: `Bronze Scimitar`
+    },
+    experience: {
+      xp: 0,
+      arenaXP: 0,
+      nextLevelAt: 83,
+      remainingXP: 83
+    },
+  },
+  {
+    id: 3,
+    name: `Strawhat19`,
+    plays: [],
+    level: {
+      num: 1,
+      name: `Bronze Scimitar`
+    },
+    experience: {
+      xp: 0,
+      arenaXP: 0,
+      nextLevelAt: 83,
+      remainingXP: 83
+    },
+  },
+];
+
 export const formatDate = (date, specificPortion) => {
   let hours = date.getHours();
   let minutes = date.getMinutes();
@@ -307,54 +355,7 @@ export default function ProductIVF({ Component, pageProps, router }) {
     let [content, setContent] = useState(`defaultContent`);
     let [year, setYear] = useState(new Date().getFullYear());
     
-    let [players, setPlayers] = useState([
-      {
-        id: 1,
-        name: `Xuruko`,
-        plays: [],
-        level: {
-          num: 1,
-          name: `Bronze Scimitar`
-        },
-        experience: {
-          xp: 0,
-          arenaXP: 0,
-          nextLevelAt: 83,
-          remainingXP: 83
-        },
-      },
-      {
-        id: 2,
-        name: `Kay`,
-        plays: [],
-        level: {
-          num: 1,
-          name: `Bronze Scimitar`
-        },
-        experience: {
-          xp: 0,
-          arenaXP: 0,
-          nextLevelAt: 83,
-          remainingXP: 83
-        },
-      },
-      {
-        id: 3,
-        name: `Strawhat19`,
-        plays: [],
-        level: {
-          num: 1,
-          name: `Bronze Scimitar`
-        },
-        experience: {
-          xp: 0,
-          arenaXP: 0,
-          nextLevelAt: 83,
-          remainingXP: 83
-        },
-      },
-    ]);
-
+    let [players, setPlayers] = useState(defaultPlayers);
     let [filteredPlayers, setFilteredPlayers] = useState(players);
 
     useEffect(() => {
@@ -364,6 +365,7 @@ export default function ProductIVF({ Component, pageProps, router }) {
       if (loaded.current) return;
       loaded.current = true;
       localStorage.setItem(`alertOpen`, false);
+      let storedPlayers = JSON.parse(localStorage.getItem(`players`));
       let storedUser = JSON.parse(localStorage.getItem(`user`));
 
       setDevEnv(dev());
@@ -403,6 +405,14 @@ export default function ProductIVF({ Component, pageProps, router }) {
       } else if (brwser == `` && navigator.userAgent.match(/opr\//i)) {
         brwser = `opera`;
         setBrowser(`opera`);
+      }
+
+      
+      if (storedPlayers) {
+        setPlayers(storedPlayers);
+        setFilteredPlayers(storedPlayers);
+      } else {
+        setPlayers(defaultPlayers);
       }
 
       setLoading(false);
