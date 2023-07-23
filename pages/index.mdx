@@ -1,4 +1,41 @@
-import Smasherscape from '../components/smasherscape'
+import Commands from '../components/Commands'
+import Smasherscape from '../components/Smasherscape'
+
+## Tips
+
+If you are using JavaScript instead of TypeScript, you may need to  ***Remove Type Definitions.***
+
+Turn `(objectWithTypeDefinition?: typeDefinition)` into `(objectWithoutTypeDefinition)`.
+
+If you are using CSS instead of SCSS, you may need to take the children out of the parent!
+
+Turn `Parent { Child { style } }` into `Parent Child { style }`.
+
+If you are using JavaScript instead of TypeScript, you may need to  ***Remove Type Definitions.***
+
+Turn `(objectWithTypeDefinition?: typeDefinition)` into `(objectWithoutTypeDefinition)`.
+
+Code gets more ***Advanced*** towards the bottom!
+
+<div className="anchorHeader" style={{marginTop: -20, position: `relative`, width: `100%`}}>
+  <div style={{maxWidth: `100%`}} className="textOverflow extended">
+    ## getCurrentPageName
+  </div>
+</div>
+
+```js showLineNumbers filename="getCurrentPageName.js" {2} copy
+export const getCurrentPageName = () => {
+  return window.location.hash.slice(window.location.hash.lastIndexOf(`/`)).replace(`/`, ``);
+};
+```
+
+<Commands>
+    <ol className={`commandsList`}>
+        <li>- [x] Write the press release</li>
+        <li>- [ ] Update the website</li>
+        <li>- [ ] Contact the media</li>
+    </ol>
+</Commands>
 
 <div style={{textAlign: `center`}}>
 # Leaderboard

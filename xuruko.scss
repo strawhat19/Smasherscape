@@ -433,6 +433,9 @@ nav {
     h1 {
         font-size: 1.75em;
     }
+    .alertInner {
+        font-size: 1.75em;
+    }
 }
 
 button[title="Change theme"] {
@@ -903,4 +906,8 @@ div[role="presentation"] {
     display: flex;
     grid-gap: 5px;
     align-items: center;
+}
+
+.commandsList {
+    text-align: left;
 }

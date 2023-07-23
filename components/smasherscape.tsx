@@ -2,14 +2,14 @@ import  moment from 'moment';
 import { db } from '../firebase';
 import StepForm from './StepForm';
 import { Badge } from '@mui/material';
-import { Characters } from './Characters';
 import Skeleton from '@mui/material/Skeleton';
 import TextField from '@mui/material/TextField';
+import { Characters } from '../common/Characters';
 import Autocomplete from '@mui/material/Autocomplete';
-import { calcPlayerLevelAndExperience } from './Levels';
-import { calcPlayerCharacterIcon } from './CharacterIcons';
+import { calcPlayerLevelAndExperience } from '../common/Levels';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { FormEvent, useContext, useRef, useState } from 'react';
+import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
 import { collection, doc, getDocs, setDoc } from 'firebase/firestore';
 import { formatDate, createXML, StateContext, showAlert, dev, defaultPlayers } from '../pages/_app';
 
@@ -351,6 +351,16 @@ export default function Smasherscape(props) {
                     deletePlayers(commandParams);
                 } else if (firstCommand.includes(`!res`)) {
                     resetPlayers(commandParams);
+                } else if (firstCommand.includes(`!com`)) {
+                    showAlert(`Here are the RukoBot commands so far:`, <div className={`alertInner`}>
+                        <ol>
+                            <li>[ !com ] to list all commands</li>
+                            <li>[ !add + name(s) ] to add player(s)</li>
+                            <li>[ !del + name(s) ] to delete player(s)</li>
+                            <li>[ !res ] to reset players back to 0 XP</li>
+                            <li>[ !upd + winner name + 'beats' + loser name + loser stocks taken from winner ] to update leaderboard</li>
+                        </ol>
+                    </div>, `85%`, `auto`);
                 }
             }
         } else {
