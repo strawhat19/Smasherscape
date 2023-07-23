@@ -82,6 +82,7 @@ li {
     justify-content: space-between;
     @media (min-width: 1366px) {
         &.populated {
+            align-items: flex-start;
             grid-template-columns: 1fr 1fr;
         }
     }

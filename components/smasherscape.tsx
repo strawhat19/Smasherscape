@@ -76,7 +76,23 @@ export default function Smasherscape(props) {
         } else {
           return num.toFixed(1);
         }
-      }
+    }
+
+    const parseDate = (dateStr: any) => {
+        const parts = dateStr.split(", ");
+        const timePart = parts[0];
+        const datePart = parts[1];
+      
+        // Remove the "rd", "th", "st" suffix from the date part
+        const datePartWithoutSuffix = datePart.replace(/(\d+)(st|nd|rd|th)/, "$1");
+      
+        // Combine the parts into a new string
+        const newDateStr = `${datePartWithoutSuffix}, ${timePart}`;
+      
+        // Return the Date object
+        return new Date(newDateStr) as any;
+    }
+      
 
     const calcWinLoseRatio = (playerOne, playerTwo) => {
         let playerOneDB = players.find(plyr => plyr?.name == playerOne || plyr?.name.toLowerCase().includes(playerOne));
@@ -88,8 +104,8 @@ export default function Smasherscape(props) {
         let winPercentage = (winRate) > 100 ? 100 : removeTrailingZeroDecimal(winRate);
         // return `${wins} - ${losses} (${winPercentage}%)`;
         return <div className={`winRateDetails`}>
-            <div className="winsToLossses">{wins} - {losses}</div>
-            <div className={`winPercentage ${winPercentage > 50 ? winPercentage == 100 ? `perfect` : `positive` : winPercentage > 25 ? `challenger` : `negative`}`}>({winPercentage}%)</div>
+            <div className="winsToLossses">Totl Wins: {wins} - Total Losses: {losses}</div>
+            <div className={`winPercentage ${winPercentage > 50 ? winPercentage == 100 ? `perfect` : `positive` : winPercentage > 24 ? `challenger` : `negative`}`}>({winPercentage}%)</div>
         </div>
     }
 
@@ -500,7 +516,7 @@ export default function Smasherscape(props) {
                                 <LazyLoadImage effect="blur" src={`${publicAssetLink}/assets/smasherscape/OSRS_Card_Template_Border_Only.png?raw=true`} className={`cardBG border`} alt={`Smasherscape Player Card`} />
                                 <ul className="recordList">
                                     <h3 className={`greenRecordText`}>Player Record</h3>
-                                    {plyr?.plays?.length > 0 && plyr?.plays?.sort((a, b) => b.date - a.date).map((ply, plyIndex) => {
+                                    {plyr?.plays?.length > 0 && plyr?.plays?.sort((a: any, b: any) => parseDate(b.date) - parseDate(a.date)).map((ply, plyIndex) => {
                                         let isWinner = ply?.winner == plyr?.name;
                                         return (
                                             <li className={`playerPlay`} key={plyIndex}>
