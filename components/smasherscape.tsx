@@ -82,17 +82,10 @@ export default function Smasherscape(props) {
         const parts = dateStr.split(", ");
         const timePart = parts[0];
         const datePart = parts[1];
-      
-        // Remove the "rd", "th", "st" suffix from the date part
         const datePartWithoutSuffix = datePart.replace(/(\d+)(st|nd|rd|th)/, "$1");
-      
-        // Combine the parts into a new string
         const newDateStr = `${datePartWithoutSuffix}, ${timePart}`;
-      
-        // Return the Date object
         return new Date(newDateStr) as any;
     }
-      
 
     const calcWinLoseRatio = (playerOne, playerTwo) => {
         let playerOneDB = players.find(plyr => plyr?.name == playerOne || plyr?.name.toLowerCase().includes(playerOne));
@@ -102,9 +95,9 @@ export default function Smasherscape(props) {
         let losses = plays.filter(ply => ply?.loser == playerOneDB?.name)?.length;
         let winRate = (wins/(wins+losses)) * 100;
         let winPercentage = (winRate) > 100 ? 100 : removeTrailingZeroDecimal(winRate);
-        // return `${wins} - ${losses} (${winPercentage}%)`;
         return <div className={`winRateDetails`}>
-            <div className="winsToLossses">Totl Wins: {wins} - Total Losses: {losses}</div>
+            {/* <div className="winsToLossses">Total Wins: {wins} - Total Losses: {losses}</div> */}
+            <div className="winsToLossses">{wins} Wins - {losses} Losses</div>
             <div className={`winPercentage ${winPercentage > 50 ? winPercentage == 100 ? `perfect` : `positive` : winPercentage > 24 ? `challenger` : `negative`}`}>({winPercentage}%)</div>
         </div>
     }
@@ -190,7 +183,16 @@ export default function Smasherscape(props) {
         if (playersToDeleteFromDB.length > 0) {
             playersToDeleteFromDB.forEach(playerDB => {
                 setPlayers(prevPlayers => {
-                    let updatedPlayers = prevPlayers.filter(plyr => plyr.name.toLowerCase() != playerDB.name.toLowerCase());
+                    let updatedPlayers = prevPlayers.map(plyr => {
+                        if (plyr.name.toLowerCase() == playerDB.name.toLowerCase()) {
+                            return {
+                                ...plyr,
+                                disabled: true
+                            }
+                        } else {
+                            return plyr;
+                        }
+                    });
                     setFilteredPlayers(updatedPlayers);
                     devEnv && console.log(`Updated Players`, updatedPlayers);
                     useLocalStorage && localStorage.setItem(`players`, JSON.stringify(updatedPlayers));
@@ -204,6 +206,15 @@ export default function Smasherscape(props) {
         setPlayers(defaultPlayers);
         setFilteredPlayers(defaultPlayers);
         useLocalStorage && localStorage.setItem(`players`, JSON.stringify(defaultPlayers));
+    }
+
+    const getActivePlayers = (players) => {
+        return players.sort((a,b) => {
+            if (b.experience.arenaXP !== a.experience.arenaXP) {
+                return b.experience.arenaXP - a.experience.arenaXP;
+            }
+            return b.plays.length - a.plays.length;
+        }).filter(plyr => !plyr.disabled);
     }
 
     const updatePlayers = (commandParams) => {
@@ -389,12 +400,7 @@ export default function Smasherscape(props) {
                         autoHighlight
                         id="combo-box-demo"
                         sx={{ width: `100%` }}
-                        options={players.sort((a,b) => {
-                            if (b.experience.arenaXP !== a.experience.arenaXP) {
-                                return b.experience.arenaXP - a.experience.arenaXP;
-                            }
-                            return b.plays.length - a.plays.length;
-                        }).map(plyr => {
+                        options={getActivePlayers(players).map(plyr => {
                             return {
                                 ...plyr,
                                 label: plyr.name,
@@ -436,17 +442,11 @@ export default function Smasherscape(props) {
                 <button className={`formSubmitButton`} type={`submit`}>Submit</button>
             </form>
         </section>
-        <div id={props.id} className={`${props.className} playerGrid ${filteredPlayers.length == 0 ? `empty` : `populated`}`}>
-            {filteredPlayers.length == 0 && <>
+        <div id={props.id} className={`${props.className} playerGrid ${getActivePlayers(filteredPlayers)?.length == 0 ? `empty` : `populated`}`}>
+            {getActivePlayers(filteredPlayers)?.length == 0 && <>
                 <div className="gridCard"><h1 className={`runescape_large noPlayersFound`}>No Players Found</h1></div>
             </>}
-            {filteredPlayers.length > 0 && filteredPlayers.sort((a,b) => {
-                if (b.experience.arenaXP !== a.experience.arenaXP) {
-                    return b.experience.arenaXP - a.experience.arenaXP;
-                }
-            
-                return b.plays.length - a.plays.length;
-            }).map((plyr, plyrIndex) => {
+            {getActivePlayers(filteredPlayers)?.length > 0 && getActivePlayers(filteredPlayers)?.map((plyr, plyrIndex) => {
                 if (plyr) {
                     return (
                         <div className="playerCard" key={plyrIndex}>
@@ -522,7 +522,7 @@ export default function Smasherscape(props) {
                                             <li className={`playerPlay`} key={plyIndex}>
                                                <div className="plyIndex">{plyIndex + 1}.</div>
                                                <div className="recordDetails">
-                                                <div className={`playMessage ${isWinner ? `winner` : `loser`}`}>{isWinner ? `Win over ${ply?.loser}` : `Loss to ${ply?.winner}`}
+                                                <div className={`playMessage`}>{isWinner ? <div><span className={`${isWinner ? `winner` : `loser`}`}>Win</span> over {ply?.loser}</div> : <div><span className={`${isWinner ? `winner` : `loser`}`}>Loss</span> to {ply?.winner}</div>}
                                                     <div className="stocksRow">
                                                         <div className="stocks">
                                                             {ply?.stocks?.map(stk => stk.character)?.includes(ply?.character) ? ply?.stocks?.length > 0 && ply?.stocks?.map((stok, stkIndex) => {
