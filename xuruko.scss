@@ -92,22 +92,12 @@ li {
         width: 100%;
         height: 100%;
         display: flex;
+        cursor: pointer;
         min-height: 500px;
         position: relative;
         align-items: center;
         flex-direction: column;
         justify-content: center;
-        .cardBG {
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            position: absolute;
-            &.border {
-                z-index: 2;
-                pointer-events: none;
-            }
-        }
         // background-size: contain !important;
         // background-repeat: no-repeat !important;
         // background-position: 50% 50% !important;
@@ -321,6 +311,80 @@ li {
             }
             @media (max-width: 768px) {
                 font-size: 1.7em;
+            }
+        }
+    }
+}
+
+.cardBG {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    &.border {
+        z-index: 2;
+        pointer-events: none;
+    }
+}
+
+.recordOfPlayer {
+    top: -55px;
+    height: 0;
+    opacity: 0;
+    z-index: 0;
+    width: 90%;
+    display: flex;
+    margin: 0 auto;
+    position: relative;
+    pointer-events: none;
+    align-items: flex-end;
+    transform-origin: top;
+    justify-content: center;
+    transition: var(--transition);
+    &.expanded {
+        padding: 75px 0 55px;
+        pointer-events: all;
+        height: max-content;
+        opacity: 1;
+        ul {
+            z-index: 1;
+        }
+    }
+    h1 {
+        backdrop-filter: blur(5px);
+        position: sticky;
+        font-size: 2em;
+        top: 0;
+    }
+    .plyIndex {
+        font-size: 1.1em;
+    }
+    ul {
+        width: 86%;
+        font-size: 1.1em;
+        overflow: overlay;
+        max-height: 350px;
+        margin: 0 auto 15px;
+        li {
+            display: flex;
+            grid-gap: 10px;
+            align-items: center;
+            .recordDetails {
+                grid-gap: 5px;
+                display: flex;
+                flex-direction: column;
+                .playMessage {
+                    grid-gap: 5px;
+                    align-items: center;
+                    display: inline-flex;
+                    img {
+                        display: inline-flex;
+                    }
+                }
+                .playDate {
+                    text-align: center;
+                }
             }
         }
     }
@@ -579,7 +643,6 @@ form {
 .MuiTouchRipple-root, .MuiButtonBase-root {
     align-items: flex-end !important;
     border-radius: 8px !important;
-    transition: var(--transition);
     justify-content: center;
     max-width: 95%;
     margin: 0 auto;
@@ -680,6 +743,11 @@ div[role="presentation"] {
     .levelNumColumn {
         text-align: center;
     }
+    .MuiBadge-badge {
+        width: auto;
+        padding: 0 !important;
+        font-size: 10px !important;
+    }
     @media (max-width: 855px) and (min-width: 768px) {
         .playerDetailsColumn {
             grid-template-columns: 1fr 99px;
@@ -764,5 +832,27 @@ div[role="presentation"] {
     }
     .autocompleteOption {
         width: 96.5% !important;
+    }
+}
+
+.dead {
+    position: relative;
+    img {
+        filter: grayscale(1);
+    }
+    &::before {
+        top: 85%;
+        left: 50%;
+        z-index: 1;
+        width: 100%;
+        height: 100%;
+        content: "X";
+        color: red;
+        display: flex;
+        font-size: 1.3em;
+        position: absolute;
+        align-items: center;
+        justify-content: center;
+        transform: translate(-50%, -50%);
     }
 }

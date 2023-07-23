@@ -88,6 +88,24 @@ export default function Smasherscape(props) {
         else return `${publicAssetLink}/assets/smasherscape/OSRS_Top_Hat.png?raw=true`;
     }
 
+    const setPlayerExpanded = (player) => {
+        let updatedPlayers = players.map(plyr => {
+            if (plyr?.id == player?.id) {
+                if (plyr.expanded) {
+                    plyr.expanded = !plyr.expanded;
+                    return plyr;
+                } else {
+                    plyr.expanded = true;
+                    return plyr;
+                }
+            } else {
+                return plyr;
+            }
+        });
+        setFilteredPlayers(updatedPlayers);
+        return updatedPlayers;
+    }
+
     const addPlayers = (commandParams) => {
         let playersToAdd = commandParams.filter((comm, commIndex) => commIndex != 0 && comm);
 
@@ -149,7 +167,7 @@ export default function Smasherscape(props) {
     const updatePlayers = (commandParams) => {
         let playerOne = commandParams[1].toLowerCase();
         let playerTwo = commandParams[3].toLowerCase();
-        let date = moment().format(`MMMM Do YYYY, h:mm:ss a`);
+        let date = moment().format(`h:mm:ss a, MMMM Do YYYY`);
 
         let characterOne;
         let characterTwo;
@@ -181,14 +199,55 @@ export default function Smasherscape(props) {
             return;
         } else {
 
+            let stocks = [
+                {
+                    character: Characters[characterOne],
+                }, 
+                {
+                    character: Characters[characterOne],
+                }, 
+                {
+                    character: Characters[characterOne],
+                }
+            ].map((stk, stkIndex) => {
+                if (stkIndex < stocksTaken) {
+                    return {
+                        ...stk,
+                        dead: true
+                    }
+                } else {
+                    return {
+                        ...stk,
+                    }
+                }
+            });
+
+            let lossStocks = [
+                {
+                    character: Characters[characterTwo],
+                    dead: true
+                }, 
+                {
+                    character: Characters[characterTwo],
+                    dead: true
+                }, 
+                {
+                    character: Characters[characterTwo],
+                    dead: true
+                }
+            ];
+
             let updatedPlayers = players.map(plyr => {
                 if (plyr?.name.toLowerCase() == playerOne || plyr?.name.toLowerCase().includes(playerOne)) {
                     plyr.experience.arenaXP = plyr.experience.arenaXP + 400;
                     plyr.plays.push({
+                        otherCharacter: Characters[characterTwo],
                         character: Characters[characterOne],
                         winner: playerOneDB?.name,
                         loser: playerTwoDB?.name,
                         stocksTaken,
+                        lossStocks,
+                        stocks,
                         date
                     });
 
@@ -198,10 +257,13 @@ export default function Smasherscape(props) {
                 } else if (plyr?.name.toLowerCase() == playerTwo || plyr?.name.toLowerCase().includes(playerTwo)) {
                     plyr.experience.arenaXP = plyr.experience.arenaXP + (100 * stocksTaken);
                     plyr.plays.push({
+                        otherCharacter: Characters[characterOne],
                         character: Characters[characterTwo],
                         winner: playerOneDB?.name,
                         loser: playerTwoDB?.name,
                         stocksTaken,
+                        lossStocks,
+                        stocks,
                         date
                     });
 
@@ -314,7 +376,9 @@ export default function Smasherscape(props) {
                                                 <div className={`playsContainer`}>
                                                     {calcPlayerCharactersPlayed(option).map((char, charIndex) => {
                                                         return (
-                                                            <img key={charIndex} className={`charImg`} width={25} src={calcPlayerCharacterIcon(char)} alt={getCharacterTitle(char)} />
+                                                            <Badge title={`Played ${getCharacterTitle(char)} ${calcPlayerCharacterTimesPlayed(option, char)} Time(s)`} key={charIndex} badgeContent={calcPlayerCharacterTimesPlayed(option, char)} color="primary">
+                                                                <img className={`charImg`} width={25} src={calcPlayerCharacterIcon(char)} alt={getCharacterTitle(char)} />
+                                                            </Badge>
                                                         )
                                                     })}
                                                 </div>
@@ -343,65 +407,118 @@ export default function Smasherscape(props) {
             }).map((plyr, plyrIndex) => {
                 if (plyr) {
                     return (
-                        <div className="gridCard" key={plyrIndex}>
-                            <LazyLoadImage effect="blur" src={`${publicAssetLink}/assets/smasherscape/OSRS_Card_Empty.png?raw=true`} className={`cardBG`} alt={`Smasherscape Player Card`} />
-                            <LazyLoadImage effect="blur" src={`${publicAssetLink}/assets/smasherscape/OSRS_Card_Template_Border_Only.png?raw=true`} className={`cardBG border`} alt={`Smasherscape Player Card`} />
-                            <div className="playerCardContent">
-                                <div className="cardTopRow">
-                                    <div className="logoWithWords">
-                                        <img width={70} src={`${publicAssetLink}/assets/smasherscape/OSRS_Top_Hat.png?raw=true`} alt={`Tophat Logo`} />
-                                        <h3>Xuruko's<br />SmasherScape</h3>
+                        <div className="playerCard" key={plyrIndex}>
+                            <div className="gridCard" onClick={(e) => setPlayerExpanded(plyr)}>
+                                <LazyLoadImage effect="blur" src={`${publicAssetLink}/assets/smasherscape/OSRS_Card_Empty.png?raw=true`} className={`cardBG`} alt={`Smasherscape Player Card`} />
+                                <LazyLoadImage effect="blur" src={`${publicAssetLink}/assets/smasherscape/OSRS_Card_Template_Border_Only.png?raw=true`} className={`cardBG border`} alt={`Smasherscape Player Card`} />
+                                <div className="playerCardContent">
+                                    <div className="cardTopRow">
+                                        <div className="logoWithWords">
+                                            <img width={70} src={`${publicAssetLink}/assets/smasherscape/OSRS_Top_Hat.png?raw=true`} alt={`Tophat Logo`} />
+                                            <h3>Xuruko's<br />SmasherScape</h3>
+                                        </div>
+                                        <h2>{plyr?.name}</h2>
                                     </div>
-                                    <h2>{plyr?.name}</h2>
+                                    <div className="cardMiddleRow">
+                                        <div className="imgLeftCol">
+                                            <img width={150} src={calcPlayerLevelImage(plyr?.level?.name)} alt={plyr?.level?.name} />
+                                            <h4 className={`levelName ${plyr?.level?.name.split(` `)[0]}`}>{plyr?.level?.name}</h4>
+                                        </div>
+                                        <div className="recordPlays">
+                                            <div className="record">
+                                                <h3>Record</h3>
+                                                <h4>{calcPlayerWins(plyr)} - {calcPlayerLosses(plyr)}</h4>
+                                            </div>
+                                            <div className="plays">
+                                                <h3>Plays</h3>
+                                                <div className={`playsContainer`}>
+                                                    {calcPlayerCharactersPlayed(plyr).map((char, charIndex) => {
+                                                        return (
+                                                            <Badge title={`Played ${getCharacterTitle(char)} ${calcPlayerCharacterTimesPlayed(plyr, char)} Time(s)`} key={charIndex} badgeContent={calcPlayerCharacterTimesPlayed(plyr, char)} color="primary">
+                                                                <img className={`charImg`} width={35} src={calcPlayerCharacterIcon(char)} alt={getCharacterTitle(char)} />
+                                                            </Badge>
+                                                        )
+                                                    })}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="rightCol">
+                                            <div className="level">
+                                                <h4 className={`levelNum levelTop`}>{plyr?.level?.num}</h4>
+                                                <div className="borderSep"></div>
+                                                <h4 className={`levelNum levelBot`}>{plyr?.level?.num}</h4>
+                                            </div>
+                                            <div className="experienceDetails">
+                                                <div className="arenaXP xpDetail">
+                                                    <div>Arena XP:</div>
+                                                    <div>{plyr?.experience.arenaXP.toLocaleString(`en`)}</div>
+                                                </div>
+                                                <div className="nextLevelAt xpDetail">
+                                                    <div>Next Level At:</div>
+                                                    <div>{plyr?.experience.nextLevelAt.toLocaleString(`en`)}</div>
+                                                </div>
+                                                <div className="remainingXP xpDetail">
+                                                    <div>Remaining XP:</div>
+                                                    <div>{plyr?.experience.remainingXP.toLocaleString(`en`)}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="cardBottomRow">
+                                        <div className="gradient" style={{clipPath: `polygon(0% 0, ${((plyr.experience.arenaXP - plyr.experience.xp) / (plyr.experience.nextLevelAt - plyr.experience.xp)) * 100}% 0%, ${((plyr.experience.arenaXP - plyr.experience.xp) / (plyr.experience.nextLevelAt - plyr.experience.xp)) * 100}% 100%, 0 100%)`}}></div>
+                                    </div>
                                 </div>
-                                <div className="cardMiddleRow">
-                                    <div className="imgLeftCol">
-                                        <img width={150} src={calcPlayerLevelImage(plyr?.level?.name)} alt={plyr?.level?.name} />
-                                        <h4 className={`levelName ${plyr?.level?.name.split(` `)[0]}`}>{plyr?.level?.name}</h4>
-                                    </div>
-                                    <div className="recordPlays">
-                                        <div className="record">
-                                            <h3>Record</h3>
-                                            <h4>{calcPlayerWins(plyr)} - {calcPlayerLosses(plyr)}</h4>
-                                        </div>
-                                        <div className="plays">
-                                            <h3>Plays</h3>
-                                            <div className={`playsContainer`}>
-                                                {calcPlayerCharactersPlayed(plyr).map((char, charIndex) => {
-                                                    return (
-                                                        <Badge title={`Played ${getCharacterTitle(char)} ${calcPlayerCharacterTimesPlayed(plyr, char)} Time(s)`} key={charIndex} badgeContent={calcPlayerCharacterTimesPlayed(plyr, char)} color="primary">
-                                                            <img className={`charImg`} width={35} src={calcPlayerCharacterIcon(char)} alt={getCharacterTitle(char)} />
-                                                        </Badge>
-                                                    )
-                                                })}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="rightCol">
-                                        <div className="level">
-                                            <h4 className={`levelNum levelTop`}>{plyr?.level?.num}</h4>
-                                            <div className="borderSep"></div>
-                                            <h4 className={`levelNum levelBot`}>{plyr?.level?.num}</h4>
-                                        </div>
-                                        <div className="experienceDetails">
-                                            <div className="arenaXP xpDetail">
-                                                <div>Arena XP:</div>
-                                                <div>{plyr?.experience.arenaXP.toLocaleString(`en`)}</div>
-                                            </div>
-                                            <div className="nextLevelAt xpDetail">
-                                                <div>Next Level At:</div>
-                                                <div>{plyr?.experience.nextLevelAt.toLocaleString(`en`)}</div>
-                                            </div>
-                                            <div className="remainingXP xpDetail">
-                                                <div>Remaining XP:</div>
-                                                <div>{plyr?.experience.remainingXP.toLocaleString(`en`)}</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="cardBottomRow">
-                                    <div className="gradient" style={{clipPath: `polygon(0% 0, ${((plyr.experience.arenaXP - plyr.experience.xp) / (plyr.experience.nextLevelAt - plyr.experience.xp)) * 100}% 0%, ${((plyr.experience.arenaXP - plyr.experience.xp) / (plyr.experience.nextLevelAt - plyr.experience.xp)) * 100}% 100%, 0 100%)`}}></div>
-                                </div>
+                            </div>
+                            <div className={`recordOfPlayer ${plyr?.expanded ? `expanded` : `collapsed`}`}>
+                                <LazyLoadImage effect="blur" src={`${publicAssetLink}/assets/smasherscape/OSRS_Card_Empty.png?raw=true`} className={`cardBG`} alt={`Smasherscape Player Card`} />
+                                <LazyLoadImage effect="blur" src={`${publicAssetLink}/assets/smasherscape/OSRS_Card_Template_Border_Only.png?raw=true`} className={`cardBG border`} alt={`Smasherscape Player Card`} />
+                                <ul className="recordList">
+                                    <h1>Player Record</h1>
+                                    {plyr?.plays?.length > 0 && plyr?.plays?.sort((a, b) => b.date - a.date).map((ply, plyIndex) => {
+                                        let isWinner = ply?.winner == plyr?.name;
+                                        return (
+                                            <li className={`playerPlay`} key={plyIndex}>
+                                               <div className="plyIndex">{plyIndex + 1}.</div>
+                                               <div className="recordDetails">
+                                                <div className="playMessage">{isWinner ? `Win over ${ply?.loser}` : `Loss to ${ply?.winner}`} with 
+                                                    <div className="stocks">
+                                                        {ply?.stocks?.map(stk => stk.character)?.includes(ply?.character) ? ply?.stocks?.length > 0 && ply?.stocks?.map((stok, stkIndex) => {
+                                                            return (
+                                                                <span key={stkIndex} className={stok?.dead ? `dead` : `living`}>
+                                                                    <img className={`charImg`} width={35} src={calcPlayerCharacterIcon(stok?.character)} alt={getCharacterTitle(stok?.character)} />
+                                                                </span>
+                                                            )
+                                                        }) : ply?.lossStocks?.map((stok, stkIndex) => {
+                                                            return (
+                                                                <span key={stkIndex} className={stok?.dead ? `dead` : `living`}>
+                                                                    <img className={`charImg`} width={35} src={calcPlayerCharacterIcon(stok?.character)} alt={getCharacterTitle(stok?.character)} />
+                                                                </span>
+                                                            )
+                                                        })}
+                                                    </div>
+                                                 vs 
+                                                    <div className="otherStocks">
+                                                        {ply?.stocks?.map(stk => stk.character)?.includes(ply?.otherCharacter) ? ply?.stocks?.length > 0 && ply?.stocks?.map((stok, stkIndex) => {
+                                                            return (
+                                                                <span key={stkIndex} className={stok?.dead ? `dead` : `living`}>
+                                                                    <img className={`charImg`} width={35} src={calcPlayerCharacterIcon(stok?.character)} alt={getCharacterTitle(stok?.character)} />
+                                                                </span>
+                                                            )
+                                                        }) : ply?.lossStocks?.map((stok, stkIndex) => {
+                                                            return (
+                                                                <span key={stkIndex} className={stok?.dead ? `dead` : `living`}>
+                                                                    <img className={`charImg`} width={35} src={calcPlayerCharacterIcon(stok?.character)} alt={getCharacterTitle(stok?.character)} />
+                                                                </span>
+                                                            )
+                                                        })}
+                                                    </div>
+                                                </div>
+                                                <div className="playDate">{ply?.date}</div>
+                                               </div>
+                                            </li>
+                                        )
+                                    })}
+                                </ul>
                             </div>
                         </div>
                     )
