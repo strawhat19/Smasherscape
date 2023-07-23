@@ -362,19 +362,6 @@ export default function Smasherscape(props) {
                             <li>[ !res ] to reset players back to 0 XP</li>
                             <li>[ !upd + winner name + 'beats' + loser name + loser stocks taken from winner ] to update leaderboard</li>
                         </ol>
-                        {/* <Commands>
-                            <ol className={`commandsList`}>
-                                <div className={`nextra-code-block`}>
-                                    <pre data-language="js" data-theme="default">
-                                        <code data-language="js" data-theme="default">
-                                            ```js copy
-                                                !upd + winner name + 'beats' + loser name + loser stocks taken from winner
-                                            ```
-                                        </code>
-                                    </pre>
-                                </div>
-                            </ol>
-                        </Commands> */}
                     </div>, `85%`, `auto`);
                 }
             }
@@ -488,7 +475,7 @@ export default function Smasherscape(props) {
                                     </div>
                                     <div className="cardMiddleRow">
                                         <div className="imgLeftCol">
-                                            <img width={150} src={calcPlayerLevelImage(plyr?.level?.name)} alt={plyr?.level?.name} />
+                                            <img width={300} src={calcPlayerLevelImage(plyr?.level?.name)} alt={plyr?.level?.name} />
                                             <h4 className={`levelName ${plyr?.level?.name.split(` `)[0]}`}>{plyr?.level?.name}</h4>
                                         </div>
                                         <div className="recordPlays">
@@ -540,7 +527,10 @@ export default function Smasherscape(props) {
                                 <LazyLoadImage effect="blur" src={`${publicAssetLink}/assets/smasherscape/OSRS_Card_Empty.png?raw=true`} className={`cardBG`} alt={`Smasherscape Player Card`} />
                                 <LazyLoadImage effect="blur" src={`${publicAssetLink}/assets/smasherscape/OSRS_Card_Template_Border_Only.png?raw=true`} className={`cardBG border`} alt={`Smasherscape Player Card`} />
                                 <ul className="recordList">
-                                    <h3 className={`greenRecordText`}>Player Record</h3>
+                                    <h3 className={`greenRecordText`}>
+                                        Player Record
+                                        <span className="recordPlays">Plays: {plyr?.plays?.length > 0 && plyr?.plays?.length}</span>
+                                    </h3>
                                     {plyr?.plays?.length > 0 && plyr?.plays?.sort((a: any, b: any) => parseDate(b.date) - parseDate(a.date)).map((ply, plyIndex) => {
                                         let isWinner = ply?.winner == plyr?.name;
                                         return (
