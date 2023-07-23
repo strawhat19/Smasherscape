@@ -168,6 +168,12 @@ export default function Smasherscape(props) {
         return lossDeaths + winDeaths;
     }
 
+    const calcPlayerKDRatio = (player, plays) => {
+        let kdRatio = removeTrailingZeroDecimal(calcPlayerKills(player, plays) / calcPlayerDeaths(player, plays));
+        console.log(`K/D Ratio`, kdRatio);
+        return kdRatio
+    }
+
     const addPlayers = (commandParams) => {
         let playersToAdd = commandParams.filter((comm, commIndex) => commIndex != 0 && comm);
 
@@ -549,6 +555,7 @@ export default function Smasherscape(props) {
                                             <span className={`blueText`}>Plays: <span className="whiteText">{plyr?.plays?.length}</span></span>
                                             <span className={`greenText`}>Kills: <span className="whiteText">{calcPlayerKills(plyr, plyr?.plays)}</span></span>
                                             <span className={`redText`}>Deaths: <span className="whiteText">{calcPlayerDeaths(plyr, plyr?.plays)}</span></span>
+                                            <span className={`goldText`}>K/D: <span className="whiteText">{calcPlayerKDRatio(plyr, plyr?.plays)}</span></span>
                                         </span>
                                     </h3>
                                     {plyr?.plays?.length > 0 ? plyr?.plays?.sort((a: any, b: any) => parseDate(b.date) - parseDate(a.date)).map((ply, plyIndex) => {
