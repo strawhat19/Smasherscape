@@ -362,7 +362,7 @@ export default function Smasherscape(props) {
                             <li>[ !res ] to reset players back to 0 XP</li>
                             <li>[ !upd + winner name + 'beats' + loser name + loser stocks taken from winner ] to update leaderboard</li>
                         </ol>
-                        <Commands>
+                        {/* <Commands>
                             <ol className={`commandsList`}>
                                 <div className={`nextra-code-block`}>
                                     <pre data-language="js" data-theme="default">
@@ -374,7 +374,7 @@ export default function Smasherscape(props) {
                                     </pre>
                                 </div>
                             </ol>
-                        </Commands>
+                        </Commands> */}
                     </div>, `85%`, `auto`);
                 }
             }
