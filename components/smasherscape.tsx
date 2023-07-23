@@ -364,9 +364,15 @@ export default function Smasherscape(props) {
                         </ol>
                         <Commands>
                             <ol className={`commandsList`}>
-                                ```js copy
-                                !upd + winner name + 'beats' + loser name + loser stocks taken from winner
-                                ```
+                                <div className={`nextra-code-block`}>
+                                    <pre data-language="js" data-theme="default">
+                                        <code data-language="js" data-theme="default">
+                                            ```js copy
+                                                !upd + winner name + 'beats' + loser name + loser stocks taken from winner
+                                            ```
+                                        </code>
+                                    </pre>
+                                </div>
                             </ol>
                         </Commands>
                     </div>, `85%`, `auto`);
