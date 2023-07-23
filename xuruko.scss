@@ -371,6 +371,7 @@ li {
             grid-gap: 10px;
             align-items: center;
             .recordDetails {
+                width: 100%;
                 grid-gap: 5px;
                 display: flex;
                 flex-direction: column;
@@ -378,7 +379,13 @@ li {
                     grid-gap: 5px;
                     align-items: center;
                     display: inline-flex;
+                    justify-content: space-between;
                     img {
+                        display: inline-flex;
+                    }
+                    .stocksRow {
+                        grid-gap: 5px;
+                        align-items: center;
                         display: inline-flex;
                     }
                 }
@@ -803,7 +810,7 @@ div[role="presentation"] {
             top: 25px;
             max-width: 100px !important;
             .borderSep {
-                top: 25px !important;
+                top: 0 !important;
                 left: -10% !important;
                 height: 4px !important;
                 width: 110px !important;
@@ -814,11 +821,8 @@ div[role="presentation"] {
             }
         }
     }
-    .borderSep {
-        top: 0;
-    }
     .experienceDetails {
-        margin-top: -10px;
+        margin: -5px auto -25px;
     }
     .cardBottomRow {
         height: 190px !important;
@@ -835,6 +839,12 @@ div[role="presentation"] {
     }
 }
 
+@media (max-width: 667px) {
+    .playMessage {
+        flex-direction: column;
+    }
+}
+
 .dead {
     position: relative;
     img {
@@ -846,9 +856,10 @@ div[role="presentation"] {
         z-index: 1;
         width: 100%;
         height: 100%;
-        content: "X";
+        content: "";
         color: red;
         display: flex;
+        // content: "X";
         font-size: 1.3em;
         position: absolute;
         align-items: center;

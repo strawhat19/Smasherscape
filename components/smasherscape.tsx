@@ -480,37 +480,39 @@ export default function Smasherscape(props) {
                                             <li className={`playerPlay`} key={plyIndex}>
                                                <div className="plyIndex">{plyIndex + 1}.</div>
                                                <div className="recordDetails">
-                                                <div className="playMessage">{isWinner ? `Win over ${ply?.loser}` : `Loss to ${ply?.winner}`} with 
-                                                    <div className="stocks">
-                                                        {ply?.stocks?.map(stk => stk.character)?.includes(ply?.character) ? ply?.stocks?.length > 0 && ply?.stocks?.map((stok, stkIndex) => {
-                                                            return (
-                                                                <span key={stkIndex} className={stok?.dead ? `dead` : `living`}>
-                                                                    <img className={`charImg`} width={35} src={calcPlayerCharacterIcon(stok?.character)} alt={getCharacterTitle(stok?.character)} />
-                                                                </span>
-                                                            )
-                                                        }) : ply?.lossStocks?.map((stok, stkIndex) => {
-                                                            return (
-                                                                <span key={stkIndex} className={stok?.dead ? `dead` : `living`}>
-                                                                    <img className={`charImg`} width={35} src={calcPlayerCharacterIcon(stok?.character)} alt={getCharacterTitle(stok?.character)} />
-                                                                </span>
-                                                            )
-                                                        })}
-                                                    </div>
-                                                 vs 
-                                                    <div className="otherStocks">
-                                                        {ply?.stocks?.map(stk => stk.character)?.includes(ply?.otherCharacter) ? ply?.stocks?.length > 0 && ply?.stocks?.map((stok, stkIndex) => {
-                                                            return (
-                                                                <span key={stkIndex} className={stok?.dead ? `dead` : `living`}>
-                                                                    <img className={`charImg`} width={35} src={calcPlayerCharacterIcon(stok?.character)} alt={getCharacterTitle(stok?.character)} />
-                                                                </span>
-                                                            )
-                                                        }) : ply?.lossStocks?.map((stok, stkIndex) => {
-                                                            return (
-                                                                <span key={stkIndex} className={stok?.dead ? `dead` : `living`}>
-                                                                    <img className={`charImg`} width={35} src={calcPlayerCharacterIcon(stok?.character)} alt={getCharacterTitle(stok?.character)} />
-                                                                </span>
-                                                            )
-                                                        })}
+                                                <div className="playMessage">{isWinner ? `Win over ${ply?.loser}` : `Loss to ${ply?.winner}`}
+                                                    <div className="stocksRow">
+                                                        <div className="stocks">
+                                                            {ply?.stocks?.map(stk => stk.character)?.includes(ply?.character) ? ply?.stocks?.length > 0 && ply?.stocks?.map((stok, stkIndex) => {
+                                                                return (
+                                                                    <span key={stkIndex} className={stok?.dead ? `dead` : `living`}>
+                                                                        <img className={`charImg`} width={35} src={calcPlayerCharacterIcon(stok?.character)} alt={getCharacterTitle(stok?.character)} />
+                                                                    </span>
+                                                                )
+                                                            }) : ply?.lossStocks?.map((stok, stkIndex) => {
+                                                                return (
+                                                                    <span key={stkIndex} className={stok?.dead ? `dead` : `living`}>
+                                                                        <img className={`charImg`} width={35} src={calcPlayerCharacterIcon(stok?.character)} alt={getCharacterTitle(stok?.character)} />
+                                                                    </span>
+                                                                )
+                                                            })}
+                                                        </div>
+                                                    vs 
+                                                        <div className="otherStocks">
+                                                            {ply?.stocks?.map(stk => stk.character)?.includes(ply?.otherCharacter) ? ply?.stocks?.length > 0 && ply?.stocks?.map((stok, stkIndex) => {
+                                                                return (
+                                                                    <span key={stkIndex} className={stok?.dead ? `dead` : `living`}>
+                                                                        <img className={`charImg`} width={35} src={calcPlayerCharacterIcon(stok?.character)} alt={getCharacterTitle(stok?.character)} />
+                                                                    </span>
+                                                                )
+                                                            }) : ply?.lossStocks?.map((stok, stkIndex) => {
+                                                                return (
+                                                                    <span key={stkIndex} className={stok?.dead ? `dead` : `living`}>
+                                                                        <img className={`charImg`} width={35} src={calcPlayerCharacterIcon(stok?.character)} alt={getCharacterTitle(stok?.character)} />
+                                                                    </span>
+                                                                )
+                                                            })}
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div className="playDate">{ply?.date}</div>
