@@ -1,7 +1,9 @@
 import  moment from 'moment';
 import { db } from '../firebase';
 import StepForm from './StepForm';
+import Commands from './Commands';
 import { Badge } from '@mui/material';
+import { MDXProvider } from '@mdx-js/react';
 import Skeleton from '@mui/material/Skeleton';
 import TextField from '@mui/material/TextField';
 import { Characters } from '../common/Characters';
@@ -360,6 +362,13 @@ export default function Smasherscape(props) {
                             <li>[ !res ] to reset players back to 0 XP</li>
                             <li>[ !upd + winner name + 'beats' + loser name + loser stocks taken from winner ] to update leaderboard</li>
                         </ol>
+                        <Commands>
+                            <ol className={`commandsList`}>
+                                ```js copy
+                                !upd + winner name + 'beats' + loser name + loser stocks taken from winner
+                                ```
+                            </ol>
+                        </Commands>
                     </div>, `85%`, `auto`);
                 }
             }
