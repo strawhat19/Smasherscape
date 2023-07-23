@@ -67,6 +67,32 @@ export default function Smasherscape(props) {
         }
     }
 
+    const removeTrailingZeroDecimal = (number) => {
+        let num = typeof number == `string` ? parseFloat(number) : number;
+        const wholeNumber = Math.trunc(num);
+        const decimalPart = num - wholeNumber;
+        if (decimalPart === 0) {
+          return wholeNumber;
+        } else {
+          return num.toFixed(1);
+        }
+      }
+
+    const calcWinLoseRatio = (playerOne, playerTwo) => {
+        let playerOneDB = players.find(plyr => plyr?.name == playerOne || plyr?.name.toLowerCase().includes(playerOne));
+        let playerTwoDB = players.find(plyr => plyr?.name == playerTwo || plyr?.name.toLowerCase().includes(playerTwo));
+        let plays = playerOneDB.plays.filter(ply => ply?.winner == playerTwoDB.name || ply?.loser == playerTwoDB.name);
+        let wins = plays.filter(ply => ply?.winner == playerOneDB?.name)?.length;
+        let losses = plays.filter(ply => ply?.loser == playerOneDB?.name)?.length;
+        let winRate = (wins/(wins+losses)) * 100;
+        let winPercentage = (winRate) > 100 ? 100 : removeTrailingZeroDecimal(winRate);
+        // return `${wins} - ${losses} (${winPercentage}%)`;
+        return <div className={`winRateDetails`}>
+            <div className="winsToLossses">{wins} - {losses}</div>
+            <div className={`winPercentage ${winPercentage > 50 ? winPercentage == 100 ? `perfect` : `positive` : winPercentage > 25 ? `challenger` : `negative`}`}>({winPercentage}%)</div>
+        </div>
+    }
+
     const calcPlayerCharactersPlayed = (plyr) => {
         let charsPlayed = plyr?.plays?.map(ply => ply?.character);
         let counts = charsPlayed.reduce((acc, char) => {
@@ -426,11 +452,11 @@ export default function Smasherscape(props) {
                                         </div>
                                         <div className="recordPlays">
                                             <div className="record">
-                                                <h3>Record</h3>
+                                                <h3 className={`greenRecordText`}>Record</h3>
                                                 <h4>{calcPlayerWins(plyr)} - {calcPlayerLosses(plyr)}</h4>
                                             </div>
                                             <div className="plays">
-                                                <h3>Plays</h3>
+                                                <h3 className={`greenRecordText`}>Plays</h3>
                                                 <div className={`playsContainer`}>
                                                     {calcPlayerCharactersPlayed(plyr).map((char, charIndex) => {
                                                         return (
@@ -473,14 +499,14 @@ export default function Smasherscape(props) {
                                 <LazyLoadImage effect="blur" src={`${publicAssetLink}/assets/smasherscape/OSRS_Card_Empty.png?raw=true`} className={`cardBG`} alt={`Smasherscape Player Card`} />
                                 <LazyLoadImage effect="blur" src={`${publicAssetLink}/assets/smasherscape/OSRS_Card_Template_Border_Only.png?raw=true`} className={`cardBG border`} alt={`Smasherscape Player Card`} />
                                 <ul className="recordList">
-                                    <h1>Player Record</h1>
+                                    <h3 className={`greenRecordText`}>Player Record</h3>
                                     {plyr?.plays?.length > 0 && plyr?.plays?.sort((a, b) => b.date - a.date).map((ply, plyIndex) => {
                                         let isWinner = ply?.winner == plyr?.name;
                                         return (
                                             <li className={`playerPlay`} key={plyIndex}>
                                                <div className="plyIndex">{plyIndex + 1}.</div>
                                                <div className="recordDetails">
-                                                <div className="playMessage">{isWinner ? `Win over ${ply?.loser}` : `Loss to ${ply?.winner}`}
+                                                <div className={`playMessage ${isWinner ? `winner` : `loser`}`}>{isWinner ? `Win over ${ply?.loser}` : `Loss to ${ply?.winner}`}
                                                     <div className="stocksRow">
                                                         <div className="stocks">
                                                             {ply?.stocks?.map(stk => stk.character)?.includes(ply?.character) ? ply?.stocks?.length > 0 && ply?.stocks?.map((stok, stkIndex) => {
@@ -515,7 +541,15 @@ export default function Smasherscape(props) {
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div className="playDate">{ply?.date}</div>
+                                                <div className="recordSubDetails">
+                                                    <div className="charsPlayedGame">
+                                                        {/* {ply?.stocks?.map(stk => stk.character)?.includes(ply?.character) ? ply?.stocks[0].character : ply?.lossStocks[0].character} vs {ply?.stocks?.map(stk => stk.character)?.includes(ply?.otherCharacter) ? ply?.stocks[0].character : ply?.lossStocks[0].character} */}
+                                                        {/* {isWinner ? ply?.loser : ply?.winner} */}
+                                                        {/* W - L:  */}
+                                                        {calcWinLoseRatio(isWinner ? ply?.winner : ply?.loser, isWinner ? ply?.loser : ply?.winner)}
+                                                    </div>
+                                                    <div className="playDate">{ply?.date}</div>
+                                                </div>
                                                </div>
                                             </li>
                                         )
