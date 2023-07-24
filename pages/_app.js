@@ -379,8 +379,6 @@ export default function ProductIVF({ Component, pageProps, router }) {
       setPage(window.location.pathname.replace(`/`,``));
       setMobile((typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1));
 
-      dev() && console.log(`Players`, players);
-
       let toc = document.querySelector(`.nextra-toc`);
       let tocMinimized = JSON.parse(localStorage.getItem(`tocMinimized`));
       if (toc) {

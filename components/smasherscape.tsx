@@ -98,9 +98,8 @@ export default function Smasherscape(props) {
         let winRate = (wins/(wins+losses)) * 100;
         let winPercentage = (winRate) > 100 ? 100 : removeTrailingZeroDecimal(winRate);
         return <div className={`winRateDetails`}>
-            {/* <div className="winsToLossses">Total Wins: {wins} - Total Losses: {losses}</div> */}
-            <div className="winsToLossses">{wins} Wins - {losses} Losses</div>
             <div className={`winPercentage ${winPercentage > 50 ? winPercentage == 100 ? `perfect` : `positive` : winPercentage > 24 ? `challenger` : `negative`}`}>({winPercentage}%)</div>
+            <div className="winsToLossses">{wins} Wins - {losses} Losses</div>
         </div>
     }
 
@@ -169,9 +168,9 @@ export default function Smasherscape(props) {
     }
 
     const calcPlayerKDRatio = (player, plays) => {
-        let kdRatio = removeTrailingZeroDecimal(calcPlayerKills(player, plays) / calcPlayerDeaths(player, plays));
-        console.log(`K/D Ratio`, kdRatio);
-        return kdRatio
+        let kd = calcPlayerKills(player, plays) / calcPlayerDeaths(player, plays);
+        let kdRatio = removeTrailingZeroDecimal(kd);
+        return kdRatio;
     }
 
     const addPlayers = (commandParams) => {
@@ -497,7 +496,7 @@ export default function Smasherscape(props) {
                                     </div>
                                     <div className="cardMiddleRow">
                                         <div className="imgLeftCol">
-                                            <img width={200} src={calcPlayerLevelImage(plyr?.level?.name)} alt={plyr?.level?.name} />
+                                            <img style={{transform: `scale(1.35)`}} width={200} src={calcPlayerLevelImage(plyr?.level?.name)} alt={plyr?.level?.name} />
                                             <h4 className={`levelName ${plyr?.level?.name.split(` `)[0]}`}>{plyr?.level?.name}</h4>
                                         </div>
                                         <div className="recordPlays">
@@ -550,13 +549,110 @@ export default function Smasherscape(props) {
                                 <LazyLoadImage effect="blur" src={`${publicAssetLink}/assets/smasherscape/OSRS_Card_Template_Border_Only.png?raw=true`} className={`cardBG border`} alt={`Smasherscape Player Card`} />
                                 <ul className="recordList">
                                     <h3 className={`greenRecordText`}>
-                                        Player Record
-                                        <span className="recordPlays">
-                                            <span className={`blueText`}>Plays: <span className="whiteText">{plyr?.plays?.length}</span></span>
-                                            <span className={`greenText`}>Kills: <span className="whiteText">{calcPlayerKills(plyr, plyr?.plays)}</span></span>
-                                            <span className={`redText`}>Deaths: <span className="whiteText">{calcPlayerDeaths(plyr, plyr?.plays)}</span></span>
-                                            <span className={`goldText`}>K/D: <span className="whiteText">{calcPlayerKDRatio(plyr, plyr?.plays)}</span></span>
-                                        </span>
+                                        <div className={`flex`}>
+                                            Player Record
+                                            <span className="recordPlays">
+                                                {plyr?.plays?.length > 0 && <span className={`goldText`}>K/D: <span className="whiteText kdRatioNum">{calcPlayerKDRatio(plyr, plyr?.plays)}</span></span>}
+                                                <span className={`greenText`}>Kills: <span className="whiteText">{calcPlayerKills(plyr, plyr?.plays)}</span></span>
+                                                <span className={`redText`}>Deaths: <span className="whiteText">{calcPlayerDeaths(plyr, plyr?.plays)}</span></span>
+                                                <span className={`blueText`}>Plays: <span className="whiteText">{plyr?.plays?.length}</span></span>
+                                            </span>
+                                        </div>
+                                        <div className="flex white noShadow">
+                                            <form action="submit" className="gridForm recordForm">
+                                                <div className={`inputWrapper materialBGInputWrapper`}>
+                                                    <div className="inputBG materialBG"></div>
+                                                    <Autocomplete
+                                                        disablePortal
+                                                        autoHighlight
+                                                        id="combo-box-demo"
+                                                        sx={{ width: `100%` }}
+                                                        options={getActivePlayers(players).map(plyr => {
+                                                            return {
+                                                                ...plyr,
+                                                                label: plyr.name,
+                                                            }
+                                                        })}
+                                                        getOptionLabel={(option) => option.label}
+                                                        onChange={(e, val: any) => searchPlayers(e, val)}
+                                                        onInputChange={(e, val: any) => searchPlayers(e, val)}
+                                                        isOptionEqualToValue={(option, value) => option.id === value.id}
+                                                        renderInput={(params) => <TextField name={`search`} onBlur={(e) => searchBlur(e)} {...params} label="Search..." />}
+                                                        renderOption={(props: any, option: any) => {
+                                                            return (
+                                                                <div key={props?.key} {...props}>
+                                                                    <div className="autocompleteOption">
+                                                                        <div className="levelNumColumn">{option?.level?.num}</div>
+                                                                        <div className="levelImageColumn"><img width={30} src={calcPlayerLevelImage(option?.level?.name)} alt={option?.level?.name} /></div>
+                                                                        <div className="playerDetailsColumn">
+                                                                            <div className="playerName">{option?.label}</div>
+                                                                            <div className="playerEXP">{option?.experience?.arenaXP}</div>
+                                                                            <div className="plays">
+                                                                                <div className={`playsContainer`}>
+                                                                                    {calcPlayerCharactersPlayed(option).map((char, charIndex) => {
+                                                                                        return (
+                                                                                            <Badge title={`Played ${getCharacterTitle(char)} ${calcPlayerCharacterTimesPlayed(option, char)} Time(s)`} key={charIndex} badgeContent={calcPlayerCharacterTimesPlayed(option, char)} color="primary">
+                                                                                                <img className={`charImg`} width={25} src={calcPlayerCharacterIcon(char)} alt={getCharacterTitle(char)} />
+                                                                                            </Badge>
+                                                                                        )
+                                                                                    })}
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            )
+                                                        }}
+                                                    />
+                                                </div>
+                                                <div className={`inputWrapper materialBGInputWrapper`}>
+                                                    <div className="inputBG materialBG"></div>
+                                                    <Autocomplete
+                                                        disablePortal
+                                                        autoHighlight
+                                                        id="combo-box-demo"
+                                                        sx={{ width: `100%` }}
+                                                        options={getActivePlayers(players).map(plyr => {
+                                                            return {
+                                                                ...plyr,
+                                                                label: plyr.name,
+                                                            }
+                                                        })}
+                                                        getOptionLabel={(option) => option.label}
+                                                        onChange={(e, val: any) => searchPlayers(e, val)}
+                                                        onInputChange={(e, val: any) => searchPlayers(e, val)}
+                                                        isOptionEqualToValue={(option, value) => option.id === value.id}
+                                                        renderInput={(params) => <TextField name={`search`} onBlur={(e) => searchBlur(e)} {...params} label="Search..." />}
+                                                        renderOption={(props: any, option: any) => {
+                                                            return (
+                                                                <div key={props?.key} {...props}>
+                                                                    <div className="autocompleteOption">
+                                                                        <div className="levelNumColumn">{option?.level?.num}</div>
+                                                                        <div className="levelImageColumn"><img width={30} src={calcPlayerLevelImage(option?.level?.name)} alt={option?.level?.name} /></div>
+                                                                        <div className="playerDetailsColumn">
+                                                                            <div className="playerName">{option?.label}</div>
+                                                                            <div className="playerEXP">{option?.experience?.arenaXP}</div>
+                                                                            <div className="plays">
+                                                                                <div className={`playsContainer`}>
+                                                                                    {calcPlayerCharactersPlayed(option).map((char, charIndex) => {
+                                                                                        return (
+                                                                                            <Badge title={`Played ${getCharacterTitle(char)} ${calcPlayerCharacterTimesPlayed(option, char)} Time(s)`} key={charIndex} badgeContent={calcPlayerCharacterTimesPlayed(option, char)} color="primary">
+                                                                                                <img className={`charImg`} width={25} src={calcPlayerCharacterIcon(char)} alt={getCharacterTitle(char)} />
+                                                                                            </Badge>
+                                                                                        )
+                                                                                    })}
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            )
+                                                        }}
+                                                    />
+                                                </div>
+                                                <button className={`formSubmitButton`} type={`submit`}>Submit</button>
+                                            </form>
+                                        </div>
                                     </h3>
                                     {plyr?.plays?.length > 0 ? plyr?.plays?.sort((a: any, b: any) => parseDate(b.date) - parseDate(a.date)).map((ply, plyIndex) => {
                                         let isWinner = ply?.winner == plyr?.name;
