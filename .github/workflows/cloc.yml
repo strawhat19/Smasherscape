@@ -3,7 +3,7 @@ name: Count Lines of Code
 on:
   push:
     branches:
-      - main
+      - testing
 
 jobs:
   build:
