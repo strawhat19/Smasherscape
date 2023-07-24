@@ -558,7 +558,7 @@ export default function Smasherscape(props) {
                                                 <span className={`blueText`}>Plays: <span className="whiteText">{plyr?.plays?.length}</span></span>
                                             </span>
                                         </div>
-                                        <div className="flex white noShadow">
+                                        {plyr?.plays?.length > 0 && devEnv && <div className="flex white noShadow">
                                             <form action="submit" className="gridForm recordForm">
                                                 <div className={`inputWrapper materialBGInputWrapper`}>
                                                     <div className="inputBG materialBG"></div>
@@ -652,7 +652,7 @@ export default function Smasherscape(props) {
                                                 </div>
                                                 <button className={`formSubmitButton`} type={`submit`}>Submit</button>
                                             </form>
-                                        </div>
+                                        </div>}
                                     </h3>
                                     {plyr?.plays?.length > 0 ? plyr?.plays?.sort((a: any, b: any) => parseDate(b.date) - parseDate(a.date)).map((ply, plyIndex) => {
                                         let isWinner = ply?.winner == plyr?.name;

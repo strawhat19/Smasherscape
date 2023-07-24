@@ -985,9 +985,11 @@ div[role="presentation"] {
     width: 98%;
     grid-gap: 0;
     .inputWrapper {
-        min-height: 14px !important;
+        max-height: 52px !important;
+        min-height: 52px !important;
         input {
             &.MuiAutocomplete-input {
+                max-height: 14px !important;
                 min-height: 14px !important;
             }
         }
