@@ -2,7 +2,7 @@
 
 ![License](https://img.shields.io/github/license/strawhat19/Smasherscape)
 ![State](https://img.shields.io/github/deployments/strawhat19/Smasherscape/Production)
-![Total Lines](https://img.shields.io/tokei/lines/github/strawhat19/Smasherscape)
+![Total Lines](https://img.shields.io/badge/Total%20Lines-total--lines--undefined-blue)
 ![Repo Size](https://img.shields.io/github/repo-size/strawhat19/Smasherscape)
 ![Release](https://img.shields.io/github/release/strawhat19/Smasherscape)
 
