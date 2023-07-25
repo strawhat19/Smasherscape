@@ -1,4 +1,4 @@
-import { defaultPlayers } from "../_app";
+import { defaultPlayers } from "../../../_app";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export default function(request: NextApiRequest, response: NextApiResponse) {

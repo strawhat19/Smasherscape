@@ -1,16 +1,11 @@
 export default class Command {
-  id: any;
-  uuid?: any;
-  name: string;
-  command: string;
-  description: string;
   [key: string]: any;
   constructor(
-    id: any,
-    name: string,
-    command: string,
-    description: string,
-    uuid?: any,
+    public id: any,
+    public name: string,
+    public command: string,
+    public description: string,
+    public uuid?: any,
   ) {
     this.id = id;
     this.uuid = uuid;

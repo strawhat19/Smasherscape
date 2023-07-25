@@ -3,8 +3,8 @@ import '../xuruko.scss';
 import '../concentration.scss';
 import ReactDOM from 'react-dom/client';
 import { AnimatePresence, motion } from 'framer-motion';
+import { getActivePlayers } from '../components/smasherscape';
 import { createContext, useRef, useState, useEffect } from 'react';
-import Player from '../models/Player';
 
 export const StateContext = createContext({});
 
@@ -420,7 +420,6 @@ export default function ProductIVF({ Component, pageProps, router }) {
       localStorage.setItem(`alertOpen`, false);
       let storedPlayers = JSON.parse(localStorage.getItem(`players`));
       let storedUser = JSON.parse(localStorage.getItem(`user`));
-
       
       setDevEnv(dev());
       setUpdates(updates);
@@ -462,8 +461,10 @@ export default function ProductIVF({ Component, pageProps, router }) {
       if (storedPlayers && useLocalStorage) {
         setPlayers(storedPlayers);
         setFilteredPlayers(storedPlayers);
+        devEnv && console.log(`Players`, getActivePlayers(storedPlayers));
       } else {
         setPlayers(defaultPlayers);
+        devEnv && console.log(`Players`, getActivePlayers(defaultPlayers));
       }
 
       setLoading(false);
@@ -471,19 +472,19 @@ export default function ProductIVF({ Component, pageProps, router }) {
       setTimeout(() => setLoading(false), 1500);
 
       // if (dev()) {
-      //   console.log(`brwser`, brwser);
-      //   console.log(`App`, router.route);
+        // console.log(`brwser`, brwser);
+        // console.log(`App`, router.route);
       // }
   
-      return () => {
+      // return () => {
       //   window.removeEventListener(`resize`, () => windowEvents());
       //   window.removeEventListener(`scroll`, () => windowEvents());
-      }
+      // }
     }, [rte, user, users, authState, dark])
 
     return <StateContext.Provider value={{ router, rte, setRte, updates, setUpdates, content, setContent, width, setWidth, user, setUser, page, setPage, mobileMenu, setMobileMenu, users, setUsers, authState, setAuthState, emailField, setEmailField, devEnv, setDevEnv, mobileMenuBreakPoint, platform, setPlatform, focus, setFocus, highScore, setHighScore, color, setColor, dark, setDark, colorPref, setColorPref, qotd, setQotd, alertOpen, setAlertOpen, mobile, setMobile, systemStatus, setSystemStatus, loading, setLoading, anim, setAnimComplete, IDs, setIDs, categories, setCategories, browser, setBrowser, onMac, rearranging, setRearranging, buttonText, setButtonText, gameFormStep, setGameFormStep, players, setPlayers, filteredPlayers, setFilteredPlayers, useLocalStorage, setUseLocalStorage, command, setCommand, commands, setCommands }}>
       {(browser != `chrome` || onMac) ? <AnimatePresence mode={`wait`}>
-        <motion.div className={`${rte} pageWrapContainer ${page.toUpperCase()}`} key={router.route} initial="pageInitial" animate="pageAnimate" exit="pageExit" transition={{ duration: 0.35 }} variants={{
+        <motion.div className={`${rte} pageWrapContainer ${page.toUpperCase()} ${devEnv ? `devMode` : ``} ${onMac ? `isMac` : `isWindows`}`} key={router.route} initial="pageInitial" animate="pageAnimate" exit="pageExit" transition={{ duration: 0.35 }} variants={{
           pageInitial: {
             opacity: 0,
             clipPath: `polygon(0 0, 100% 0, 100% 100%, 0% 100%)`,
@@ -499,7 +500,7 @@ export default function ProductIVF({ Component, pageProps, router }) {
         }}>
           <Component {...pageProps} />
         </motion.div>
-      </AnimatePresence> : <div className={`pageWrapContainer ${page.toUpperCase()}`}>
+      </AnimatePresence> : <div className={`pageWrapContainer ${page.toUpperCase()} ${devEnv ? `devMode` : ``} ${onMac ? `isMac` : `isWindows`}`}>
         <Component {...pageProps} />
       </div>}
     </StateContext.Provider>

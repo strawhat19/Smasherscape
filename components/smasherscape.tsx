@@ -13,9 +13,9 @@ import Skeleton from '@mui/material/Skeleton';
 import TextField from '@mui/material/TextField';
 import { Characters } from '../common/Characters';
 import Autocomplete from '@mui/material/Autocomplete';
-import { calcPlayerLevelAndExperience } from '../common/Levels';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { FormEvent, useContext, useRef, useState } from 'react';
+import { calcPlayerLevelAndExperience } from '../common/Levels';
 import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
 import { collection, doc, getDocs, setDoc } from 'firebase/firestore';
 import { formatDate, createXML, StateContext, showAlert, dev, defaultPlayers } from '../pages/_app';
@@ -34,6 +34,19 @@ export const searchBlur = (e: any, filteredPlayers: Player[]) => {
     }
 }
 
+export const newPlayerType = (player: Player) => {
+    let { id, name, expanded } = player;
+    let level: Level = new Level(player.level.name, player.level.num) as Level;
+    let experience: Experience = new Experience(player.experience.nextLevelAt, player.experience.remainingXP, player.experience.arenaXP, player.experience.xp) as Experience;
+    let plays: Play[] = player.plays.map((play: Play) => {
+        let { date, loser, winner, stocks, character, stocksTaken, lossStocks, otherCharacter } = play;
+        return new Play(date, loser, winner, stocks, character, stocksTaken, lossStocks, otherCharacter);
+    }) as Play[];
+    let newPlayer: Player = new Player(id, name, level, plays, expanded, experience) as Player;
+    Object.keys(newPlayer).forEach(key => isInvalid(newPlayer[key]) && delete newPlayer[key]);
+    return newPlayer as Player;
+}
+
 export const getActivePlayers = (players: Player[]) => {
     return players
         .filter(plyr => !plyr.disabled)
@@ -44,15 +57,7 @@ export const getActivePlayers = (players: Player[]) => {
             return b.plays.length - a.plays.length;
         })
         .map((player: Player) => {
-            let newPlayer = new Player(
-                player.id, 
-                player.name,
-                player.level, 
-                player.plays, 
-                player.expanded,
-                player.experience,
-            );
-            Object.keys(newPlayer).forEach(key => isInvalid(newPlayer[key]) && delete newPlayer[key]);
+            let newPlayer = newPlayerType(player);
             return newPlayer;
         });
 }
@@ -161,6 +166,12 @@ export default function Smasherscape(props) {
         updatePlayersDB(defaultPlayers);
     }
 
+    const showCommands = () => {
+        showAlert(`Here are the RukoBot Commands so far: (Hover to Click to Copy)`, <div className={`alertInner`}>
+            <Commands commands={commands} devEnv={devEnv} />
+        </div>, `85%`, `auto`);
+    }
+
     const addPlayers = (commandParams) => {
         let playersToAdd = commandParams.filter((comm, commIndex) => commIndex != 0 && comm);
 
@@ -218,6 +229,15 @@ export default function Smasherscape(props) {
                 });
             })
         }
+    }
+
+    const setParameter = (commandParams) => {
+        let updatedPlayers: Player[] = [];
+        let playerToSet = commandParams[1].toLowerCase();
+        let parameter = commandParams[2].toLowerCase();
+        let amount = parseFloat(commandParams[3]);
+        let playerToSetDB: Player = players.find(plyr => plyr?.name.toLowerCase() == playerToSet || plyr?.name.toLowerCase().includes(playerToSet));
+        devEnv && console.log(`Set Parameter`, commandParams);
     }
 
     const giveParameter = (commandParams) => {
@@ -393,10 +413,10 @@ export default function Smasherscape(props) {
                     resetPlayers(commandParams);
                 } else if (firstCommand.includes(`!giv`)) {
                     giveParameter(commandParams);
+                } else if (firstCommand.includes(`!set`)) {
+                    setParameter(commandParams);
                 } else if (firstCommand.includes(`!com`)) {
-                    showAlert(`Here are the RukoBot Commands so far: (Hover to Click to Copy)`, <div className={`alertInner`}>
-                        <Commands commands={commands} />
-                    </div>, `85%`, `auto`);
+                    showCommands();
                 }
             }
         } else {
