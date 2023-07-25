@@ -183,6 +183,7 @@ li {
                             position: relative;
                         }
                         @media (max-width: 768px) {
+                            top: 0;
                             font-size: 1.8em;
                         }
                     }
@@ -832,8 +833,8 @@ div[role="presentation"] {
     .cardMiddleRow {
         grid-gap: 30px;
         flex-direction: column;
-        img {
-            padding: 0 0 0 0 !important;
+        img:not(.charImg) {
+            padding: 15px 0 0 0 !important;
         }
         h4 {
             padding: 0 !important;
@@ -876,6 +877,26 @@ div[role="presentation"] {
     .MuiBadge-badge {
         top: 3px;
         right: 5px;
+    }
+    .recordOfPlayer {
+        .playerRecordBegin {
+            grid-gap: 15px;
+            flex-direction: column;
+            .recordPlays {
+                padding: 0;
+                grid-gap: 10px;
+                span {
+                    padding: 0;
+                    align-items: center;
+                }
+            }
+        }
+        form {
+            display: none !important;
+        }
+        .recordSubDetails {
+            flex-direction: column;
+        }
     }
 }
 

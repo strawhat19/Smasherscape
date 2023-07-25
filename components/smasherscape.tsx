@@ -3,7 +3,7 @@ import { db } from '../firebase';
 import StepForm from './StepForm';
 import { Badge } from '@mui/material';
 import { Commands } from './Commands';
-import { MDXProvider } from '@mdx-js/react';
+import PlayerRecord from './PlayerRecord';
 import Skeleton from '@mui/material/Skeleton';
 import TextField from '@mui/material/TextField';
 import { Characters } from '../common/Characters';
@@ -15,36 +15,58 @@ import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
 import { collection, doc, getDocs, setDoc } from 'firebase/firestore';
 import { formatDate, createXML, StateContext, showAlert, dev, defaultPlayers } from '../pages/_app';
 
+export const publicAssetLink = `https://github.com/strawhat19/Smasherscape/blob/main`;
+export const calcPlayerCharacterTimesPlayed = (plyr, char) => plyr.plays.map(ply => ply.character).filter(ply => ply.toLowerCase() == char || ply.toLowerCase().includes(char)).length;
+
+export const getCharacterTitle = (char) => {
+    if (char.split(` `).length > 1) char = char.split(` `).join(``).toLowerCase();
+    return Characters[char];
+}
+
+export const searchBlur = (e: any, filteredPlayers) => {
+    if (filteredPlayers?.length == 0) {
+        e.target.value = ``;
+    }
+}
+
+export const getActivePlayers = (players) => {
+    return players.sort((a,b) => {
+        if (b.experience.arenaXP !== a.experience.arenaXP) {
+            return b.experience.arenaXP - a.experience.arenaXP;
+        }
+        return b.plays.length - a.plays.length;
+    }).filter(plyr => !plyr.disabled);
+}
+
+export const calcPlayerLevelImage = (levelName) => {
+    if (levelName == `Bronze Scimitar`) return `${publicAssetLink}/assets/smasherscape/Bronze_Scimmy.png?raw=true`; 
+    else if (levelName == `Iron Scimitar`) return `${publicAssetLink}/assets/smasherscape/Iron_Scimmy.png?raw=true`; 
+    else if (levelName == `Steel Scimitar`) return `${publicAssetLink}/assets/smasherscape/Steel_Scimmy.png?raw=true`; 
+    else if (levelName == `Mithril Scimitar`) return `${publicAssetLink}/assets/smasherscape/Mithril_Scimmy.png?raw=true`; 
+    else if (levelName == `Adamantite Scimitar`) return `${publicAssetLink}/assets/smasherscape/Adamant_Scimmy.png?raw=true`; 
+    else if (levelName == `Rune Scimitar`) return `${publicAssetLink}/assets/smasherscape/Rune_Scimmy.png?raw=true`; 
+    else if (levelName == `Gilded Scimitar`) return `${publicAssetLink}/assets/smasherscape/Gilded_Scimmy.png?raw=true`; 
+    else return `${publicAssetLink}/assets/smasherscape/OSRS_Top_Hat.png?raw=true`;
+}
+
+export const calcPlayerCharactersPlayed = (plyr) => {
+    let charsPlayed = plyr?.plays?.map(ply => ply?.character);
+    let counts = charsPlayed.reduce((acc, char) => {
+        acc[char] = (acc[char] || 0) + 1;
+        return acc;
+    }, {});
+    let sortedChars = Object.entries(counts).sort((a: any, b: any) => b[1] - a[1]).map(entry => entry[0].toLowerCase());
+    return sortedChars.slice(0,3);
+}
+
 export default function Smasherscape(props) {
 
     const searchInput = useRef();
     const commandsInput = useRef();
     const { players, setPlayers, filteredPlayers, setFilteredPlayers, devEnv, setDevEnv, useLocalStorage, commands } = useContext<any>(StateContext);
-    const [publicAssetLink, setPublicAssetLink] = useState(`https://github.com/strawhat19/Smasherscape/blob/main`);
 
     const calcPlayerWins = (plyr) => plyr.plays.filter(ply => ply.winner.toLowerCase() == plyr.name.toLowerCase()).length;
     const calcPlayerLosses = (plyr) => plyr.plays.filter(ply => ply.loser.toLowerCase() == plyr.name.toLowerCase()).length;
-    const calcPlayerCharacterTimesPlayed = (plyr, char) => plyr.plays.map(ply => ply.character).filter(ply => ply.toLowerCase() == char || ply.toLowerCase().includes(char)).length;
-
-    const getCharacterTitle = (char) => {
-        if (char.split(` `).length > 1) char = char.split(` `).join(``).toLowerCase();
-        return Characters[char];
-    }
-
-    const setCommandPlayers = (e: any, value?: any) => {
-        console.log(`Command Players`, value);
-    }
-
-    const searchBlur = (e: any) => {
-        if (filteredPlayers?.length == 0) {
-            e.target.value = ``;
-        }
-    }
-
-    const commandsForm = (e: FormEvent) => {
-        e.preventDefault();
-        console.log(`Commands Form`, e);
-    }
 
     const searchPlayers = (e: any, value?: any) => {
         let field = e.target as HTMLInputElement;
@@ -69,61 +91,6 @@ export default function Smasherscape(props) {
         }
     }
 
-    const removeTrailingZeroDecimal = (number) => {
-        let num = typeof number == `string` ? parseFloat(number) : number;
-        const wholeNumber = Math.trunc(num);
-        const decimalPart = num - wholeNumber;
-        if (decimalPart === 0) {
-          return wholeNumber;
-        } else {
-          return num.toFixed(1);
-        }
-    }
-
-    const parseDate = (dateStr: any) => {
-        const parts = dateStr.split(", ");
-        const timePart = parts[0];
-        const datePart = parts[1];
-        const datePartWithoutSuffix = datePart.replace(/(\d+)(st|nd|rd|th)/, "$1");
-        const newDateStr = `${datePartWithoutSuffix}, ${timePart}`;
-        return new Date(newDateStr) as any;
-    }
-
-    const calcWinLoseRatio = (playerOne, playerTwo) => {
-        let playerOneDB = players.find(plyr => plyr?.name == playerOne || plyr?.name.toLowerCase().includes(playerOne));
-        let playerTwoDB = players.find(plyr => plyr?.name == playerTwo || plyr?.name.toLowerCase().includes(playerTwo));
-        let plays = playerOneDB.plays.filter(ply => ply?.winner == playerTwoDB.name || ply?.loser == playerTwoDB.name);
-        let wins = plays.filter(ply => ply?.winner == playerOneDB?.name)?.length;
-        let losses = plays.filter(ply => ply?.loser == playerOneDB?.name)?.length;
-        let winRate = (wins/(wins+losses)) * 100;
-        let winPercentage = (winRate) > 100 ? 100 : removeTrailingZeroDecimal(winRate);
-        return <div className={`winRateDetails`}>
-            <div className={`winPercentage ${winPercentage > 50 ? winPercentage == 100 ? `perfect` : `positive` : winPercentage > 24 ? `challenger` : `negative`}`}>({winPercentage}%)</div>
-            <div className="winsToLossses">{wins} Wins - {losses} Losses</div>
-        </div>
-    }
-
-    const calcPlayerCharactersPlayed = (plyr) => {
-        let charsPlayed = plyr?.plays?.map(ply => ply?.character);
-        let counts = charsPlayed.reduce((acc, char) => {
-            acc[char] = (acc[char] || 0) + 1;
-            return acc;
-        }, {});
-        let sortedChars = Object.entries(counts).sort((a: any, b: any) => b[1] - a[1]).map(entry => entry[0].toLowerCase());
-        return sortedChars.slice(0,3);
-    }
-
-    const calcPlayerLevelImage = (levelName) => {
-        if (levelName == `Bronze Scimitar`) return `${publicAssetLink}/assets/smasherscape/Bronze_Scimmy.png?raw=true`; 
-        else if (levelName == `Iron Scimitar`) return `${publicAssetLink}/assets/smasherscape/Iron_Scimmy.png?raw=true`; 
-        else if (levelName == `Steel Scimitar`) return `${publicAssetLink}/assets/smasherscape/Steel_Scimmy.png?raw=true`; 
-        else if (levelName == `Mithril Scimitar`) return `${publicAssetLink}/assets/smasherscape/Mithril_Scimmy.png?raw=true`; 
-        else if (levelName == `Adamantite Scimitar`) return `${publicAssetLink}/assets/smasherscape/Adamant_Scimmy.png?raw=true`; 
-        else if (levelName == `Rune Scimitar`) return `${publicAssetLink}/assets/smasherscape/Rune_Scimmy.png?raw=true`; 
-        else if (levelName == `Gilded Scimitar`) return `${publicAssetLink}/assets/smasherscape/Gilded_Scimmy.png?raw=true`; 
-        else return `${publicAssetLink}/assets/smasherscape/OSRS_Top_Hat.png?raw=true`;
-    }
-
     const setPlayerExpanded = (player) => {
         let updatedPlayers = players.map(plyr => {
             if (plyr?.id == player?.id) {
@@ -140,37 +107,6 @@ export default function Smasherscape(props) {
         });
         setFilteredPlayers(updatedPlayers);
         return updatedPlayers;
-    }
-
-    const getActivePlayers = (players) => {
-        return players.sort((a,b) => {
-            if (b.experience.arenaXP !== a.experience.arenaXP) {
-                return b.experience.arenaXP - a.experience.arenaXP;
-            }
-            return b.plays.length - a.plays.length;
-        }).filter(plyr => !plyr.disabled);
-    }
-
-    const calcPlayerKills = (player, plays) => {
-        let wins = plays.filter(ply => ply?.winner == player?.name)?.length;
-        let losses = plays.filter(ply => ply?.winner != player?.name);
-        let lossKills = losses?.map(loss => loss?.stocksTaken)?.reduce((partialSum, a) => partialSum + a, 0);
-        let winKills = wins * 3;
-        return winKills + lossKills;
-    }
-
-    const calcPlayerDeaths = (player, plays) => {
-        let losses = plays.filter(ply => ply?.winner != player?.name)?.length;
-        let wins = plays.filter(ply => ply?.winner == player?.name);
-        let winDeaths = wins?.map(win => win?.stocksTaken)?.reduce((partialSum, a) => partialSum + a, 0);
-        let lossDeaths = losses * 3;
-        return lossDeaths + winDeaths;
-    }
-
-    const calcPlayerKDRatio = (player, plays) => {
-        let kd = calcPlayerKills(player, plays) / calcPlayerDeaths(player, plays);
-        let kdRatio = removeTrailingZeroDecimal(kd);
-        return kdRatio;
     }
 
     const addPlayers = (commandParams) => {
@@ -385,39 +321,8 @@ export default function Smasherscape(props) {
         }
     }
 
-    return <main>
+    return <main className={`smasherscapeLeaderboard`}>
         <section className={`formsSection`}>
-            {/* <h5 className={`heading`}>Forms</h5> */}
-            {/* {devEnv && <form onSubmit={(e) => commandsForm(e)} action="submit" className={`gridForm commandsForm ${devEnv ? `dev` : ``}`}>
-                <div className={`inputWrapper materialBGInputWrapper`}>
-                    <div className="inputBG materialBG"></div>
-                    <Autocomplete
-                        disablePortal
-                        autoHighlight
-                        id="combo-box-demo"
-                        sx={{ width: `100%` }}
-                        options={players.map(plyr => plyr.name)}
-                        onChange={(e, val) => setCommandPlayers(e, val)}
-                        // onInputChange={(e, val) => searchPlayers(e, val)}
-                        renderInput={(params) => <TextField name={`search`} {...params} label="Player" />}
-                    />
-                </div>
-                <div className={`inputWrapper materialBGInputWrapper`}>
-                    <div className="inputBG materialBG"></div>
-                    <Autocomplete
-                        disablePortal
-                        autoHighlight
-                        id="combo-box-demo"
-                        sx={{ width: `100%` }}
-                        options={players.map(plyr => plyr.name)}
-                        onChange={(e, val) => setCommandPlayers(e, val)}
-                        // onInputChange={(e, val) => searchPlayers(e, val)}
-                        renderInput={(params) => <TextField name={`search`} {...params} label="Player" />}
-                    />
-                </div>
-                <button className={`formSubmitButton commandsFormSubmit`} type={`submit`}>Submit</button>
-            </form>} */}
-            {/* <StepForm /> */}
             <form onSubmit={(e) => handleCommands(e)} action="submit" className="gridForm">
                 <div className={`inputWrapper materialBGInputWrapper`}>
                     <div className="inputBG materialBG"></div>
@@ -437,7 +342,7 @@ export default function Smasherscape(props) {
                         onChange={(e, val: any) => searchPlayers(e, val)}
                         onInputChange={(e, val: any) => searchPlayers(e, val)}
                         isOptionEqualToValue={(option, value) => option.id === value.id}
-                        renderInput={(params) => <TextField name={`search`} onBlur={(e) => searchBlur(e)} {...params} label="Search..." />}
+                        renderInput={(params) => <TextField name={`search`} onBlur={(e) => searchBlur(e, filteredPlayers)} {...params} label="Search..." />}
                         renderOption={(props: any, option: any) => {
                             return (
                                 <div key={props?.key} {...props}>
@@ -540,174 +445,7 @@ export default function Smasherscape(props) {
                                     </div>
                                 </div>
                             </div>
-                            <div className={`recordOfPlayer ${plyr?.expanded ? `expanded` : `collapsed`}`}>
-                                <LazyLoadImage effect="blur" src={`${publicAssetLink}/assets/smasherscape/OSRS_Card_Empty.png?raw=true`} className={`cardBG`} alt={`Smasherscape Player Card`} />
-                                <LazyLoadImage effect="blur" src={`${publicAssetLink}/assets/smasherscape/OSRS_Card_Template_Border_Only.png?raw=true`} className={`cardBG border`} alt={`Smasherscape Player Card`} />
-                                <ul className="recordList">
-                                    <h3 className={`greenRecordText`}>
-                                        <div className={`flex`}>
-                                            Player Record
-                                            <span className="recordPlays">
-                                                {plyr?.plays?.length > 0 && <span className={`goldText`}>K/D: <span className="whiteText kdRatioNum">{calcPlayerKDRatio(plyr, plyr?.plays)}</span></span>}
-                                                <span className={`greenText`}>Kills: <span className="whiteText">{calcPlayerKills(plyr, plyr?.plays)}</span></span>
-                                                <span className={`redText`}>Deaths: <span className="whiteText">{calcPlayerDeaths(plyr, plyr?.plays)}</span></span>
-                                                <span className={`blueText`}>Plays: <span className="whiteText">{plyr?.plays?.length}</span></span>
-                                            </span>
-                                        </div>
-                                        {plyr?.plays?.length > 0 && devEnv && <div className="flex white noShadow">
-                                            <form action="submit" className="gridForm recordForm">
-                                                <div className={`inputWrapper materialBGInputWrapper`}>
-                                                    <div className="inputBG materialBG"></div>
-                                                    <Autocomplete
-                                                        disablePortal
-                                                        autoHighlight
-                                                        id="combo-box-demo"
-                                                        sx={{ width: `100%` }}
-                                                        options={getActivePlayers(players).map(plyr => {
-                                                            return {
-                                                                ...plyr,
-                                                                label: plyr.name,
-                                                            }
-                                                        })}
-                                                        getOptionLabel={(option) => option.label}
-                                                        onChange={(e, val: any) => searchPlayers(e, val)}
-                                                        onInputChange={(e, val: any) => searchPlayers(e, val)}
-                                                        isOptionEqualToValue={(option, value) => option.id === value.id}
-                                                        renderInput={(params) => <TextField name={`search`} onBlur={(e) => searchBlur(e)} {...params} label="Search..." />}
-                                                        renderOption={(props: any, option: any) => {
-                                                            return (
-                                                                <div key={props?.key} {...props}>
-                                                                    <div className="autocompleteOption">
-                                                                        <div className="levelNumColumn">{option?.level?.num}</div>
-                                                                        <div className="levelImageColumn"><img width={30} src={calcPlayerLevelImage(option?.level?.name)} alt={option?.level?.name} /></div>
-                                                                        <div className="playerDetailsColumn">
-                                                                            <div className="playerName">{option?.label}</div>
-                                                                            <div className="playerEXP">{option?.experience?.arenaXP}</div>
-                                                                            <div className="plays">
-                                                                                <div className={`playsContainer`}>
-                                                                                    {calcPlayerCharactersPlayed(option).map((char, charIndex) => {
-                                                                                        return (
-                                                                                            <Badge title={`Played ${getCharacterTitle(char)} ${calcPlayerCharacterTimesPlayed(option, char)} Time(s)`} key={charIndex} badgeContent={calcPlayerCharacterTimesPlayed(option, char)} color="primary">
-                                                                                                <img className={`charImg`} width={25} src={calcPlayerCharacterIcon(char)} alt={getCharacterTitle(char)} />
-                                                                                            </Badge>
-                                                                                        )
-                                                                                    })}
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            )
-                                                        }}
-                                                    />
-                                                </div>
-                                                <div className={`inputWrapper materialBGInputWrapper`}>
-                                                    <div className="inputBG materialBG"></div>
-                                                    <Autocomplete
-                                                        disablePortal
-                                                        autoHighlight
-                                                        id="combo-box-demo"
-                                                        sx={{ width: `100%` }}
-                                                        options={getActivePlayers(players).map(plyr => {
-                                                            return {
-                                                                ...plyr,
-                                                                label: plyr.name,
-                                                            }
-                                                        })}
-                                                        getOptionLabel={(option) => option.label}
-                                                        onChange={(e, val: any) => searchPlayers(e, val)}
-                                                        onInputChange={(e, val: any) => searchPlayers(e, val)}
-                                                        isOptionEqualToValue={(option, value) => option.id === value.id}
-                                                        renderInput={(params) => <TextField name={`search`} onBlur={(e) => searchBlur(e)} {...params} label="Search..." />}
-                                                        renderOption={(props: any, option: any) => {
-                                                            return (
-                                                                <div key={props?.key} {...props}>
-                                                                    <div className="autocompleteOption">
-                                                                        <div className="levelNumColumn">{option?.level?.num}</div>
-                                                                        <div className="levelImageColumn"><img width={30} src={calcPlayerLevelImage(option?.level?.name)} alt={option?.level?.name} /></div>
-                                                                        <div className="playerDetailsColumn">
-                                                                            <div className="playerName">{option?.label}</div>
-                                                                            <div className="playerEXP">{option?.experience?.arenaXP}</div>
-                                                                            <div className="plays">
-                                                                                <div className={`playsContainer`}>
-                                                                                    {calcPlayerCharactersPlayed(option).map((char, charIndex) => {
-                                                                                        return (
-                                                                                            <Badge title={`Played ${getCharacterTitle(char)} ${calcPlayerCharacterTimesPlayed(option, char)} Time(s)`} key={charIndex} badgeContent={calcPlayerCharacterTimesPlayed(option, char)} color="primary">
-                                                                                                <img className={`charImg`} width={25} src={calcPlayerCharacterIcon(char)} alt={getCharacterTitle(char)} />
-                                                                                            </Badge>
-                                                                                        )
-                                                                                    })}
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            )
-                                                        }}
-                                                    />
-                                                </div>
-                                                <button className={`formSubmitButton`} type={`submit`}>Submit</button>
-                                            </form>
-                                        </div>}
-                                    </h3>
-                                    {plyr?.plays?.length > 0 ? plyr?.plays?.sort((a: any, b: any) => parseDate(b.date) - parseDate(a.date)).map((ply, plyIndex) => {
-                                        let isWinner = ply?.winner == plyr?.name;
-                                        return (
-                                            <li className={`playerPlay`} key={plyIndex}>
-                                               <div className="plyIndex">{plyIndex + 1}.</div>
-                                               <div className="recordDetails">
-                                                <div className={`playMessage`}>{isWinner ? <div><span className={`${isWinner ? `winner` : `loser`}`}>Win</span> over {ply?.loser}</div> : <div><span className={`${isWinner ? `winner` : `loser`}`}>Loss</span> to {ply?.winner}</div>}
-                                                    <div className="stocksRow">
-                                                        <div className="stocks">
-                                                            {ply?.stocks?.map(stk => stk.character)?.includes(ply?.character) ? ply?.stocks?.length > 0 && ply?.stocks?.map((stok, stkIndex) => {
-                                                                return (
-                                                                    <span key={stkIndex} className={stok?.dead ? `dead` : `living`}>
-                                                                        <img className={`charImg`} width={35} src={calcPlayerCharacterIcon(stok?.character)} alt={getCharacterTitle(stok?.character)} />
-                                                                    </span>
-                                                                )
-                                                            }) : ply?.lossStocks?.map((stok, stkIndex) => {
-                                                                return (
-                                                                    <span key={stkIndex} className={stok?.dead ? `dead` : `living`}>
-                                                                        <img className={`charImg`} width={35} src={calcPlayerCharacterIcon(stok?.character)} alt={getCharacterTitle(stok?.character)} />
-                                                                    </span>
-                                                                )
-                                                            })}
-                                                        </div>
-                                                    vs 
-                                                        <div className="otherStocks">
-                                                            {ply?.stocks?.map(stk => stk.character)?.includes(ply?.otherCharacter) ? ply?.stocks?.length > 0 && ply?.stocks?.map((stok, stkIndex) => {
-                                                                return (
-                                                                    <span key={stkIndex} className={stok?.dead ? `dead` : `living`}>
-                                                                        <img className={`charImg`} width={35} src={calcPlayerCharacterIcon(stok?.character)} alt={getCharacterTitle(stok?.character)} />
-                                                                    </span>
-                                                                )
-                                                            }) : ply?.lossStocks?.map((stok, stkIndex) => {
-                                                                return (
-                                                                    <span key={stkIndex} className={stok?.dead ? `dead` : `living`}>
-                                                                        <img className={`charImg`} width={35} src={calcPlayerCharacterIcon(stok?.character)} alt={getCharacterTitle(stok?.character)} />
-                                                                    </span>
-                                                                )
-                                                            })}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div className="recordSubDetails">
-                                                    <div className="charsPlayedGame">
-                                                        {/* {ply?.stocks?.map(stk => stk.character)?.includes(ply?.character) ? ply?.stocks[0].character : ply?.lossStocks[0].character} vs {ply?.stocks?.map(stk => stk.character)?.includes(ply?.otherCharacter) ? ply?.stocks[0].character : ply?.lossStocks[0].character} */}
-                                                        {/* {isWinner ? ply?.loser : ply?.winner} */}
-                                                        {/* W - L:  */}
-                                                        {calcWinLoseRatio(isWinner ? ply?.winner : ply?.loser, isWinner ? ply?.loser : ply?.winner)}
-                                                    </div>
-                                                    <div className="playDate">{ply?.date}</div>
-                                                </div>
-                                               </div>
-                                            </li>
-                                        )
-                                    }) : <div className={`noPlaysYet`}>
-                                    No Plays Yet
-                                </div>}
-                                </ul>
-                            </div>
+                            <PlayerRecord plyr={plyr} />
                         </div>
                     )
                 } else {

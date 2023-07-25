@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 export default function CodeBlock(props) {
     let [clicked, setClicked] = useState(false);
     const handleCopyClick = (e) => {
