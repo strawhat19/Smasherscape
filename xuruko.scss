@@ -907,7 +907,7 @@ div[role="presentation"] {
     }
 }
 
-@media (max-width: 420px) {
+@media (max-width: 520px) {
     .recordOfPlayer {
         .playerRecordBegin {
             grid-gap: 15px;
@@ -923,14 +923,19 @@ div[role="presentation"] {
         }
         ul {
             li {
+                padding: 5px 0 10px;
                 .recordDetails {
                     .playMessage {
+                        grid-gap: 0px;
                         img {
-                            max-width: 30px;
+                            max-width: 26px;
                         }
                     }
                 }
             }
+        }
+        .recordSubDetails {
+            font-size: 0.7em;
         }
     }
 }
