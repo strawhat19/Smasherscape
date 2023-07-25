@@ -381,7 +381,7 @@ export default function Smasherscape(props) {
             {getActivePlayers(filteredPlayers)?.length > 0 && getActivePlayers(filteredPlayers)?.map((plyr, plyrIndex) => {
                 if (plyr) {
                     return (
-                        <div className="playerCard" key={plyrIndex}>
+                        <div className={`playerCard ${plyr?.expanded ? `expandedPlayerCard` : `collapsedPlayerCard`}`} key={plyrIndex}>
                             <div className="gridCard" onClick={(e) => setPlayerExpanded(plyr)}>
                                 <LazyLoadImage effect="blur" src={`${publicAssetLink}/assets/smasherscape/OSRS_Card_Empty.png?raw=true`} className={`cardBG`} alt={`Smasherscape Player Card`} />
                                 <LazyLoadImage effect="blur" src={`${publicAssetLink}/assets/smasherscape/OSRS_Card_Template_Border_Only.png?raw=true`} className={`cardBG border`} alt={`Smasherscape Player Card`} />
@@ -395,7 +395,7 @@ export default function Smasherscape(props) {
                                     </div>
                                     <div className="cardMiddleRow">
                                         <div className="imgLeftCol">
-                                            <img style={{transform: `scale(1.25)`}} width={150} src={calcPlayerLevelImage(plyr?.level?.name)} alt={plyr?.level?.name} />
+                                            <img className={`cardLevelImage`} style={{transform: `scale(1.25)`}} width={150} src={calcPlayerLevelImage(plyr?.level?.name)} alt={plyr?.level?.name} />
                                             <h4 className={`levelName ${plyr?.level?.name.split(` `)[0]}`}>{plyr?.level?.name}</h4>
                                         </div>
                                         <div className="recordPlays">
