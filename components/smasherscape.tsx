@@ -1,8 +1,8 @@
 import  moment from 'moment';
 import { db } from '../firebase';
 import StepForm from './StepForm';
-import Commands from './Commands';
 import { Badge } from '@mui/material';
+import { Commands } from './Commands';
 import { MDXProvider } from '@mdx-js/react';
 import Skeleton from '@mui/material/Skeleton';
 import TextField from '@mui/material/TextField';
@@ -19,7 +19,7 @@ export default function Smasherscape(props) {
 
     const searchInput = useRef();
     const commandsInput = useRef();
-    const { players, setPlayers, filteredPlayers, setFilteredPlayers, devEnv, setDevEnv, useLocalStorage } = useContext<any>(StateContext);
+    const { players, setPlayers, filteredPlayers, setFilteredPlayers, devEnv, setDevEnv, useLocalStorage, commands } = useContext<any>(StateContext);
     const [publicAssetLink, setPublicAssetLink] = useState(`https://github.com/strawhat19/Smasherscape/blob/main`);
 
     const calcPlayerWins = (plyr) => plyr.plays.filter(ply => ply.winner.toLowerCase() == plyr.name.toLowerCase()).length;
@@ -375,14 +375,8 @@ export default function Smasherscape(props) {
                 } else if (firstCommand.includes(`!res`)) {
                     resetPlayers(commandParams);
                 } else if (firstCommand.includes(`!com`)) {
-                    showAlert(`Here are the RukoBot commands so far:`, <div className={`alertInner`}>
-                        <ol>
-                            <li>[ !com ] to list all commands</li>
-                            <li>[ !add + name(s) ] to add player(s)</li>
-                            <li>[ !del + name(s) ] to delete player(s)</li>
-                            <li>[ !res ] to reset players back to 0 XP</li>
-                            <li>[ !upd + winner name + 'beats' + loser name + loser stocks taken from winner ] to update leaderboard</li>
-                        </ol>
+                    showAlert(`Here are the RukoBot Commands so far: (Hover to Click to Copy)`, <div className={`alertInner`}>
+                        <Commands commands={commands} />
                     </div>, `85%`, `auto`);
                 }
             }
@@ -496,7 +490,7 @@ export default function Smasherscape(props) {
                                     </div>
                                     <div className="cardMiddleRow">
                                         <div className="imgLeftCol">
-                                            <img style={{transform: `scale(1.35)`}} width={200} src={calcPlayerLevelImage(plyr?.level?.name)} alt={plyr?.level?.name} />
+                                            <img style={{transform: `scale(1.25)`}} width={150} src={calcPlayerLevelImage(plyr?.level?.name)} alt={plyr?.level?.name} />
                                             <h4 className={`levelName ${plyr?.level?.name.split(` `)[0]}`}>{plyr?.level?.name}</h4>
                                         </div>
                                         <div className="recordPlays">
@@ -507,13 +501,15 @@ export default function Smasherscape(props) {
                                             <div className="plays">
                                                 <h3 className={`greenRecordText`}>Plays</h3>
                                                 <div className={`playsContainer`}>
-                                                    {calcPlayerCharactersPlayed(plyr).map((char, charIndex) => {
+                                                    {calcPlayerCharactersPlayed(plyr)?.length > 0 ? calcPlayerCharactersPlayed(plyr).map((char, charIndex) => {
                                                         return (
                                                             <Badge title={`Played ${getCharacterTitle(char)} ${calcPlayerCharacterTimesPlayed(plyr, char)} Time(s)`} key={charIndex} badgeContent={calcPlayerCharacterTimesPlayed(plyr, char)} color="primary">
                                                                 <img className={`charImg`} width={35} src={calcPlayerCharacterIcon(char)} alt={getCharacterTitle(char)} />
                                                             </Badge>
                                                         )
-                                                    })}
+                                                    }) : <div className={`flex center`}>
+                                                        No Plays Yet
+                                                    </div>}
                                                 </div>
                                             </div>
                                         </div>

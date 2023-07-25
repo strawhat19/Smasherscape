@@ -117,10 +117,12 @@ li {
             flex-direction: column;
             justify-content: space-between;
             .cardTopRow {
+                top: -15px;
                 width: 100%;
                 display: flex;
+                position: relative;
                 align-items: center;
-                margin: 35px auto -10px;
+                margin: 35px auto 0px;
                 justify-content: space-between;
                 .logoWithWords {
                     width: 232px;
@@ -154,6 +156,7 @@ li {
                     .levelName {
                         top: -15px;
                         font-size: 2.5em;
+                        line-height: 0.85;
                         text-shadow: none;
                         position: relative;
                         letter-spacing: 3px;
@@ -166,7 +169,8 @@ li {
                             color: var(--smasherscapeIron);
                         }
                         @media (max-width: 1800px) {
-                            font-size: 2.3em;
+                            top: 15px;
+                            font-size: 2.1em;
                             letter-spacing: 2px;
                         }
                         @media (max-width: 1400px) {
@@ -222,6 +226,10 @@ li {
                             position: absolute;
                             background: black;
                             transform: rotate(-45deg);
+                            @media (max-width: 1555px) {
+                                top: 15px;
+                                left: 3%;
+                            }
                             @media (max-width: 1400px) {
                                 top: 10px;
                                 left: 0%;
@@ -279,7 +287,7 @@ li {
             color: var(--smasherscapeBlue2);
             text-shadow: 3px 3px 0px var(--smasherscapePurple), 0px 0px 8px rgba(0, 0, 0, 0.75), 0px 1px 8px rgba(0, 0, 0, 0.69);
             @media (max-width: 1800px) {
-                font-size: 5em;
+                font-size: 4.7em;
             }
             @media (max-width: 1545px) {
                 font-size: 4.5em;
@@ -459,6 +467,7 @@ nav {
         font-size: 1.75em;
     }
     .alertInner {
+        width: 100%;
         font-size: 1.75em;
     }
 }
@@ -946,7 +955,25 @@ div[role="presentation"] {
 }
 
 .commandsList {
+    gap: 10px;
+    display: grid;
     text-align: left;
+    li {
+        display: flex;
+        grid-gap: 10px;
+        align-items: center;
+        justify-content: space-between;
+        .desc {
+            white-space: nowrap;
+        }
+        .nextra-code-block {
+            margin: 0;
+            width: 100%;
+            pre {
+                margin: 0;
+            }
+        }
+    }
 }
 
 .whiteText {
@@ -994,4 +1021,13 @@ div[role="presentation"] {
             }
         }
     }
+}
+
+.center {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
 }

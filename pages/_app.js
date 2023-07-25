@@ -15,6 +15,51 @@ export const getCurrentPageName = () => {
   return window.location.hash.slice(window.location.hash.lastIndexOf(`/`)).replace(`/`, ``);
 };
 
+export const defaultCommands = {
+  List: {
+    id: 1,
+    name: `List`,
+    command: `!com`,
+    description: `List All Commands`,
+  },
+  Add: {
+    id: 2,
+    name: `Add`,
+    command: `!add name(s) of player(s)`,
+    description: `Add Player or Player(s) separated by spaces`,
+  },
+  Delete: {
+    id: 3,
+    name: `Delete`,
+    command: `!del name(s) of player(s)`,
+    description: `Delete Player or Player(s) separated by spaces`,
+  },
+  Reset: {
+    id: 4,
+    name: `Reset`,
+    command: `!res`,
+    description: `Reset Leaderboard`,
+  },
+  Update: {
+    id: 5,
+    name: `Update`,
+    description: `Update Leaderboard`,
+    command: `!upd winnerName 'beats' loserName loserStocksTakenFromWinner`,
+  },
+  Set: {
+    id: 6,
+    name: `Set`,
+    command: `!set playerName (xp) amount`,
+    description: `Set Parameter for Player`,
+  },
+  Give: {
+    id: 7,
+    name: `Give`,
+    command: `!giv playerName (xp) amount`,
+    description: `Give Parameter to Player`,
+  },
+};
+
 export const defaultPlayers = [
   {
     id: 1,
@@ -355,6 +400,9 @@ export default function ProductIVF({ Component, pageProps, router }) {
     let [content, setContent] = useState(`defaultContent`);
     let [year, setYear] = useState(new Date().getFullYear());
     let [useLocalStorage, setUseLocalStorage] = useState(true);
+
+    let [command, setCommand] = useState(defaultCommands.Update);
+    let [commands, setCommands] = useState(defaultCommands);
     
     let [players, setPlayers] = useState(defaultPlayers);
     let [filteredPlayers, setFilteredPlayers] = useState(players);
@@ -369,6 +417,7 @@ export default function ProductIVF({ Component, pageProps, router }) {
       let storedPlayers = JSON.parse(localStorage.getItem(`players`));
       let storedUser = JSON.parse(localStorage.getItem(`user`));
 
+      
       setDevEnv(dev());
       setUpdates(updates);
       setPlatform(navigator?.userAgent);
@@ -428,7 +477,7 @@ export default function ProductIVF({ Component, pageProps, router }) {
       }
     }, [rte, user, users, authState, dark])
 
-    return <StateContext.Provider value={{ router, rte, setRte, updates, setUpdates, content, setContent, width, setWidth, user, setUser, page, setPage, mobileMenu, setMobileMenu, users, setUsers, authState, setAuthState, emailField, setEmailField, devEnv, setDevEnv, mobileMenuBreakPoint, platform, setPlatform, focus, setFocus, highScore, setHighScore, color, setColor, dark, setDark, colorPref, setColorPref, qotd, setQotd, alertOpen, setAlertOpen, mobile, setMobile, systemStatus, setSystemStatus, loading, setLoading, anim, setAnimComplete, IDs, setIDs, categories, setCategories, browser, setBrowser, onMac, rearranging, setRearranging, buttonText, setButtonText, gameFormStep, setGameFormStep, players, setPlayers, filteredPlayers, setFilteredPlayers, useLocalStorage, setUseLocalStorage }}>
+    return <StateContext.Provider value={{ router, rte, setRte, updates, setUpdates, content, setContent, width, setWidth, user, setUser, page, setPage, mobileMenu, setMobileMenu, users, setUsers, authState, setAuthState, emailField, setEmailField, devEnv, setDevEnv, mobileMenuBreakPoint, platform, setPlatform, focus, setFocus, highScore, setHighScore, color, setColor, dark, setDark, colorPref, setColorPref, qotd, setQotd, alertOpen, setAlertOpen, mobile, setMobile, systemStatus, setSystemStatus, loading, setLoading, anim, setAnimComplete, IDs, setIDs, categories, setCategories, browser, setBrowser, onMac, rearranging, setRearranging, buttonText, setButtonText, gameFormStep, setGameFormStep, players, setPlayers, filteredPlayers, setFilteredPlayers, useLocalStorage, setUseLocalStorage, command, setCommand, commands, setCommands }}>
       {(browser != `chrome` || onMac) ? <AnimatePresence mode={`wait`}>
         <motion.div className={`${rte} pageWrapContainer ${page.toUpperCase()}`} key={router.route} initial="pageInitial" animate="pageAnimate" exit="pageExit" transition={{ duration: 0.35 }} variants={{
           pageInitial: {
