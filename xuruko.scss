@@ -895,6 +895,7 @@ div[role="presentation"] {
             display: none !important;
         }
         .recordSubDetails {
+            font-size: 0.85em;
             flex-direction: column;
         }
     }
@@ -903,6 +904,34 @@ div[role="presentation"] {
 @media (max-width: 667px) {
     .playMessage {
         flex-direction: column;
+    }
+}
+
+@media (max-width: 420px) {
+    .recordOfPlayer {
+        .playerRecordBegin {
+            grid-gap: 15px;
+            flex-direction: column;
+            .recordPlays {
+                width: 100%;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                span {
+                    justify-content: center;
+                }
+            }
+        }
+        ul {
+            li {
+                .recordDetails {
+                    .playMessage {
+                        img {
+                            max-width: 30px;
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
