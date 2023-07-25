@@ -4,6 +4,7 @@ import '../concentration.scss';
 import ReactDOM from 'react-dom/client';
 import { AnimatePresence, motion } from 'framer-motion';
 import { createContext, useRef, useState, useEffect } from 'react';
+import Player from '../models/Player';
 
 export const StateContext = createContext({});
 
@@ -63,6 +64,7 @@ export const defaultCommands = {
 export const defaultPlayers = [
   {
     id: 1,
+    expanded: false,
     name: `Xuruko`,
     plays: [],
     level: {
@@ -78,6 +80,7 @@ export const defaultPlayers = [
   },
   {
     id: 2,
+    expanded: false,
     name: `Kay`,
     plays: [],
     level: {
@@ -93,6 +96,7 @@ export const defaultPlayers = [
   },
   {
     id: 3,
+    expanded: false,
     name: `Strawhat19`,
     plays: [],
     level: {

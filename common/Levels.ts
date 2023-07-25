@@ -1,4 +1,6 @@
-export const calcPlayerLevelAndExperience = (plyr) => {
+import Player from "../models/Player";
+
+export const calcPlayerLevelAndExperience = (plyr: Player) => {
     let xp = plyr.experience.arenaXP;
     if (xp >= 83 && xp < 174) {
         plyr.level.num = 2;
@@ -594,5 +596,5 @@ export const calcPlayerLevelAndExperience = (plyr) => {
         plyr.experience.remainingXP = (999999999 - xp);
     }
 
-    return plyr;
+    return plyr as Player;
 }

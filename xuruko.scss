@@ -155,9 +155,7 @@ li {
                     img {
                         top: -15px;
                         position: relative;
-                    }
-                    @media (max-width: 1400px) {
-                        img {
+                        @media (max-width: 1425px) {
                             padding: 2em 1em 1em 1em;
                         }
                     }
@@ -166,7 +164,7 @@ li {
                         line-height: 0.85;
                         text-shadow: none;
                         letter-spacing: 3px;
-                        transition: 300ms ease-in-out;
+                        transition: var(--transition);
                         font-family: "RuneScape Large";
                         &.Bronze {
                             color: var(--smasherscapeBronze);
@@ -179,7 +177,10 @@ li {
                             font-size: 2.1em;
                             letter-spacing: 2px;
                         }
-                        @media (max-width: 1400px) {
+                        @media (max-width: 1500px) {
+                            font-size: 2em;
+                        }
+                        @media (max-width: 1425px) {
                             top: -15px;
                             line-height: 1;
                             font-size: 1.7em;
@@ -202,6 +203,9 @@ li {
                     align-items: center;
                     flex-direction: column;
                     justify-content: center;
+                    .playsContainer {
+                        z-index: -1;
+                    }
                 }
                 .rightCol {
                     width: 100%;
@@ -223,6 +227,9 @@ li {
                             position: relative;
                             bottom: -15px;
                             right: 65px;
+                            @media (min-width: 1366px) and (max-width: 1545px) {
+                                right: 45px;
+                            }
                             @media (max-width: 768px) {
                                 right: 25px;
                             }
@@ -239,7 +246,7 @@ li {
                                 top: 15px;
                                 left: 3%;
                             }
-                            @media (max-width: 1400px) {
+                            @media (max-width: 1425px) {
                                 top: 10px;
                                 left: 0%;
                             }
@@ -301,7 +308,7 @@ li {
             @media (max-width: 1545px) {
                 font-size: 4.5em;
             }
-            @media (max-width: 1400px) {
+            @media (max-width: 1425px) {
                 font-size: 4em;
             }
         }
@@ -316,11 +323,11 @@ li {
                 @media (max-width: 1800px) {
                     font-size: 4em;
                 }
-                @media (max-width: 1400px) {
+                @media (max-width: 1425px) {
                     font-size: 3em;
                 }
             }
-            @media (max-width: 1400px) {
+            @media (max-width: 1425px) {
                 font-size: 2em;
             }
             @media (max-width: 768px) {
@@ -401,6 +408,7 @@ li {
         overflow: overlay;
         max-height: 275px;
         margin: 0 auto 15px;
+        transition: var(--transition);
         li {
             display: flex;
             grid-gap: 10px;
@@ -437,6 +445,12 @@ li {
                     justify-content: space-between;
                 }
             }
+        }
+        @media (min-width: 1500px) and (max-width: 1545px) {
+            font-size: 1em;
+        }
+        @media (min-width: 1366px) and (max-width: 1499px) {
+            font-size: .9em;
         }
     }
 }
@@ -824,141 +838,6 @@ div[role="presentation"] {
     }
 }
 
-@media (min-width: 1400px) {
-    .cardLevelImage {
-        transform: scale(1.3) !important;
-    }
-}
-
-@media (min-width: 677px) and (max-width: 1399px) {
-    .cardLevelImage {
-        transform: scale(1.75) !important;
-    }
-}
-
-@media (max-width: 676px) {
-    .cardTopRow {
-        margin: 90px auto -10px !important;
-        justify-content: center !important;
-        h2 {
-            align-items: center;
-            width: 100% !important;
-            justify-content: center;
-        }
-        .logoWithWords {
-            display: none !important;
-        }
-    }
-    .cardMiddleRow {
-        grid-gap: 30px;
-        flex-direction: column;
-        img:not(.charImg) {
-            padding: 15px 0 0 0 !important;
-        }
-        h4 {
-            padding: 0 !important;
-        }
-        .recordPlays {
-            top: 0px !important;
-            grid-gap: 10px !important;
-            .playsContainer {
-                right: 5px;
-                grid-gap: 0px;
-                min-width: auto;
-                position: relative;
-                padding-top: 10px;
-            }
-        }
-        .level {
-            top: 25px;
-            max-width: 100px !important;
-            .borderSep {
-                top: 0 !important;
-                left: -10% !important;
-                height: 4px !important;
-                width: 110px !important;
-            }
-            .levelBot {
-                right: 5px !important;
-                top: 0;
-            }
-        }
-    }
-    .experienceDetails {
-        margin: -5px auto -25px;
-    }
-    .cardBottomRow {
-        height: 190px !important;
-        .gradient {
-            bottom: 65px !important;
-        }
-    }
-    .MuiBadge-badge {
-        top: 3px;
-        right: 5px;
-    }
-    .recordOfPlayer {
-        .playerRecordBegin {
-            grid-gap: 15px;
-            flex-direction: column;
-            .recordPlays {
-                padding: 0;
-                grid-gap: 10px;
-                span {
-                    padding: 0;
-                    align-items: center;
-                }
-            }
-        }
-        form {
-            display: none !important;
-        }
-        .recordSubDetails {
-            font-size: 0.85em;
-            flex-direction: column;
-        }
-    }
-}
-
-@media (max-width: 667px) {
-    .playMessage {
-        flex-direction: column;
-    }
-}
-
-@media (max-width: 520px) {
-    .recordOfPlayer {
-        .playerRecordBegin {
-            grid-gap: 15px;
-            flex-direction: column;
-            .recordPlays {
-                width: 100%;
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                span {
-                    justify-content: center;
-                }
-            }
-        }
-        ul {
-            li {
-                padding: 5px 0 10px;
-                .recordDetails {
-                    .playMessage {
-                        grid-gap: 0px;
-                        img {
-                            max-width: 26px;
-                        }
-                    }
-                }
-            }
-        }
-        .recordSubDetails {
-            font-size: 0.7em;
-        }
-    }
-}
-
 .dead {
     position: relative;
     img {
@@ -989,7 +868,7 @@ div[role="presentation"] {
     font-family: "RuneScape Chat";
     color: var(--smasherscapeGreen);
     text-shadow: 2px 2px 0px black;
-    @media (max-width: 1400px) {
+    @media (max-width: 1425px) {
         font-size: 2em;
     }
 }
@@ -1115,6 +994,145 @@ div[role="presentation"] {
         width: 245px !important;
         img {
             transform: rotate(-55deg);
+        }
+    }
+}
+
+@media (min-width: 1425px) {
+    .cardLevelImage {
+        transform: scale(1.3) !important;
+    }
+}
+
+@media (min-width: 677px) and (max-width: 1425px) {
+    .cardLevelImage {
+        transform: scale(1.75) !important;
+    }
+}
+
+@media (max-width: 676px) {
+    .cardTopRow {
+        margin: 90px auto -10px !important;
+        justify-content: center !important;
+        h2 {
+            align-items: center;
+            width: 100% !important;
+            justify-content: center;
+        }
+        .logoWithWords {
+            display: none !important;
+        }
+    }
+    .cardMiddleRow {
+        grid-gap: 30px;
+        flex-direction: column;
+        img:not(.charImg) {
+            padding: 15px 0 0 0 !important;
+        }
+        h4 {
+            padding: 0 !important;
+        }
+        .recordPlays {
+            top: 0px !important;
+            grid-gap: 10px !important;
+            .playsContainer {
+                right: 5px;
+                grid-gap: 0px;
+                min-width: auto;
+                position: relative;
+                padding-top: 10px;
+            }
+        }
+        .level {
+            top: 25px;
+            max-width: 100px !important;
+            .borderSep {
+                top: 2px !important;
+                left: 0% !important;
+                height: 4px !important;
+                width: 110px !important;
+            }
+            .levelBot {
+                right: 5px !important;
+                top: 0;
+            }
+        }
+    }
+    .experienceDetails {
+        margin: -5px auto -25px;
+    }
+    .cardBottomRow {
+        height: 190px !important;
+        .gradient {
+            bottom: 65px !important;
+        }
+    }
+    .MuiBadge-badge {
+        top: 3px;
+        right: 5px;
+    }
+    .recordOfPlayer {
+        ul {
+            max-height: 375px;
+        }
+        .playerRecordBegin {
+            grid-gap: 15px;
+            flex-direction: column;
+            .recordPlays {
+                padding: 0;
+                grid-gap: 10px;
+                span {
+                    padding: 0;
+                    align-items: center;
+                }
+            }
+        }
+        form {
+            display: none !important;
+        }
+        .recordSubDetails {
+            font-size: 0.85em;
+            flex-direction: column;
+        }
+    }
+}
+
+@media (max-width: 667px) {
+    .playMessage {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 520px) {
+    .recordOfPlayer {
+        .playerRecordBegin {
+            grid-gap: 15px;
+            flex-direction: column;
+            .recordPlays {
+                width: 100%;
+                display: grid;
+                font-size: 0.85em;
+                grid-template-columns: 1fr 1fr;
+                span {
+                    justify-content: center;
+                }
+            }
+        }
+        ul {
+            li {
+                padding: 5px 0 10px;
+                .recordDetails {
+                    .playMessage {
+                        grid-gap: 0px;
+                        img {
+                            max-width: 25px;
+                        }
+                    }
+                }
+            }
+        }
+        .recordSubDetails {
+            font-size: 0.7em;
         }
     }
 }

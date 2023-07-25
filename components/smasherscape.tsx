@@ -1,9 +1,14 @@
 import  moment from 'moment';
 import { db } from '../firebase';
 import StepForm from './StepForm';
+import Play from '../models/Play';
+import Stock from '../models/Stock';
+import Level from '../models/Level';
 import { Badge } from '@mui/material';
+import Player from '../models/Player';
 import { Commands } from './Commands';
 import PlayerRecord from './PlayerRecord';
+import Experience from '../models/Experience';
 import Skeleton from '@mui/material/Skeleton';
 import TextField from '@mui/material/TextField';
 import { Characters } from '../common/Characters';
@@ -16,26 +21,40 @@ import { collection, doc, getDocs, setDoc } from 'firebase/firestore';
 import { formatDate, createXML, StateContext, showAlert, dev, defaultPlayers } from '../pages/_app';
 
 export const publicAssetLink = `https://github.com/strawhat19/Smasherscape/blob/main`;
-export const calcPlayerCharacterTimesPlayed = (plyr, char) => plyr.plays.map(ply => ply.character).filter(ply => ply.toLowerCase() == char || ply.toLowerCase().includes(char)).length;
+export const calcPlayerCharacterTimesPlayed = (plyr: Player, char) => plyr.plays.map(ply => ply.character).filter(ply => ply.toLowerCase() == char || ply.toLowerCase().includes(char)).length;
 
 export const getCharacterTitle = (char) => {
     if (char.split(` `).length > 1) char = char.split(` `).join(``).toLowerCase();
     return Characters[char];
 }
 
-export const searchBlur = (e: any, filteredPlayers) => {
+export const searchBlur = (e: any, filteredPlayers: Player[]) => {
     if (filteredPlayers?.length == 0) {
         e.target.value = ``;
     }
 }
 
-export const getActivePlayers = (players) => {
-    return players.sort((a,b) => {
-        if (b.experience.arenaXP !== a.experience.arenaXP) {
-            return b.experience.arenaXP - a.experience.arenaXP;
-        }
-        return b.plays.length - a.plays.length;
-    }).filter(plyr => !plyr.disabled);
+export const getActivePlayers = (players: Player[]) => {
+    return players
+        .filter(plyr => !plyr.disabled)
+        .sort((a,b) => {
+            if (b.experience.arenaXP !== a.experience.arenaXP) {
+                return b.experience.arenaXP - a.experience.arenaXP;
+            }
+            return b.plays.length - a.plays.length;
+        })
+        .map((player: Player) => {
+            let newPlayer = new Player(
+                player.id, 
+                player.name,
+                player.level, 
+                player.plays, 
+                player.expanded,
+                player.experience,
+            );
+            Object.keys(newPlayer).forEach(key => isInvalid(newPlayer[key]) && delete newPlayer[key]);
+            return newPlayer;
+        });
 }
 
 export const calcPlayerLevelImage = (levelName) => {
@@ -49,7 +68,7 @@ export const calcPlayerLevelImage = (levelName) => {
     else return `${publicAssetLink}/assets/smasherscape/OSRS_Top_Hat.png?raw=true`;
 }
 
-export const calcPlayerCharactersPlayed = (plyr) => {
+export const calcPlayerCharactersPlayed = (plyr: Player) => {
     let charsPlayed = plyr?.plays?.map(ply => ply?.character);
     let counts = charsPlayed.reduce((acc, char) => {
         acc[char] = (acc[char] || 0) + 1;
@@ -59,14 +78,36 @@ export const calcPlayerCharactersPlayed = (plyr) => {
     return sortedChars.slice(0,3);
 }
 
+export const isInvalid = (item) => {
+    if (typeof item == `string`) {
+        if (!item || item == `` || item == undefined || item == null) {
+            return true;
+        } else {
+            return false;
+        }
+    } else if (typeof item == `number`) {
+        if (isNaN(item) || item == undefined || item == null) {
+            return true;
+        } else {
+            return false;
+        }
+    } else {
+        if (item == undefined || item == null) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+}
+
 export default function Smasherscape(props) {
 
     const searchInput = useRef();
     const commandsInput = useRef();
     const { players, setPlayers, filteredPlayers, setFilteredPlayers, devEnv, setDevEnv, useLocalStorage, commands } = useContext<any>(StateContext);
 
-    const calcPlayerWins = (plyr) => plyr.plays.filter(ply => ply.winner.toLowerCase() == plyr.name.toLowerCase()).length;
-    const calcPlayerLosses = (plyr) => plyr.plays.filter(ply => ply.loser.toLowerCase() == plyr.name.toLowerCase()).length;
+    const calcPlayerWins = (plyr: Player) => plyr.plays.filter(ply => ply.winner.toLowerCase() == plyr.name.toLowerCase()).length;
+    const calcPlayerLosses = (plyr: Player) => plyr.plays.filter(ply => ply.loser.toLowerCase() == plyr.name.toLowerCase()).length;
 
     const searchPlayers = (e: any, value?: any) => {
         let field = e.target as HTMLInputElement;
@@ -74,13 +115,13 @@ export default function Smasherscape(props) {
         if (!value) value = field.value;
         if (value && value != ``) {
             if (typeof value == `string`) {
-                setFilteredPlayers(players.filter(plyr => {
+                setFilteredPlayers(players.filter((plyr: Player) => {
                     return Object.values(plyr).some(val =>
                         typeof val === `string` && val.toLowerCase().includes(value?.toLowerCase())
                     );
                 }));
             } else {
-                setFilteredPlayers(players.filter(plyr => {
+                setFilteredPlayers(players.filter((plyr: Player) => {
                     return Object.values(plyr).some(val =>
                         typeof val === `string` && val.toLowerCase().includes(value?.name?.toLowerCase())
                     );
@@ -91,8 +132,8 @@ export default function Smasherscape(props) {
         }
     }
 
-    const setPlayerExpanded = (player) => {
-        let updatedPlayers = players.map(plyr => {
+    const setPlayerExpanded = (player: Player) => {
+        let updatedPlayers: Player[] = players.map((plyr: Player) => {
             if (plyr?.id == player?.id) {
                 if (plyr.expanded) {
                     plyr.expanded = !plyr.expanded;
@@ -109,71 +150,112 @@ export default function Smasherscape(props) {
         return updatedPlayers;
     }
 
+    const updatePlayersDB = (updatedPlayers: Player[]) => {
+        devEnv && console.log(`Updated Players`, getActivePlayers(updatedPlayers));
+        useLocalStorage && localStorage.setItem(`players`, JSON.stringify(updatedPlayers));
+    }
+
+    const resetPlayers = (commandParams) => {
+        setPlayers(defaultPlayers);
+        setFilteredPlayers(defaultPlayers);
+        updatePlayersDB(defaultPlayers);
+    }
+
     const addPlayers = (commandParams) => {
         let playersToAdd = commandParams.filter((comm, commIndex) => commIndex != 0 && comm);
 
         playersToAdd.forEach(plyr => {
             setPlayers(prevPlayers => {
-                let updatedPlayers = [...prevPlayers, {
+                let updatedPlayers: Player[] = [...prevPlayers, {
                     id: players.length + 1,
                     name: plyr.charAt(0).toUpperCase() + plyr.slice(1).toLowerCase(),
-                    plays: [],
+                    plays: [] as Play[],
                     level: {
                         num: 1,
                         name: `Bronze Scimitar`
-                    },
+                    } as Level,
                     experience: {
                         xp: 0,
                         arenaXP: 0,
                         nextLevelAt: 83,
                         remainingXP: 83
-                    },
+                    } as Experience,
                 }];
                 setFilteredPlayers(updatedPlayers);
-                devEnv && console.log(`Updated Players`, updatedPlayers);
-                useLocalStorage && localStorage.setItem(`players`, JSON.stringify(updatedPlayers));
+                updatePlayersDB(updatedPlayers);
                 return updatedPlayers;
             });
         })
     }
 
     const deletePlayers = (commandParams) => {
-        let playersToDeleteFromDB = [];
+        let playersToDeleteFromDB: Player[] = [];
         let playersToDelete = commandParams.filter((comm, commIndex) => commIndex != 0 && comm);
 
         playersToDelete.forEach(player => {
-            let playerDB = players.find(plyr => plyr?.name.toLowerCase() == player.toLowerCase() || plyr?.name.toLowerCase().includes(player.toLowerCase()));
+            let playerDB: Player = players.find(plyr => plyr?.name.toLowerCase() == player.toLowerCase() || plyr?.name.toLowerCase().includes(player.toLowerCase()));
             if (playerDB) {
                 playersToDeleteFromDB.push(playerDB);
             }
         });
 
         if (playersToDeleteFromDB.length > 0) {
-            playersToDeleteFromDB.forEach(playerDB => {
+            playersToDeleteFromDB.forEach((playerDB: Player) => {
                 setPlayers(prevPlayers => {
-                    let updatedPlayers = prevPlayers.map(plyr => {
+                    let updatedPlayers: Player[] = prevPlayers.map((plyr: Player) => {
                         if (plyr.name.toLowerCase() == playerDB.name.toLowerCase()) {
                             return {
                                 ...plyr,
                                 disabled: true
-                            }
+                            } as Player
                         } else {
-                            return plyr;
+                            return plyr as Player;
                         }
                     });
                     setFilteredPlayers(updatedPlayers);
-                    devEnv && console.log(`Updated Players`, updatedPlayers);
-                    useLocalStorage && localStorage.setItem(`players`, JSON.stringify(updatedPlayers));
+                    updatePlayersDB(updatedPlayers);
                     return updatedPlayers;
                 });
             })
         }
     }
 
-    const resetPlayers = (commandParams) => {
-        setPlayers(defaultPlayers);
-        setFilteredPlayers(defaultPlayers);
-        useLocalStorage && localStorage.setItem(`players`, JSON.stringify(defaultPlayers));
+    const giveParameter = (commandParams) => {
+        let updatedPlayers: Player[] = [];
+        let playerToGive = commandParams[1].toLowerCase();
+        let parameter = commandParams[2].toLowerCase();
+        let amount = parseFloat(commandParams[3]);
+        let playerToGiveDB: Player = players.find(plyr => plyr?.name.toLowerCase() == playerToGive || plyr?.name.toLowerCase().includes(playerToGive));
+
+        if (!playerToGiveDB) {
+            showAlert(`Can't Find Players`, <h1>
+                Can't find players with that name.
+            </h1>, `65%`, `35%`);
+            return;
+        } else {
+            if (isInvalid(parameter) || isInvalid(amount)) {
+                showAlert(`Please Enter Parameter & Valid Amount`, <h1>
+                    Please Enter Parameter such as `xp`.
+                    Please Enter Valid Amount such as `100` or `-500`.
+                </h1>, `65%`, `35%`);
+                return;
+            } else {
+                if (parameter == `xp`) {
+                    updatedPlayers = players.map(plyr => {
+                        if (plyr?.name.toLowerCase() == playerToGiveDB?.name?.toLowerCase() || plyr?.name.toLowerCase().includes(playerToGiveDB?.name?.toLowerCase())) {
+                            plyr.experience.arenaXP = plyr.experience.arenaXP + amount;
+                            calcPlayerLevelAndExperience(plyr);
+                            return plyr as Player;
+                        } else {
+                            return plyr as Player;
+                        }
+                    });
+                }
+
+                updatePlayersDB(updatedPlayers);
+                setPlayers(updatedPlayers);
+            }
+        }
     }
 
     const updatePlayers = (commandParams) => {
@@ -185,8 +267,8 @@ export default function Smasherscape(props) {
         let characterTwo;
         let stocksTaken;
 
-        let playerOneDB = players.find(plyr => plyr?.name.toLowerCase() == playerOne || plyr?.name.toLowerCase().includes(playerOne));
-        let playerTwoDB = players.find(plyr => plyr?.name.toLowerCase() == playerTwo || plyr?.name.toLowerCase().includes(playerTwo));
+        let playerOneDB: Player = players.find(plyr => plyr?.name.toLowerCase() == playerOne || plyr?.name.toLowerCase().includes(playerOne));
+        let playerTwoDB: Player = players.find(plyr => plyr?.name.toLowerCase() == playerTwo || plyr?.name.toLowerCase().includes(playerTwo));
 
         if (commandParams.length >= 8) {
             characterOne = commandParams[5].toLowerCase();
@@ -211,7 +293,7 @@ export default function Smasherscape(props) {
             return;
         } else {
 
-            let stocks = [
+            let stocks: Stock[] = [
                 {
                     character: Characters[characterOne],
                 }, 
@@ -221,20 +303,20 @@ export default function Smasherscape(props) {
                 {
                     character: Characters[characterOne],
                 }
-            ].map((stk, stkIndex) => {
+            ].map((stk: Stock, stkIndex) => {
                 if (stkIndex < stocksTaken) {
                     return {
                         ...stk,
                         dead: true
-                    }
+                    } as Stock
                 } else {
                     return {
                         ...stk,
-                    }
+                    } as Stock
                 }
             });
 
-            let lossStocks = [
+            let lossStocks: Stock[] = [
                 {
                     character: Characters[characterTwo],
                     dead: true
@@ -249,7 +331,7 @@ export default function Smasherscape(props) {
                 }
             ];
 
-            let updatedPlayers = players.map(plyr => {
+            let updatedPlayers: Player[] = players.map((plyr: Player) => {
                 if (plyr?.name.toLowerCase() == playerOne || plyr?.name.toLowerCase().includes(playerOne)) {
                     plyr.experience.arenaXP = plyr.experience.arenaXP + 400;
                     plyr.plays.push({
@@ -265,7 +347,7 @@ export default function Smasherscape(props) {
 
                     calcPlayerLevelAndExperience(plyr);
 
-                    return plyr;
+                    return plyr as Player;
                 } else if (plyr?.name.toLowerCase() == playerTwo || plyr?.name.toLowerCase().includes(playerTwo)) {
                     plyr.experience.arenaXP = plyr.experience.arenaXP + (100 * stocksTaken);
                     plyr.plays.push({
@@ -281,14 +363,13 @@ export default function Smasherscape(props) {
 
                     calcPlayerLevelAndExperience(plyr);
 
-                    return plyr;
+                    return plyr as Player;
                 } else {
-                    return plyr;
+                    return plyr as Player;
                 }
             });
 
-            devEnv && console.log(`Updated Players`, updatedPlayers);
-            useLocalStorage && localStorage.setItem(`players`, JSON.stringify(updatedPlayers));
+            updatePlayersDB(updatedPlayers);
             setPlayers(updatedPlayers);
         }
     }
@@ -310,6 +391,8 @@ export default function Smasherscape(props) {
                     deletePlayers(commandParams);
                 } else if (firstCommand.includes(`!res`)) {
                     resetPlayers(commandParams);
+                } else if (firstCommand.includes(`!giv`)) {
+                    giveParameter(commandParams);
                 } else if (firstCommand.includes(`!com`)) {
                     showAlert(`Here are the RukoBot Commands so far: (Hover to Click to Copy)`, <div className={`alertInner`}>
                         <Commands commands={commands} />

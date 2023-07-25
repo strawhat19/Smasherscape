@@ -1,4 +1,6 @@
+import Play from '../models/Play';
 import { useContext } from 'react';
+import Player from '../models/Player';
 import { Badge } from '@mui/material';
 import { StateContext } from '../pages/_app';
 import TextField from '@mui/material/TextField';
@@ -35,7 +37,7 @@ function PlayerRecord(props) {
     }
   }
 
-  const calcPlayerKills = (player, plays) => {
+  const calcPlayerKills = (player: Player, plays: Play[]) => {
     let wins = plays.filter(ply => ply?.winner == player?.name)?.length;
     let losses = plays.filter(ply => ply?.winner != player?.name);
     let lossKills = losses?.map(loss => loss?.stocksTaken)?.reduce((partialSum, a) => partialSum + a, 0);
@@ -43,7 +45,7 @@ function PlayerRecord(props) {
     return winKills + lossKills;
   }
 
-  const calcPlayerDeaths = (player, plays) => {
+  const calcPlayerDeaths = (player: Player, plays: Play[]) => {
     let losses = plays.filter(ply => ply?.winner != player?.name)?.length;
     let wins = plays.filter(ply => ply?.winner == player?.name);
     let winDeaths = wins?.map(win => win?.stocksTaken)?.reduce((partialSum, a) => partialSum + a, 0);
@@ -51,16 +53,16 @@ function PlayerRecord(props) {
     return lossDeaths + winDeaths;
   }
 
-  const calcPlayerKDRatio = (player, plays) => {
+  const calcPlayerKDRatio = (player: Player, plays: Play[]) => {
     let kd = calcPlayerKills(player, plays) / calcPlayerDeaths(player, plays);
     let kdRatio = removeTrailingZeroDecimal(kd);
     return kdRatio;
   }
 
   const calcWinLoseRatio = (playerOne, playerTwo) => {
-    let playerOneDB = players.find(plyr => plyr?.name == playerOne || plyr?.name.toLowerCase().includes(playerOne));
-    let playerTwoDB = players.find(plyr => plyr?.name == playerTwo || plyr?.name.toLowerCase().includes(playerTwo));
-    let plays = playerOneDB.plays.filter(ply => ply?.winner == playerTwoDB.name || ply?.loser == playerTwoDB.name);
+    let playerOneDB: Player = players.find(plyr => plyr?.name == playerOne || plyr?.name.toLowerCase().includes(playerOne));
+    let playerTwoDB: Player = players.find(plyr => plyr?.name == playerTwo || plyr?.name.toLowerCase().includes(playerTwo));
+    let plays: Play[] = playerOneDB.plays.filter(ply => ply?.winner == playerTwoDB.name || ply?.loser == playerTwoDB.name);
     let wins = plays.filter(ply => ply?.winner == playerOneDB?.name)?.length;
     let losses = plays.filter(ply => ply?.loser == playerOneDB?.name)?.length;
     let winRate = (wins/(wins+losses)) * 100;
