@@ -1279,7 +1279,9 @@ textarea {
         }
     }
     &:hover {
-        filter: invert(1);
+        &:not(#topButton) {
+            filter: invert(1);
+        }
         .itemLength {
             filter: invert(1) !important;
         }

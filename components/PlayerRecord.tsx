@@ -2,12 +2,13 @@ import Play from '../models/Play';
 import { useContext } from 'react';
 import Player from '../models/Player';
 import { Badge } from '@mui/material';
+import { searchBlur } from './PlayerForm';
 import { StateContext } from '../pages/_app';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
-import { calcPlayerCharacterTimesPlayed, calcPlayerCharactersPlayed, calcPlayerLevelImage, getActivePlayers, getCharacterTitle, publicAssetLink, searchBlur } from './smasherscape';
+import { calcPlayerCharacterTimesPlayed, calcPlayerCharactersPlayed, calcPlayerLevelImage, getActivePlayers, getCharacterTitle, publicAssetLink } from './smasherscape';
 
 function PlayerRecord(props) {
   let { plyr } = props;

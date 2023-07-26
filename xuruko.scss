@@ -1,3 +1,15 @@
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    &:not:has(.mobile) {
+        scroll-behavior: smooth;
+    }
+}
+
 :root {
     --red: #f63460;
     --smasherscapeYellow: #fcfc05;
@@ -88,7 +100,7 @@ li {
     padding: 15px 15px 50px;
     grid-template-columns: 1fr;
     justify-content: space-between;
-    @media (min-width: 1366px) {
+    @media (min-width: 1200px) {
         &.populated {
             align-items: flex-start;
             grid-template-columns: 1fr 1fr;
@@ -231,7 +243,7 @@ li {
                             position: relative;
                             bottom: -15px;
                             right: 65px;
-                            @media (min-width: 1366px) and (max-width: 1545px) {
+                            @media (min-width: 1200px) and (max-width: 1545px) {
                                 right: 45px;
                             }
                             @media (max-width: 768px) {
@@ -453,7 +465,7 @@ li {
         @media (min-width: 1500px) and (max-width: 1545px) {
             font-size: 1em;
         }
-        @media (min-width: 1366px) and (max-width: 1499px) {
+        @media (min-width: 1200px) and (max-width: 1499px) {
             font-size: .9em;
         }
     }
@@ -1194,7 +1206,6 @@ div[role="presentation"] {
     }
 }
 
-
 .nextra-code-block {
     margin: 0;
     width: 100%;
@@ -1206,5 +1217,80 @@ div[role="presentation"] {
     }
     pre {
         margin: 0;
+    }
+}
+
+#topButton {
+    width: 100%;
+    right: 30px;
+    z-index: 99;
+    bottom: 60px;
+    display: block;
+    position: fixed;
+    cursor: pointer;
+    margin: 0 !important;
+    border: none !important;
+    outline: none !important;
+    color: white !important;
+    transform: rotate(-90deg);
+    backdrop-filter: blur(3px);
+    font-size: 18px !important;
+    max-width: 35px !important;
+    min-width: 35px !important;
+    min-height: 35px !important;
+    font-weight: 700 !important;
+    border-radius: 7px !important;
+    -webkit-backdrop-filter: blur(3px);
+    animation: fadeIn 1000ms ease-in-out;
+    font-family: "montserrat" !important;
+    transition: var(--transition) !important;
+    padding: 0.3em 0.7em 0.5em 0.7em !important;
+    -webkit-animation: fadeIn 1000ms ease-in-out;
+    background: var(--xurukoGradientGreenBlue) !important;
+    .upArrow {
+        bottom: -3px;
+        position: relative;
+        transition: var(--transition) !important;
+    }
+    &:active {
+        box-shadow: inset 0px 0px 3px rgba(0, 0, 0, 0.8);
+        background: black;
+        color: black;
+    }
+    &:hover {
+        background: var(--xurukoGradientBlueGreen) !important;
+        color: black !important;
+        &::before {
+            transform: scale(1, 1);
+            opacity: 1;
+        }
+    }
+    &::before {
+        top: 0;
+        left: 0;
+        opacity: 0;
+        content: "";
+        z-index: -1;
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        transform-origin: top;
+        transform: scale(0, 1);
+        transition: var(--transition);
+        border-radius: 7px !important;
+        background: var(--xurukoGradientBlueGreen);
+    }
+    @media (max-width: 992px) {
+        bottom: 10px;
+    }
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
     }
 }
