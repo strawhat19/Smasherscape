@@ -461,10 +461,10 @@ export default function ProductIVF({ Component, pageProps, router }) {
       if (storedPlayers && useLocalStorage) {
         setPlayers(storedPlayers);
         setFilteredPlayers(storedPlayers);
-        devEnv && console.log(`Players`, getActivePlayers(storedPlayers));
+        dev() && console.log(`Players`, getActivePlayers(storedPlayers));
       } else {
         setPlayers(defaultPlayers);
-        devEnv && console.log(`Players`, getActivePlayers(defaultPlayers));
+        dev() && console.log(`Players`, getActivePlayers(defaultPlayers));
       }
 
       setLoading(false);

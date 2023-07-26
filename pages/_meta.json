@@ -7,6 +7,14 @@
       "layout": "full"
     }
   },
+  "about": {
+    "title": "About",
+    "type": "page",
+    "theme": {
+      "pagination": false,
+      "layout": "full"
+    }
+  },
   "Xuruko": {
     "title": "Xuruko",
     "type": "menu",

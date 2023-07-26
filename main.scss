@@ -371,6 +371,15 @@ html[class~=dark] .dark\:nx-bg-dark {
 html[class~=dark] .dark\:nx-text-neutral-500, html[class~=dark] .dark\:nx-text-gray-400 {
     &:not(.excerpt) {
         @extend .hoverLink;
+        color: white !important;
+        // &:hover {
+        //     &::before {
+        //         transform: scale(0,1) !important;
+        //     }
+        // }
+        // &::before {
+        //     transform: scale(1,1) !important;
+        // }
     }
     &::before {
         height: 1px;
@@ -1092,6 +1101,7 @@ textarea {
         font-weight: 600;
         font-size: 2.5em;
         border-radius: 3px 3px;
+        text-shadow: 2px 2px 0px black;
         border-bottom: 4px solid var(--smasherscapeGreen);
     }
 
@@ -1188,7 +1198,7 @@ textarea {
         content: "" !important;
         transform-origin: 0% 100%;
         transition: var(--transition);
-        background: var(--xurukoGreenBlue);
+        background: var(--xurukoGradientGreenBlue);
     }
 
     &:hover {

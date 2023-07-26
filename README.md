@@ -15,14 +15,7 @@
 ![Screenshot of SmasherScape](./assets/smasherscape/SmasherScapeRecords.png)
 
 ## About
-Players can level up and gain experience while keeping a track record of their wins, defeats, deaths, characters played and level. Players can level up to gain rewards, search for their card and expand to view details, or view other player data on the leaderboard.
-
-## Table of Contents  
-* [About](#about)
-* [Installation](#installation)
-* [Usage](#usage)
-* [Licensing](#licensing)
-* [Contact](#contact)
+Smasherscape is a leaderboard system designed for tracking player statistics. This component provides an interactive leaderboard system, where admins can add, delete, update, and search for players, along with their respective statistics.
 
 ## Installation
 ```
@@ -35,9 +28,60 @@ npm run dev
 ## Usage
 Players can level up and gain experience while keeping a track record of their wins, defeats, deaths, characters played and level. Players can level up to gain rewards, search for their card and expand to view details, or view other player data on the leaderboard.
 
+Each player card displays detailed player statistics, including the player's name, level, record, and characters played. Each card also includes an XP progress bar that indicates the player's progress towards the next level.
+
 Open [http://localhost:3000](http://localhost:3000) with your browser, after installation, to see the result of the local development.
 
 Production [https://smasherscape.vercel.app/](https://smasherscape.vercel.app/) to see the production build.
+
+## Table of Contents  
+* [About](#about)
+* [Installation](#installation)
+* [Usage](#usage)
+* [Features](#features)
+* [Functions](#functions)
+* [Licensing](#licensing)
+* [Contact](#contact)
+
+## Features
+
+- **Player Management:** This component allows for adding, deleting, and resetting players.
+
+- **Player Statistics:** Each player has detailed statistics, including their level, experience, and plays.
+
+- **Interactive Search:** An interactive search field allows you to search for specific players.
+
+- **Commands Input:** A dedicated input field allows for entering commands to manipulate player data.
+
+## Functions
+
+### `addPlayers(commandParams)`
+
+This function adds a new player to the leaderboard. It accepts an array of command parameters.
+
+### `deletePlayers(commandParams)`
+
+This function removes a player from the leaderboard. It also accepts an array of command parameters.
+
+### `resetPlayers(commandParams)`
+
+This function resets the statistics of a player. It accepts an array of command parameters.
+
+### `setParameter(commandParams)`
+
+This function sets a specific parameter for a player. It accepts an array of command parameters.
+
+### `giveParameter(commandParams)`
+
+This function increments a player's parameter by a certain amount. It accepts an array of command parameters.
+
+### `updatePlayers(commandParams)`
+
+This function updates player statistics based on their performance in a match. It accepts an array of command parameters.
+
+### `handleCommands(e: FormEvent)`
+
+This function handles the execution of commands entered into the commands input field. It accepts a FormEvent as an argument.
 
 ## Licensing
 #### 
