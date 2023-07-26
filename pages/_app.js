@@ -467,6 +467,9 @@ export default function ProductIVF({ Component, pageProps, router }) {
         dev() && console.log(`Players`, getActivePlayers(defaultPlayers));
       }
 
+      document.documentElement.setAttribute(`data-theme`, `dark`);
+      localStorage.setItem(`theme`, `dark`);
+
       setLoading(false);
       setSystemStatus(`${getPage()} Loaded.`);
       setTimeout(() => setLoading(false), 1500);
@@ -500,7 +503,8 @@ export default function ProductIVF({ Component, pageProps, router }) {
         }}>
           <Component {...pageProps} />
         </motion.div>
-      </AnimatePresence> : <div className={`pageWrapContainer ${page.toUpperCase()} ${devEnv ? `devMode` : ``} ${onMac ? `isMac` : `isWindows`}`}>
+      </AnimatePresence> : <div className={`pageWrapContainer ${page.toUpperCase()} ${devEnv ? `devMode` : ``} 
+        ${onMac ? `isMac` : `isWindows`}`}>
         <Component {...pageProps} />
       </div>}
     </StateContext.Provider>
