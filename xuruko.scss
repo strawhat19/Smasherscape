@@ -5,7 +5,9 @@
 }
 
 html, body {
-    scroll-behavior: smooth;
+    &:not:has(.mobile) {
+        scroll-behavior: smooth;
+    }
 }
 
 :root {
@@ -1219,63 +1221,76 @@ div[role="presentation"] {
 }
 
 #topButton {
-    display: block;
-    position: fixed;
-    bottom: 60px;
+    width: 100%;
     right: 30px;
     z-index: 99;
-    font-size: 18px !important;
+    bottom: 60px;
+    display: block;
+    position: fixed;
     cursor: pointer;
-    border-radius: 7px !important;
     margin: 0 !important;
-    outline: none !important;
     border: none !important;
-    -webkit-backdrop-filter: blur(3px);
+    outline: none !important;
+    color: white !important;
+    transform: rotate(-90deg);
     backdrop-filter: blur(3px);
-    padding: 0.3em 0.7em !important;
+    font-size: 18px !important;
+    max-width: 35px !important;
     min-width: 35px !important;
     min-height: 35px !important;
     font-weight: 700 !important;
-    color: var(--bg) !important;
-    font-family: "montserrat" !important;
-    -webkit-animation: fadeIn 1000ms ease-in-out;
+    border-radius: 7px !important;
+    -webkit-backdrop-filter: blur(3px);
     animation: fadeIn 1000ms ease-in-out;
-    background: var(--font) !important;
+    font-family: "montserrat" !important;
     transition: var(--transition) !important;
+    padding: 0.3em 0.7em 0.5em 0.7em !important;
+    -webkit-animation: fadeIn 1000ms ease-in-out;
+    background: var(--xurukoGradientGreenBlue) !important;
     .upArrow {
         bottom: -3px;
         position: relative;
         transition: var(--transition) !important;
     }
     &:active {
-        background: black;
         box-shadow: inset 0px 0px 3px rgba(0, 0, 0, 0.8);
-        color: var(--secondary);
+        background: black;
+        color: black;
     }
     &:hover {
-        background: var(--secondary) !important;
-        color: var(--bg) !important;
+        background: var(--xurukoGradientBlueGreen) !important;
+        color: black !important;
         &::before {
-        transform: scale(1, 1);
-        opacity: 1;
+            transform: scale(1, 1);
+            opacity: 1;
         }
     }
     &::before {
-        content: "";
-        position: absolute;
-        opacity: 0;
-        width: 100%;
-        height: 100%;
-        background: var(--primary);
-        border-radius: 7px !important;
         top: 0;
         left: 0;
+        opacity: 0;
+        content: "";
         z-index: -1;
+        width: 100%;
+        height: 100%;
+        position: absolute;
         transform-origin: top;
         transform: scale(0, 1);
         transition: var(--transition);
+        border-radius: 7px !important;
+        background: var(--xurukoGradientBlueGreen);
     }
     @media (max-width: 992px) {
         bottom: 10px;
+    }
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
     }
 }

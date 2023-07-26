@@ -413,6 +413,7 @@ export default function ProductIVF({ Component, pageProps, router }) {
     let [colorPref, setColorPref] = useState(user);
     let [alertOpen, setAlertOpen] = useState(false);
     let [authState, setAuthState] = useState(`Next`);
+    let [bodyClasses, setBodyClasses] = useState(``);
     let [mobileMenu, setMobileMenu] = useState(false);
     let [gameFormStep, setGameFormStep] = useState(1);
     let [emailField, setEmailField] = useState(false);
@@ -420,7 +421,6 @@ export default function ProductIVF({ Component, pageProps, router }) {
     let [buttonText, setButtonText] = useState(`Next`);
     let [rearranging, setRearranging] = useState(false);
     let [content, setContent] = useState(`defaultContent`);
-    let [bodyClasses, setBodyClasses] = useState<string>(``);
     let [year, setYear] = useState(new Date().getFullYear());
     let [useLocalStorage, setUseLocalStorage] = useState(true);
 
@@ -478,12 +478,12 @@ export default function ProductIVF({ Component, pageProps, router }) {
       setPage(window.location.pathname.replace(`/`,``));
       setMobile((typeof window.orientation !== `undefined`) || (navigator.userAgent.indexOf(`IEMobile`) !== -1));
       
-      setBrowserUI();
       setThemeUI();
+      setBrowserUI();
       setSideBarUI();
       setPlayersUI();
 
-      setBodyClasses(`${rte} pageWrapContainer ${page.toUpperCase()} ${devEnv ? `devMode` : ``} ${onMac ? `isMac` : `isWindows`} ${mobile ? `mobile` : ``}`);
+      setBodyClasses(`${rte= `` ? rte : `Index`} pageWrapContainer ${page != `` ? page?.toUpperCase() : `Home`} ${devEnv ? `devMode` : `prodMode`} ${onMac ? `isMac` : `isWindows`} ${mobile ? `mobile` : `desktop`}`);
 
       setLoading(false);
       setSystemStatus(`${getPage()} Loaded.`);

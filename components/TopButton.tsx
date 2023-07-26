@@ -18,6 +18,7 @@ export default function TopButton(props) {
 
     const windowEvents = () => {
         window.addEventListener(`scroll`, event => {
+            console.log(event);
             showButton();
             return () => window.removeEventListener(`scroll`, event => {
                 showButton();
