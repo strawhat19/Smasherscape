@@ -5,7 +5,7 @@
 }
 
 html, body {
-    &:not:has(.mobile) {
+    &:has(.desktop) {
         scroll-behavior: smooth;
     }
 }
@@ -94,13 +94,13 @@ li {
 }
 
 .playerGrid {
-    gap: 40px;
     display: grid;
     align-items: center;
     padding: 15px 15px 50px;
+    gap: 0px 40px !important;
     grid-template-columns: 1fr;
     justify-content: space-between;
-    @media (min-width: 1200px) {
+    @media (min-width: 1291px) {
         &.populated {
             align-items: flex-start;
             grid-template-columns: 1fr 1fr;
@@ -243,7 +243,7 @@ li {
                             position: relative;
                             bottom: -15px;
                             right: 65px;
-                            @media (min-width: 1200px) and (max-width: 1545px) {
+                            @media (min-width: 1291px) and (max-width: 1545px) {
                                 right: 45px;
                             }
                             @media (max-width: 768px) {
@@ -284,6 +284,8 @@ li {
                         }
                         @media (max-width: 768px) {
                             top: 22px;
+                            width: 85%;
+                            margin: 0 auto;
                             font-size: 14px;
                         }
                     }
@@ -316,8 +318,6 @@ li {
             display: flex;
             font-size: 6em;
             font-family: "RuneScape Large";
-            color: var(--smasherscapeBlue2);
-            text-shadow: 3px 3px 0px var(--smasherscapePurple), 0px 0px 8px rgba(0, 0, 0, 0.75), 0px 1px 8px rgba(0, 0, 0, 0.69);
             @media (max-width: 1800px) {
                 font-size: 4.7em;
             }
@@ -326,6 +326,9 @@ li {
             }
             @media (max-width: 1425px) {
                 font-size: 4em;
+            }
+            @media (max-width: 1366px) {
+                font-size: 3.85em;
             }
         }
         h4 {
@@ -465,7 +468,7 @@ li {
         @media (min-width: 1500px) and (max-width: 1545px) {
             font-size: 1em;
         }
-        @media (min-width: 1200px) and (max-width: 1499px) {
+        @media (min-width: 1291px) and (max-width: 1499px) {
             font-size: .9em;
         }
     }
@@ -498,20 +501,6 @@ nav {
     }
     a, button {
         font-size: 18px !important;
-    }
-}
-
-.alert {
-    h1 {
-        font-size: 1.75em;
-    }
-    .alertInner {
-        width: 100%;
-        overflow: overlay;
-        font-size: 1.75em;
-        max-height: 535px;
-        padding: 0 1em 0 0;
-        text-shadow: 2px 2px 0px black;
     }
 }
 
@@ -568,37 +557,6 @@ footer {
         .inputWrapper {
             width: 100%;
         }
-    }
-}
-
-@media (max-width: 768px) {
-    .dark {
-        aside {
-            max-height: max-content;
-            backdrop-filter: blur(5px);
-            background: rgba(0, 0, 0, 0.6) !important;
-            div {
-                &:first-child {
-                    &:not(.nx-transition-opacity) {
-                        display: none;
-                    }
-                }
-            }
-            ul {
-                li {
-                    a {
-                        color: white !important;
-                    }
-                    button {
-                        font-size: 18px !important;
-                    }
-                }
-            }
-        }
-    }
-    .dark .nx-sticky:not(.nx-top-0) {
-        background: var(--menuBackground) !important;
-        display: none;
     }
 }
 
@@ -670,7 +628,10 @@ form {
 }
 
 .playsContainer {
-    left: -5px;
+    left: 2px;
+    &.populatedPlays {
+        left: -5px;
+    }
     width: 100%;
     height: 100%;
     grid-gap: 5px;
@@ -689,46 +650,6 @@ form {
     font-size: 18px;
     border-radius: 8px;
     background: var(--xurukoGradientGreenBlue) !important;
-}
-
-@media (min-width: 768px) {
-    .formSubmitButton {
-        &:not(.commandsFormSubmit) {
-            display: none;
-        }
-    }
-}
-
-@media (max-width: 768px) {
-    .dev {
-        display: none !important;
-    }
-    form {
-        display: flex !important;
-        grid-gap: 25px !important;
-        margin: 1em auto !important;
-        flex-direction: column !important;
-        .inputWrapper {
-            &:not(.materialBGInputWrapper) {
-                max-height: 55px;
-                input {
-                    max-height: 55px;
-                }
-            }
-        }
-        .materialBGInputWrapper {
-            z-index: 5;
-            width: 100%;
-            transform: scaleX(1.01);
-        }
-        button {
-            align-items: center;
-            justify-content: center;
-        }
-    }
-    .gradient {
-        bottom: 48px !important;
-    }
 }
 
 .Mui-focused {
@@ -899,7 +820,7 @@ div[role="presentation"] {
     color: var(--smasherscapeGreen);
     text-shadow: 2px 2px 0px black;
     @media (max-width: 1425px) {
-        font-size: 2em;
+        font-size: 1.9em !important;
     }
 }
 
@@ -1012,11 +933,14 @@ div[role="presentation"] {
     justify-content: center;
 }
 
-.expandedPlayerCard {
-    .logoWithWords {
-        width: 245px !important;
-        img {
-            transform: rotate(-55deg);
+.playerCard {
+    margin-bottom: 40px;
+    &.expandedPlayerCard {
+        .logoWithWords {
+            width: 245px !important;
+            img {
+                transform: rotate(-55deg);
+            }
         }
     }
 }
@@ -1043,27 +967,119 @@ div[role="presentation"] {
     }
 }
 
-@media (min-width: 677px) and (max-width: 1425px) {
+@media (min-width: 768px) {
+    .formSubmitButton {
+        &:not(.commandsFormSubmit) {
+            display: none;
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .dark {
+        aside {
+            max-height: max-content;
+            backdrop-filter: blur(5px);
+            background: rgba(0, 0, 0, 0.6) !important;
+            div {
+                &:first-child {
+                    &:not(.nx-transition-opacity) {
+                        display: none;
+                    }
+                }
+            }
+            ul {
+                li {
+                    a {
+                        color: white !important;
+                    }
+                    button {
+                        font-size: 18px !important;
+                    }
+                }
+            }
+        }
+    }
+    .dark .nx-sticky:not(.nx-top-0) {
+        background: var(--menuBackground) !important;
+        display: none;
+    }
+    .dev {
+        display: none !important;
+    }
+    form {
+        display: flex !important;
+        grid-gap: 25px !important;
+        margin: 1em auto !important;
+        flex-direction: column !important;
+        .inputWrapper {
+            &:not(.materialBGInputWrapper) {
+                max-height: 55px;
+                input {
+                    max-height: 55px;
+                }
+            }
+        }
+        .materialBGInputWrapper {
+            z-index: 5;
+            width: 100%;
+            transform: scaleX(1.01);
+        }
+        button {
+            align-items: center;
+            justify-content: center;
+        }
+    }
+    .gradient {
+        bottom: 48px !important;
+    }
+    .recordOfPlayer {
+        h3 {
+            font-size: 1.85em !important;
+        }
+    }
+}
+
+@media (min-width: 677px) and (max-width: 1366px) {
+    .cardLevelImage {
+        transform: scale(1.55) !important;
+    }
+    .xpDetail {
+        width: 95%;
+        margin-left: auto;
+    }
+}
+
+@media (min-width: 1367px) and (max-width: 1425px) {
     .cardLevelImage {
         transform: scale(1.75) !important;
     }
 }
 
+@media (max-width: 677px) {
+    .recordList {
+        h3 {
+            font-size: 1.6em !important;
+        }
+    }
+}
+
 @media (max-width: 676px) {
     .cardTopRow {
-        margin: 90px auto -10px !important;
+        flex-direction: column;
         justify-content: center !important;
+        margin: 135px auto -10px !important;
         h2 {
             align-items: center;
             width: 100% !important;
             justify-content: center;
         }
-        .logoWithWords {
-            display: none !important;
-        }
+        // .logoWithWords {
+        //     display: none !important;
+        // }
     }
     .cardMiddleRow {
-        grid-gap: 30px;
+        grid-gap: 50px;
         flex-direction: column;
         img:not(.charImg) {
             padding: 15px 0 0 0 !important;
@@ -1098,12 +1114,12 @@ div[role="presentation"] {
         }
     }
     .experienceDetails {
-        margin: -5px auto -25px;
+        margin: -5px auto -5px;
     }
     .cardBottomRow {
         height: 190px !important;
         .gradient {
-            bottom: 65px !important;
+            bottom: 85px !important;
         }
     }
     .MuiBadge-badge {
@@ -1206,6 +1222,13 @@ div[role="presentation"] {
     }
 }
 
+.blackTextShadow {
+    text-shadow: 2px 2px 0px black !important;
+    &.slimmed {
+        text-shadow: 1px 1px 0px black !important;
+    }
+}
+
 .nextra-code-block {
     margin: 0;
     width: 100%;
@@ -1220,9 +1243,17 @@ div[role="presentation"] {
     }
 }
 
+.bluePurpleTextShadow {
+    color: var(--smasherscapeBlue2);
+    text-shadow: 3px 3px 0px var(--smasherscapePurple), 0px 0px 8px rgba(0, 0, 0, 0.75), 0px 1px 8px rgba(0, 0, 0, 0.69);
+    &.slimmed {
+        text-shadow: 1px 1px 0px var(--smasherscapePurple), 0px 0px 5px rgba(0, 0, 0, 0.75), 0px 1px 5px rgba(0, 0, 0, 0.69);
+    }
+}
+
 #topButton {
     width: 100%;
-    right: 30px;
+    right: 70px;
     z-index: 99;
     bottom: 60px;
     display: block;
@@ -1247,6 +1278,10 @@ div[role="presentation"] {
     padding: 0.3em 0.7em 0.5em 0.7em !important;
     -webkit-animation: fadeIn 1000ms ease-in-out;
     background: var(--xurukoGradientGreenBlue) !important;
+    &.hiddenButton {
+        opacity: 0;
+        pointer-events: none;
+    }
     .upArrow {
         bottom: -3px;
         position: relative;

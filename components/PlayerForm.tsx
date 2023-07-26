@@ -8,12 +8,12 @@ import { Commands } from './Commands';
 import Experience from '../models/Experience';
 import TextField from '@mui/material/TextField';
 import { Characters } from '../common/Characters';
-import { calcPlayerCharacterTimesPlayed, calcPlayerCharactersPlayed, calcPlayerLevelImage, getActivePlayers, getCharacterTitle, isInvalid } from './smasherscape';
 import { FormEvent, useContext, useRef } from 'react';
 import Autocomplete from '@mui/material/Autocomplete';
 import { calcPlayerLevelAndExperience } from '../common/Levels';
 import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
 import { StateContext, showAlert, defaultPlayers } from '../pages/_app';
+import { calcPlayerCharacterTimesPlayed, calcPlayerCharactersPlayed, calcPlayerLevelImage, getActivePlayers, getCharacterTitle, isInvalid } from './smasherscape';
 
 export const searchBlur = (e: any, filteredPlayers: Player[]) => {
     if (filteredPlayers?.length == 0) {
@@ -132,7 +132,35 @@ export default function PlayerForm(props) {
         let parameter = commandParams[2].toLowerCase();
         let amount = parseFloat(commandParams[3]);
         let playerToSetDB: Player = players.find(plyr => plyr?.name.toLowerCase() == playerToSet || plyr?.name.toLowerCase().includes(playerToSet));
-        devEnv && console.log(`Set Parameter`, commandParams);
+
+        if (!playerToSetDB) {
+            showAlert(`Can't Find Players`, <h1>
+                Can't find players with that name.
+            </h1>, `65%`, `35%`);
+            return;
+        } else {
+            if (isInvalid(parameter) || isInvalid(amount)) {
+                showAlert(`Please Enter Parameter & Valid Amount`, <h1>
+                    Please Enter Parameter such as `xp`.
+                    Please Enter Valid Amount such as `100` or `-500`.
+                </h1>, `65%`, `35%`);
+                return;
+            } else {
+                if (parameter == `xp`) {
+                    updatedPlayers = players.map(plyr => {
+                        if (plyr?.name.toLowerCase() == playerToSetDB?.name?.toLowerCase() || plyr?.name.toLowerCase().includes(playerToSetDB?.name?.toLowerCase())) {
+                            plyr.xpModifier = amount;
+                            return plyr as Player;
+                        } else {
+                            return plyr as Player;
+                        }
+                    });
+                }
+
+                updatePlayersDB(updatedPlayers);
+                setPlayers(updatedPlayers);
+            }
+        }
     }
 
     const giveParameter = (commandParams) => {
@@ -158,7 +186,7 @@ export default function PlayerForm(props) {
                 if (parameter == `xp`) {
                     updatedPlayers = players.map(plyr => {
                         if (plyr?.name.toLowerCase() == playerToGiveDB?.name?.toLowerCase() || plyr?.name.toLowerCase().includes(playerToGiveDB?.name?.toLowerCase())) {
-                            plyr.experience.arenaXP = plyr.experience.arenaXP + amount;
+                            plyr.experience.arenaXP = plyr.experience.arenaXP + (plyr?.xpModifier ? (amount * plyr?.xpModifier) : amount);
                             calcPlayerLevelAndExperience(plyr);
                             return plyr as Player;
                         } else {
@@ -248,7 +276,7 @@ export default function PlayerForm(props) {
 
             let updatedPlayers: Player[] = players.map((plyr: Player) => {
                 if (plyr?.name.toLowerCase() == playerOne || plyr?.name.toLowerCase().includes(playerOne)) {
-                    plyr.experience.arenaXP = plyr.experience.arenaXP + 400;
+                    plyr.experience.arenaXP = (plyr?.xpModifier ? (plyr.experience.arenaXP * plyr?.xpModifier) : plyr.experience.arenaXP) + 400;
                     plyr.plays.push({
                         otherCharacter: Characters[characterTwo],
                         character: Characters[characterOne],
@@ -264,7 +292,7 @@ export default function PlayerForm(props) {
 
                     return plyr as Player;
                 } else if (plyr?.name.toLowerCase() == playerTwo || plyr?.name.toLowerCase().includes(playerTwo)) {
-                    plyr.experience.arenaXP = plyr.experience.arenaXP + (100 * stocksTaken);
+                    plyr.experience.arenaXP = (plyr?.xpModifier ? (plyr.experience.arenaXP * plyr?.xpModifier) : plyr.experience.arenaXP) + (100 * stocksTaken);
                     plyr.plays.push({
                         otherCharacter: Characters[characterOne],
                         character: Characters[characterTwo],

@@ -1,11 +1,12 @@
+import Main from '../components/Main'
+import TopButton from '../components/TopButton'
 import Smasherscape from '../components/smasherscape'
 
 <div style={{textAlign: `center`}}>
   # About
 </div>
 
-
-<main className={`smasherscapeAbout`}>
+<Main className={`smasherscapeAbout`} showTopButton={false}>
     <div className={`badges`}>
         ![NextJS](https://img.shields.io/badge/next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
         ![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)
@@ -132,4 +133,6 @@ import Smasherscape from '../components/smasherscape'
     #### Twitch: [*Twitch.tv/Xuruko*](https://www.twitch.tv/xuruko)
     #### Discord: [*Join The Bröthērhoöd Discord*](https://discord.gg/FUXbKfGs29)
     #### Contact me or ask me questions at [rahmed@piratechs.com](mailto:rahmed@piratechs.com)
-</main>
+</Main>
+
+<TopButton />

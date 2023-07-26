@@ -1,9 +1,9 @@
 
+import Main from './Main';
 import { db } from '../firebase';
 import Play from '../models/Play';
 import { useContext } from 'react';
 import Level from '../models/Level';
-import TopButton from './TopButton';
 import Player from '../models/Player';
 import PlayerForm from './PlayerForm';
 import PlayerCard from './PlayerCard';
@@ -19,17 +19,23 @@ export const getCharacterTitle = (char) => {
     return Characters[char];
 }
 
+export const removeEmptyParams = (object) => {
+    Object.keys(object).forEach(key => isInvalid(object[key]) && delete object[key]);
+    return object;
+}
+
 export const newPlayerType = (player: Player) => {
-    let { id, name, expanded } = player;
+    let { id, name, expanded, xpModifier } = player;
     let level: Level = new Level(player.level.name, player.level.num) as Level;
     let experience: Experience = new Experience(player.experience.nextLevelAt, player.experience.remainingXP, player.experience.arenaXP, player.experience.xp) as Experience;
     let plays: Play[] = player.plays.map((play: Play) => {
         let { date, loser, winner, stocks, character, stocksTaken, lossStocks, otherCharacter } = play;
-        return new Play(date, loser, winner, stocks, character, stocksTaken, lossStocks, otherCharacter);
+        let newPlay = new Play(date, loser, winner, stocks, character, stocksTaken, lossStocks, otherCharacter);
+        return removeEmptyParams(newPlay) as Play;
     }) as Play[];
-    let newPlayer: Player = new Player(id, name, level, plays, expanded, experience) as Player;
-    Object.keys(newPlayer).forEach(key => isInvalid(newPlayer[key]) && delete newPlayer[key]);
-    return newPlayer as Player;
+    experience = removeEmptyParams(experience) as Experience;
+    let newPlayer: Player = new Player(id, name, level, plays, expanded, experience, xpModifier) as Player;
+    return removeEmptyParams(newPlayer) as Player;
 }
 
 export const getActivePlayers = (players: Player[]) => {
@@ -93,7 +99,7 @@ export const isInvalid = (item) => {
 export default function Smasherscape(props) {
     const { filteredPlayers } = useContext<any>(StateContext);
 
-    return <main className={`smasherscapeLeaderboard`}>
+    return <Main className={`smasherscapeLeaderboard`}>
         <PlayerForm />
         <div id={props.id} className={`${props.className} playerGrid ${getActivePlayers(filteredPlayers)?.length == 0 ? `empty` : `populated`}`}>
             {getActivePlayers(filteredPlayers)?.length == 0 && <>
@@ -105,6 +111,5 @@ export default function Smasherscape(props) {
             </>}
             {getActivePlayers(filteredPlayers)?.length > 0 && getActivePlayers(filteredPlayers)?.map((plyr, plyrIndex) => <PlayerCard plyr={plyr} key={plyrIndex} />)}
         </div>
-        <TopButton />
-    </main>
+    </Main>
 }

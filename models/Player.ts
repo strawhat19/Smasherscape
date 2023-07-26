@@ -14,6 +14,7 @@ export default class Player {
     public plays: Play[],
     public expanded: boolean,
     public experience: Experience,
+    public xpModifier?: number,
     public uuid?: any,
     public bio?: string,
     public wins?: Play[],
@@ -44,6 +45,7 @@ export default class Player {
     this.username = username;
     this.password = password;
     this.expanded = expanded;
+    this.xpModifier = xpModifier;
     this.experience = experience;
     this.description = description;
   }

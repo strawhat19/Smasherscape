@@ -3,6 +3,7 @@ import '../xuruko.scss';
 import '../concentration.scss';
 import ReactDOM from 'react-dom/client';
 import { AnimatePresence, motion } from 'framer-motion';
+import { defaultCommands } from '../components/Commands';
 import { getActivePlayers } from '../components/smasherscape';
 import { createContext, useRef, useState, useEffect } from 'react';
 
@@ -14,51 +15,6 @@ export const getPage = () => {
 
 export const getCurrentPageName = () => {
   return window.location.hash.slice(window.location.hash.lastIndexOf(`/`)).replace(`/`, ``);
-};
-
-export const defaultCommands = {
-  List: {
-    id: 1,
-    name: `List`,
-    command: `!com`,
-    description: `List All Commands`,
-  },
-  Add: {
-    id: 2,
-    name: `Add`,
-    command: `!add name(s) of player(s)`,
-    description: `Add Player or Player(s) separated by spaces`,
-  },
-  Delete: {
-    id: 3,
-    name: `Delete`,
-    command: `!del name(s) of player(s)`,
-    description: `Delete Player or Player(s) separated by spaces`,
-  },
-  Reset: {
-    id: 4,
-    name: `Reset`,
-    command: `!res`,
-    description: `Reset Leaderboard`,
-  },
-  Update: {
-    id: 5,
-    name: `Update`,
-    description: `Update Leaderboard`,
-    command: `!upd winnerName 'beats' loserName loserStocksTakenFromWinner`,
-  },
-  Set: {
-    id: 6,
-    name: `Set`,
-    command: `!set playerName (xp) amount`,
-    description: `Set Parameter for Player`,
-  },
-  Give: {
-    id: 7,
-    name: `Give`,
-    command: `!giv playerName (xp) amount`,
-    description: `Give Parameter to Player`,
-  },
 };
 
 export const defaultPlayers = [
@@ -115,31 +71,29 @@ export const defaultPlayers = [
 export const formatDate = (date, specificPortion) => {
   let hours = date.getHours();
   let minutes = date.getMinutes();
-  let ampm = hours >= 12 ? 'PM' : 'AM';
+  let ampm = hours >= 12 ? `PM` : `AM`;
   hours = hours % 12;
-  hours = hours ? hours : 12; // the hour '0' should be '12'
-  minutes = minutes < 10 ? '0' + minutes : minutes;
-  let strTime = hours + ':' + minutes + ' ' + ampm;
-  let completedDate = strTime + ` ` + (date.getMonth() + 1) + "/" + date.getDate() + "/" + date.getFullYear();
+  hours = hours ? hours : 12; // the hour `0` should be `12`
+  minutes = minutes < 10 ? `0` + minutes : minutes;
+  let strTime = hours + `:` + minutes + ` ` + ampm;
+  let completedDate = strTime + ` ` + (date.getMonth() + 1) + `/` + date.getDate() + `/` + date.getFullYear();
   if (specificPortion == `time`) {
     completedDate = strTime;
   } else if (specificPortion == `date`) {
-    completedDate = (date.getMonth() + 1) + "/" + date.getDate() + "/" + date.getFullYear();
+    completedDate = (date.getMonth() + 1) + `/` + date.getDate() + `/` + date.getFullYear();
   } else {
-    completedDate = strTime + ` ` + (date.getMonth() + 1) + "/" + date.getDate() + "/" + date.getFullYear();
+    completedDate = strTime + ` ` + (date.getMonth() + 1) + `/` + date.getDate() + `/` + date.getFullYear();
   }
   return completedDate;
 };
 
 export const generateUniqueID = (existingIDs, name) => {
-
   let newID = Math.random().toString(36).substr(2, 9);
   if (existingIDs && existingIDs.length > 0) {
     while (existingIDs.includes(newID)) {
       newID = Math.random().toString(36).substr(2, 9);
     }
   }
-
   if (name && existingIDs && existingIDs.length > 0) {
     return `${name}_${existingIDs.length + 1}_${formatDate(new Date())}_${newID}`.replace(/\s+/g, `_`).replace(/[:/]/g, `_`);
   } else if (name && !existingIDs) {
@@ -147,7 +101,6 @@ export const generateUniqueID = (existingIDs, name) => {
   } else {
     return `${formatDate(new Date())}_${newID}`.replace(/\s+/g, `_`).replace(/[:/]/g, `_`);
   }
-
 };
 
 export const dev = (item, source) => {
@@ -163,8 +116,6 @@ export const dev = (item, source) => {
   }
 }
 
-export const defaultContent = `Hey, I’m Rakib, a Software Engineer @ Mitsubishi Electric Trane HVAC US, or just Mitsubishi Electric for short. Along with my 7 years of experience as a developer, and owner of my own tech and digital media side business, Piratechs. This website is just for me to test out Next.js 13.`;
-
 export const setThemeUI = () => {
   localStorage.setItem(`alertOpen`, false);
   document.documentElement.setAttribute(`data-theme`, `dark`);
@@ -178,7 +129,7 @@ export const getNumberFromString = (string) => {
 }
 
 export const createXML = (xmlString) => {
-  let div = document.createElement('div');
+  let div = document.createElement(`div`);
   div.innerHTML = xmlString.trim();
   return div.firstChild;
 }
@@ -351,7 +302,9 @@ export const showAlert = async (title, component, width, height) => {
         document.body.removeChild(overlay);
         localStorage.setItem(`alertOpen`, false);
       }, 300);
-    }} className={`alertButton iconButton`}>X</button>
+    }} className={`alertButton iconButton`}>
+      <span>X</span>
+    </button>
   </>);
 
   overlay.appendChild(alertDialog);

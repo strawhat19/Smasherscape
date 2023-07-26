@@ -1071,8 +1071,16 @@ textarea {
     align-items: center;
     justify-content: center;
     backdrop-filter: blur(5px);
-    background: rgba(59, 54, 48, 0.75);
     // background: rgba(0, 40, 46, 0.5);
+    // background: rgba(59, 54, 48, 0.75);
+    background: rgba(24, 24, 24, 0.65);
+}
+
+.textGradient {
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent;
+    -webkit-background-clip: text !important;
+    background: var(--xurukoGradientBlueGreen);
 }
 
 .alert {
@@ -1086,23 +1094,64 @@ textarea {
     flex-direction: column;
     backdrop-filter: blur(5px);
     justify-content: flex-start;
+    // background: var(--alertBG);
     transition: var(--transition);
     box-shadow: 0 0 8px 0px black;
     // background: var(--blackGlass);
     border-radius: var(--borderRadius);
-    background: var(--alertBG);
     // background: rgba(59, 54, 48, 0.75);
     // background: rgba(1, 47, 74, 0.75);
     // background: rgba(0, 194, 255, 0.4);
+    background: var(--xurukoGradientBlueGreenTransparent);
+
+    h1 {
+        font-size: 1.75em;
+    }
+
+    .alertInner {
+        width: 100%;
+        overflow: overlay;
+        font-size: 1.75em;
+        max-height: 535px;
+        padding: 0 1em 0 0;
+        text-shadow: 2px 2px 0px black;
+        @media (max-width: 1200px) {
+            font-size: 1.35em;
+        }
+    }
+
+    button {
+        span {
+            @extend .textGradient;
+        }
+    }
 
     .alertTitle {
         width: 95%;
         color: white;
         font-weight: 600;
         font-size: 2.5em;
+        position: relative;
         border-radius: 3px 3px;
+        transition: var(--transition);
         text-shadow: 2px 2px 0px black;
-        border-bottom: 4px solid var(--smasherscapeGreen);
+        // border-bottom: 4px solid var(--smasherscapeGreen);
+        &::after {
+            left: 0;
+            content: "";
+            bottom: -2px;
+            width: 100%;
+            height: 5px;
+            border-radius: 8px;
+            position: absolute;
+            background: var(--xurukoGradientGreenBlue);
+        }
+        @media (max-width: 1400px) {
+            font-size: 2.1em;
+        }
+        @media (max-width: 1200px) {
+            font-size: 1.75em;
+        }
     }
 
     .inner {
@@ -1172,8 +1221,7 @@ textarea {
         }
     }
 
-    h3,
-    p {
+    h3, p {
         padding: 5px 0;
         text-align: center;
     }

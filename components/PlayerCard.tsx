@@ -40,14 +40,14 @@ export default function PlayerCard(props) {
             <div className="cardTopRow">
                 <div className="logoWithWords">
                     <img width={70} src={`${publicAssetLink}/assets/smasherscape/OSRS_Top_Hat.png?raw=true`} alt={`Tophat Logo`} />
-                    <h3>Xuruko's<br />SmasherScape</h3>
+                    <h3 className={`blackTextShadow slimmed`}>Xuruko's<br />SmasherScape</h3>
                 </div>
-                <h2>{plyr?.name}</h2>
+                <h2 className={`bluePurpleTextShadow`}>{plyr?.name}</h2>
             </div>
             <div className="cardMiddleRow">
                 <div className="imgLeftCol">
                     <img className={`cardLevelImage`} width={150} src={calcPlayerLevelImage(plyr?.level?.name)} alt={plyr?.level?.name} />
-                    <h4 className={`levelName ${plyr?.level?.name.split(` `)[0]}`}>{plyr?.level?.name}</h4>
+                    <h4 className={`levelName blackTextShadow slimmed ${plyr?.level?.name.split(` `)[0]}`}>{plyr?.level?.name}</h4>
                 </div>
                 <div className="recordPlays">
                     <div className="record">
@@ -56,14 +56,14 @@ export default function PlayerCard(props) {
                     </div>
                     <div className="plays">
                         <h3 className={`greenRecordText`}>Plays</h3>
-                        <div className={`playsContainer`}>
+                        <div className={`playsContainer ${calcPlayerCharactersPlayed(plyr)?.length > 0 ? `populatedPlays` : ``}`}>
                             {calcPlayerCharactersPlayed(plyr)?.length > 0 ? calcPlayerCharactersPlayed(plyr).map((char, charIndex) => {
                                 return (
                                     <Badge title={`Played ${getCharacterTitle(char)} ${calcPlayerCharacterTimesPlayed(plyr, char)} Time(s)`} key={charIndex} badgeContent={calcPlayerCharacterTimesPlayed(plyr, char)} color="primary">
                                         <img className={`charImg`} width={35} src={calcPlayerCharacterIcon(char)} alt={getCharacterTitle(char)} />
                                     </Badge>
                                 )
-                            }) : <div className={`flex center`}>
+                            }) : <div className={`flex center blackTextShadow slimmed`}>
                                 No Plays Yet
                             </div>}
                         </div>
