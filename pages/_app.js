@@ -165,6 +165,12 @@ export const dev = (item, source) => {
 
 export const defaultContent = `Hey, I’m Rakib, a Software Engineer @ Mitsubishi Electric Trane HVAC US, or just Mitsubishi Electric for short. Along with my 7 years of experience as a developer, and owner of my own tech and digital media side business, Piratechs. This website is just for me to test out Next.js 13.`;
 
+export const setThemeUI = () => {
+  localStorage.setItem(`alertOpen`, false);
+  document.documentElement.setAttribute(`data-theme`, `dark`);
+  localStorage.setItem(`theme`, `dark`);
+}
+
 export const getNumberFromString = (string) => {
   let result = string.match(/\d+/);
   let number = parseInt(result[0]);
@@ -249,6 +255,18 @@ export const genUUIDNumbers = (existingIDs) => {
     newID = Math.floor(Math.random() * 1000000); // generate a random integer between 0 and 999999
   } while (existingIDs.includes(newID)); // keep generating a new ID until it's not already in the existing IDs array
   return newID;
+}
+
+export const setSideBarUI = () => {
+  let toc = document.querySelector(`.nextra-toc`);
+  let tocMinimized = JSON.parse(localStorage.getItem(`tocMinimized`));
+  if (toc) {
+    if (tocMinimized) {
+      toc.classList.add(`minimized`);
+    } else {
+      toc.classList.remove(`minimized`);
+    };
+  }
 }
 
 export const getRGBAColorFromHue = (hue, alpha) => {
@@ -402,6 +420,7 @@ export default function ProductIVF({ Component, pageProps, router }) {
     let [buttonText, setButtonText] = useState(`Next`);
     let [rearranging, setRearranging] = useState(false);
     let [content, setContent] = useState(`defaultContent`);
+    let [bodyClasses, setBodyClasses] = useState<string>(``);
     let [year, setYear] = useState(new Date().getFullYear());
     let [useLocalStorage, setUseLocalStorage] = useState(true);
 
@@ -411,36 +430,7 @@ export default function ProductIVF({ Component, pageProps, router }) {
     let [players, setPlayers] = useState(defaultPlayers);
     let [filteredPlayers, setFilteredPlayers] = useState(players);
 
-    useEffect(() => {
-      setLoading(true);
-      setAnimComplete(false);
-      setSystemStatus(`Page Loading!`);
-      if (loaded.current) return;
-      loaded.current = true;
-      localStorage.setItem(`alertOpen`, false);
-      let storedPlayers = JSON.parse(localStorage.getItem(`players`));
-      let storedUser = JSON.parse(localStorage.getItem(`user`));
-      
-      setDevEnv(dev());
-      setUpdates(updates);
-      setPlatform(navigator?.userAgent);
-      setYear(new Date().getFullYear());
-      setSystemStatus(`System Status Ok.`);
-      setRte(replaceAll(router.route, `/`, `_`));
-      setOnMac(navigator.platform.includes(`Mac`));
-      setPage(window.location.pathname.replace(`/`,``));
-      setMobile((typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1));
-
-      let toc = document.querySelector(`.nextra-toc`);
-      let tocMinimized = JSON.parse(localStorage.getItem(`tocMinimized`));
-      if (toc) {
-        if (tocMinimized) {
-          toc.classList.add(`minimized`);
-        } else {
-          toc.classList.remove(`minimized`);
-        };
-      }
-        
+    const setBrowserUI = () => {
       if (brwser == `` && (navigator.userAgent.match(/edg/i) || navigator.userAgent.includes(`edg`) || navigator.userAgent.includes(`Edg`))) {
         brwser = `edge`;
         setBrowser(`edge`);
@@ -457,7 +447,10 @@ export default function ProductIVF({ Component, pageProps, router }) {
         brwser = `opera`;
         setBrowser(`opera`);
       }
-      
+    }
+
+    const setPlayersUI = () => {
+      let storedPlayers = JSON.parse(localStorage.getItem(`players`));
       if (storedPlayers && useLocalStorage) {
         setPlayers(storedPlayers);
         setFilteredPlayers(storedPlayers);
@@ -466,9 +459,31 @@ export default function ProductIVF({ Component, pageProps, router }) {
         setPlayers(defaultPlayers);
         dev() && console.log(`Players`, getActivePlayers(defaultPlayers));
       }
+    }
 
-      document.documentElement.setAttribute(`data-theme`, `dark`);
-      localStorage.setItem(`theme`, `dark`);
+    useEffect(() => {
+      setLoading(true);
+      setAnimComplete(false);
+      setSystemStatus(`Page Loading!`);
+      if (loaded.current) return;
+      loaded.current = true;
+      
+      setDevEnv(dev());
+      setUpdates(updates);
+      setPlatform(navigator?.userAgent);
+      setYear(new Date().getFullYear());
+      setSystemStatus(`System Status Ok.`);
+      setRte(replaceAll(router.route, `/`, `_`));
+      setOnMac(navigator.platform.includes(`Mac`));
+      setPage(window.location.pathname.replace(`/`,``));
+      setMobile((typeof window.orientation !== `undefined`) || (navigator.userAgent.indexOf(`IEMobile`) !== -1));
+      
+      setBrowserUI();
+      setThemeUI();
+      setSideBarUI();
+      setPlayersUI();
+
+      setBodyClasses(`${rte} pageWrapContainer ${page.toUpperCase()} ${devEnv ? `devMode` : ``} ${onMac ? `isMac` : `isWindows`} ${mobile ? `mobile` : ``}`);
 
       setLoading(false);
       setSystemStatus(`${getPage()} Loaded.`);
@@ -487,7 +502,7 @@ export default function ProductIVF({ Component, pageProps, router }) {
 
     return <StateContext.Provider value={{ router, rte, setRte, updates, setUpdates, content, setContent, width, setWidth, user, setUser, page, setPage, mobileMenu, setMobileMenu, users, setUsers, authState, setAuthState, emailField, setEmailField, devEnv, setDevEnv, mobileMenuBreakPoint, platform, setPlatform, focus, setFocus, highScore, setHighScore, color, setColor, dark, setDark, colorPref, setColorPref, qotd, setQotd, alertOpen, setAlertOpen, mobile, setMobile, systemStatus, setSystemStatus, loading, setLoading, anim, setAnimComplete, IDs, setIDs, categories, setCategories, browser, setBrowser, onMac, rearranging, setRearranging, buttonText, setButtonText, gameFormStep, setGameFormStep, players, setPlayers, filteredPlayers, setFilteredPlayers, useLocalStorage, setUseLocalStorage, command, setCommand, commands, setCommands }}>
       {(browser != `chrome` || onMac) ? <AnimatePresence mode={`wait`}>
-        <motion.div className={`${rte} pageWrapContainer ${page.toUpperCase()} ${devEnv ? `devMode` : ``} ${onMac ? `isMac` : `isWindows`}`} key={router.route} initial="pageInitial" animate="pageAnimate" exit="pageExit" transition={{ duration: 0.35 }} variants={{
+        <motion.div className={bodyClasses} key={router.route} initial="pageInitial" animate="pageAnimate" exit="pageExit" transition={{ duration: 0.35 }} variants={{
           pageInitial: {
             opacity: 0,
             clipPath: `polygon(0 0, 100% 0, 100% 100%, 0% 100%)`,
@@ -503,8 +518,7 @@ export default function ProductIVF({ Component, pageProps, router }) {
         }}>
           <Component {...pageProps} />
         </motion.div>
-      </AnimatePresence> : <div className={`pageWrapContainer ${page.toUpperCase()} ${devEnv ? `devMode` : ``} 
-        ${onMac ? `isMac` : `isWindows`}`}>
+      </AnimatePresence> : <div className={bodyClasses}>
         <Component {...pageProps} />
       </div>}
     </StateContext.Provider>
