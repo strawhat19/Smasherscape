@@ -1173,14 +1173,22 @@ div[role="presentation"] {
     background: var(--xurukoGradientBlueGreenTransparent);
     // background: rgba(57, 57, 57, 0.4);
     .badges {
+        margin: 5px 0;
+        &.threeCol {
+            p {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
         p {
+            gap: 10px;
             width: 100%;
             display: grid;
+            align-items: center;
             grid-template-columns: repeat(5, 1fr);
             img {
                 width: auto;
                 margin: 5px auto;
-                text-align: center;@extend .center;
+                text-align: center;
             }
         }
     }
