@@ -40,7 +40,7 @@ export const defaultCommands = {
     command: `!upd`,
     description: `Update Leaderboard`,
     triggers: [`!upd`, `!update`, `!game`, `!match`],
-    example: `!upd winnerName 'beats' loserName loserStocksTakenFromWinner`,
+    example: `!upd winnerName beats loserName with characterPlayedByWinner vs characterPlayedByLoser loserStocksTakenFromWinner`,
   },
   Set: {
     id: 6,
