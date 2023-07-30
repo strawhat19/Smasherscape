@@ -25,11 +25,14 @@ html, body {
     --smasherscapePurple: #7b4e9b;
     --win: var(--smasherscapeGreen2);
     --smasherscapeBlue2Transparent: rgba(49, 168, 229, 0.35);
+    --smasherscapeBlue2Transparent2: rgba(49, 168, 229, 0.55);
     --smasherscapeGreen2Transparent: rgba(30, 220, 120, 0.35);
+    --smasherscapeGreen2Transparent2: rgba(30, 220, 120, 0.55);
     --xurukoGradientGreenBlue: linear-gradient(90deg, var(--smasherscapeGreen2), var(--smasherscapeBlue2));
     --xurukoGradientBlueGreen: linear-gradient(90deg, var(--smasherscapeBlue2), var(--smasherscapeGreen2));
     --xurukoGradientGreenBlueTransparent: linear-gradient(90deg, var(--smasherscapeGreen2Transparent), var(--smasherscapeBlue2Transparent));
     --xurukoGradientBlueGreenTransparent: linear-gradient(90deg, var(--smasherscapeBlue2Transparent), var(--smasherscapeGreen2Transparent));
+    --xurukoGradientBlueGreenTransparentSubtle: linear-gradient(90deg, var(--smasherscapeBlue2Transparent2), var(--smasherscapeGreen2Transparent2));
 }
 
 @font-face {
