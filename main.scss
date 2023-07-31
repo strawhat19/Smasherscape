@@ -1099,9 +1099,9 @@ textarea {
     box-shadow: 0 0 8px 0px black;
     // background: var(--blackGlass);
     border-radius: var(--borderRadius);
-    // background: rgba(59, 54, 48, 0.75);
     // background: rgba(1, 47, 74, 0.75);
     // background: rgba(0, 194, 255, 0.4);
+    // background: rgba(59, 54, 48, 0.75);
     background: var(--xurukoGradientBlueGreenTransparentSubtle);
 
     h1 {
@@ -1207,7 +1207,7 @@ textarea {
         position: absolute;
         background: black;
         font-weight: 900;
-        font-size: 16px;
+        font-size: 20px;
         // filter: invert(1);
         color: var(--smasherscapeGreen);
         right: 15px;
@@ -1216,6 +1216,10 @@ textarea {
         display: flex;
         justify-content: center;
         align-items: center;
+        span {
+            top: 2px;
+            position: relative;
+        }
         &:hover {
             color: white;
         }

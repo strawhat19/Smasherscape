@@ -7,6 +7,7 @@ import Level from '../models/Level';
 import Player from '../models/Player';
 import PlayerForm from './PlayerForm';
 import PlayerCard from './PlayerCard';
+import CommandsForm from './CommandsForm';
 import { StateContext } from '../pages/_app';
 import Experience from '../models/Experience';
 import { Characters } from '../common/Characters';
@@ -97,9 +98,10 @@ export const isInvalid = (item) => {
 }
 
 export default function Smasherscape(props) {
-    const { filteredPlayers } = useContext<any>(StateContext);
+    const { filteredPlayers, devEnv } = useContext<any>(StateContext);
 
     return <Main className={`smasherscapeLeaderboard`}>
+        {devEnv && <CommandsForm />}
         <PlayerForm />
         <div id={props.id} className={`${props.className} playerGrid ${getActivePlayers(filteredPlayers)?.length == 0 ? `empty` : `populated`}`}>
             {getActivePlayers(filteredPlayers)?.length == 0 && <>

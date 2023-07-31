@@ -40,7 +40,7 @@ export const defaultCommands = {
     command: `!upd`,
     description: `Update Leaderboard`,
     triggers: [`!upd`, `!update`, `!game`, `!match`],
-    example: `!upd winnerName beats loserName with characterPlayedByWinner vs characterPlayedByLoser loserStocksTakenFromWinner`,
+    example: `!upd winner vs loser with winChar vs loseChar stocksTakenFromWinner`,
   },
   Set: {
     id: 6,
@@ -79,7 +79,7 @@ export function Commands(props) {
           <li className={`listedCommand`} key={commIndex} title={`${comm?.description}: ${commandMessage}`}>
             <span className="commandIndex">{commIndex + 1}.</span>
             <div className="commandDetails flex gap15">
-              <CodeBlock id={`comm-${comm?.id}`} language={`js`}>
+              <CodeBlock custombutton={false} id={`comm-${comm?.id}`} language={`js`}>
                 {commandMessage}
               </CodeBlock>
               <div className={`desc`}>{comm?.description}</div>

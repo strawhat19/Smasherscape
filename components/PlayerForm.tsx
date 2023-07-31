@@ -4,7 +4,7 @@ import Stock from '../models/Stock';
 import Level from '../models/Level';
 import { Badge } from '@mui/material';
 import Player from '../models/Player';
-import { Commands } from './Commands';
+import { Commands, defaultCommands } from './Commands';
 import Experience from '../models/Experience';
 import TextField from '@mui/material/TextField';
 import { Characters } from '../common/Characters';
@@ -395,6 +395,34 @@ export default function PlayerForm(props) {
                 }}
             />
         </div>
+        {/* <div className={`inputWrapper materialBGInputWrapper`}>
+            <div className="inputBG materialBG"></div>
+            <Autocomplete
+                disablePortal
+                autoHighlight
+                ref={commandsInput}
+                id="combo-box-demo"
+                sx={{ width: `100%` }}
+                options={Object.values(defaultCommands).map((comm: Command) => {
+                    return {
+                        ...comm,
+                        label: comm.example ? comm.example : comm.command,
+                    }
+                })}
+                getOptionLabel={(option) => option.label}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
+                renderInput={(params) => <TextField name={`commands`} {...params} label="Commands..." />}
+                renderOption={(props: any, option: any) => {
+                    return (
+                        <div key={props?.key} {...props}>
+                            <div className="autocompleteOption">
+                                {option.label}
+                            </div>
+                        </div>
+                    )
+                }}
+            />
+        </div> */}
         <div className={`inputWrapper`}><div className="inputBG"></div><input ref={commandsInput} type="text" className="commands" name={`commands`} placeholder={`Commands...`} /></div>
         <button className={`formSubmitButton`} type={`submit`}>Submit</button>
     </form>

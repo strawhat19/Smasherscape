@@ -556,7 +556,22 @@ footer {
     grid-gap: 0;
     flex-direction: column;
     .commandsForm {
-        grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+        gap: 15px;
+        grid-template-columns: 1fr;
+        transition: var(--transition);
+        .commandInputs {
+            display: grid;
+            grid-template-columns: 1fr 250px 1fr;
+            &.collapsed {
+                margin: 0;
+                opacity: 0;
+                height: 0px;
+                pointer-events: none;
+            }
+            &.expanded {
+                height: 100%;
+            }
+        }
         .inputWrapper {
             width: 100%;
         }
@@ -733,6 +748,9 @@ div[role="presentation"] {
     width: 96.5% !important;
     transition: var(--transition);
     background: transparent !important;
+    &.singularLabel {
+        grid-template-columns: 1fr;
+    }
     grid-template-columns: 20px 35px 1fr;
     font-family: "RuneScape Chat Bold", Montserrat, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
         Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
@@ -869,6 +887,15 @@ div[role="presentation"] {
     gap: 10px;
     display: grid;
     text-align: left;
+    &.commandToCopy {
+        width: 95%;
+        margin: 0 auto;
+        li {
+            .commandDetails {
+                grid-gap: 10px !important;
+            }
+        }
+    }
     li {
         display: flex;
         grid-gap: 10px;
@@ -1237,8 +1264,20 @@ div[role="presentation"] {
     width: 100%;
     text-shadow: 1px 1px 0px black;
     div {
-       &.nx-absolute.nx-top-0 {
-        font-size: 1.25em;
+       &[data-custombutton="false"] {
+           height: 100%;
+           font-size: 1.25em;
+           align-items: center;
+           margin: 0 0.3em 0 0;
+       } 
+       &[data-custombutton="true"] {
+            align-items: end;
+            button {
+                max-width: 30px;
+                * {
+                    height: 100%;
+                }
+            }
        } 
     }
     pre {
