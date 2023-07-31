@@ -101,7 +101,7 @@ export default function Smasherscape(props) {
     const { filteredPlayers, devEnv } = useContext<any>(StateContext);
 
     return <Main className={`smasherscapeLeaderboard`}>
-        {devEnv && <CommandsForm />}
+        <CommandsForm />
         <PlayerForm />
         <div id={props.id} className={`${props.className} playerGrid ${getActivePlayers(filteredPlayers)?.length == 0 ? `empty` : `populated`}`}>
             {getActivePlayers(filteredPlayers)?.length == 0 && <>

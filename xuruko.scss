@@ -525,16 +525,6 @@ button[title="Change theme"] {
     }
 }
 
-// .isMac {
-//     &.devMode {
-//         .nextra-nav-container-blur {
-//             &::after {
-//                 top: 2px;
-//             }
-//         }
-//     }
-// }
-
 footer {
     z-index: 0;
     position: relative;
@@ -561,7 +551,28 @@ footer {
         transition: var(--transition);
         .commandInputs {
             display: grid;
-            grid-template-columns: 1fr 250px 1fr;
+            grid-template-columns: 1fr;
+            transition: var(--transition);
+            .updateRow {
+                gap: 15px;
+                display: grid;
+                transition: var(--transition);
+                grid-template-columns: 1fr 350px 1fr;
+                padding: 5px 0 0;
+                &.collapsed {
+                    margin: 0;
+                    opacity: 0;
+                    height: 0px;
+                    pointer-events: none;
+                }
+                &.expanded {
+                    height: 100%;
+                }
+                &.updateBottomRow {
+                    width: 85%;
+                    margin: 0 auto;
+                }
+            }
             &.collapsed {
                 margin: 0;
                 opacity: 0;
@@ -670,12 +681,6 @@ form {
     background: var(--xurukoGradientGreenBlue) !important;
 }
 
-.Mui-focused {
-    label {
-        top: 15px;
-    }
-}
-
 .MuiAutocomplete-popupIndicatorOpen {
     justify-content: flex-end !important;
     flex-direction: row-reverse;
@@ -699,11 +704,14 @@ form {
 }
 
 .MuiAutocomplete-root {
-    .MuiFormLabel-root {
-        color: black;
-        padding: 5px 0 0 10px;
-        font-family: "RuneScape Chat Bold", Montserrat, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-        Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+    .MuiTextField-root {
+        padding-top: 1em;
+        .MuiFormLabel-root {
+            color: black;
+            padding: 15px 0 0 10px;
+            font-family: "RuneScape Chat Bold", Montserrat, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+            Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+        }
     }
 }
 
@@ -730,9 +738,13 @@ div[role="presentation"] {
     z-index: 99 !important;
     width: 95% !important;
     border-radius: 8px;
-    display: flex;
+    max-width: 350px;
     margin: 0 auto;
+    display: flex;
     grid-gap: 5px;
+    * {
+        width: 100%;
+    }
     font-family: "RuneScape Chat Bold", Montserrat, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
         Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
 }
@@ -748,15 +760,15 @@ div[role="presentation"] {
     width: 96.5% !important;
     transition: var(--transition);
     background: transparent !important;
+    &.characterOption {
+        grid-template-columns: 20px 35px 10px 1fr;
+    }
     &.singularLabel {
         grid-template-columns: 1fr;
     }
     grid-template-columns: 20px 35px 1fr;
     font-family: "RuneScape Chat Bold", Montserrat, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
         Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
-    // &:hover {
-    //     background: white;
-    // }
     .levelImageColumn {
         text-align: left;
     }

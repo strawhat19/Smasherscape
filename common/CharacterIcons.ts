@@ -102,7 +102,7 @@ export const calcPlayerCharacterIcon = (char) => {
     } else if (char == `miigunner` || char == `gunner` || char == `mg` || Characters[char] == Characters.MiiGunner || char == Characters.MiiGunner || char == Characters.MiiGunner.toLowerCase()) {
         return `${publicAssetImageLink}/MiiGunner.webp`;
     } else if (char == `miiswordfighter` || char == `swordfighter` || char == `ms` || Characters[char] == Characters.MiiSwordFighter || char == Characters.MiiSwordFighter || char == Characters.MiiSwordFighter.toLowerCase()) {
-        return `${publicAssetImageLink}/MiiSwordFighter.webp`;
+        return `${publicAssetImageLink}/MiiSwordfighter.webp`;
     } else if (char == `minmin` || char == `min` || Characters[char] == Characters.MinMin || char == Characters.MinMin || char == Characters.MinMin.toLowerCase()) {
         return `${publicAssetImageLink}/MinMin.webp`;
     } else if (char == `mrgame&watch` || char == `gnw` || char == `game&watch` || char == `mrgameandwatch` || char == `gameandwatch` || Characters[char] == Characters.MrGameAndWatch || char == Characters.MrGameAndWatch || char == Characters.MrGameAndWatch.toLowerCase()) {
@@ -126,7 +126,7 @@ export const calcPlayerCharacterIcon = (char) => {
     } else if (char == `pit` || Characters[char] == Characters.Pit || char == Characters.Pit || char == Characters.Pit.toLowerCase()) {
         return `${publicAssetImageLink}/Pit.webp`;
     } else if (char == `pokemontrainer` || char == `pt` || Characters[char] == Characters.PokemonTrainer || char == Characters.PokemonTrainer || char == Characters.PokemonTrainer.toLowerCase()) {
-        return `${publicAssetImageLink}/PokemonTrainer.webp`;
+        return `${publicAssetImageLink}/PokémonTrainer.webp`;
     } else if (char == `richter` || char == `ri` || Characters[char] == Characters.Richter || char == Characters.Richter || char == Characters.Richter.toLowerCase()) {
         return `${publicAssetImageLink}/Richter.webp`;
     } else if (char == `ridley` || char == `rid` || Characters[char] == Characters.Ridley || char == Characters.Ridley || char == Characters.Ridley.toLowerCase()) {
@@ -140,7 +140,7 @@ export const calcPlayerCharacterIcon = (char) => {
     } else if (char == `roy` || Characters[char] == Characters.Roy || char == Characters.Roy || char == Characters.Roy.toLowerCase()) {
         return `${publicAssetImageLink}/Roy.webp`;
     } else if (char == `ryu` || Characters[char] == Characters.Ryu || char == Characters.Ryu || char == Characters.Ryu.toLowerCase()) {
-        return `${publicAssetImageLink}/Ryu.webp`;
+        return `${publicAssetImageLink}/Ryu.png`;
     } else if (char == `samus` || char == `samu` || Characters[char] == Characters.Samus || char == Characters.Samus || char == Characters.Samus.toLowerCase()) {
         return `${publicAssetImageLink}/Samus.webp`;
     } else if (char == `sephiroth` || char == `sephi` || char == `seph` || Characters[char] == Characters.Sephiroth || char == Characters.Sephiroth || char == Characters.Sephiroth.toLowerCase()) {

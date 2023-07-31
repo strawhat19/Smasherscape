@@ -203,15 +203,19 @@ export default function PlayerForm(props) {
 
     const updatePlayers = (commandParams) => {
         let playerOne = commandParams[1].toLowerCase();
+        let condition = commandParams[2].toLowerCase();
         let playerTwo = commandParams[3].toLowerCase();
         let date = moment().format(`h:mm:ss a, MMMM Do YYYY`);
+
+        let playerOneDB: Player = players.find(plyr => plyr?.name.toLowerCase() == playerOne || plyr?.name.toLowerCase().includes(playerOne));
+        let playerTwoDB: Player = players.find(plyr => plyr?.name.toLowerCase() == playerTwo || plyr?.name.toLowerCase().includes(playerTwo));
 
         let characterOne;
         let characterTwo;
         let stocksTaken;
 
-        let playerOneDB: Player = players.find(plyr => plyr?.name.toLowerCase() == playerOne || plyr?.name.toLowerCase().includes(playerOne));
-        let playerTwoDB: Player = players.find(plyr => plyr?.name.toLowerCase() == playerTwo || plyr?.name.toLowerCase().includes(playerTwo));
+        let winCons = [`beats`, `defeats`, `conquers`, `vanquishes`, `fells`, `kills`];
+        let loseCons = [`loses-to`, `falls-to`, `defeated-by`];
 
         if (commandParams.length >= 8) {
             characterOne = commandParams[5].toLowerCase();
@@ -219,9 +223,16 @@ export default function PlayerForm(props) {
             stocksTaken = parseInt(commandParams[8]) || 0;
         }
 
+        console.log(`Condition`, condition);
+
         if (!playerOneDB || !playerTwoDB) {
             showAlert(`Can't Find Players`, <h1>
                 Can't find players with those names.
+            </h1>, `65%`, `35%`);
+            return;
+        } else if (!winCons.includes(condition) && !loseCons.includes(condition)) {
+            showAlert(`Missing Condition`, <h1>
+                Did player one win or lose?
             </h1>, `65%`, `35%`);
             return;
         } else if (!characterOne || !characterTwo) {
@@ -234,17 +245,29 @@ export default function PlayerForm(props) {
                 Can't find characters with those names.
             </h1>, `65%`, `35%`);
             return;
+        } else if (stocksTaken >= 3) {
+            showAlert(`Invalid Stocks Taken`, <h1>
+                Stocks taken should be less than 3.
+            </h1>, `65%`, `35%`);
+            return;
         } else {
 
+            let winner = winCons.includes(condition) ? playerOne : playerTwo;
+            let loser = winCons.includes(condition) ? playerTwo : playerOne;
+            let winnerDB: Player = players.find(plyr => plyr?.name.toLowerCase() == winner || plyr?.name.toLowerCase().includes(winner));
+            let loserDB: Player = players.find(plyr => plyr?.name.toLowerCase() == loser || plyr?.name.toLowerCase().includes(loser));
+            let winChar = winCons.includes(condition) ? Characters[characterOne] : Characters[characterTwo];
+            let loseChar = winCons.includes(condition) ? Characters[characterTwo] : Characters[characterOne];
+            
             let stocks: Stock[] = [
                 {
-                    character: Characters[characterOne],
+                    character: winChar,
                 }, 
                 {
-                    character: Characters[characterOne],
+                    character: winChar,
                 }, 
                 {
-                    character: Characters[characterOne],
+                    character: winChar,
                 }
             ].map((stk: Stock, stkIndex) => {
                 if (stkIndex < stocksTaken) {
@@ -261,27 +284,27 @@ export default function PlayerForm(props) {
 
             let lossStocks: Stock[] = [
                 {
-                    character: Characters[characterTwo],
+                    character: loseChar,
                     dead: true
                 }, 
                 {
-                    character: Characters[characterTwo],
+                    character: loseChar,
                     dead: true
                 }, 
                 {
-                    character: Characters[characterTwo],
+                    character: loseChar,
                     dead: true
                 }
             ];
 
             let updatedPlayers: Player[] = players.map((plyr: Player) => {
-                if (plyr?.name.toLowerCase() == playerOne || plyr?.name.toLowerCase().includes(playerOne)) {
+                if (plyr?.name.toLowerCase() == winner || plyr?.name.toLowerCase().includes(winner)) {
                     plyr.experience.arenaXP = (plyr?.xpModifier ? (plyr.experience.arenaXP * plyr?.xpModifier) : plyr.experience.arenaXP) + 400;
                     plyr.plays.push({
-                        otherCharacter: Characters[characterTwo],
-                        character: Characters[characterOne],
-                        winner: playerOneDB?.name,
-                        loser: playerTwoDB?.name,
+                        otherCharacter: loseChar,
+                        winner: winnerDB?.name,
+                        loser: loserDB?.name,
+                        character: winChar,
                         stocksTaken,
                         lossStocks,
                         stocks,
@@ -291,13 +314,13 @@ export default function PlayerForm(props) {
                     calcPlayerLevelAndExperience(plyr);
 
                     return plyr as Player;
-                } else if (plyr?.name.toLowerCase() == playerTwo || plyr?.name.toLowerCase().includes(playerTwo)) {
+                } else if (plyr?.name.toLowerCase() == loser || plyr?.name.toLowerCase().includes(loser)) {
                     plyr.experience.arenaXP = (plyr?.xpModifier ? (plyr.experience.arenaXP * plyr?.xpModifier) : plyr.experience.arenaXP) + (100 * stocksTaken);
                     plyr.plays.push({
-                        otherCharacter: Characters[characterOne],
-                        character: Characters[characterTwo],
-                        winner: playerOneDB?.name,
-                        loser: playerTwoDB?.name,
+                        otherCharacter: winChar,
+                        winner: winnerDB?.name,
+                        loser: loserDB?.name,
+                        character: loseChar,
                         stocksTaken,
                         lossStocks,
                         stocks,
