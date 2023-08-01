@@ -27,23 +27,39 @@ export default function PlayerForm(props) {
     const commandsInput = useRef();
     const { players, setPlayers, filteredPlayers, setFilteredPlayers, devEnv, useLocalStorage, commands } = useContext<any>(StateContext);
 
-    const searchPlayers = (e: any, value?: any) => {
+    const searchPlayers = (e: any, value?: any, type?) => {
         let field = e.target as HTMLInputElement;
         if (field && field.name == `commands`) return;
         if (!value) value = field.value;
         if (value && value != ``) {
-            if (typeof value == `string`) {
-                setFilteredPlayers(players.filter((plyr: Player) => {
-                    return Object.values(plyr).some(val =>
-                        typeof val === `string` && val.toLowerCase().includes(value?.toLowerCase())
-                    );
-                }));
+            if (type == `playerName`) {
+                if (typeof value == `string`) {
+                    setFilteredPlayers(players.filter((plyr: Player) => {
+                        return Object.values(plyr).some(val =>
+                            typeof val === `string` && val.toLowerCase().includes(value?.toLowerCase())
+                        );
+                    }));
+                } else {
+                    setFilteredPlayers(players.filter((plyr: Player) => {
+                        return Object.values(plyr).some(val =>
+                            typeof val === `string` && val.toLowerCase().includes(value?.name?.toLowerCase())
+                        );
+                    }));
+                }
             } else {
-                setFilteredPlayers(players.filter((plyr: Player) => {
-                    return Object.values(plyr).some(val =>
-                        typeof val === `string` && val.toLowerCase().includes(value?.name?.toLowerCase())
-                    );
-                }));
+                if (typeof value == `string`) {
+                    setFilteredPlayers(players.filter((plyr: Player) => {
+                        return plyr.plays.map(ply => ply.character).some(char =>
+                            typeof char === `string` && char.toLowerCase().includes(value?.toLowerCase())
+                        );
+                    }));
+                } else {
+                    setFilteredPlayers(players.filter((plyr: Player) => {
+                        return plyr.plays.map(ply => ply.character).some(char =>
+                            typeof char === `string` && char.toLowerCase().includes(value?.label?.toLowerCase())
+                        );
+                    }));
+                }
             }
         } else {
             setFilteredPlayers(players);
@@ -65,6 +81,17 @@ export default function PlayerForm(props) {
         showAlert(`Here are the RukoBot Commands so far: (Hover to Click to Copy)`, <div className={`alertInner`}>
             <Commands commands={commands} devEnv={devEnv} />
         </div>, `85%`, `auto`);
+    }
+
+    const getCharacterObjs = () => {
+        return Object.entries(Characters).filter(char => char[0] === char[0].charAt(0).toUpperCase() + char[0].slice(1)).map((char, charIndex) => {
+            return {
+                id: charIndex + 1,
+                key: char[0],
+                label: char[1],
+                image: calcPlayerCharacterIcon(char[0])
+            }
+        })
     }
 
     const addPlayers = (commandParams) => {
@@ -223,8 +250,6 @@ export default function PlayerForm(props) {
             stocksTaken = parseInt(commandParams[8]) || 0;
         }
 
-        console.log(`Condition`, condition);
-
         if (!playerOneDB || !playerTwoDB) {
             showAlert(`Can't Find Players`, <h1>
                 Can't find players with those names.
@@ -236,11 +261,13 @@ export default function PlayerForm(props) {
             </h1>, `65%`, `35%`);
             return;
         } else if (!characterOne || !characterTwo) {
+            console.log(`Missing Characters`, !characterOne, !characterTwo);
             showAlert(`Missing Characters`, <h1>
                 Which Charcaters Did They Play?
             </h1>, `65%`, `35%`);
             return;
         } else if (!Characters[characterOne] || !Characters[characterTwo]) {
+            console.log(`Cannot Find Characters`, !Characters[characterOne], !Characters[characterTwo]);
             showAlert(`Cannot Find Characters`, <h1>
                 Can't find characters with those names.
             </h1>, `65%`, `35%`);
@@ -386,10 +413,10 @@ export default function PlayerForm(props) {
                     }
                 })}
                 getOptionLabel={(option) => option.label}
-                onChange={(e, val: any) => searchPlayers(e, val)}
-                onInputChange={(e, val: any) => searchPlayers(e, val)}
+                onChange={(e, val: any) => searchPlayers(e, val, `playerName`)}
+                onInputChange={(e, val: any) => searchPlayers(e, val, `playerName`)}
                 isOptionEqualToValue={(option, value) => option.id === value.id}
-                renderInput={(params) => <TextField name={`search`} onBlur={(e) => searchBlur(e, filteredPlayers)} {...params} label="Search..." />}
+                renderInput={(params) => <TextField name={`search`} onBlur={(e) => searchBlur(e, filteredPlayers)} {...params} label="Search Player(s) by Name..." />}
                 renderOption={(props: any, option: any) => {
                     return (
                         <div key={props?.key} {...props}>
@@ -445,6 +472,32 @@ export default function PlayerForm(props) {
             />
         </div> */}
         <div id={`commandsInput`} className={`inputWrapper`}><div className="inputBG"></div><input ref={commandsInput} type="text" className="commands" name={`commands`} placeholder={`Commands...`} /></div>
+        <div className={`characterSearchAuto inputWrapper materialBGInputWrapper`}>
+            <div className="inputBG materialBG"></div>
+            <Autocomplete
+                autoHighlight
+                id="combo-box-demo"
+                sx={{ width: `100%` }}
+                options={getCharacterObjs()}
+                getOptionLabel={(option) => option.label}
+                onChange={(e, val: any) => searchPlayers(e, val, `searchCharacters`)}
+                onInputChange={(e, val: any) => searchPlayers(e, val, `searchCharacters`)}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
+                renderInput={(params) => <TextField name={`characters`} {...params} label="Search Player(s) by Character..." />}
+                renderOption={(props: any, option: any) => {
+                    return (
+                        <div key={props?.key} {...props}>
+                            <div className="autocompleteOption characterOption">
+                                <div className="characterIndex">{option?.id}</div>
+                                <img className={`charImg`} width={25} src={option.image} alt={option.label} />
+                                <div className="spacer"></div>
+                                <div className="characterName">{option?.label}</div>
+                            </div>
+                        </div>
+                    )
+                }}
+            />
+        </div>
         <button className={`formSubmitButton`} type={`submit`}>Submit</button>
     </form>
 </section>

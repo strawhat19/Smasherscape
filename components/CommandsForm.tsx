@@ -22,7 +22,7 @@ export default function CommandsForm(props) {
     const setDefaultCommand = (e, val) => {
         if (val) {
             if (typeof val == `string`) {
-                console.log(val);
+                return;
             } else {
                 setCommand(val);
             }
@@ -82,18 +82,14 @@ export default function CommandsForm(props) {
         if (val) {
             if (whichPlayer == 1) {
                 if (typeof val == `string`) {
-                    console.log(`adjustCharacters`, val);
                     setCharOne(val);
                 } else {
-                    console.log(`adjustCharacters`, val);
                     setCharOne(val.key);
                 }
             } else {
                 if (typeof val == `string`) {
-                    console.log(`adjustCharacters`, val);
                     setCharTwo(val);
                 } else {
-                    console.log(`adjustCharacters`, val);
                     setCharTwo(val.key);
                 }
             }
@@ -123,24 +119,14 @@ export default function CommandsForm(props) {
         let playerForm: any = document.querySelector(`#playerForm`);
         let commandsInput: any = document.querySelector(`#commandsInput input`);
         let commandToRender = document.querySelector(`#commandToRender`);
-        if (commandsInput && playerForm) {
-            commandsInput.value = commandToRender.innerHTML;
-            playerForm.submit(e);
-        }
+        // if (commandsInput && playerForm) {
+        //     commandsInput.value = commandToRender.innerHTML;
+        //     playerForm.submit();
+        // }
     }
 
     return (
         <section className={`formsSection`}>
-            <ul className="commandsList commandToCopy">
-                <li className={`listedCommand`} title={renderCommand(command)}>
-                    <div className="commandDetails flex gap15">
-                        <CodeBlock custombutton={true} id={`commandToRender`} language={`js`}>
-                            {renderCommand(command)}
-                        </CodeBlock>
-                        {/* <div className={`desc`}>{command?.description}</div> */}
-                    </div>
-                </li>
-            </ul>
             <form onSubmit={(e) => submitCommandsForm(e)} className={`commandsForm gridForm`} action="submit">
                 <div className={`commandsSearch inputWrapper materialBGInputWrapper`}>
                     <div className="inputBG materialBG"></div>
@@ -291,7 +277,7 @@ export default function CommandsForm(props) {
                                 autoHighlight
                                 id="combo-box-demo"
                                 sx={{ width: `100%` }}
-                                options={getCharacterObjs().filter(cha => cha.key != charTwo)}
+                                options={getCharacterObjs()}
                                 getOptionLabel={(option) => option.label}
                                 onChange={(e, val: any) => adjustCharacters(e, val, 1)}
                                 onInputChange={(e, val: any) => adjustCharacters(e, val, 1)}
@@ -340,7 +326,7 @@ export default function CommandsForm(props) {
                                 autoHighlight
                                 id="combo-box-demo"
                                 sx={{ width: `100%` }}
-                                options={getCharacterObjs().filter(cha => cha.key != charOne)}
+                                options={getCharacterObjs()}
                                 getOptionLabel={(option) => option.label}
                                 onChange={(e, val: any) => adjustCharacters(e, val, 2)}
                                 onInputChange={(e, val: any) => adjustCharacters(e, val, 2)}
@@ -364,6 +350,16 @@ export default function CommandsForm(props) {
                 </div>
                 <button className={`formSubmitButton`} type={`submit`}>Submit</button>
             </form>
+            <ul className="commandsList commandToCopy">
+                <li className={`listedCommand`} title={renderCommand(command)}>
+                    <div className="commandDetails flex gap15">
+                        <CodeBlock custombutton={true} id={`commandToRender`} language={`js`}>
+                            {renderCommand(command)}
+                        </CodeBlock>
+                        {/* <div className={`desc`}>{command?.description}</div> */}
+                    </div>
+                </li>
+            </ul>
         </section>
     )
 }
