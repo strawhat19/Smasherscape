@@ -4,7 +4,7 @@ import Stock from '../models/Stock';
 import Level from '../models/Level';
 import { Badge } from '@mui/material';
 import Player from '../models/Player';
-import { Commands, defaultCommands } from './Commands';
+import { Commands } from './Commands';
 import Experience from '../models/Experience';
 import TextField from '@mui/material/TextField';
 import { Characters } from '../common/Characters';
@@ -361,7 +361,7 @@ export default function PlayerForm(props) {
                     giveParameter(commandParams);
                 } else if (firstCommand.includes(`!set`)) {
                     setParameter(commandParams);
-                } else if (firstCommand.includes(`!com`)) {
+                } else {
                     showCommands();
                 }
             }
@@ -371,11 +371,10 @@ export default function PlayerForm(props) {
     }
 
     return <section className={`formsSection`}>
-    <form onSubmit={(e) => handleCommands(e)} action="submit" className="gridForm">
+    <form id={`playerForm`} onSubmit={(e) => handleCommands(e)} action="submit" className="gridForm">
         <div className={`inputWrapper materialBGInputWrapper`}>
             <div className="inputBG materialBG"></div>
             <Autocomplete
-                disablePortal
                 autoHighlight
                 ref={searchInput}
                 id="combo-box-demo"
@@ -421,7 +420,6 @@ export default function PlayerForm(props) {
         {/* <div className={`inputWrapper materialBGInputWrapper`}>
             <div className="inputBG materialBG"></div>
             <Autocomplete
-                disablePortal
                 autoHighlight
                 ref={commandsInput}
                 id="combo-box-demo"
@@ -446,7 +444,7 @@ export default function PlayerForm(props) {
                 }}
             />
         </div> */}
-        <div className={`inputWrapper`}><div className="inputBG"></div><input ref={commandsInput} type="text" className="commands" name={`commands`} placeholder={`Commands...`} /></div>
+        <div id={`commandsInput`} className={`inputWrapper`}><div className="inputBG"></div><input ref={commandsInput} type="text" className="commands" name={`commands`} placeholder={`Commands...`} /></div>
         <button className={`formSubmitButton`} type={`submit`}>Submit</button>
     </form>
 </section>

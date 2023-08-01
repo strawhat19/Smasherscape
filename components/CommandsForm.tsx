@@ -10,14 +10,44 @@ import { calcPlayerCharacterIcon } from "../common/CharacterIcons";
 import { calcPlayerCharacterTimesPlayed, calcPlayerCharactersPlayed, calcPlayerLevelImage, getActivePlayers, getCharacterTitle } from "./smasherscape";
 
 export default function CommandsForm(props) {
+    let [characters, setCharacters] = useState([]);
     let [playerTwo, setPlayerTwo] = useState(`Player-Two`);
     let [playerOne, setPlayerOne] = useState(`Player-One`);
     let [condition, setCondition] = useState(`vs`);
     let [charOne, setCharOne] = useState(`Character-One`);
     let [charTwo, setCharTwo] = useState(`Character-Two`);
     let [stocksTaken, setStocksTaken] = useState<any>(`Stocks-Taken-From-Winner`);
-    let [characters, setCharacters] = useState([]);
     const { players, command, setCommand } = useContext<any>(StateContext);
+
+    const setDefaultCommand = (e, val) => {
+        if (val) {
+            if (typeof val == `string`) {
+                console.log(val);
+            } else {
+                setCommand(val);
+            }
+        }
+    }
+
+    const adjustStocks = (e, val) => {
+        if (val) {
+            if (typeof val == `string`) {
+                setStocksTaken(val.split(` `)[0]);
+            } else {
+                setStocksTaken(val.id);
+            }
+        }
+    }
+
+    const adjustCondition = (e, val) => {
+        if (val) {
+            if (typeof val == `string`) {
+                setCondition(val);
+            } else {
+                setCondition(val.label);
+            }
+        }
+    }
 
     const getCharacterObjs = () => {
         return Object.entries(Characters).filter(char => char[0] === char[0].charAt(0).toUpperCase() + char[0].slice(1)).map((char, charIndex) => {
@@ -28,16 +58,6 @@ export default function CommandsForm(props) {
                 image: calcPlayerCharacterIcon(char[0])
             }
         })
-    }
-
-    const setDefaultCommand = (e, val) => {
-        if (val) {
-            if (typeof val == `string`) {
-                console.log(val);
-            } else {
-                setCommand(val);
-            }
-        }
     }
 
     const adjustPlayers = (e, val, winnerOrLoser) => {
@@ -54,26 +74,6 @@ export default function CommandsForm(props) {
                 } else {
                     setPlayerTwo(val.name);
                 }
-            }
-        }
-    }
-
-    const adjustCondition = (e, val) => {
-        if (val) {
-            if (typeof val == `string`) {
-                setCondition(val);
-            } else {
-                setCondition(val.label);
-            }
-        }
-    }
-
-    const adjustStocks = (e, val) => {
-        if (val) {
-            if (typeof val == `string`) {
-                setStocksTaken(val.split(` `)[0]);
-            } else {
-                setStocksTaken(val.id);
             }
         }
     }
@@ -101,7 +101,6 @@ export default function CommandsForm(props) {
     }
 
     const renderCommand = (command: Command) => {
-        console.log(`Command`, command);
         if (characters.length == 0) {
             setCharacters(Object.entries(Characters).filter(char => char[0] === char[0].charAt(0).toUpperCase() + char[0].slice(1)).map((char, charIndex) => {
                 return {
@@ -119,23 +118,33 @@ export default function CommandsForm(props) {
         }
     }
 
+    const submitCommandsForm = (e) => {
+        e.preventDefault();
+        let playerForm: any = document.querySelector(`#playerForm`);
+        let commandsInput: any = document.querySelector(`#commandsInput input`);
+        let commandToRender = document.querySelector(`#commandToRender`);
+        if (commandsInput && playerForm) {
+            commandsInput.value = commandToRender.innerHTML;
+            playerForm.submit(e);
+        }
+    }
+
     return (
         <section className={`formsSection`}>
             <ul className="commandsList commandToCopy">
-                <li className={`listedCommand`} title={`${command?.description}: ${command?.example ? command?.example : command?.command}`}>
+                <li className={`listedCommand`} title={renderCommand(command)}>
                     <div className="commandDetails flex gap15">
-                        <CodeBlock custombutton={true} id={`comm-${command?.id}`} language={`js`}>
+                        <CodeBlock custombutton={true} id={`commandToRender`} language={`js`}>
                             {renderCommand(command)}
                         </CodeBlock>
                         {/* <div className={`desc`}>{command?.description}</div> */}
                     </div>
                 </li>
             </ul>
-            <form className={`commandsForm gridForm`} action="submit">
+            <form onSubmit={(e) => submitCommandsForm(e)} className={`commandsForm gridForm`} action="submit">
                 <div className={`commandsSearch inputWrapper materialBGInputWrapper`}>
                     <div className="inputBG materialBG"></div>
                     <Autocomplete
-                        disablePortal
                         autoHighlight
                         id="combo-box-demo"
                         sx={{ width: `100%` }}
@@ -166,7 +175,6 @@ export default function CommandsForm(props) {
                         <div className={`playerSearchAuto inputWrapper materialBGInputWrapper`}>
                             <div className="inputBG materialBG"></div>
                             <Autocomplete
-                                disablePortal
                                 autoHighlight
                                 id="combo-box-demo"
                                 sx={{ width: `100%` }}
@@ -211,7 +219,6 @@ export default function CommandsForm(props) {
                         <div className={`conditionAuto smallAuto inputWrapper materialBGInputWrapper`}>
                             <div className="inputBG materialBG"></div>
                             <Autocomplete
-                                disablePortal
                                 autoHighlight
                                 id="combo-box-demo"
                                 sx={{ width: `100%` }}
@@ -235,7 +242,6 @@ export default function CommandsForm(props) {
                         <div className={`playerSearchAuto inputWrapper materialBGInputWrapper`}>
                             <div className="inputBG materialBG"></div>
                             <Autocomplete
-                                disablePortal
                                 autoHighlight
                                 id="combo-box-demo"
                                 sx={{ width: `100%` }}
@@ -308,7 +314,6 @@ export default function CommandsForm(props) {
                         <div className={`conditionAuto smallAuto inputWrapper materialBGInputWrapper`}>
                             <div className="inputBG materialBG"></div>
                             <Autocomplete
-                                disablePortal
                                 autoHighlight
                                 id="combo-box-demo"
                                 sx={{ width: `100%` }}
@@ -357,6 +362,7 @@ export default function CommandsForm(props) {
                         </div>
                     </div>
                 </div>
+                <button className={`formSubmitButton`} type={`submit`}>Submit</button>
             </form>
         </section>
     )

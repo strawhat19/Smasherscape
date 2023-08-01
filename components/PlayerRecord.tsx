@@ -89,12 +89,11 @@ function PlayerRecord(props) {
                         <span className={`blueText`}>Plays: <span className="whiteText">{plyr?.plays?.length}</span></span>
                     </span>
                 </div>
-                {plyr?.plays?.length > 0 && devEnv && <div className="flex white noShadow">
+                {plyr?.plays?.length > 0 && devEnv && <div className="flex white noShadow recordForms">
                     <form action="submit" className="gridForm recordForm">
                         <div className={`inputWrapper materialBGInputWrapper`}>
                             <div className="inputBG materialBG"></div>
                             <Autocomplete
-                                disablePortal
                                 autoHighlight
                                 id="combo-box-demo"
                                 sx={{ width: `100%` }}
@@ -139,7 +138,6 @@ function PlayerRecord(props) {
                         <div className={`inputWrapper materialBGInputWrapper`}>
                             <div className="inputBG materialBG"></div>
                             <Autocomplete
-                                disablePortal
                                 autoHighlight
                                 id="combo-box-demo"
                                 sx={{ width: `100%` }}
