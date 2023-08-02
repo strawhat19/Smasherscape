@@ -3,10 +3,12 @@ import CodeBlock from "./CodeBlock";
 import Command from "../models/Command";
 import { defaultCommands } from "./Commands";
 import { StateContext } from "../pages/_app";
+import CustomizedHook from './CustomizedHook';
 import { Characters } from "../common/Characters";
 import { useContext, useEffect, useState } from "react";
-import { Autocomplete, Badge, Button, ButtonGroup, TextField, ToggleButton, ToggleButtonGroup } from "@mui/material";
+import AutoCompleteMultiple from './AutoCompleteMultiple';
 import { calcPlayerCharacterIcon } from "../common/CharacterIcons";
+import { Autocomplete, Badge, Button, ButtonGroup, TextField, ToggleButton, ToggleButtonGroup } from "@mui/material";
 import { calcPlayerCharacterTimesPlayed, calcPlayerCharactersPlayed, calcPlayerLevelImage, getActivePlayers, getCharacterTitle } from "./smasherscape";
 
 export default function CommandsForm(props) {
@@ -136,7 +138,7 @@ export default function CommandsForm(props) {
     return (
         <>
         <div className={`toggleButtonsContainer`}>
-            <h2 className={`toggleButtonsHeader`}>Commands</h2>
+            <h2 className={`toggleButtonsHeader`}>Commands Builder Form</h2>
             <ToggleButtonGroup
                 exclusive
                 color="primary"
@@ -155,7 +157,7 @@ export default function CommandsForm(props) {
         </div>
         <section className={`formsSection`}>
             <form onSubmit={(e) => submitCommandsForm(e)} className={`commandsForm gridForm`} action="submit">
-                <div className={`commandInputs ${command.command == `!upd` ? `expanded` : `collapsed`}`}>
+            <div className={`commandInputs ${command.command == `!upd` ? `expanded` : `collapsed`}`}>
                     <div className="updateRow updateTopRow">
                         <div className={`playerSearchAuto inputWrapper materialBGInputWrapper`}>
                             <div className="inputBG materialBG"></div>
@@ -348,21 +350,27 @@ export default function CommandsForm(props) {
                     </div>
                 </div>
                 <div className={`commandInputs ${command.command == `!del` ? `expanded` : `collapsed`}`}>
-                    Hello
+                    <CustomizedHook />
+                    <AutoCompleteMultiple />
+                </div>
+                <div className={`commandInputs ${command.command == `!set` ? `expanded` : `collapsed`}`}>
+                    Set Fields
+                </div>
+                <div className={`commandInputs ${command.command == `!giv` ? `expanded` : `collapsed`}`}>
+                    Give Fields
                 </div>
                 <button className={`formSubmitButton`} type={`submit`}>Submit</button>
             </form>
-            <ul className="commandsList commandToCopy">
-                <li className={`listedCommand`} title={renderCommand(command)}>
-                    <div className="commandDetails flex gap15">
-                        <CodeBlock custombutton={true} border={`solid 2px white`} id={`commandToRender`} language={`js`}>
-                            {renderCommand(command)}
-                        </CodeBlock>
-                        <div className={`desc`}>{command?.description}</div>
-                    </div>
-                </li>
-            </ul>
         </section>
+        <ul className="commandsList commandToCopy">
+            <li className={`listedCommand`} title={renderCommand(command)}>
+                <div className="commandDetails flex gap15">
+                    <CodeBlock custombutton={true} border={`solid 2px white`} id={`commandToRender`} language={`js`} codeTitle={<div className={`desc`}>{command?.description}</div>}>
+                        {renderCommand(command)}
+                    </CodeBlock>
+                </div>
+            </li>
+        </ul>
         </>
     )
 }

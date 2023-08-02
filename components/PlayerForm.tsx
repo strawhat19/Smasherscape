@@ -21,6 +21,14 @@ export const searchBlur = (e: any, filteredPlayers: Player[]) => {
     }
 }
 
+export const getAllCharacters = () => {
+    return Object.entries(Characters).filter(char => char[0] === char[0].charAt(0).toUpperCase() + char[0].slice(1));
+}
+
+export const getUniqueCharactersPlayed = (players) => {
+    return [...new Set(players.flatMap((p: Player) => p.plays.flatMap((play: Play) => [play.character, play.otherCharacter]) ))].sort()
+}
+
 export default function PlayerForm(props) {
 
     const searchInput = useRef();
@@ -85,13 +93,7 @@ export default function PlayerForm(props) {
 
     const getCharacterObjs = (active) => {
         if (active == true) {
-            let activeCharactersPlayed = players.map((ply: Player) => ply.plays).map((pla: Play[]) => pla.map(pl => {
-                return [pl.character, pl.otherCharacter];
-            })).reduce((acc: any, round: any) => {
-                return acc.concat(round.flatMap((match: any) => match));
-            }, []);
-            devEnv && console.log(`Character(s) Played`, new Set(activeCharactersPlayed));
-            return Object.entries(Characters).filter(char => char[0] === char[0].charAt(0).toUpperCase() + char[0].slice(1)).map((char, charIndex) => {
+            return getAllCharacters().filter(char => getUniqueCharactersPlayed(players).includes(char[1])).map((char, charIndex) => {
                 return {
                     id: charIndex + 1,
                     key: char[0],
@@ -100,7 +102,7 @@ export default function PlayerForm(props) {
                 }
             })
         } else {
-            return Object.entries(Characters).filter(char => char[0] === char[0].charAt(0).toUpperCase() + char[0].slice(1)).map((char, charIndex) => {
+            return getAllCharacters().map((char, charIndex) => {
                 return {
                     id: charIndex + 1,
                     key: char[0],
@@ -461,7 +463,7 @@ export default function PlayerForm(props) {
                 }}
             />
         </div>
-        <div id={`commandsInput`} className={`inputWrapper`}><div className="inputBG"></div><input ref={commandsInput} type="text" className="commands" name={`commands`} placeholder={`Commands...`} /></div>
+        <div id={`commandsInput`} className={`inputWrapper`}><div className="inputBG"></div><input ref={commandsInput} type="text" className="commands" name={`commands`} placeholder={`Enter Commands...`} /></div>
         <div className={`characterSearchAuto inputWrapper materialBGInputWrapper`}>
             <div className="inputBG materialBG"></div>
             <Autocomplete
@@ -473,7 +475,7 @@ export default function PlayerForm(props) {
                 onChange={(e, val: any) => searchPlayers(e, val, `searchCharacters`)}
                 onInputChange={(e, val: any) => searchPlayers(e, val, `searchCharacters`)}
                 isOptionEqualToValue={(option, value) => option.id === value.id}
-                renderInput={(params) => <TextField name={`characters`} {...params} label="Search Player(s) by Character..." />}
+                renderInput={(params) => <TextField name={`characters`} {...params} label="Search Player(s) by Character(s) Played..." />}
                 renderOption={(props: any, option: any) => {
                     return (
                         <div key={props?.key} {...props}>

@@ -547,6 +547,7 @@ footer {
     flex-direction: column;
     .commandsForm {
         gap: 15px;
+        margin: 15px auto 20px;
         grid-template-columns: 1fr;
         transition: var(--transition);
         .commandInputs {
@@ -1301,6 +1302,11 @@ div[role="presentation"] {
     margin: 0;
     width: 100%;
     text-shadow: 1px 1px 0px black;
+    .codeTitle {
+        font-size: 1.2em;
+        font-weight: 900;
+        text-decoration: underline;
+    }
     div {
        &[data-custombutton="false"] {
            height: 100%;
