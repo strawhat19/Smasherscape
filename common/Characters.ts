@@ -21,6 +21,7 @@ export enum Characters {
     bow = `Bowser`,
     BowserJr = `Bowser Jr`,
     bowserJr = `Bowser Jr`,
+    bowserjr = `Bowser Jr`,
     bjr = `Bowser Jr`,
     bj = `Bowser Jr`,
     Byleth = `Byleth`,

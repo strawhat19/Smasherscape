@@ -8,8 +8,8 @@ import { Commands } from './Commands';
 import Experience from '../models/Experience';
 import TextField from '@mui/material/TextField';
 import { Characters } from '../common/Characters';
-import { FormEvent, useContext, useRef } from 'react';
 import Autocomplete from '@mui/material/Autocomplete';
+import { FormEvent, useContext, useRef, useState } from 'react';
 import { calcPlayerLevelAndExperience } from '../common/Levels';
 import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
 import { StateContext, showAlert, defaultPlayers } from '../pages/_app';
@@ -24,7 +24,7 @@ export const searchBlur = (e: any, filteredPlayers: Player[]) => {
 export default function PlayerForm(props) {
 
     const searchInput = useRef();
-    const commandsInput = useRef();
+    const commandsInput = useRef(); 
     const { players, setPlayers, filteredPlayers, setFilteredPlayers, devEnv, useLocalStorage, commands } = useContext<any>(StateContext);
 
     const searchPlayers = (e: any, value?: any, type?) => {
@@ -83,15 +83,32 @@ export default function PlayerForm(props) {
         </div>, `85%`, `auto`);
     }
 
-    const getCharacterObjs = () => {
-        return Object.entries(Characters).filter(char => char[0] === char[0].charAt(0).toUpperCase() + char[0].slice(1)).map((char, charIndex) => {
-            return {
-                id: charIndex + 1,
-                key: char[0],
-                label: char[1],
-                image: calcPlayerCharacterIcon(char[0])
-            }
-        })
+    const getCharacterObjs = (active) => {
+        if (active == true) {
+            let activeCharactersPlayed = players.map((ply: Player) => ply.plays).map((pla: Play[]) => pla.map(pl => {
+                return [pl.character, pl.otherCharacter];
+            })).reduce((acc: any, round: any) => {
+                return acc.concat(round.flatMap((match: any) => match));
+            }, []);
+            devEnv && console.log(`Character(s) Played`, new Set(activeCharactersPlayed));
+            return Object.entries(Characters).filter(char => char[0] === char[0].charAt(0).toUpperCase() + char[0].slice(1)).map((char, charIndex) => {
+                return {
+                    id: charIndex + 1,
+                    key: char[0],
+                    label: char[1],
+                    image: calcPlayerCharacterIcon(char[0])
+                }
+            })
+        } else {
+            return Object.entries(Characters).filter(char => char[0] === char[0].charAt(0).toUpperCase() + char[0].slice(1)).map((char, charIndex) => {
+                return {
+                    id: charIndex + 1,
+                    key: char[0],
+                    label: char[1],
+                    image: calcPlayerCharacterIcon(char[0])
+                }
+            })
+        }
     }
 
     const addPlayers = (commandParams) => {
@@ -267,7 +284,7 @@ export default function PlayerForm(props) {
             </h1>, `65%`, `35%`);
             return;
         } else if (!Characters[characterOne] || !Characters[characterTwo]) {
-            console.log(`Cannot Find Characters`, !Characters[characterOne], !Characters[characterTwo]);
+            devEnv && console.log(`Cannot Find Characters`, {characterOne, characterTwo}, !Characters[characterOne], !Characters[characterTwo]);
             showAlert(`Cannot Find Characters`, <h1>
                 Can't find characters with those names.
             </h1>, `65%`, `35%`);
@@ -444,33 +461,6 @@ export default function PlayerForm(props) {
                 }}
             />
         </div>
-        {/* <div className={`inputWrapper materialBGInputWrapper`}>
-            <div className="inputBG materialBG"></div>
-            <Autocomplete
-                autoHighlight
-                ref={commandsInput}
-                id="combo-box-demo"
-                sx={{ width: `100%` }}
-                options={Object.values(defaultCommands).map((comm: Command) => {
-                    return {
-                        ...comm,
-                        label: comm.example ? comm.example : comm.command,
-                    }
-                })}
-                getOptionLabel={(option) => option.label}
-                isOptionEqualToValue={(option, value) => option.id === value.id}
-                renderInput={(params) => <TextField name={`commands`} {...params} label="Commands..." />}
-                renderOption={(props: any, option: any) => {
-                    return (
-                        <div key={props?.key} {...props}>
-                            <div className="autocompleteOption">
-                                {option.label}
-                            </div>
-                        </div>
-                    )
-                }}
-            />
-        </div> */}
         <div id={`commandsInput`} className={`inputWrapper`}><div className="inputBG"></div><input ref={commandsInput} type="text" className="commands" name={`commands`} placeholder={`Commands...`} /></div>
         <div className={`characterSearchAuto inputWrapper materialBGInputWrapper`}>
             <div className="inputBG materialBG"></div>
@@ -478,7 +468,7 @@ export default function PlayerForm(props) {
                 autoHighlight
                 id="combo-box-demo"
                 sx={{ width: `100%` }}
-                options={getCharacterObjs()}
+                options={getCharacterObjs(true)}
                 getOptionLabel={(option) => option.label}
                 onChange={(e, val: any) => searchPlayers(e, val, `searchCharacters`)}
                 onInputChange={(e, val: any) => searchPlayers(e, val, `searchCharacters`)}

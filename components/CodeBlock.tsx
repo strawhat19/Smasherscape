@@ -8,7 +8,7 @@ export default function CodeBlock(props) {
     };
     return (
         <div className="nextra-code-block nx-relative nx-mt-6 first:nx-mt-0">
-            <pre className="nx-bg-primary-700/5 nx-mb-4 nx-overflow-x-auto nx-rounded-xl nx-font-medium nx-subpixel-antialiased dark:nx-bg-primary-300/10 nx-text-[.9em] contrast-more:nx-border contrast-more:nx-border-primary-900/20 contrast-more:nx-contrast-150 contrast-more:dark:nx-border-primary-100/40 nx-py-4" data-language="js" data-theme="default">
+            <pre style={{border: props.border ? props.border : `none`}} className="nx-bg-primary-700/5 nx-mb-4 nx-overflow-x-auto nx-rounded-xl nx-font-medium nx-subpixel-antialiased dark:nx-bg-primary-300/10 nx-text-[.9em] contrast-more:nx-border contrast-more:nx-border-primary-900/20 contrast-more:nx-contrast-150 contrast-more:dark:nx-border-primary-100/40 nx-py-4" data-language="js" data-theme="default">
                 <code style={{whiteSpace: `pre-wrap`, lineHeight: 1.3}} className="nx-border-black nx-border-opacity-[0.04] nx-bg-opacity-[0.03] nx-bg-black nx-break-words nx-rounded-md nx-border nx-py-0.5 nx-px-[.25em] nx-text-[.9em] dark:nx-border-white/10 dark:nx-bg-white/10" dir="ltr" data-language={props.language} data-theme="default">
                     <span className="line">
                         <span id={props.id}>{props.children}</span>

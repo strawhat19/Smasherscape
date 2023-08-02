@@ -608,8 +608,8 @@ form {
     gap: 5%;
     width: 95%;
     display: grid;
-    margin: 15px auto;
     align-items: center;
+    margin: 15px auto 5px;
     justify-content: center;
     grid-template-columns: 1fr 1fr 1fr;
     .inputWrapper {
@@ -693,13 +693,14 @@ form {
     max-width: 95%;
     margin: 0 auto;
     display: flex;
-    left: 45px;
+    // left: 45px;
 }
 
 .MuiAutocomplete-hasClearIcon {
     .MuiTouchRipple-root, .MuiButtonBase-root {
-        max-width: 90%;
-        left: 25px;
+        &:first-child {
+            max-width: 80%;
+        }
     }
 }
 
@@ -740,7 +741,7 @@ form {
 .MuiAutocomplete-endAdornment {
     width: 100%;
     flex-direction: row;
-    right: 65px !important;
+    // right: 65px !important;
     justify-content: space-between;
     button:nth-child(2) {
         max-width: max-content;
@@ -921,6 +922,7 @@ div[role="presentation"] {
         margin: 0 auto;
         li {
             .commandDetails {
+                font-size: 1.7em;
                 grid-gap: 10px !important;
             }
         }
@@ -1308,6 +1310,8 @@ div[role="presentation"] {
        } 
        &[data-custombutton="true"] {
             align-items: end;
+            min-height: 43px;
+            justify-content: center;
             button {
                 max-width: 30px;
                 * {
@@ -1326,6 +1330,44 @@ div[role="presentation"] {
     text-shadow: 3px 3px 0px var(--smasherscapePurple), 0px 0px 8px rgba(0, 0, 0, 0.75), 0px 1px 8px rgba(0, 0, 0, 0.69);
     &.slimmed {
         text-shadow: 1px 1px 0px var(--smasherscapePurple), 0px 0px 5px rgba(0, 0, 0, 0.75), 0px 1px 5px rgba(0, 0, 0, 0.69);
+    }
+}
+
+.toggleButtonsContainer {
+    width: 100%;
+    padding: 0 2em;
+    text-align: center;
+    .toggleButtonsHeader {
+        font-size: 1.55em;
+        padding-bottom: 15px;
+    }
+    div[role="group"] {
+        width: 100%;
+        grid-gap: 15px;
+        display: flex;
+        margin: 0 auto;
+        align-items: center;
+        justify-content: center;
+        button {
+            width: 100%;
+            color: black;
+            font-weight: 900;
+            font-size: 1.2em;
+            text-transform: none;
+            transition: var(--transition);
+            font-family: "RuneScape Chat";
+            background: var(--xurukoGradientBlueGreen);
+            .buttonInnerText {
+                width: 100%;
+                border-radius: 8px;
+                border: 3px solid black;
+                background: rgba(255, 255, 255, 0.65);
+            }
+            &.Mui-selected {
+                color: var(--smasherscapeBlue2);
+                background: var(--xurukoGradientBlueGreen);
+            }
+        }
     }
 }
 

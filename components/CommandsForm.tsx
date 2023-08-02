@@ -5,7 +5,7 @@ import { defaultCommands } from "./Commands";
 import { StateContext } from "../pages/_app";
 import { Characters } from "../common/Characters";
 import { useContext, useEffect, useState } from "react";
-import { Autocomplete, Badge, TextField } from "@mui/material";
+import { Autocomplete, Badge, Button, ButtonGroup, TextField, ToggleButton, ToggleButtonGroup } from "@mui/material";
 import { calcPlayerCharacterIcon } from "../common/CharacterIcons";
 import { calcPlayerCharacterTimesPlayed, calcPlayerCharactersPlayed, calcPlayerLevelImage, getActivePlayers, getCharacterTitle } from "./smasherscape";
 
@@ -19,7 +19,9 @@ export default function CommandsForm(props) {
     let [stocksTaken, setStocksTaken] = useState<any>(`Stocks-Taken-From-Winner`);
     const { players, command, setCommand } = useContext<any>(StateContext);
 
-    const setDefaultCommand = (e, val) => {
+    const setDefaultCommand = (event: React.MouseEvent<HTMLElement>, commandToSet: Command) => setCommand(commandToSet);
+
+    const setDefaultCommandAutoCompleteInput = (e, val) => {
         if (val) {
             if (typeof val == `string`) {
                 return;
@@ -108,7 +110,13 @@ export default function CommandsForm(props) {
             }));
         }
         if (command) {
-            if (command.command == `!upd`) {
+            if (command.command == `!del`) {
+                return `!del name(s) of player(s)`;
+            } else if (command.command == `!set`) {
+                return `!set playerName (xp) amount`;
+            } else if (command.command == `!giv`) {
+                return `!giv playerName (xp) amount`;
+            } else {
                 return `!upd ${playerOne} ${condition} ${playerTwo} with ${charOne} vs ${charTwo} ${stocksTaken}`;
             }
         }
@@ -116,9 +124,9 @@ export default function CommandsForm(props) {
 
     const submitCommandsForm = (e) => {
         e.preventDefault();
-        let playerForm: any = document.querySelector(`#playerForm`);
-        let commandsInput: any = document.querySelector(`#commandsInput input`);
-        let commandToRender = document.querySelector(`#commandToRender`);
+        // let playerForm: any = document.querySelector(`#playerForm`);
+        // let commandsInput: any = document.querySelector(`#commandsInput input`);
+        // let commandToRender = document.querySelector(`#commandToRender`);
         // if (commandsInput && playerForm) {
         //     commandsInput.value = commandToRender.innerHTML;
         //     playerForm.submit();
@@ -126,36 +134,27 @@ export default function CommandsForm(props) {
     }
 
     return (
+        <>
+        <div className={`toggleButtonsContainer`}>
+            <h2 className={`toggleButtonsHeader`}>Commands</h2>
+            <ToggleButtonGroup
+                exclusive
+                color="primary"
+                value={command}
+                aria-label="Platform"
+                onChange={(e, val) => setDefaultCommand(e, val)}
+            >
+                {Object.values(defaultCommands).filter(cmd => ![`!com`, `!add`, `!res`].includes(cmd.command)).map((comm: Command, commIndex) => {
+                    return (
+                        <ToggleButton key={commIndex} size={`small`} value={comm}>
+                            <span className={`buttonInnerText`}>{comm?.command}</span>
+                        </ToggleButton>
+                    )
+                })}
+            </ToggleButtonGroup>
+        </div>
         <section className={`formsSection`}>
             <form onSubmit={(e) => submitCommandsForm(e)} className={`commandsForm gridForm`} action="submit">
-                <div className={`commandsSearch inputWrapper materialBGInputWrapper`}>
-                    <div className="inputBG materialBG"></div>
-                    <Autocomplete
-                        autoHighlight
-                        id="combo-box-demo"
-                        sx={{ width: `100%` }}
-                        options={Object.values(defaultCommands).map((comm: Command) => {
-                            return {
-                                ...comm,
-                                label: comm.command,
-                            }
-                        })}
-                        onChange={(e, val: any) => setDefaultCommand(e, val)}
-                        onInputChange={(e, val: any) => setDefaultCommand(e, val)}
-                        getOptionLabel={(option) => option.label}
-                        isOptionEqualToValue={(option, value) => option.id === value.id}
-                        renderInput={(params) => <TextField name={`commands`} {...params} label="Commands..." />}
-                        renderOption={(props: any, option: any) => {
-                            return (
-                                <div key={props?.key} {...props}>
-                                    <div className="autocompleteOption singularLabel">
-                                        {option.label}
-                                    </div>
-                                </div>
-                            )
-                        }}
-                    />
-                </div>
                 <div className={`commandInputs ${command.command == `!upd` ? `expanded` : `collapsed`}`}>
                     <div className="updateRow updateTopRow">
                         <div className={`playerSearchAuto inputWrapper materialBGInputWrapper`}>
@@ -348,18 +347,22 @@ export default function CommandsForm(props) {
                         </div>
                     </div>
                 </div>
+                <div className={`commandInputs ${command.command == `!del` ? `expanded` : `collapsed`}`}>
+                    Hello
+                </div>
                 <button className={`formSubmitButton`} type={`submit`}>Submit</button>
             </form>
             <ul className="commandsList commandToCopy">
                 <li className={`listedCommand`} title={renderCommand(command)}>
                     <div className="commandDetails flex gap15">
-                        <CodeBlock custombutton={true} id={`commandToRender`} language={`js`}>
+                        <CodeBlock custombutton={true} border={`solid 2px white`} id={`commandToRender`} language={`js`}>
                             {renderCommand(command)}
                         </CodeBlock>
-                        {/* <div className={`desc`}>{command?.description}</div> */}
+                        <div className={`desc`}>{command?.description}</div>
                     </div>
                 </li>
             </ul>
         </section>
+        </>
     )
 }
