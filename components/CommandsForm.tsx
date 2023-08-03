@@ -6,7 +6,6 @@ import { StateContext } from "../pages/_app";
 import CustomizedHook from './CustomizedHook';
 import { Characters } from "../common/Characters";
 import { useContext, useEffect, useState } from "react";
-import AutoCompleteMultiple from './AutoCompleteMultiple';
 import { calcPlayerCharacterIcon } from "../common/CharacterIcons";
 import { Autocomplete, Badge, Button, ButtonGroup, TextField, ToggleButton, ToggleButtonGroup } from "@mui/material";
 import { calcPlayerCharacterTimesPlayed, calcPlayerCharactersPlayed, calcPlayerLevelImage, getActivePlayers, getCharacterTitle } from "./smasherscape";
@@ -351,7 +350,6 @@ export default function CommandsForm(props) {
                 </div>
                 <div className={`commandInputs ${command.command == `!del` ? `expanded` : `collapsed`}`}>
                     <CustomizedHook />
-                    <AutoCompleteMultiple />
                 </div>
                 <div className={`commandInputs ${command.command == `!set` ? `expanded` : `collapsed`}`}>
                     Set Fields

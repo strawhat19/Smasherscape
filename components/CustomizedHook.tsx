@@ -20,9 +20,10 @@ const Label = styled('label')`
 
 const InputWrapper = styled('div')(
   ({ theme }) => `
-  width: 300px;
+  width: 100%;
+  flex-direction: row;
   border: 1px solid ${theme.palette.mode === 'dark' ? '#434343' : '#d9d9d9'};
-  background-color: ${theme.palette.mode === 'dark' ? '#141414' : '#fff'};
+  background: #141414;
   border-radius: 4px;
   padding: 1px;
   display: flex;
@@ -71,7 +72,10 @@ function Tag(props: TagProps) {
 
 const StyledTag = styled(Tag)<TagProps>(
   ({ theme }) => `
+  column-gap: 15px;
+  width: fit-content;
   display: flex;
+  flex-direction: row;
   align-items: center;
   height: 24px;
   margin: 2px;
@@ -94,7 +98,12 @@ const StyledTag = styled(Tag)<TagProps>(
   & span {
     overflow: hidden;
     white-space: nowrap;
+    min-width: fit-content;
     text-overflow: ellipsis;
+  }
+
+  & i {
+    cursor: pointer;
   }
 
   & svg {
@@ -120,11 +129,14 @@ const Listbox = styled('ul')(
   z-index: 1;
 
   & li {
+    flex-direction: row;
     padding: 5px 12px;
     display: flex;
+    width: 100%
 
     & span {
       flex-grow: 1;
+      min-width: fit-content;
     }
 
     & svg {
@@ -173,10 +185,10 @@ export default function CustomizedHook() {
   });
 
   return (
-    <Root>
-      <div {...getRootProps()}>
-        <Label {...getInputLabelProps()}>Customized hook</Label>
-        <InputWrapper ref={setAnchorEl} className={focused ? 'focused' : ''}>
+    <Root className={`customHookRoot`}>
+      <div {...getRootProps()} className={`customHookRootProps`}>
+        {/* <Label {...getInputLabelProps()}>Customized hook</Label> */}
+        <InputWrapper className={`customHookRoot ${focused ? `focused` : ``}`} ref={setAnchorEl}>
           {value.map((option: FilmOptionType, index: number) => (
             <StyledTag label={option.title} {...getTagProps({ index })} />
           ))}
@@ -184,11 +196,11 @@ export default function CustomizedHook() {
         </InputWrapper>
       </div>
       {groupedOptions.length > 0 ? (
-        <Listbox {...getListboxProps()}>
+        <Listbox className={`customHookListBox`} {...getListboxProps()}>
           {(groupedOptions as typeof top100Films).map((option, index) => (
-            <li {...getOptionProps({ option, index })}>
-              <span>{option.title}</span>
-              <i className="fas fa-check"></i>
+            <li className={`customHookOption`} {...getOptionProps({ option, index })}>
+              <span style={{minWidth: `90%`}}>{option.title}</span>
+              <i style={{display: `flex`, alignItems: `end !important`, justifyContent: `center`, minWidth: `fit-content`}} className="fas fa-check"></i>
             </li>
           ))}
         </Listbox>
