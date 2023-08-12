@@ -1,9 +1,15 @@
 import * as React from 'react';
+import { useContext } from "react";
+import { Badge } from '@mui/material';
+import Player from '../models/Player';
+import { StateContext } from '../pages/_app';
 import { styled } from '@mui/material/styles';
 import { autocompleteClasses } from '@mui/material/Autocomplete';
+import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
 import useAutocomplete, { AutocompleteGetTagProps } from '@mui/base/useAutocomplete';
+import { calcPlayerCharacterTimesPlayed, calcPlayerCharactersPlayed, calcPlayerLevelImage, getActivePlayers, getCharacterTitle } from './smasherscape';
 
-const Root = styled('div')(
+const Root = styled(`div`)(
   ({ theme }) => `
   color: ${
     theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.65)' : 'rgba(0,0,0,.85)'
@@ -12,13 +18,7 @@ const Root = styled('div')(
 `,
 );
 
-const Label = styled('label')`
-  padding: 0 0 4px;
-  line-height: 1.5;
-  display: block;
-`;
-
-const InputWrapper = styled('div')(
+const InputWrapper = styled(`div`)(
   ({ theme }) => `
   width: 100%;
   flex-direction: row;
@@ -57,19 +57,40 @@ const InputWrapper = styled('div')(
 );
 
 interface TagProps extends ReturnType<AutocompleteGetTagProps> {
+  option: any;
   label: string;
+  player: Player;
 }
 
 function Tag(props: TagProps) {
-  const { label, onDelete, ...other } = props;
+  const { option, player, label, onDelete, ...other } = props;
   return (
-    <div {...other}>
-      <span>{label}</span>
-      <i className="fas fa-times" onClick={onDelete}></i>
+    <div className={`playerHookTag`} {...other}>
+      <div className="autocompleteOption">
+        <div className="levelNumColumn">{option?.level?.num}</div>
+        <div className="levelImageColumn"><img width={30} src={calcPlayerLevelImage(option?.level?.name)} alt={option?.level?.name} /></div>
+        <div className="playerHookTagDetails playerDetailsColumn">
+          <div className="playerName">{option?.label}</div>
+          <div className="playerEXP">{option?.experience?.arenaXP}</div>
+          <div className="plays">
+            <div className={`playsContainer`}>
+              {calcPlayerCharactersPlayed(option).map((char, charIndex) => {
+                return (
+                  <img title={getCharacterTitle(char)} key={charIndex} className={`charImg`} width={25} src={calcPlayerCharacterIcon(char)} alt={getCharacterTitle(char)} />
+                )
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+      <i className="fas fa-times tagCloseIcon" onClick={onDelete}></i>
     </div>
   );
 }
 
+// background: ${
+//   theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : '#fafafa'
+// };
 const StyledTag = styled(Tag)<TagProps>(
   ({ theme }) => `
   column-gap: 15px;
@@ -80,15 +101,18 @@ const StyledTag = styled(Tag)<TagProps>(
   height: 24px;
   margin: 2px;
   line-height: 22px;
-  background-color: ${
-    theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : '#fafafa'
-  };
   border: 1px solid ${theme.palette.mode === 'dark' ? '#303030' : '#e8e8e8'};
   border-radius: 2px;
   box-sizing: content-box;
   padding: 0 4px 0 10px;
   outline: 0;
   overflow: hidden;
+
+  background: var(--smasherscapeBlue);
+  color: white;
+  border-radius: 8px;
+  border: 2px solid black;
+  min-height: 30px;
 
   &:focus {
     border-color: ${theme.palette.mode === 'dark' ? '#177ddc' : '#40a9ff'};
@@ -114,24 +138,34 @@ const StyledTag = styled(Tag)<TagProps>(
 `,
 );
 
-const Listbox = styled('ul')(
+const Listbox = styled(`ul`)(
   ({ theme }) => `
-  width: 300px;
-  margin: 2px 0 0;
-  padding: 0;
+  width: 95%;
+  max-width: 350px;
+  margin: 50px 0 0;
+  padding: 1em 0;
   position: absolute;
   list-style: none;
   background-color: ${theme.palette.mode === 'dark' ? '#141414' : '#fff'};
   overflow: auto;
-  max-height: 250px;
+  max-height: 100%;
   border-radius: 4px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   z-index: 1;
 
   & li {
+    transition: var(--transition);
     flex-direction: row;
+    border-radius: 8px;
     padding: 5px 12px;
+    margin: 0 auto;
     display: flex;
+    width: 95%;
+
+    &:hover {
+      background: #d7d7d7 !important;
+    }
+
     width: 100%
 
     & span {
@@ -145,8 +179,13 @@ const Listbox = styled('ul')(
   }
 
   & li[aria-selected='true'] {
-    background-color: ${theme.palette.mode === 'dark' ? '#2b2b2b' : '#fafafa'};
+    background: var(--smasherscapeBlue) !important;
+    color: white !important;
     font-weight: 600;
+
+    &:hover {
+      filter: brightness(1.15);
+    }
 
     & svg {
       color: #1890ff;
@@ -164,10 +203,15 @@ const Listbox = styled('ul')(
 `,
 );
 
-export default function CustomizedHook() {
+export default function CustomizedHook(props) {
+  const { players, playersToSelect, setPlayersToSelect } = useContext<any>(StateContext);
+
+  const adjustPlayersToSelect = (e: any, val: any) => {
+    setPlayersToSelect(val);
+  }
+
   const {
     getRootProps,
-    getInputLabelProps,
     getInputProps,
     getTagProps,
     getListboxProps,
@@ -176,168 +220,67 @@ export default function CustomizedHook() {
     value,
     focused,
     setAnchorEl,
+    getClearProps,
   } = useAutocomplete({
-    id: 'customized-hook-demo',
-    defaultValue: [top100Films[1]],
     multiple: true,
-    options: top100Films,
-    getOptionLabel: (option) => option.title,
+    defaultValue: [],
+    id: `players-search-complete`,
+    options: getActivePlayers(players).map(plyr => {
+      return {
+        ...plyr,
+        label: plyr.name,
+      }
+    }),
+    getOptionLabel: (option) => option.label,
+    isOptionEqualToValue: (option, value) => option.id === value.id,
+    onChange: (e, val: any) => adjustPlayersToSelect(e, val),
   });
 
   return (
     <Root className={`customHookRoot`}>
       <div {...getRootProps()} className={`customHookRootProps`}>
-        {/* <Label {...getInputLabelProps()}>Customized hook</Label> */}
-        <InputWrapper className={`customHookRoot ${focused ? `focused` : ``}`} ref={setAnchorEl}>
-          {value.map((option: FilmOptionType, index: number) => (
-            <StyledTag label={option.title} {...getTagProps({ index })} />
-          ))}
-          <input {...getInputProps()} />
-        </InputWrapper>
+        <div className={`playerHookInputWrapper`}>
+          <div className="playerHookInputBG"></div>
+          <InputWrapper className={`customHookRoot ${focused ? `focused` : ``}`} ref={setAnchorEl}>
+            {value.filter(v => playersToSelect.map(plyr => plyr.name).includes(v.name)).map((option: any, index: number) => (
+              <StyledTag {...getTagProps({ index })} label={option.label} player={option} option={option} />
+            ))}
+            <input className={`playerHookInput`} placeholder={`Start Typing or Click Here to Enter Player(s) to Delete`} {...getInputProps()} />
+            <i style={{width: 20, cursor: `pointer`}} className="fas fa-times clearAllTagsIcon" {...getClearProps()}></i>
+          </InputWrapper>
+        </div>
       </div>
       {groupedOptions.length > 0 ? (
         <Listbox className={`customHookListBox`} {...getListboxProps()}>
-          {(groupedOptions as typeof top100Films).map((option, index) => (
-            <li className={`customHookOption`} {...getOptionProps({ option, index })}>
-              <span style={{minWidth: `90%`}}>{option.title}</span>
-              <i style={{display: `flex`, alignItems: `end !important`, justifyContent: `center`, minWidth: `fit-content`}} className="fas fa-check"></i>
-            </li>
-          ))}
+          {(groupedOptions).map((option, index) => 
+            (
+              <li className={`customHookOption`} key={index} {...getOptionProps({ option, index })}>
+                <div>
+                  <div className="autocompleteOption">
+                    <div className="levelNumColumn">{option?.level?.num}</div>
+                    <div className="levelImageColumn"><img width={30} src={calcPlayerLevelImage(option?.level?.name)} alt={option?.level?.name} /></div>
+                    <div className="playerDetailsColumn">
+                      <div className="playerName">{option?.label}</div>
+                      <div className="playerEXP">{option?.experience?.arenaXP}</div>
+                      <div className="plays">
+                        <div className={`playsContainer`}>
+                          {calcPlayerCharactersPlayed(option).map((char, charIndex) => {
+                            return (
+                              <Badge title={`Played ${getCharacterTitle(char)} ${calcPlayerCharacterTimesPlayed(option, char)} Time(s)`} key={charIndex} badgeContent={calcPlayerCharacterTimesPlayed(option, char)} color="primary">
+                                <img className={`charImg`} width={25} src={calcPlayerCharacterIcon(char)} alt={getCharacterTitle(char)} />
+                              </Badge>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            )
+          )}
         </Listbox>
       ) : null}
     </Root>
   );
 }
-
-interface FilmOptionType {
-  title: string;
-  year: number;
-}
-
-// Top 100 films as rated by IMDb users. http://www.imdb.com/chart/top
-const top100Films = [
-  { title: 'The Shawshank Redemption', year: 1994 },
-  { title: 'The Godfather', year: 1972 },
-  { title: 'The Godfather: Part II', year: 1974 },
-  { title: 'The Dark Knight', year: 2008 },
-  { title: '12 Angry Men', year: 1957 },
-  { title: "Schindler's List", year: 1993 },
-  { title: 'Pulp Fiction', year: 1994 },
-  {
-    title: 'The Lord of the Rings: The Return of the King',
-    year: 2003,
-  },
-  { title: 'The Good, the Bad and the Ugly', year: 1966 },
-  { title: 'Fight Club', year: 1999 },
-  {
-    title: 'The Lord of the Rings: The Fellowship of the Ring',
-    year: 2001,
-  },
-  {
-    title: 'Star Wars: Episode V - The Empire Strikes Back',
-    year: 1980,
-  },
-  { title: 'Forrest Gump', year: 1994 },
-  { title: 'Inception', year: 2010 },
-  {
-    title: 'The Lord of the Rings: The Two Towers',
-    year: 2002,
-  },
-  { title: "One Flew Over the Cuckoo's Nest", year: 1975 },
-  { title: 'Goodfellas', year: 1990 },
-  { title: 'The Matrix', year: 1999 },
-  { title: 'Seven Samurai', year: 1954 },
-  {
-    title: 'Star Wars: Episode IV - A New Hope',
-    year: 1977,
-  },
-  { title: 'City of God', year: 2002 },
-  { title: 'Se7en', year: 1995 },
-  { title: 'The Silence of the Lambs', year: 1991 },
-  { title: "It's a Wonderful Life", year: 1946 },
-  { title: 'Life Is Beautiful', year: 1997 },
-  { title: 'The Usual Suspects', year: 1995 },
-  { title: 'Léon: The Professional', year: 1994 },
-  { title: 'Spirited Away', year: 2001 },
-  { title: 'Saving Private Ryan', year: 1998 },
-  { title: 'Once Upon a Time in the West', year: 1968 },
-  { title: 'American History X', year: 1998 },
-  { title: 'Interstellar', year: 2014 },
-  { title: 'Casablanca', year: 1942 },
-  { title: 'City Lights', year: 1931 },
-  { title: 'Psycho', year: 1960 },
-  { title: 'The Green Mile', year: 1999 },
-  { title: 'The Intouchables', year: 2011 },
-  { title: 'Modern Times', year: 1936 },
-  { title: 'Raiders of the Lost Ark', year: 1981 },
-  { title: 'Rear Window', year: 1954 },
-  { title: 'The Pianist', year: 2002 },
-  { title: 'The Departed', year: 2006 },
-  { title: 'Terminator 2: Judgment Day', year: 1991 },
-  { title: 'Back to the Future', year: 1985 },
-  { title: 'Whiplash', year: 2014 },
-  { title: 'Gladiator', year: 2000 },
-  { title: 'Memento', year: 2000 },
-  { title: 'The Prestige', year: 2006 },
-  { title: 'The Lion King', year: 1994 },
-  { title: 'Apocalypse Now', year: 1979 },
-  { title: 'Alien', year: 1979 },
-  { title: 'Sunset Boulevard', year: 1950 },
-  {
-    title: 'Dr. Strangelove or: How I Learned to Stop Worrying and Love the Bomb',
-    year: 1964,
-  },
-  { title: 'The Great Dictator', year: 1940 },
-  { title: 'Cinema Paradiso', year: 1988 },
-  { title: 'The Lives of Others', year: 2006 },
-  { title: 'Grave of the Fireflies', year: 1988 },
-  { title: 'Paths of Glory', year: 1957 },
-  { title: 'Django Unchained', year: 2012 },
-  { title: 'The Shining', year: 1980 },
-  { title: 'WALL·E', year: 2008 },
-  { title: 'American Beauty', year: 1999 },
-  { title: 'The Dark Knight Rises', year: 2012 },
-  { title: 'Princess Mononoke', year: 1997 },
-  { title: 'Aliens', year: 1986 },
-  { title: 'Oldboy', year: 2003 },
-  { title: 'Once Upon a Time in America', year: 1984 },
-  { title: 'Witness for the Prosecution', year: 1957 },
-  { title: 'Das Boot', year: 1981 },
-  { title: 'Citizen Kane', year: 1941 },
-  { title: 'North by Northwest', year: 1959 },
-  { title: 'Vertigo', year: 1958 },
-  {
-    title: 'Star Wars: Episode VI - Return of the Jedi',
-    year: 1983,
-  },
-  { title: 'Reservoir Dogs', year: 1992 },
-  { title: 'Braveheart', year: 1995 },
-  { title: 'M', year: 1931 },
-  { title: 'Requiem for a Dream', year: 2000 },
-  { title: 'Amélie', year: 2001 },
-  { title: 'A Clockwork Orange', year: 1971 },
-  { title: 'Like Stars on Earth', year: 2007 },
-  { title: 'Taxi Driver', year: 1976 },
-  { title: 'Lawrence of Arabia', year: 1962 },
-  { title: 'Double Indemnity', year: 1944 },
-  {
-    title: 'Eternal Sunshine of the Spotless Mind',
-    year: 2004,
-  },
-  { title: 'Amadeus', year: 1984 },
-  { title: 'To Kill a Mockingbird', year: 1962 },
-  { title: 'Toy Story 3', year: 2010 },
-  { title: 'Logan', year: 2017 },
-  { title: 'Full Metal Jacket', year: 1987 },
-  { title: 'Dangal', year: 2016 },
-  { title: 'The Sting', year: 1973 },
-  { title: '2001: A Space Odyssey', year: 1968 },
-  { title: "Singin' in the Rain", year: 1952 },
-  { title: 'Toy Story', year: 1995 },
-  { title: 'Bicycle Thieves', year: 1948 },
-  { title: 'The Kid', year: 1921 },
-  { title: 'Inglourious Basterds', year: 2009 },
-  { title: 'Snatch', year: 2000 },
-  { title: '3 Idiots', year: 2009 },
-  { title: 'Monty Python and the Holy Grail', year: 1975 },
-];

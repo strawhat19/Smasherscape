@@ -3,11 +3,11 @@ import CodeBlock from "./CodeBlock";
 import Command from "../models/Command";
 import { defaultCommands } from "./Commands";
 import { StateContext } from "../pages/_app";
+import { useContext, useState } from "react";
 import CustomizedHook from './CustomizedHook';
 import { Characters } from "../common/Characters";
-import { useContext, useEffect, useState } from "react";
 import { calcPlayerCharacterIcon } from "../common/CharacterIcons";
-import { Autocomplete, Badge, Button, ButtonGroup, TextField, ToggleButton, ToggleButtonGroup } from "@mui/material";
+import { Autocomplete, Badge, TextField, ToggleButton, ToggleButtonGroup } from "@mui/material";
 import { calcPlayerCharacterTimesPlayed, calcPlayerCharactersPlayed, calcPlayerLevelImage, getActivePlayers, getCharacterTitle } from "./smasherscape";
 
 export default function CommandsForm(props) {
@@ -18,7 +18,7 @@ export default function CommandsForm(props) {
     let [charOne, setCharOne] = useState(`Character-One`);
     let [charTwo, setCharTwo] = useState(`Character-Two`);
     let [stocksTaken, setStocksTaken] = useState<any>(`Stocks-Taken-From-Winner`);
-    const { players, command, setCommand } = useContext<any>(StateContext);
+    const { players, command, setCommand, playersToSelect, setPlayersToSelect } = useContext<any>(StateContext);
 
     const setDefaultCommand = (event: React.MouseEvent<HTMLElement>, commandToSet: Command) => setCommand(commandToSet);
 
@@ -112,7 +112,11 @@ export default function CommandsForm(props) {
         }
         if (command) {
             if (command.command == `!del`) {
-                return `!del name(s) of player(s)`;
+                return `!del ${playersToSelect.length == 0 ? `name(s) of player(s)` : playersToSelect.map(plyr => {
+                    return (
+                        plyr.name
+                    )
+                }).join(` `)}`;
             } else if (command.command == `!set`) {
                 return `!set playerName (xp) amount`;
             } else if (command.command == `!giv`) {
@@ -145,7 +149,7 @@ export default function CommandsForm(props) {
                 aria-label="Platform"
                 onChange={(e, val) => setDefaultCommand(e, val)}
             >
-                {Object.values(defaultCommands).filter(cmd => ![`!com`, `!add`, `!res`].includes(cmd.command)).map((comm: Command, commIndex) => {
+                {Object.values(defaultCommands).filter(cmd => ![`!com`, `!add`, `!res`, `!set`, `!giv`].includes(cmd.command)).map((comm: Command, commIndex) => {
                     return (
                         <ToggleButton key={commIndex} size={`small`} value={comm}>
                             <span className={`buttonInnerText`}>{comm?.command}</span>

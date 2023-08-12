@@ -33,7 +33,7 @@ export default function PlayerForm(props) {
 
     const searchInput = useRef();
     const commandsInput = useRef(); 
-    const { players, setPlayers, filteredPlayers, setFilteredPlayers, devEnv, useLocalStorage, commands } = useContext<any>(StateContext);
+    const { players, setPlayers, filteredPlayers, setFilteredPlayers, devEnv, useLocalStorage, commands, setPlayersToSelect } = useContext<any>(StateContext);
 
     const searchPlayers = (e: any, value?: any, type?) => {
         let field = e.target as HTMLInputElement;
@@ -116,27 +116,34 @@ export default function PlayerForm(props) {
     const addPlayers = (commandParams) => {
         let playersToAdd = commandParams.filter((comm, commIndex) => commIndex != 0 && comm);
 
-        playersToAdd.forEach(plyr => {
-            setPlayers(prevPlayers => {
-                let updatedPlayers: Player[] = [...prevPlayers, {
-                    id: players.length + 1,
-                    name: plyr.charAt(0).toUpperCase() + plyr.slice(1).toLowerCase(),
-                    plays: [] as Play[],
-                    level: {
-                        num: 1,
-                        name: `Bronze Scimitar`
-                    } as Level,
-                    experience: {
-                        xp: 0,
-                        arenaXP: 0,
-                        nextLevelAt: 83,
-                        remainingXP: 83
-                    } as Experience,
-                }];
-                setFilteredPlayers(updatedPlayers);
-                updatePlayersDB(updatedPlayers);
-                return updatedPlayers;
-            });
+        playersToAdd.forEach((plyr, plyrIndex) => {
+            if (!getActivePlayers(players).map(playr => playr.name.toLowerCase()).some(nam => nam == plyr.toLowerCase())) {
+                setPlayers(prevPlayers => {
+                    let updatedPlayers: Player[] = [...prevPlayers, {
+                        id: prevPlayers.length + 1,
+                        name: plyr.charAt(0).toUpperCase() + plyr.slice(1).toLowerCase(),
+                        plays: [] as Play[],
+                        level: {
+                            num: 1,
+                            name: `Bronze Scimitar`
+                        } as Level,
+                        experience: {
+                            xp: 0,
+                            arenaXP: 0,
+                            nextLevelAt: 83,
+                            remainingXP: 83
+                        } as Experience,
+                    }];
+                    setFilteredPlayers(updatedPlayers);
+                    updatePlayersDB(updatedPlayers);
+                    return updatedPlayers;
+                });
+            } else {
+                showAlert(`Players Added Already`, <h1>
+                    Players with those name(s) already exist.
+                </h1>, `65%`, `35%`);
+                return;
+            }
         })
     }
 
@@ -153,6 +160,7 @@ export default function PlayerForm(props) {
 
         if (playersToDeleteFromDB.length > 0) {
             playersToDeleteFromDB.forEach((playerDB: Player) => {
+                (document.querySelector(`.clearAllTagsIcon`) as any).click();
                 setPlayers(prevPlayers => {
                     let updatedPlayers: Player[] = prevPlayers.map((plyr: Player) => {
                         if (plyr.name.toLowerCase() == playerDB.name.toLowerCase()) {

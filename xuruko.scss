@@ -547,9 +547,44 @@ footer {
     flex-direction: column;
     .commandsForm {
         gap: 15px;
+        z-index: 2;
         margin: 15px auto 20px;
         grid-template-columns: 1fr;
         transition: var(--transition);
+        .playerHookInputWrapper {
+            position: relative;
+            display: grid;
+            width: 100%;
+            .playerHookInputBG {
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                position: absolute;
+                border-radius: 8px;
+                transform: scale(1.01, 1.3);
+                background: var(--xurukoGradientGreenBlue) !important;
+            }
+        }
+        .customHookRoot {
+            z-index: 1;
+            width: 99.5%;
+            margin: 0 auto;
+            border-radius: 8px;
+            align-items: center;
+            border: 3px solid black;
+            background: rgba(255, 255, 255, 0.65) !important;
+            .playerHookInput {
+                font-size: 18px;
+                padding-left: 1em;
+                border-radius: 8px;
+                color: black !important;
+                background: transparent !important;
+                &::placeholder {
+                    color: black;
+                }
+            }
+        }
         .commandInputs {
             display: grid;
             grid-template-columns: 1fr;
@@ -557,13 +592,15 @@ footer {
             .updateRow {
                 gap: 15px;
                 display: grid;
+                padding: 5px 0 0;
                 transition: var(--transition);
                 grid-template-columns: 1fr 350px 1fr;
-                padding: 5px 0 0;
                 &.collapsed {
                     margin: 0;
                     opacity: 0;
                     height: 0px;
+                    left: -9999px;
+                    position: absolute;
                     pointer-events: none;
                 }
                 &.expanded {
@@ -578,6 +615,8 @@ footer {
                 margin: 0;
                 opacity: 0;
                 height: 0px;
+                left: -9999px;
+                position: absolute;
                 pointer-events: none;
             }
             &.expanded {
@@ -795,6 +834,9 @@ div[role="presentation"] {
         display: grid;
         align-items: center;
         grid-template-columns: 1fr 1fr 99px;
+        &.playerHookTagDetails {
+            grid-template-columns: 1fr 50px 85px;
+        }
         .playerEXP {
             text-align: right;
         }
@@ -1315,13 +1357,13 @@ div[role="presentation"] {
            margin: 0 0.3em 0 0;
        } 
        &[data-custombutton="true"] {
-            align-items: end;
-            min-height: 43px;
-            justify-content: center;
+           min-height: 79%;
+           align-items: center;
+           justify-content: center;
             button {
                 max-width: 30px;
                 * {
-                    height: 100%;
+                    height: 56%;
                 }
             }
        } 
