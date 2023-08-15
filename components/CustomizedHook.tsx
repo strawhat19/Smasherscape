@@ -148,7 +148,7 @@ const Listbox = styled(`ul`)(
   list-style: none;
   background-color: ${theme.palette.mode === 'dark' ? '#141414' : '#fff'};
   overflow: auto;
-  max-height: 100%;
+  max-height: 180px;
   border-radius: 4px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   z-index: 1;

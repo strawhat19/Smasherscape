@@ -654,6 +654,7 @@ form {
     grid-template-columns: 1fr 1fr 1fr;
     .inputWrapper {
         position: relative;
+        max-height: 91px;
         min-height: 55px;
         display: grid;
         width: 100%;
@@ -1300,6 +1301,12 @@ div[role="presentation"] {
         .recordSubDetails {
             font-size: 0.7em;
         }
+    }
+}
+
+@media (max-width: 390px) {
+    .codeTitle {
+        display: none;
     }
 }
 

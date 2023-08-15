@@ -18,19 +18,7 @@ export default function CommandsForm(props) {
     let [charOne, setCharOne] = useState(`Character-One`);
     let [charTwo, setCharTwo] = useState(`Character-Two`);
     let [stocksTaken, setStocksTaken] = useState<any>(`Stocks-Taken-From-Winner`);
-    const { players, command, setCommand, playersToSelect, setPlayersToSelect } = useContext<any>(StateContext);
-
-    const setDefaultCommand = (event: React.MouseEvent<HTMLElement>, commandToSet: Command) => setCommand(commandToSet);
-
-    const setDefaultCommandAutoCompleteInput = (e, val) => {
-        if (val) {
-            if (typeof val == `string`) {
-                return;
-            } else {
-                setCommand(val);
-            }
-        }
-    }
+    const { players, command, setCommand, playersToSelect } = useContext<any>(StateContext);
 
     const adjustStocks = (e, val) => {
         if (val) {
@@ -147,7 +135,7 @@ export default function CommandsForm(props) {
                 color="primary"
                 value={command}
                 aria-label="Platform"
-                onChange={(e, val) => setDefaultCommand(e, val)}
+                onChange={(e, val) => val && setCommand(val)}
             >
                 {Object.values(defaultCommands).filter(cmd => ![`!com`, `!add`, `!res`, `!set`, `!giv`].includes(cmd.command)).map((comm: Command, commIndex) => {
                     return (
