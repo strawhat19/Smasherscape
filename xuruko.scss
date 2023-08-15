@@ -465,6 +465,9 @@ li {
                     display: flex;
                     align-items: center;
                     justify-content: space-between;
+                    .playDate {
+                        font-size: 0.9em;
+                    }
                 }
             }
         }
@@ -782,10 +785,10 @@ form {
 .MuiAutocomplete-endAdornment {
     width: 100%;
     flex-direction: row;
-    // right: 65px !important;
     justify-content: space-between;
     button:nth-child(2) {
-        max-width: max-content;
+        max-width: max-content !important;
+        min-width: fit-content !important;
     }
 }
 
@@ -1013,13 +1016,23 @@ div[role="presentation"] {
 }
 
 .recordForm {
-    gap: 0px;
+    gap: 5px;
     margin: 0;
     width: 98%;
-    grid-gap: 0;
+    grid-template-columns: 1fr 1fr;
     .inputWrapper {
         max-height: 52px !important;
         min-height: 52px !important;
+        .MuiAutocomplete-endAdornment {
+            width: 85%;
+            right: 50px;
+            display: flex;
+        }
+        .MuiIconButton-root {
+            min-width: 100%;
+            align-items: center;
+            justify-content: flex-end;
+        }
         input {
             &.MuiAutocomplete-input {
                 max-height: 14px !important;
@@ -1148,6 +1161,12 @@ div[role="presentation"] {
     .recordOfPlayer {
         h3 {
             font-size: 1.85em !important;
+        }
+        .recordForms { 
+            display: none;
+        }
+        .playDate {
+            font-size: 18px;
         }
     }
 }

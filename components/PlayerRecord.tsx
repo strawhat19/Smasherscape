@@ -1,31 +1,84 @@
 import Play from '../models/Play';
-import { useContext } from 'react';
-import Player from '../models/Player';
 import { Badge } from '@mui/material';
-import { searchBlur } from './PlayerForm';
+import Player from '../models/Player';
 import { StateContext } from '../pages/_app';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
+import { useContext, useState, useEffect } from 'react';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
+import { getAllCharacters, getUniqueCharactersPlayed, searchBlur } from './PlayerForm';
 import { calcPlayerCharacterTimesPlayed, calcPlayerCharactersPlayed, calcPlayerLevelImage, getActivePlayers, getCharacterTitle, publicAssetLink } from './smasherscape';
+
+export const parseDate = (dateStr: any) => {
+    const parts = dateStr.split(`, `);
+    const timePart = parts[0];
+    const datePart = parts[1];
+    const datePartWithoutSuffix = datePart.replace(/(\d+)(st|nd|rd|th)/, `$1`);
+    const newDateStr = `${datePartWithoutSuffix}, ${timePart}`;
+    return new Date(newDateStr) as any;
+}
 
 function PlayerRecord(props) {
   let { plyr } = props;
-  const { players, filteredPlayers, setFilteredPlayers, devEnv } = useContext<any>(StateContext);
+  const { players, filteredPlayers, devEnv } = useContext<any>(StateContext);
+  let [plays, setPlays] = useState(plyr?.plays?.sort((a: any, b: any) => parseDate(b.date) - parseDate(a.date)));
 
-  const search = (e: any, value?: any) => {
-    console.log(`Search`, {e, value});
+  useEffect(() => {
+    setPlays(plyr?.plays?.sort((a: any, b: any) => parseDate(b.date) - parseDate(a.date)));
+  }, [players])
+
+  const searchRecordPlayers = (e: any, value?: any) => {
+    if (value) {
+        let searchTerm;
+        if (typeof value == `string`) {
+            searchTerm = value;
+        } else {
+            searchTerm = value?.name;
+        }
+        setPlays(plyr?.plays.filter(ply => ply?.winner == searchTerm || ply?.loser == searchTerm));
+    } else {
+        setPlays(plyr?.plays);
+    }
+    devEnv && console.log(`Search Record Players`, {e, value, plays});
   }
 
-  const parseDate = (dateStr: any) => {
-    const parts = dateStr.split(", ");
-    const timePart = parts[0];
-    const datePart = parts[1];
-    const datePartWithoutSuffix = datePart.replace(/(\d+)(st|nd|rd|th)/, "$1");
-    const newDateStr = `${datePartWithoutSuffix}, ${timePart}`;
-    return new Date(newDateStr) as any;
+  const searchRecordCharacters = (e: any, value?: any) => {
+    if (value) {
+        let searchTerm;
+        if (typeof value == `string`) {
+            searchTerm = value;
+        } else {
+            searchTerm = value?.label;
+        }
+        setPlays(plyr?.plays.filter(ply => ply?.character == searchTerm || ply?.otherCharacter == searchTerm));
+    } else {
+        setPlays(plyr?.plays);
+    }
+    devEnv && console.log(`Search Record Characters`, {e, value, plays});
   }
+
+  const getCharacterObjs = (active) => {
+    if (active == true) {
+        return getAllCharacters().filter(char => getUniqueCharactersPlayed(players).includes(char[1])).filter(char => plyr?.plays.map(ply => ply.otherCharacter).includes(char[1])).map((char, charIndex) => {
+            return {
+                id: charIndex + 1,
+                key: char[0],
+                label: char[1],
+                image: calcPlayerCharacterIcon(char[0])
+            }
+        })
+    } else {
+        return getAllCharacters().map((char, charIndex) => {
+            return {
+                id: charIndex + 1,
+                key: char[0],
+                label: char[1],
+                image: calcPlayerCharacterIcon(char[0])
+            }
+        })
+    }
+}
 
   const removeTrailingZeroDecimal = (number) => {
     let num = typeof number == `string` ? parseFloat(number) : number;
@@ -83,13 +136,13 @@ function PlayerRecord(props) {
                 <div className={`flex playerRecordBegin`}>
                     Player Record
                     <span className="recordPlays">
-                        {plyr?.plays?.length > 0 && <span className={`goldText`}>K/D: <span className="whiteText kdRatioNum">{calcPlayerKDRatio(plyr, plyr?.plays)}</span></span>}
-                        <span className={`greenText`}>Kills: <span className="whiteText">{calcPlayerKills(plyr, plyr?.plays)}</span></span>
-                        <span className={`redText`}>Deaths: <span className="whiteText">{calcPlayerDeaths(plyr, plyr?.plays)}</span></span>
-                        <span className={`blueText`}>Plays: <span className="whiteText">{plyr?.plays?.length}</span></span>
+                        {plyr?.plays?.length > 0 && <span className={`goldText`}>K/D: <span className="whiteText kdRatioNum">{calcPlayerKDRatio(plyr, plays)}</span></span>}
+                        <span className={`greenText`}>Kills: <span className="whiteText">{calcPlayerKills(plyr, plays)}</span></span>
+                        <span className={`redText`}>Deaths: <span className="whiteText">{calcPlayerDeaths(plyr, plays)}</span></span>
+                        <span className={`blueText`}>Plays: <span className="whiteText">{plays?.length}</span></span>
                     </span>
                 </div>
-                {plyr?.plays?.length > 0 && devEnv && <div className="flex white noShadow recordForms">
+                {plyr?.plays?.length > 0 && <div className="flex white noShadow recordForms">
                     <form action="submit" className="gridForm recordForm">
                         <div className={`inputWrapper materialBGInputWrapper`}>
                             <div className="inputBG materialBG"></div>
@@ -102,12 +155,12 @@ function PlayerRecord(props) {
                                         ...plyr,
                                         label: plyr.name,
                                     }
-                                })}
+                                }).filter(playr => playr.name != plyr.name && (plyr.plays.map(ply => ply.winner).includes(playr.name) || plyr.plays.map(ply => ply.loser).includes(playr.name)))}
                                 getOptionLabel={(option) => option.label}
-                                onChange={(e, val: any) => search(e, val)}
-                                onInputChange={(e, val: any) => search(e, val)}
+                                onChange={(e, val: any) => searchRecordPlayers(e, val)}
+                                onInputChange={(e, val: any) => searchRecordPlayers(e, val)}
                                 isOptionEqualToValue={(option, value) => option.id === value.id}
-                                renderInput={(params) => <TextField name={`search`} onBlur={(e) => searchBlur(e, filteredPlayers)} {...params} label="Search..." />}
+                                renderInput={(params) => <TextField name={`search`} onBlur={(e) => searchBlur(e, filteredPlayers)} {...params} label="Player(s)..." />}
                                 renderOption={(props: any, option: any) => {
                                     return (
                                         <div key={props?.key} {...props}>
@@ -135,44 +188,26 @@ function PlayerRecord(props) {
                                 }}
                             />
                         </div>
-                        <div className={`inputWrapper materialBGInputWrapper`}>
+                        <div className={`characterSearchAuto inputWrapper materialBGInputWrapper`}>
                             <div className="inputBG materialBG"></div>
                             <Autocomplete
                                 autoHighlight
                                 id="combo-box-demo"
                                 sx={{ width: `100%` }}
-                                options={getActivePlayers(players).map(plyr => {
-                                    return {
-                                        ...plyr,
-                                        label: plyr.name,
-                                    }
-                                })}
+                                options={getCharacterObjs(true)}
                                 getOptionLabel={(option) => option.label}
-                                onChange={(e, val: any) => search(e, val)}
-                                onInputChange={(e, val: any) => search(e, val)}
+                                onChange={(e, val: any) => searchRecordCharacters(e, val)}
+                                onInputChange={(e, val: any) => searchRecordCharacters(e, val)}
                                 isOptionEqualToValue={(option, value) => option.id === value.id}
-                                renderInput={(params) => <TextField name={`search`} onBlur={(e) => searchBlur(e, filteredPlayers)} {...params} label="Search..." />}
+                                renderInput={(params) => <TextField name={`characters`} {...params} label="Character(s)..." />}
                                 renderOption={(props: any, option: any) => {
                                     return (
                                         <div key={props?.key} {...props}>
-                                            <div className="autocompleteOption">
-                                                <div className="levelNumColumn">{option?.level?.num}</div>
-                                                <div className="levelImageColumn"><img width={30} src={calcPlayerLevelImage(option?.level?.name)} alt={option?.level?.name} /></div>
-                                                <div className="playerDetailsColumn">
-                                                    <div className="playerName">{option?.label}</div>
-                                                    <div className="playerEXP">{option?.experience?.arenaXP}</div>
-                                                    <div className="plays">
-                                                        <div className={`playsContainer`}>
-                                                            {calcPlayerCharactersPlayed(option).map((char, charIndex) => {
-                                                                return (
-                                                                    <Badge title={`Played ${getCharacterTitle(char)} ${calcPlayerCharacterTimesPlayed(option, char)} Time(s)`} key={charIndex} badgeContent={calcPlayerCharacterTimesPlayed(option, char)} color="primary">
-                                                                        <img className={`charImg`} width={25} src={calcPlayerCharacterIcon(char)} alt={getCharacterTitle(char)} />
-                                                                    </Badge>
-                                                                )
-                                                            })}
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                            <div className="autocompleteOption characterOption">
+                                                <div className="characterIndex">{option?.id}</div>
+                                                <img className={`charImg`} width={25} src={option.image} alt={option.label} />
+                                                <div className="spacer"></div>
+                                                <div className="characterName">{option?.label}</div>
                                             </div>
                                         </div>
                                     )
@@ -183,7 +218,7 @@ function PlayerRecord(props) {
                     </form>
                 </div>}
             </h3>
-            {plyr?.plays?.length > 0 ? plyr?.plays?.sort((a: any, b: any) => parseDate(b.date) - parseDate(a.date)).map((ply, plyIndex) => {
+            {plays?.length > 0 ? plays.map((ply, plyIndex) => {
                 let isWinner = ply?.winner == plyr?.name;
                 return (
                     <li className={`playerPlay`} key={plyIndex}>
