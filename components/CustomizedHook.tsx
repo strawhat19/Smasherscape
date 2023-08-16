@@ -104,7 +104,7 @@ const StyledTag = styled(Tag)<TagProps>(
   border: 1px solid ${theme.palette.mode === 'dark' ? '#303030' : '#e8e8e8'};
   border-radius: 2px;
   box-sizing: content-box;
-  padding: 0 4px 0 10px;
+  padding: 0 15px 0 10px;
   outline: 0;
   overflow: hidden;
 

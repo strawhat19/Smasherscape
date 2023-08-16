@@ -427,8 +427,9 @@ li {
     ul {
         width: 86%;
         font-size: 1.1em;
-        overflow: overlay;
         max-height: 290px;
+        overflow-x: hidden;
+        overflow-y: overlay;
         margin: 0 auto 15px;
         transition: var(--transition);
         li {
@@ -575,6 +576,7 @@ footer {
             margin: 0 auto;
             border-radius: 8px;
             align-items: center;
+            max-height: fit-content;
             border: 3px solid black;
             background: rgba(255, 255, 255, 0.65) !important;
             .playerHookInput {
@@ -795,7 +797,7 @@ form {
 div[role="presentation"] {
     background: var(--softWhite);
     backdrop-filter: blur(5px);
-    z-index: 99 !important;
+    z-index: 12 !important;
     width: 95% !important;
     border-radius: 8px;
     margin: 0 auto;
@@ -1169,6 +1171,32 @@ div[role="presentation"] {
             font-size: 18px;
         }
     }
+    .codeTitle {
+        display: none;
+    }
+    .commandsList {
+        li {
+            .desc {
+                display: none;
+            }
+        }
+        &.commandToCopy {
+            margin: 2em auto 1em;
+        }
+    }
+
+    .mobile {
+        .formsSection {
+            .commandsForm {
+                grid-gap: 5px !important;
+                .commandInputs {
+                    .updateRow {
+                        gap: 5px;
+                    }
+                }
+            }
+        }
+    }
 }
 
 @media (min-width: 677px) and (max-width: 1366px) {
@@ -1299,6 +1327,9 @@ div[role="presentation"] {
                 display: grid;
                 font-size: 0.85em;
                 grid-template-columns: 1fr 1fr;
+                &.empty {
+                    grid-template-columns: 1fr 1fr 1fr;
+                }
                 span {
                     justify-content: center;
                 }
@@ -1320,12 +1351,6 @@ div[role="presentation"] {
         .recordSubDetails {
             font-size: 0.7em;
         }
-    }
-}
-
-@media (max-width: 390px) {
-    .codeTitle {
-        display: none;
     }
 }
 
@@ -1448,7 +1473,7 @@ div[role="presentation"] {
 #topButton {
     width: 100%;
     right: 70px;
-    z-index: 99;
+    z-index: 13;
     bottom: 85px;
     display: block;
     position: fixed;

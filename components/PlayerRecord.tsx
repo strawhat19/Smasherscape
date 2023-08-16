@@ -135,7 +135,7 @@ function PlayerRecord(props) {
             <h3 className={`greenRecordText`}>
                 <div className={`flex playerRecordBegin`}>
                     Player Record
-                    <span className="recordPlays">
+                    <span className={`recordPlays ${plyr?.plays?.length > 0 ? `populated` : `empty`}`}>
                         {plyr?.plays?.length > 0 && <span className={`goldText`}>K/D: <span className="whiteText kdRatioNum">{calcPlayerKDRatio(plyr, plays)}</span></span>}
                         <span className={`greenText`}>Kills: <span className="whiteText">{calcPlayerKills(plyr, plays)}</span></span>
                         <span className={`redText`}>Deaths: <span className="whiteText">{calcPlayerDeaths(plyr, plays)}</span></span>
@@ -227,7 +227,7 @@ function PlayerRecord(props) {
                         <div className={`playMessage`}>{isWinner ? <div><span className={`${isWinner ? `winner` : `loser`}`}>Win</span> over {ply?.loser}</div> : <div><span className={`${isWinner ? `winner` : `loser`}`}>Loss</span> to {ply?.winner}</div>}
                             <div className="stocksRow">
                                 <div className="stocks">
-                                    {ply?.stocks?.map(stk => stk.character)?.includes(ply?.character) ? ply?.stocks?.length > 0 && ply?.stocks?.map((stok, stkIndex) => {
+                                    {isWinner ? ply?.stocks?.length > 0 && ply?.stocks?.map((stok, stkIndex) => {
                                         return (
                                             <span key={stkIndex} className={stok?.dead ? `dead` : `living`}>
                                                 <img className={`charImg`} width={35} src={calcPlayerCharacterIcon(stok?.character)} alt={getCharacterTitle(stok?.character)} />
@@ -243,7 +243,7 @@ function PlayerRecord(props) {
                                 </div>
                             vs 
                                 <div className="otherStocks">
-                                    {ply?.stocks?.map(stk => stk.character)?.includes(ply?.otherCharacter) ? ply?.stocks?.length > 0 && ply?.stocks?.map((stok, stkIndex) => {
+                                    {!isWinner ? ply?.stocks?.length > 0 && ply?.stocks?.map((stok, stkIndex) => {
                                         return (
                                             <span key={stkIndex} className={stok?.dead ? `dead` : `living`}>
                                                 <img className={`charImg`} width={35} src={calcPlayerCharacterIcon(stok?.character)} alt={getCharacterTitle(stok?.character)} />
