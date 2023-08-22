@@ -14,11 +14,12 @@ import Autocomplete from '@mui/material/Autocomplete';
 import { calcPlayerLevelAndExperience } from '../common/Levels';
 import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
 import { FormEvent, useContext, useEffect, useRef, useState } from 'react';
-import { doc, setDoc, collection, addDoc, getDocs, onSnapshot } from 'firebase/firestore';
-import { StateContext, showAlert, defaultPlayers, formatDate, generateUniqueID } from '../pages/_app';
+import { doc, setDoc, collection, addDoc, getDocs, onSnapshot, deleteDoc } from 'firebase/firestore';
+import { StateContext, showAlert, defaultPlayers, formatDate, generateUniqueID, dev } from '../pages/_app';
 import { calcPlayerCharacterTimesPlayed, calcPlayerCharactersPlayed, calcPlayerLevelImage, getActivePlayers, getCharacterTitle, isInvalid, newPlayerType } from './smasherscape';
 
-export const addPlayerToDB = async (playerObj) => await setDoc(doc(db, `players`, playerObj?.ID), playerObj);
+export const addPlayerToDB = async (playerObj: Player) => await setDoc(doc(db, `players`, playerObj?.ID), playerObj);
+export const deletePlayerFromDB = async (playerObj: Player) => await deleteDoc(doc(db, `players`, playerObj?.ID));
 
 export const searchBlur = (e: any, filteredPlayers: Player[]) => {
     if (filteredPlayers?.length == 0) {
@@ -186,7 +187,7 @@ export default function PlayerForm(props) {
         const unsubscribeFromSmasherScapeSnapShot = onSnapshot(collection(db, `players`), (querySnapshot) => {
             const playersFromDatabase = [];
             querySnapshot.forEach((doc) => playersFromDatabase.push(doc.data()));
-            devEnv && console.log(`Database Update for Players`, playersFromDatabase);
+            dev() && console.log(`Database Update for Players`, playersFromDatabase);
             setPlayers(playersFromDatabase);
             setDatabasePlayers(playersFromDatabase);
             setFilteredPlayers(playersFromDatabase);
@@ -243,21 +244,25 @@ export default function PlayerForm(props) {
         if (playersToDeleteFromDB.length > 0) {
             playersToDeleteFromDB.forEach((playerDB: Player) => {
                 (document.querySelector(`.clearAllTagsIcon`) as any).click();
-                setPlayers(prevPlayers => {
-                    let updatedPlayers: Player[] = prevPlayers.map((plyr: Player) => {
-                        if (plyr.name.toLowerCase() == playerDB.name.toLowerCase()) {
-                            return {
-                                ...plyr,
-                                disabled: true
-                            } as Player
-                        } else {
-                            return plyr as Player;
-                        }
+                if (useDatabase == true) {
+                    return deletePlayerFromDB(playerDB);
+                } else {
+                    setPlayers(prevPlayers => {
+                        let updatedPlayers: Player[] = prevPlayers.map((plyr: Player) => {
+                            if (plyr.name.toLowerCase() == playerDB.name.toLowerCase()) {
+                                return {
+                                    ...plyr,
+                                    disabled: true
+                                } as Player
+                            } else {
+                                return plyr as Player;
+                            }
+                        });
+                        setFilteredPlayers(updatedPlayers);
+                        updatePlayersDB(updatedPlayers);
+                        return updatedPlayers;
                     });
-                    setFilteredPlayers(updatedPlayers);
-                    updatePlayersDB(updatedPlayers);
-                    return updatedPlayers;
-                });
+                }
             })
         }
     }
