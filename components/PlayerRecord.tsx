@@ -163,7 +163,7 @@ function PlayerRecord(props) {
                                 renderInput={(params) => <TextField name={`search`} onBlur={(e) => searchBlur(e, filteredPlayers)} {...params} label="Player(s)..." />}
                                 renderOption={(props: any, option: any) => {
                                     return (
-                                        <div key={props?.key} {...props}>
+                                        <div key={option.id} {...props}>
                                             <div className="autocompleteOption">
                                                 <div className="levelNumColumn">{option?.level?.num}</div>
                                                 <div className="levelImageColumn"><img width={30} src={calcPlayerLevelImage(option?.level?.name)} alt={option?.level?.name} /></div>
@@ -202,7 +202,7 @@ function PlayerRecord(props) {
                                 renderInput={(params) => <TextField name={`characters`} {...params} label="Character(s)..." />}
                                 renderOption={(props: any, option: any) => {
                                     return (
-                                        <div key={props?.key} {...props}>
+                                        <div key={option.id} {...props}>
                                             <div className="autocompleteOption characterOption">
                                                 <div className="characterIndex">{option?.id}</div>
                                                 <img className={`charImg`} width={25} src={option.image} alt={option.label} />

@@ -1,19 +1,24 @@
 import  moment from 'moment';
 import Play from '../models/Play';
+import Role from '../models/Role';
 import Stock from '../models/Stock';
 import Level from '../models/Level';
 import { Badge } from '@mui/material';
 import Player from '../models/Player';
+import app, { db } from '../firebase';
 import { Commands } from './Commands';
 import Experience from '../models/Experience';
 import TextField from '@mui/material/TextField';
 import { Characters } from '../common/Characters';
 import Autocomplete from '@mui/material/Autocomplete';
-import { FormEvent, useContext, useRef, useState } from 'react';
 import { calcPlayerLevelAndExperience } from '../common/Levels';
 import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
-import { StateContext, showAlert, defaultPlayers } from '../pages/_app';
-import { calcPlayerCharacterTimesPlayed, calcPlayerCharactersPlayed, calcPlayerLevelImage, getActivePlayers, getCharacterTitle, isInvalid } from './smasherscape';
+import { FormEvent, useContext, useEffect, useRef, useState } from 'react';
+import { doc, setDoc, collection, addDoc, getDocs, onSnapshot } from 'firebase/firestore';
+import { StateContext, showAlert, defaultPlayers, formatDate, generateUniqueID } from '../pages/_app';
+import { calcPlayerCharacterTimesPlayed, calcPlayerCharactersPlayed, calcPlayerLevelImage, getActivePlayers, getCharacterTitle, isInvalid, newPlayerType } from './smasherscape';
+
+export const addPlayerToDB = async (playerObj) => await setDoc(doc(db, `players`, playerObj?.ID), playerObj);
 
 export const searchBlur = (e: any, filteredPlayers: Player[]) => {
     if (filteredPlayers?.length == 0) {
@@ -25,15 +30,79 @@ export const getAllCharacters = () => {
     return Object.entries(Characters).filter(char => char[0] === char[0].charAt(0).toUpperCase() + char[0].slice(1));
 }
 
+export const getCharacterObjects = () => {
+    return getAllCharacters().map((char, charIndex) => {
+        return {
+            id: charIndex + 1,
+            key: char[0],
+            label: char[1],
+            image: calcPlayerCharacterIcon(char[0]),
+            shortcuts: Object.entries(Characters).filter(entry => entry[1] == char[1]).map(entr => entr[0]),
+        }
+    })
+}
+
 export const getUniqueCharactersPlayed = (players) => {
     return [...new Set(players.flatMap((p: Player) => p.plays.flatMap((play: Play) => [play.character, play.otherCharacter]) ))].sort()
+}
+
+export const playerConverter = {
+    toFirestore: (playr) => {
+        return newPlayerType(playr);
+    },
+    fromFirestore: (snapshot, options) => {
+        const playrData = snapshot.data(options);
+        return newPlayerType(playrData);
+    }
+};
+
+export const createPlayer = (playerName, playerIndex, databasePlayers): Player => {
+    let currentDateTimeStamp = formatDate(new Date());
+    let uniqueIndex = databasePlayers.length + 1 + playerIndex;
+    let currentDateTimeStampNoSpaces = formatDate(new Date(), `timezoneNoSpaces`);
+    let uuid = generateUniqueID(databasePlayers.map(plyr => plyr?.uuid || plyr?.id));
+    let displayName = playerName.charAt(0).toUpperCase() + playerName.slice(1).toLowerCase();
+    let id = `${uniqueIndex}_Player_${displayName}_${currentDateTimeStampNoSpaces}_${uuid}`;
+    let ID = `${uniqueIndex} ${displayName} ${currentDateTimeStamp} ${uuid}`;
+    let playerObj: Player = {
+        id,
+        ID,
+        uuid,
+        displayName,
+        expanded: false,
+        playerLink: false,
+        name: displayName,
+        lastUpdatedBy: id,
+        plays: [] as Play[],
+        created: currentDateTimeStamp,
+        updated: currentDateTimeStamp,
+        lastUpdated: currentDateTimeStamp,
+        level: {
+            num: 1,
+            name: `Bronze Scimitar`
+        } as Level,
+        roles: [
+            {
+                promoted: currentDateTimeStamp,
+                name: `Player`,
+                level: 1,
+            }
+        ] as Role[],
+        experience: {
+            xp: 0,
+            arenaXP: 0,
+            nextLevelAt: 83,
+            remainingXP: 83
+        } as Experience,
+    };
+    return playerObj as Player;
 }
 
 export default function PlayerForm(props) {
 
     const searchInput = useRef();
     const commandsInput = useRef(); 
-    const { players, setPlayers, filteredPlayers, setFilteredPlayers, devEnv, useLocalStorage, commands, setPlayersToSelect } = useContext<any>(StateContext);
+    const { players, setPlayers, filteredPlayers, setFilteredPlayers, devEnv, useDatabase, useLocalStorage, commands, databasePlayers, setDatabasePlayers } = useContext<any>(StateContext);
 
     const searchPlayers = (e: any, value?: any, type?) => {
         let field = e.target as HTMLInputElement;
@@ -113,36 +182,49 @@ export default function PlayerForm(props) {
         }
     }
 
+    useEffect(() => {
+        const unsubscribeFromSmasherScapeSnapShot = onSnapshot(collection(db, `players`), (querySnapshot) => {
+            const playersFromDatabase = [];
+            querySnapshot.forEach((doc) => playersFromDatabase.push(doc.data()));
+            devEnv && console.log(`Database Update for Players`, playersFromDatabase);
+            setPlayers(playersFromDatabase);
+            setDatabasePlayers(playersFromDatabase);
+            setFilteredPlayers(playersFromDatabase);
+        });
+
+        return () => {
+            unsubscribeFromSmasherScapeSnapShot();
+        };
+    }, [])
+
     const addPlayers = (commandParams) => {
         let playersToAdd = commandParams.filter((comm, commIndex) => commIndex != 0 && comm);
-
-        playersToAdd.forEach((plyr, plyrIndex) => {
-            if (!getActivePlayers(players).map(playr => playr.name.toLowerCase()).some(nam => nam == plyr.toLowerCase())) {
-                setPlayers(prevPlayers => {
-                    let updatedPlayers: Player[] = [...prevPlayers, {
-                        id: prevPlayers.length + 1,
-                        name: plyr.charAt(0).toUpperCase() + plyr.slice(1).toLowerCase(),
-                        plays: [] as Play[],
-                        level: {
-                            num: 1,
-                            name: `Bronze Scimitar`
-                        } as Level,
-                        experience: {
-                            xp: 0,
-                            arenaXP: 0,
-                            nextLevelAt: 83,
-                            remainingXP: 83
-                        } as Experience,
-                    }];
-                    setFilteredPlayers(updatedPlayers);
-                    updatePlayersDB(updatedPlayers);
-                    return updatedPlayers;
-                });
+        [...new Set(playersToAdd)].forEach((plyr: any, plyrIndex) => {
+            let playerObj: Player = createPlayer(plyr, plyrIndex, databasePlayers);
+            if (useDatabase == true) {
+                if (!getActivePlayers(players).map(playr => playr.name.toLowerCase()).some(nam => nam == plyr.toLowerCase())) {
+                    addPlayerToDB(playerObj);
+                    return playerObj;
+                } else {
+                    showAlert(`Player(s) Added Already`, <h1>
+                        Player(s) with those name(s) already exist.
+                    </h1>, `65%`, `35%`);
+                    return;
+                }
             } else {
-                showAlert(`Players Added Already`, <h1>
-                    Players with those name(s) already exist.
-                </h1>, `65%`, `35%`);
-                return;
+                if (!getActivePlayers(players).map(playr => playr.name.toLowerCase()).some(nam => nam == plyr.toLowerCase())) {
+                    setPlayers(prevPlayers => {
+                        let updatedPlayers: Player[] = [...prevPlayers, playerObj];
+                        setFilteredPlayers(updatedPlayers);
+                        updatePlayersDB(updatedPlayers);
+                        return updatedPlayers;
+                    });
+                } else {
+                    showAlert(`Player(s) Added Already`, <h1>
+                        Player(s) with those name(s) already exist.
+                    </h1>, `65%`, `35%`);
+                    return;
+                }
             }
         })
     }
@@ -446,7 +528,7 @@ export default function PlayerForm(props) {
                 renderInput={(params) => <TextField name={`search`} onBlur={(e) => searchBlur(e, filteredPlayers)} {...params} label="Search Player(s) by Name..." />}
                 renderOption={(props: any, option: any) => {
                     return (
-                        <div key={props?.key} {...props}>
+                        <div key={option.id} {...props}>
                             <div className="autocompleteOption">
                                 <div className="levelNumColumn">{option?.level?.num}</div>
                                 <div className="levelImageColumn"><img width={30} src={calcPlayerLevelImage(option?.level?.name)} alt={option?.level?.name} /></div>
@@ -486,7 +568,7 @@ export default function PlayerForm(props) {
                 renderInput={(params) => <TextField name={`characters`} {...params} label="Search Player(s) by Character(s) Played..." />}
                 renderOption={(props: any, option: any) => {
                     return (
-                        <div key={props?.key} {...props}>
+                        <div key={option.id} {...props}>
                             <div className="autocompleteOption characterOption">
                                 <div className="characterIndex">{option?.id}</div>
                                 <img className={`charImg`} width={25} src={option.image} alt={option.label} />

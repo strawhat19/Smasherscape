@@ -1,19 +1,17 @@
-import Update from "./Update";
-
 export default class Role {
   [key: string]: any;
   constructor(
-    public id: any,
+    public level: any,
     public name: string,
-    public lastUpdatedBy: Update,
+    public promoted: string,
+    public lastUpdatedBy?: any,
     public description?: string,
     public dateUpdated?: string,
     public dateAdded?: string,
-    public uuid?: any,
   ) {
-    this.id = id;
-    this.uuid = uuid;
     this.name = name;
+    this.level = level;
+    this.promoted = promoted;
     this.dateAdded = dateAdded;
     this.dateUpdated = dateUpdated;
     this.description = description;

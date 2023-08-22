@@ -1189,6 +1189,11 @@ div[role="presentation"] {
         .formsSection {
             .commandsForm {
                 grid-gap: 5px !important;
+                .customHookRoot {
+                    .customHookListBox {
+                        max-height: 35px;
+                    }
+                }
                 .commandInputs {
                     .updateRow {
                         gap: 5px;

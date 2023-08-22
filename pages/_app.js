@@ -1,9 +1,11 @@
 import '../main.scss';
 import '../xuruko.scss';
 import '../concentration.scss';
+import app, { db } from '../firebase';
 import ReactDOM from 'react-dom/client';
 import { AnimatePresence, motion } from 'framer-motion';
 import { defaultCommands } from '../components/Commands';
+import { collection, onSnapshot } from "firebase/firestore";
 import { getActivePlayers } from '../components/smasherscape';
 import { createContext, useRef, useState, useEffect } from 'react';
 
@@ -68,6 +70,12 @@ export const defaultPlayers = [
   },
 ];
 
+export const getTimezone = (date) => {
+  const timeZoneString = new Intl.DateTimeFormat(undefined, {timeZoneName: `short`}).format(date);
+  const match = timeZoneString.match(/\b([A-Z]{3,5})\b/);
+  return match ? match[1] : ``;
+}
+
 export const formatDate = (date, specificPortion) => {
   let hours = date.getHours();
   let minutes = date.getMinutes();
@@ -76,31 +84,39 @@ export const formatDate = (date, specificPortion) => {
   hours = hours ? hours : 12; // the hour `0` should be `12`
   minutes = minutes < 10 ? `0` + minutes : minutes;
   let strTime = hours + `:` + minutes + ` ` + ampm;
+  let strTimeNoSpaces = hours + `:` + minutes + `_` + ampm;
   let completedDate = strTime + ` ` + (date.getMonth() + 1) + `/` + date.getDate() + `/` + date.getFullYear();
+  let timezone = getTimezone(date);
+
   if (specificPortion == `time`) {
     completedDate = strTime;
   } else if (specificPortion == `date`) {
-    completedDate = (date.getMonth() + 1) + `/` + date.getDate() + `/` + date.getFullYear();
+    completedDate = (date.getMonth() + 1) + `-` + date.getDate() + `-` + date.getFullYear();
+  } else if (specificPortion == `timezone`) {
+    completedDate = strTime + ` ` + (date.getMonth() + 1) + `-` + date.getDate() + `-` + date.getFullYear() + ` ` + timezone;
+  } else if (specificPortion == `timezoneNoSpaces`) {
+    completedDate = strTimeNoSpaces + `_` + (date.getMonth() + 1) + `-` + date.getDate() + `-` + date.getFullYear() + `_` + timezone;
   } else {
-    completedDate = strTime + ` ` + (date.getMonth() + 1) + `/` + date.getDate() + `/` + date.getFullYear();
+    completedDate = strTime + ` ` + (date.getMonth() + 1) + `-` + date.getDate() + `-` + date.getFullYear() + ` ` + timezone;
   }
+
   return completedDate;
 };
 
-export const generateUniqueID = (existingIDs, name) => {
-  let newID = Math.random().toString(36).substr(2, 9);
+export const generateUniqueID = (existingIDs) => {
+  const generateID = () => {
+    let id = Math.random().toString(36).substr(2, 9);
+    return Array.from(id).map(char => {
+      return Math.random() > 0.5 ? char.toUpperCase() : char;
+    }).join(``);
+  };
+  let newID = generateID();
   if (existingIDs && existingIDs.length > 0) {
     while (existingIDs.includes(newID)) {
-      newID = Math.random().toString(36).substr(2, 9);
+      newID = generateID();
     }
   }
-  if (name && existingIDs && existingIDs.length > 0) {
-    return `${name}_${existingIDs.length + 1}_${formatDate(new Date())}_${newID}`.replace(/\s+/g, `_`).replace(/[:/]/g, `_`);
-  } else if (name && !existingIDs) {
-    return `${name}_${formatDate(new Date())}_${newID}`.replace(/\s+/g, `_`).replace(/[:/]/g, `_`);
-  } else {
-    return `${formatDate(new Date())}_${newID}`.replace(/\s+/g, `_`).replace(/[:/]/g, `_`);
-  }
+  return newID;
 };
 
 export const dev = (item, source) => {
@@ -279,12 +295,12 @@ export const showAlert = async (title, component, width, height) => {
   // Add transition styles for smooth fade-in/out
   overlay.style.opacity = 0;
   // overlay.style.transform = `translateY(-50px)`;
-  overlay.style.transition = `opacity 0.3s ease-out, transform 0.3s ease-out`;
+  overlay.style.transition = `opacity 240ms ease-out, transform 240ms ease-out`;
   alertDialog.style.opacity = 0;
   if (width) alertDialog.style.width = `${width}`;
   if (height) alertDialog.style.height = `${height}`;
   alertDialog.style.transform = `translateY(-50px)`;
-  alertDialog.style.transition = `opacity 0.3s ease-out, transform 0.3s ease-out`;
+  alertDialog.style.transition = `opacity 240ms ease-out, transform 240ms ease-out`;
 
   ReactDOM.createRoot(alertDialog).render(<>
     <h2 className={`alertTitle`}>{title}</h2>
@@ -301,7 +317,7 @@ export const showAlert = async (title, component, width, height) => {
       setTimeout(() => {
         document.body.removeChild(overlay);
         localStorage.setItem(`alertOpen`, false);
-      }, 300);
+      }, 240);
     }} className={`alertButton iconButton`}>
       <span>X</span>
     </button>
@@ -332,7 +348,7 @@ export const showAlert = async (title, component, width, height) => {
       setTimeout(() => {
         document.body.removeChild(overlay);
         localStorage.setItem(`alertOpen`, false);
-      }, 300);
+      }, 240);
     }
   });
 }
@@ -373,15 +389,15 @@ export default function Xuruko({ Component, pageProps, router }) {
     let [systemStatus, setSystemStatus] = useState(``);
     let [buttonText, setButtonText] = useState(`Next`);
     let [rearranging, setRearranging] = useState(false);
+    let [useDatabase, setUseDatabase] = useState(true);
     let [content, setContent] = useState(`defaultContent`);
-    let [playersToSelect, setPlayersToSelect] = useState([]);
+    let [commands, setCommands] = useState(defaultCommands);
     let [year, setYear] = useState(new Date().getFullYear());
     let [useLocalStorage, setUseLocalStorage] = useState(true);
-
     let [command, setCommand] = useState(defaultCommands.Update);
-    let [commands, setCommands] = useState(defaultCommands);
-    
-    let [players, setPlayers] = useState(defaultPlayers);
+    let [players, setPlayers] = useState([]);
+    let [playersToSelect, setPlayersToSelect] = useState([]);
+    let [databasePlayers, setDatabasePlayers] = useState([]);
     let [filteredPlayers, setFilteredPlayers] = useState(players);
 
     const setBrowserUI = () => {
@@ -403,12 +419,14 @@ export default function Xuruko({ Component, pageProps, router }) {
       }
     }
 
-    const setPlayersUI = () => {
+    const setPlayersUI = async () => {
       let storedPlayers = JSON.parse(localStorage.getItem(`players`));
       if (storedPlayers && useLocalStorage) {
-        setPlayers(storedPlayers);
-        setFilteredPlayers(storedPlayers);
-        dev() && console.log(`Players`, getActivePlayers(storedPlayers));
+        if (useDatabase != true) {
+          setPlayers(storedPlayers);
+          setFilteredPlayers(storedPlayers);
+          dev() && console.log(`Players`, getActivePlayers(storedPlayers));
+        }
       } else {
         setPlayers(defaultPlayers);
         dev() && console.log(`Players`, getActivePlayers(defaultPlayers));
@@ -452,9 +470,10 @@ export default function Xuruko({ Component, pageProps, router }) {
       //   window.removeEventListener(`resize`, () => windowEvents());
       //   window.removeEventListener(`scroll`, () => windowEvents());
       // }
+
     }, [rte, user, users, authState, dark])
 
-    return <StateContext.Provider value={{ router, rte, setRte, updates, setUpdates, content, setContent, width, setWidth, user, setUser, page, setPage, mobileMenu, setMobileMenu, users, setUsers, authState, setAuthState, emailField, setEmailField, devEnv, setDevEnv, mobileMenuBreakPoint, platform, setPlatform, focus, setFocus, highScore, setHighScore, color, setColor, dark, setDark, colorPref, setColorPref, qotd, setQotd, alertOpen, setAlertOpen, mobile, setMobile, systemStatus, setSystemStatus, loading, setLoading, anim, setAnimComplete, IDs, setIDs, categories, setCategories, browser, setBrowser, onMac, rearranging, setRearranging, buttonText, setButtonText, gameFormStep, setGameFormStep, players, setPlayers, filteredPlayers, setFilteredPlayers, useLocalStorage, setUseLocalStorage, command, setCommand, commands, setCommands, playersToSelect, setPlayersToSelect }}>
+    return <StateContext.Provider value={{ router, rte, setRte, updates, setUpdates, content, setContent, width, setWidth, user, setUser, page, setPage, mobileMenu, setMobileMenu, users, setUsers, authState, setAuthState, emailField, setEmailField, devEnv, setDevEnv, mobileMenuBreakPoint, platform, setPlatform, focus, setFocus, highScore, setHighScore, color, setColor, dark, setDark, colorPref, setColorPref, qotd, setQotd, alertOpen, setAlertOpen, mobile, setMobile, systemStatus, setSystemStatus, loading, setLoading, anim, setAnimComplete, IDs, setIDs, categories, setCategories, browser, setBrowser, onMac, rearranging, setRearranging, buttonText, setButtonText, gameFormStep, setGameFormStep, players, setPlayers, filteredPlayers, setFilteredPlayers, useLocalStorage, setUseLocalStorage, command, setCommand, commands, setCommands, playersToSelect, setPlayersToSelect, databasePlayers, setDatabasePlayers, useDatabase, setUseDatabase }}>
       {(browser != `chrome` || onMac) ? <AnimatePresence mode={`wait`}>
         <motion.div className={bodyClasses} key={router.route} initial="pageInitial" animate="pageAnimate" exit="pageExit" transition={{ duration: 0.35 }} variants={{
           pageInitial: {

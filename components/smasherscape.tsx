@@ -48,10 +48,6 @@ export const getActivePlayers = (players: Player[]) => {
             }
             return b.plays.length - a.plays.length;
         })
-        .map((player: Player) => {
-            let newPlayer = newPlayerType(player);
-            return newPlayer;
-        });
 }
 
 export const calcPlayerLevelImage = (levelName) => {

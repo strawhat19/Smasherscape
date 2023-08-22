@@ -11,11 +11,11 @@ export const calcPlayerWins = (plyr: Player) => plyr.plays.filter(ply => ply.win
 export const calcPlayerLosses = (plyr: Player) => plyr.plays.filter(ply => ply.loser.toLowerCase() == plyr.name.toLowerCase()).length;
 
 export default function PlayerCard(props) {
-    const { players, setFilteredPlayers } = useContext<any>(StateContext);
+    const { filteredPlayers, setFilteredPlayers } = useContext<any>(StateContext);
     let { plyr } = props;
     
     const setPlayerExpanded = (player: Player) => {
-        let updatedPlayers: Player[] = players.map((plyr: Player) => {
+        let updatedPlayers: Player[] = filteredPlayers.map((plyr: Player) => {
             if (plyr?.id == player?.id) {
                 if (plyr.expanded) {
                     plyr.expanded = !plyr.expanded;
@@ -32,7 +32,7 @@ export default function PlayerCard(props) {
         return updatedPlayers;
     }
 
-    return <div className={`playerCard ${plyr?.expanded ? `expandedPlayerCard` : `collapsedPlayerCard`}`}>
+    return <div id={plyr.id} className={`playerCard ${plyr?.expanded ? `expandedPlayerCard` : `collapsedPlayerCard`}`}>
     <div className="gridCard" onClick={(e) => setPlayerExpanded(plyr)}>
         <LazyLoadImage effect="blur" src={`${publicAssetLink}/assets/smasherscape/OSRS_Card_Empty.png?raw=true`} className={`cardBG`} alt={`Smasherscape Player Card`} />
         <LazyLoadImage effect="blur" src={`${publicAssetLink}/assets/smasherscape/OSRS_Card_Template_Border_Only.png?raw=true`} className={`cardBG border`} alt={`Smasherscape Player Card`} />

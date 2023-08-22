@@ -169,7 +169,7 @@ export default function CommandsForm(props) {
                                 renderInput={(params) => <TextField name={`players`} {...params} label="Players..." />}
                                 renderOption={(props: any, option: any) => {
                                     return (
-                                        <div key={props?.key} {...props}>
+                                        <div key={option.id} {...props}>
                                             <div className="autocompleteOption">
                                                 <div className="levelNumColumn">{option?.level?.num}</div>
                                                 <div className="levelImageColumn"><img width={30} src={calcPlayerLevelImage(option?.level?.name)} alt={option?.level?.name} /></div>
@@ -208,7 +208,7 @@ export default function CommandsForm(props) {
                                 renderInput={(params) => <TextField name={`condition`} {...params} label="Condition..." />}
                                 renderOption={(props: any, option: any) => {
                                     return (
-                                        <div key={props?.key} {...props}>
+                                        <div key={option.id} {...props}>
                                             <div className="autocompleteOption singularLabel">
                                                 {option.label}
                                             </div>
@@ -236,7 +236,7 @@ export default function CommandsForm(props) {
                                 renderInput={(params) => <TextField name={`players`} {...params} label="Players..." />}
                                 renderOption={(props: any, option: any) => {
                                     return (
-                                        <div key={props?.key} {...props}>
+                                        <div key={option.id} {...props}>
                                             <div className="autocompleteOption">
                                                 <div className="levelNumColumn">{option?.level?.num}</div>
                                                 <div className="levelImageColumn"><img width={30} src={calcPlayerLevelImage(option?.level?.name)} alt={option?.level?.name} /></div>
@@ -277,7 +277,7 @@ export default function CommandsForm(props) {
                                 renderInput={(params) => <TextField name={`characters`} {...params} label="Characters..." />}
                                 renderOption={(props: any, option: any) => {
                                     return (
-                                        <div key={props?.key} {...props}>
+                                        <div key={option?.id} {...props}>
                                             <div className="autocompleteOption characterOption">
                                                 <div className="characterIndex">{option?.id}</div>
                                                 <img className={`charImg`} width={25} src={option.image} alt={option.label} />
@@ -303,7 +303,7 @@ export default function CommandsForm(props) {
                                 renderInput={(params) => <TextField name={`stocks`} {...params} label="Stocks..." />}
                                 renderOption={(props: any, option: any) => {
                                     return (
-                                        <div key={props?.key} {...props}>
+                                        <div key={option?.id} {...props}>
                                             <div className="autocompleteOption singularLabel">
                                                 {option.label}
                                             </div>
@@ -326,7 +326,7 @@ export default function CommandsForm(props) {
                                 renderInput={(params) => <TextField name={`characters`} {...params} label="Characters..." />}
                                 renderOption={(props: any, option: any) => {
                                     return (
-                                        <div key={props?.key} {...props}>
+                                        <div key={option?.label} {...props}>
                                             <div className="autocompleteOption characterOption">
                                                 <div className="characterIndex">{option?.id}</div>
                                                 <img className={`charImg`} width={25} src={option.image} alt={option.label} />
