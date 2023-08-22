@@ -1,5 +1,6 @@
 import React from 'react';
 import CodeBlock from "./CodeBlock";
+import Player from '../models/Player';
 import Command from "../models/Command";
 import { defaultCommands } from "./Commands";
 import { StateContext } from "../pages/_app";
@@ -11,9 +12,9 @@ import { Autocomplete, Badge, TextField, ToggleButton, ToggleButtonGroup } from 
 import { calcPlayerCharacterTimesPlayed, calcPlayerCharactersPlayed, calcPlayerLevelImage, getActivePlayers, getCharacterTitle } from "./smasherscape";
 
 export default function CommandsForm(props) {
+    let [playerOne, setPlayerOne] = useState({});
+    let [playerTwo, setPlayerTwo] = useState({});
     let [characters, setCharacters] = useState([]);
-    let [playerTwo, setPlayerTwo] = useState(`Player-Two`);
-    let [playerOne, setPlayerOne] = useState(`Player-One`);
     let [condition, setCondition] = useState(`vs`);
     let [charOne, setCharOne] = useState(`Character-One`);
     let [charTwo, setCharTwo] = useState(`Character-Two`);
@@ -53,17 +54,18 @@ export default function CommandsForm(props) {
 
     const adjustPlayers = (e, val, winnerOrLoser) => {
         if (val) {
+            console.log(`Val`, val);
             if (winnerOrLoser == `winner`) {
                 if (typeof val == `string`) {
                     setPlayerOne(val);   
                 } else {
-                    setPlayerOne(val.name);
+                    setPlayerOne(val);
                 }
             } else {
                 if (typeof val == `string`) {
                     setPlayerTwo(val);
                 } else {
-                    setPlayerTwo(val.name);
+                    setPlayerTwo(val);
                 }
             }
         }
@@ -156,10 +158,10 @@ export default function CommandsForm(props) {
                                 autoHighlight
                                 id="combo-box-demo"
                                 sx={{ width: `100%` }}
-                                options={getActivePlayers(players).map(plyr => {
+                                options={getActivePlayers(players).map((plyr: Player, plyrIndex) => {
                                     return {
                                         ...plyr,
-                                        label: plyr.name,
+                                        label: plyrIndex + 1 + ` ` + plyr.name,
                                     }
                                 }).filter(plyr => plyr?.name != playerTwo)}
                                 getOptionLabel={(option) => option.label}
@@ -167,20 +169,20 @@ export default function CommandsForm(props) {
                                 onInputChange={(e, val: any) => adjustPlayers(e, val, `winner`)}
                                 isOptionEqualToValue={(option, value) => option.id === value.id}
                                 renderInput={(params) => <TextField name={`players`} {...params} label="Players..." />}
-                                renderOption={(props: any, option: any) => {
+                                renderOption={(props: any, playerOption: any) => {
                                     return (
-                                        <div key={option.id} {...props}>
+                                        <div key={playerOption.id} {...props}>
                                             <div className="autocompleteOption">
-                                                <div className="levelNumColumn">{option?.level?.num}</div>
-                                                <div className="levelImageColumn"><img width={30} src={calcPlayerLevelImage(option?.level?.name)} alt={option?.level?.name} /></div>
+                                                <div className="levelNumColumn">Lv {playerOption?.level?.num}</div>
+                                                <div className="levelImageColumn"><img width={30} src={calcPlayerLevelImage(playerOption?.level?.name)} alt={playerOption?.level?.name} /></div>
                                                 <div className="playerDetailsColumn">
-                                                    <div className="playerName">{option?.label}</div>
-                                                    <div className="playerEXP">{option?.experience?.arenaXP}</div>
+                                                    <div className="playerName">{playerOption?.name}</div>
+                                                    <div className="playerEXP">{playerOption?.experience?.arenaXP}</div>
                                                     <div className="plays">
                                                         <div className={`playsContainer`}>
-                                                            {calcPlayerCharactersPlayed(option).map((char, charIndex) => {
+                                                            {calcPlayerCharactersPlayed(playerOption).map((char, charIndex) => {
                                                                 return (
-                                                                    <Badge title={`Played ${getCharacterTitle(char)} ${calcPlayerCharacterTimesPlayed(option, char)} Time(s)`} key={charIndex} badgeContent={calcPlayerCharacterTimesPlayed(option, char)} color="primary">
+                                                                    <Badge title={`Played ${getCharacterTitle(char)} ${calcPlayerCharacterTimesPlayed(playerOption, char)} Time(s)`} key={charIndex} badgeContent={calcPlayerCharacterTimesPlayed(playerOption, char)} color="primary">
                                                                         <img className={`charImg`} width={25} src={calcPlayerCharacterIcon(char)} alt={getCharacterTitle(char)} />
                                                                     </Badge>
                                                                 )
@@ -223,10 +225,10 @@ export default function CommandsForm(props) {
                                 autoHighlight
                                 id="combo-box-demo"
                                 sx={{ width: `100%` }}
-                                options={getActivePlayers(players).map(plyr => {
+                                options={getActivePlayers(players).map((plyr: Player, plyrIndex) => {
                                     return {
                                         ...plyr,
-                                        label: plyr.name,
+                                        label: plyrIndex + 1 + ` ` + plyr.name,
                                     }
                                 }).filter(plyr => plyr.name != playerOne)}
                                 getOptionLabel={(option) => option.label}
@@ -234,20 +236,20 @@ export default function CommandsForm(props) {
                                 onInputChange={(e, val: any) => adjustPlayers(e, val, `loser`)}
                                 isOptionEqualToValue={(option, value) => option.id === value.id}
                                 renderInput={(params) => <TextField name={`players`} {...params} label="Players..." />}
-                                renderOption={(props: any, option: any) => {
+                                renderOption={(props: any, playerOption: any) => {
                                     return (
-                                        <div key={option.id} {...props}>
+                                        <div key={playerOption.id} {...props}>
                                             <div className="autocompleteOption">
-                                                <div className="levelNumColumn">{option?.level?.num}</div>
-                                                <div className="levelImageColumn"><img width={30} src={calcPlayerLevelImage(option?.level?.name)} alt={option?.level?.name} /></div>
+                                                <div className="levelNumColumn">Lv {playerOption?.level?.num}</div>
+                                                <div className="levelImageColumn"><img width={30} src={calcPlayerLevelImage(playerOption?.level?.name)} alt={playerOption?.level?.name} /></div>
                                                 <div className="playerDetailsColumn">
-                                                    <div className="playerName">{option?.label}</div>
-                                                    <div className="playerEXP">{option?.experience?.arenaXP}</div>
+                                                    <div className="playerName">{playerOption?.name}</div>
+                                                    <div className="playerEXP">{playerOption?.experience?.arenaXP}</div>
                                                     <div className="plays">
                                                         <div className={`playsContainer`}>
-                                                            {calcPlayerCharactersPlayed(option).map((char, charIndex) => {
+                                                            {calcPlayerCharactersPlayed(playerOption).map((char, charIndex) => {
                                                                 return (
-                                                                    <Badge title={`Played ${getCharacterTitle(char)} ${calcPlayerCharacterTimesPlayed(option, char)} Time(s)`} key={charIndex} badgeContent={calcPlayerCharacterTimesPlayed(option, char)} color="primary">
+                                                                    <Badge title={`Played ${getCharacterTitle(char)} ${calcPlayerCharacterTimesPlayed(playerOption, char)} Time(s)`} key={charIndex} badgeContent={calcPlayerCharacterTimesPlayed(playerOption, char)} color="primary">
                                                                         <img className={`charImg`} width={25} src={calcPlayerCharacterIcon(char)} alt={getCharacterTitle(char)} />
                                                                     </Badge>
                                                                 )

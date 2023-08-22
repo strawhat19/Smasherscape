@@ -1,6 +1,5 @@
 
 import Main from './Main';
-import { db } from '../firebase';
 import Play from '../models/Play';
 import { useContext } from 'react';
 import Level from '../models/Level';
@@ -40,14 +39,19 @@ export const newPlayerType = (player: Player) => {
 }
 
 export const getActivePlayers = (players: Player[]) => {
-    return players
-        .filter(plyr => !plyr.disabled)
-        .sort((a,b) => {
-            if (b.experience.arenaXP !== a.experience.arenaXP) {
-                return b.experience.arenaXP - a.experience.arenaXP;
-            }
-            return b.plays.length - a.plays.length;
-        })
+    let activePlayers: Player[] = players.filter(plyr => !plyr.disabled).sort((a,b) => {
+        if (b.experience.arenaXP !== a.experience.arenaXP) {
+            return b.experience.arenaXP - a.experience.arenaXP;
+        }
+        return b.plays.length - a.plays.length;
+    }).map((plyr, plyrIndex) => {
+        return {
+            ...plyr,
+            label: plyrIndex + 1 + ` ` + plyr.name,
+        }
+    });
+    // console.log(`Active Players`, activePlayers);
+    return activePlayers;
 }
 
 export const calcPlayerLevelImage = (levelName) => {

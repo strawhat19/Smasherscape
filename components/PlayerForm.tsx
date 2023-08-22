@@ -102,16 +102,20 @@ export const createPlayer = (playerName, playerIndex, databasePlayers): Player =
 export default function PlayerForm(props) {
 
     const searchInput = useRef();
-    const commandsInput = useRef(); 
+    const commandsInput = useRef();
     const { players, setPlayers, filteredPlayers, setFilteredPlayers, devEnv, useDatabase, useLocalStorage, commands, databasePlayers, setDatabasePlayers } = useContext<any>(StateContext);
+
+    const getPlayerFromDBWithKeyVal = (key, val) => players.find(plyr => plyr[key] == val);
 
     const searchPlayers = (e: any, value?: any, type?) => {
         let field = e.target as HTMLInputElement;
         if (field && field.name == `commands`) return;
+        // console.log(`Value`, value);
         if (!value) value = field.value;
         if (value && value != ``) {
             if (type == `playerName`) {
                 if (typeof value == `string`) {
+                    // let plyrToSelect = getPlayerFromDBWithKeyVal(`ID`, value);
                     setFilteredPlayers(players.filter((plyr: Player) => {
                         return Object.values(plyr).some(val =>
                             typeof val === `string` && val.toLowerCase().includes(value?.toLowerCase())
@@ -203,15 +207,17 @@ export default function PlayerForm(props) {
         [...new Set(playersToAdd)].forEach((plyr: any, plyrIndex) => {
             let playerObj: Player = createPlayer(plyr, plyrIndex, databasePlayers);
             if (useDatabase == true) {
-                if (!getActivePlayers(players).map(playr => playr.name.toLowerCase()).some(nam => nam == plyr.toLowerCase())) {
-                    addPlayerToDB(playerObj);
-                    return playerObj;
-                } else {
-                    showAlert(`Player(s) Added Already`, <h1>
-                        Player(s) with those name(s) already exist.
-                    </h1>, `65%`, `35%`);
-                    return;
-                }
+                addPlayerToDB(playerObj);
+                return playerObj;
+                // if (!getActivePlayers(players).map(playr => playr.name.toLowerCase()).some(nam => nam == plyr.toLowerCase())) {
+                //     addPlayerToDB(playerObj);
+                //     return playerObj;
+                // } else {
+                //     showAlert(`Player(s) Added Already`, <h1>
+                //         Player(s) with those name(s) already exist.
+                //     </h1>, `65%`, `35%`);
+                //     return;
+                // }
             } else {
                 if (!getActivePlayers(players).map(playr => playr.name.toLowerCase()).some(nam => nam == plyr.toLowerCase())) {
                     setPlayers(prevPlayers => {
@@ -520,31 +526,31 @@ export default function PlayerForm(props) {
                 ref={searchInput}
                 id="combo-box-demo"
                 sx={{ width: `100%` }}
-                options={getActivePlayers(players).map(plyr => {
+                options={getActivePlayers(players).map((plyr: Player, plyrIndex) => {
                     return {
                         ...plyr,
-                        label: plyr.name,
+                        label: plyrIndex + 1 + ` ` + plyr.name,
                     }
                 })}
                 getOptionLabel={(option) => option.label}
                 onChange={(e, val: any) => searchPlayers(e, val, `playerName`)}
-                onInputChange={(e, val: any) => searchPlayers(e, val, `playerName`)}
                 isOptionEqualToValue={(option, value) => option.id === value.id}
+                onInputChange={(e, val: any) => searchPlayers(e, val, `playerName`)}
                 renderInput={(params) => <TextField name={`search`} onBlur={(e) => searchBlur(e, filteredPlayers)} {...params} label="Search Player(s) by Name..." />}
-                renderOption={(props: any, option: any) => {
+                renderOption={(props: any, playerOption: any) => {
                     return (
-                        <div key={option.id} {...props}>
+                        <div key={playerOption.id} {...props}>
                             <div className="autocompleteOption">
-                                <div className="levelNumColumn">{option?.level?.num}</div>
-                                <div className="levelImageColumn"><img width={30} src={calcPlayerLevelImage(option?.level?.name)} alt={option?.level?.name} /></div>
+                                <div className="levelNumColumn">Lv {playerOption?.level?.num}</div>
+                                <div className="levelImageColumn"><img width={30} src={calcPlayerLevelImage(playerOption?.level?.name)} alt={playerOption?.level?.name} /></div>
                                 <div className="playerDetailsColumn">
-                                    <div className="playerName">{option?.label}</div>
-                                    <div className="playerEXP">{option?.experience?.arenaXP}</div>
+                                    <div className="playerName">{playerOption?.name}</div>
+                                    <div className="playerEXP">{playerOption?.experience?.arenaXP}</div>
                                     <div className="plays">
                                         <div className={`playsContainer`}>
-                                            {calcPlayerCharactersPlayed(option).map((char, charIndex) => {
+                                            {calcPlayerCharactersPlayed(playerOption).map((char, charIndex) => {
                                                 return (
-                                                    <Badge title={`Played ${getCharacterTitle(char)} ${calcPlayerCharacterTimesPlayed(option, char)} Time(s)`} key={charIndex} badgeContent={calcPlayerCharacterTimesPlayed(option, char)} color="primary">
+                                                    <Badge title={`Played ${getCharacterTitle(char)} ${calcPlayerCharacterTimesPlayed(playerOption, char)} Time(s)`} key={charIndex} badgeContent={calcPlayerCharacterTimesPlayed(playerOption, char)} color="primary">
                                                         <img className={`charImg`} width={25} src={calcPlayerCharacterIcon(char)} alt={getCharacterTitle(char)} />
                                                     </Badge>
                                                 )
