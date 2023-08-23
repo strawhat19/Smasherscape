@@ -16,12 +16,15 @@ import { calcPlayerLevelAndExperience } from '../common/Levels';
 import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
 import { FormEvent, useContext, useEffect, useRef, useState } from 'react';
 import { calcPlayerDeaths, calcPlayerKDRatio, calcPlayerKills } from './PlayerRecord';
-import { doc, setDoc, collection, addDoc, getDocs, onSnapshot, deleteDoc } from 'firebase/firestore';
+import { doc, setDoc, collection, addDoc, getDocs, onSnapshot, deleteDoc, updateDoc } from 'firebase/firestore';
 import { StateContext, showAlert, defaultPlayers, formatDate, generateUniqueID, dev } from '../pages/_app';
 import { calcPlayerCharacterTimesPlayed, calcPlayerCharactersPlayed, calcPlayerLevelImage, getActivePlayers, getCharacterTitle, isInvalid, newPlayerType } from './smasherscape';
 
 export const addPlayerToDB = async (playerObj: Player) => await setDoc(doc(db, `players`, playerObj?.ID), playerObj);
 export const deletePlayerFromDB = async (playerObj: Player) => await deleteDoc(doc(db, `players`, playerObj?.ID));
+export const updatePlayerInDB = async (playerObj: Player, parameters) => {
+    await updateDoc(doc(db, `players`, playerObj?.ID), parameters);
+};
 
 export const searchBlur = (e: any, filteredPlayers: Player[]) => {
     if (filteredPlayers?.length == 0) {
@@ -75,7 +78,9 @@ export const createPlayer = (playerName, playerIndex, databasePlayers): Player =
         uuid,
         uniqueIndex,
         displayName,
+        active: true,
         xpModifier: 1,
+        disabled: false,
         expanded: false,
         playerLink: false,
         name: displayName,
@@ -118,7 +123,7 @@ export default function PlayerForm(props) {
 
     const searchInput = useRef();
     const commandsInput = useRef();
-    const { players, setPlayers, filteredPlayers, setFilteredPlayers, devEnv, useDatabase, useLocalStorage, commands, databasePlayers, setDatabasePlayers, setCommand, setCommandsToNotInclude } = useContext<any>(StateContext);
+    const { players, setPlayers, filteredPlayers, setFilteredPlayers, devEnv, useDatabase, useLocalStorage, commands, databasePlayers, setDatabasePlayers, setCommand, setCommandsToNotInclude, sameNamePlayeredEnabled, deleteCompletely } = useContext<any>(StateContext);
 
     const searchPlayers = (e: any, value?: any, type?) => {
         let field = e.target as HTMLInputElement;
@@ -205,7 +210,8 @@ export default function PlayerForm(props) {
             dev() && console.log(`Database Update for Players`, playersFromDatabase.map(pla => newPlayerType(pla)));
             setPlayers(playersFromDatabase);
             setDatabasePlayers(playersFromDatabase);
-            setFilteredPlayers(playersFromDatabase);
+            // setFilteredPlayers(playersFromDatabase);
+            setFilteredPlayers(getActivePlayers(playersFromDatabase));
             localStorage.setItem(`players`, JSON.stringify(playersFromDatabase));
             if (playersFromDatabase.length < 2 ) {
                 setCommand(defaultCommands.Delete);
@@ -226,17 +232,20 @@ export default function PlayerForm(props) {
         [...new Set(playersToAdd)].forEach((plyr: any, plyrIndex) => {
             let playerObj: Player = createPlayer(plyr, plyrIndex, databasePlayers);
             if (useDatabase == true) {
-                addPlayerToDB(playerObj);
-                return playerObj;
-                // if (!getActivePlayers(players).map(playr => playr.name.toLowerCase()).some(nam => nam == plyr.toLowerCase())) {
-                //     addPlayerToDB(playerObj);
-                //     return playerObj;
-                // } else {
-                //     showAlert(`Player(s) Added Already`, <h1>
-                //         Player(s) with those name(s) already exist.
-                //     </h1>, `65%`, `35%`);
-                //     return;
-                // }
+                if (sameNamePlayeredEnabled) {
+                    addPlayerToDB(playerObj);
+                    return playerObj;
+                } else {
+                    if (!getActivePlayers(players).map(playr => playr.name.toLowerCase()).some(nam => nam == plyr.toLowerCase())) {
+                        addPlayerToDB(playerObj);
+                        return playerObj;
+                    } else {
+                        showAlert(`Player(s) Added Already`, <h1>
+                            Player(s) with those name(s) already exist.
+                        </h1>, `65%`, `35%`);
+                        return;
+                    }
+                }
             } else {
                 if (!getActivePlayers(players).map(playr => playr.name.toLowerCase()).some(nam => nam == plyr.toLowerCase())) {
                     setPlayers(prevPlayers => {
@@ -260,7 +269,7 @@ export default function PlayerForm(props) {
         let playersToDelete = commandParams.filter((comm, commIndex) => commIndex != 0 && comm);
 
         playersToDelete.forEach(player => {
-            let playerDB: Player = players.find(plyr => plyr?.name.toLowerCase() == player.toLowerCase() || plyr?.name.toLowerCase().includes(player.toLowerCase()));
+            let playerDB: Player = filteredPlayers.find(plyr => plyr?.name.toLowerCase() == player.toLowerCase() || plyr?.name.toLowerCase().includes(player.toLowerCase()));
             if (playerDB) {
                 playersToDeleteFromDB.push(playerDB);
             }
@@ -270,7 +279,11 @@ export default function PlayerForm(props) {
             playersToDeleteFromDB.forEach((playerDB: Player) => {
                 (document.querySelector(`.clearAllTagsIcon`) as any).click();
                 if (useDatabase == true) {
-                    return deletePlayerFromDB(playerDB);
+                    if (deleteCompletely) {
+                        return deletePlayerFromDB(playerDB);
+                    } else {
+                        return updatePlayerInDB(playerDB, {disabled: true, active: false})
+                    }
                 } else {
                     setPlayers(prevPlayers => {
                         let updatedPlayers: Player[] = prevPlayers.map((plyr: Player) => {
@@ -556,6 +569,7 @@ export default function PlayerForm(props) {
                 isOptionEqualToValue={(option, value) => option.id === value.id}
                 onInputChange={(e, val: any) => searchPlayers(e, val, `playerName`)}
                 renderInput={(params) => <TextField name={`search`} onBlur={(e) => searchBlur(e, filteredPlayers)} {...params} label="Search Player(s) by Name..." />}
+                noOptionsText={`No Player(s) Found for Search`}
                 renderOption={(props: any, playerOption: any) => {
                     return (
                         <div key={playerOption.id} {...props}>
@@ -596,6 +610,7 @@ export default function PlayerForm(props) {
                 onInputChange={(e, val: any) => searchPlayers(e, val, `searchCharacters`)}
                 isOptionEqualToValue={(option, value) => option.id === value.id}
                 renderInput={(params) => <TextField name={`characters`} {...params} label="Search Player(s) by Character(s) Played..." />}
+                noOptionsText={`No Character(s) Found for Search`}
                 renderOption={(props: any, option: any) => {
                     return (
                         <div key={option.id} {...props}>

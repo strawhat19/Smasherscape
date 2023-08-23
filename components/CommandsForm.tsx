@@ -169,6 +169,7 @@ export default function CommandsForm(props) {
                                 isOptionEqualToValue={(option, value) => option.id === value.id}
                                 options={getActivePlayers(players).filter(plyr => plyr?.id != playerTwo?.id)}
                                 renderInput={(params) => <TextField name={`players`} {...params} label="Players..." />}
+                                noOptionsText={`No Player(s) Found for Search`}
                                 renderOption={(props: any, playerOption: any) => {
                                     return (
                                         <div key={playerOption.id} {...props}>
@@ -208,6 +209,7 @@ export default function CommandsForm(props) {
                                 onInputChange={(e, val: any) => adjustCondition(e, val)}
                                 isOptionEqualToValue={(option, value) => option.id === value.id}
                                 renderInput={(params) => <TextField name={`condition`} {...params} label="Condition..." />}
+                                noOptionsText={`No Condition(s) Found for Search`}
                                 renderOption={(props: any, option: any) => {
                                     return (
                                         <div key={option.id} {...props}>
@@ -231,6 +233,7 @@ export default function CommandsForm(props) {
                                 isOptionEqualToValue={(option, value) => option.id === value.id}
                                 options={getActivePlayers(players).filter(plyr => plyr.id != playerOne?.id)}
                                 renderInput={(params) => <TextField name={`players`} {...params} label="Players..." />}
+                                noOptionsText={`No Player(s) Found for Search`}
                                 renderOption={(props: any, playerOption: any) => {
                                     return (
                                         <div key={playerOption.id} {...props}>
@@ -272,6 +275,7 @@ export default function CommandsForm(props) {
                                 onInputChange={(e, val: any) => adjustCharacters(e, val, 1)}
                                 isOptionEqualToValue={(option, value) => option.id === value.id}
                                 renderInput={(params) => <TextField name={`characters`} {...params} label="Characters..." />}
+                                noOptionsText={`No Character(s) Found for Search`}
                                 renderOption={(props: any, option: any) => {
                                     return (
                                         <div key={option?.id} {...props}>
@@ -298,6 +302,7 @@ export default function CommandsForm(props) {
                                 onInputChange={(e, val: any) => adjustStocks(e, val)}
                                 isOptionEqualToValue={(option, value) => option.id === value.id}
                                 renderInput={(params) => <TextField name={`stocks`} {...params} label="Stocks..." />}
+                                noOptionsText={`No Stock(s) Found for Search`}
                                 renderOption={(props: any, option: any) => {
                                     return (
                                         <div key={option?.id} {...props}>
@@ -321,6 +326,7 @@ export default function CommandsForm(props) {
                                 onInputChange={(e, val: any) => adjustCharacters(e, val, 2)}
                                 isOptionEqualToValue={(option, value) => option.id === value.id}
                                 renderInput={(params) => <TextField name={`characters`} {...params} label="Characters..." />}
+                                noOptionsText={`No Character(s) Found for Search`}
                                 renderOption={(props: any, option: any) => {
                                     return (
                                         <div key={option?.label} {...props}>

@@ -54,7 +54,7 @@ export const newPlayerType = (player: Player, customObject = true) => {
 }
 
 export const getActivePlayers = (players: Player[]) => {
-    let activePlayers: Player[] = players.filter(plyr => !plyr.disabled).sort((a,b) => {
+    let activePlayers: Player[] = players.filter(plyr => (plyr.active || !plyr.disabled)).sort((a, b) => {
         if (b.experience.arenaXP !== a.experience.arenaXP) {
             return b.experience.arenaXP - a.experience.arenaXP;
         }

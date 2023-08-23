@@ -1190,8 +1190,11 @@ div[role="presentation"] {
             .commandsForm {
                 grid-gap: 5px !important;
                 .customHookRoot {
+                    overflow: hidden;
+                    max-height: 50px !important;
                     .customHookListBox {
-                        max-height: 35px;
+                        overflow: hidden;
+                        max-height: 35px !important;
                     }
                 }
                 .commandInputs {

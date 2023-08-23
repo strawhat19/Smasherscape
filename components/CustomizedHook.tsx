@@ -228,6 +228,7 @@ export default function CustomizedHook(props) {
     id: `players-search-complete`,
     options: getActivePlayers(players),
     getOptionLabel: (option) => option.label,
+    // noOptionsText: `No Player(s) Found for Search`,
     onChange: (e, val: any) => adjustPlayersToSelect(e, val),
     isOptionEqualToValue: (option, value) => option.id === value.id,
   });

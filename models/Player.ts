@@ -23,6 +23,7 @@ export default class Player {
     updated?: any,
     roles?: Role[],
     disabled?: any,
+    active?: any,
     email?: string,
     kills?: number,
     losses?: Play[],
