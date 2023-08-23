@@ -1405,6 +1405,12 @@ div[role="presentation"] {
         font-weight: 900;
         text-decoration: underline;
     }
+    .copyText {
+        color: white;
+        font-size: 16px;
+        font-weight: 500;
+        font-family: 'RuneScape Chat';
+    }
     div {
        &[data-custombutton="false"] {
            height: 100%;
@@ -1417,7 +1423,8 @@ div[role="presentation"] {
            align-items: center;
            justify-content: center;
             button {
-                max-width: 30px;
+                left: -7px;
+                max-width: 71px;
                 * {
                     height: 56%;
                 }

@@ -6,14 +6,16 @@ import Level from '../models/Level';
 import { Badge } from '@mui/material';
 import Player from '../models/Player';
 import app, { db } from '../firebase';
-import { Commands } from './Commands';
 import Experience from '../models/Experience';
 import TextField from '@mui/material/TextField';
 import { Characters } from '../common/Characters';
 import Autocomplete from '@mui/material/Autocomplete';
+import { Commands, defaultCommands } from './Commands';
+import { calcPlayerLosses, calcPlayerWins } from './PlayerCard';
 import { calcPlayerLevelAndExperience } from '../common/Levels';
 import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
 import { FormEvent, useContext, useEffect, useRef, useState } from 'react';
+import { calcPlayerDeaths, calcPlayerKDRatio, calcPlayerKills } from './PlayerRecord';
 import { doc, setDoc, collection, addDoc, getDocs, onSnapshot, deleteDoc } from 'firebase/firestore';
 import { StateContext, showAlert, defaultPlayers, formatDate, generateUniqueID, dev } from '../pages/_app';
 import { calcPlayerCharacterTimesPlayed, calcPlayerCharactersPlayed, calcPlayerLevelImage, getActivePlayers, getCharacterTitle, isInvalid, newPlayerType } from './smasherscape';
@@ -58,6 +60,7 @@ export const playerConverter = {
 };
 
 export const createPlayer = (playerName, playerIndex, databasePlayers): Player => {
+
     let currentDateTimeStamp = formatDate(new Date());
     let uniqueIndex = databasePlayers.length + 1 + playerIndex;
     let currentDateTimeStampNoSpaces = formatDate(new Date(), `timezoneNoSpaces`);
@@ -65,19 +68,24 @@ export const createPlayer = (playerName, playerIndex, databasePlayers): Player =
     let displayName = playerName.charAt(0).toUpperCase() + playerName.slice(1).toLowerCase();
     let id = `${uniqueIndex}_Player_${displayName}_${currentDateTimeStampNoSpaces}_${uuid}`;
     let ID = `${uniqueIndex} ${displayName} ${currentDateTimeStamp} ${uuid}`;
+
     let playerObj: Player = {
         id,
         ID,
         uuid,
+        uniqueIndex,
         displayName,
+        xpModifier: 1,
         expanded: false,
         playerLink: false,
         name: displayName,
         lastUpdatedBy: id,
         plays: [] as Play[],
+        username: displayName,
         created: currentDateTimeStamp,
         updated: currentDateTimeStamp,
         lastUpdated: currentDateTimeStamp,
+        label: `${uniqueIndex} ${displayName}`,
         level: {
             num: 1,
             name: `Bronze Scimitar`
@@ -96,26 +104,29 @@ export const createPlayer = (playerName, playerIndex, databasePlayers): Player =
             remainingXP: 83
         } as Experience,
     };
-    return playerObj as Player;
+
+    playerObj.wins = calcPlayerWins(playerObj);
+    playerObj.losses = calcPlayerLosses(playerObj);
+    playerObj.kills = calcPlayerKills(playerObj, []);
+    playerObj.deaths = calcPlayerDeaths(playerObj, []);
+    playerObj.kdRatio = calcPlayerKDRatio(playerObj, []);
+
+    return playerObj;
 }
 
 export default function PlayerForm(props) {
 
     const searchInput = useRef();
     const commandsInput = useRef();
-    const { players, setPlayers, filteredPlayers, setFilteredPlayers, devEnv, useDatabase, useLocalStorage, commands, databasePlayers, setDatabasePlayers } = useContext<any>(StateContext);
-
-    const getPlayerFromDBWithKeyVal = (key, val) => players.find(plyr => plyr[key] == val);
+    const { players, setPlayers, filteredPlayers, setFilteredPlayers, devEnv, useDatabase, useLocalStorage, commands, databasePlayers, setDatabasePlayers, setCommand, setCommandsToNotInclude } = useContext<any>(StateContext);
 
     const searchPlayers = (e: any, value?: any, type?) => {
         let field = e.target as HTMLInputElement;
         if (field && field.name == `commands`) return;
-        // console.log(`Value`, value);
         if (!value) value = field.value;
         if (value && value != ``) {
             if (type == `playerName`) {
                 if (typeof value == `string`) {
-                    // let plyrToSelect = getPlayerFromDBWithKeyVal(`ID`, value);
                     setFilteredPlayers(players.filter((plyr: Player) => {
                         return Object.values(plyr).some(val =>
                             typeof val === `string` && val.toLowerCase().includes(value?.toLowerCase())
@@ -191,10 +202,18 @@ export default function PlayerForm(props) {
         const unsubscribeFromSmasherScapeSnapShot = onSnapshot(collection(db, `players`), (querySnapshot) => {
             const playersFromDatabase = [];
             querySnapshot.forEach((doc) => playersFromDatabase.push(doc.data()));
-            dev() && console.log(`Database Update for Players`, playersFromDatabase);
+            dev() && console.log(`Database Update for Players`, playersFromDatabase.map(pla => newPlayerType(pla)));
             setPlayers(playersFromDatabase);
             setDatabasePlayers(playersFromDatabase);
             setFilteredPlayers(playersFromDatabase);
+            localStorage.setItem(`players`, JSON.stringify(playersFromDatabase));
+            if (playersFromDatabase.length < 2 ) {
+                setCommand(defaultCommands.Delete);
+                setCommandsToNotInclude([`!com`, `!add`, `!res`, `!set`, `!giv`, `!upd`]);
+            } else {
+                setCommand(defaultCommands.Update);
+                setCommandsToNotInclude([`!com`, `!add`, `!res`, `!set`, `!giv`]);
+            }
         });
 
         return () => {
@@ -270,6 +289,11 @@ export default function PlayerForm(props) {
                     });
                 }
             })
+        } else {
+            showAlert(`Can't Find Players`, <h1>
+                Can't find players with those names.
+            </h1>, `65%`, `35%`);
+            return;
         }
     }
 
@@ -526,12 +550,7 @@ export default function PlayerForm(props) {
                 ref={searchInput}
                 id="combo-box-demo"
                 sx={{ width: `100%` }}
-                options={getActivePlayers(players).map((plyr: Player, plyrIndex) => {
-                    return {
-                        ...plyr,
-                        label: plyrIndex + 1 + ` ` + plyr.name,
-                    }
-                })}
+                options={getActivePlayers(players)}
                 getOptionLabel={(option) => option.label}
                 onChange={(e, val: any) => searchPlayers(e, val, `playerName`)}
                 isOptionEqualToValue={(option, value) => option.id === value.id}

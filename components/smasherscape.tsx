@@ -5,11 +5,12 @@ import { useContext } from 'react';
 import Level from '../models/Level';
 import Player from '../models/Player';
 import PlayerForm from './PlayerForm';
-import PlayerCard from './PlayerCard';
 import CommandsForm from './CommandsForm';
 import { StateContext } from '../pages/_app';
 import Experience from '../models/Experience';
 import { Characters } from '../common/Characters';
+import PlayerCard, { calcPlayerLosses, calcPlayerWins } from './PlayerCard';
+import { calcPlayerDeaths, calcPlayerKDRatio, calcPlayerKills } from './PlayerRecord';
 
 export const publicAssetLink = `https://github.com/strawhat19/Smasherscape/blob/main`;
 export const calcPlayerCharacterTimesPlayed = (plyr: Player, char) => plyr.plays.map(ply => ply.character).filter(ply => ply.toLowerCase() == char || ply.toLowerCase().includes(char)).length;
@@ -24,8 +25,7 @@ export const removeEmptyParams = (object) => {
     return object;
 }
 
-export const newPlayerType = (player: Player) => {
-    let { id, name, expanded, xpModifier } = player;
+export const newPlayerType = (player: Player, customObject = true) => {
     let level: Level = new Level(player.level.name, player.level.num) as Level;
     let experience: Experience = new Experience(player.experience.nextLevelAt, player.experience.remainingXP, player.experience.arenaXP, player.experience.xp) as Experience;
     let plays: Play[] = player.plays.map((play: Play) => {
@@ -33,9 +33,24 @@ export const newPlayerType = (player: Player) => {
         let newPlay = new Play(date, loser, winner, stocks, character, stocksTaken, lossStocks, otherCharacter);
         return removeEmptyParams(newPlay) as Play;
     }) as Play[];
+    let wins = calcPlayerWins(player);
+    let losses = calcPlayerLosses(player);
+    let kills = calcPlayerKills(player, plays);
+    let deaths = calcPlayerDeaths(player, plays);
+    let kdRatio = calcPlayerKDRatio(player, plays);
     experience = removeEmptyParams(experience) as Experience;
-    let newPlayer: Player = new Player(id, name, level, plays, expanded, experience, xpModifier) as Player;
-    return removeEmptyParams(newPlayer) as Player;
+    let newPlayer: Player = new Player({
+        ...player,
+        level,
+        plays,
+        experience,
+        kills,
+        deaths,
+        kdRatio,
+        wins,
+        losses
+    }) as Player;
+    return new Player(removeEmptyParams(newPlayer)) as Player;
 }
 
 export const getActivePlayers = (players: Player[]) => {
@@ -44,13 +59,7 @@ export const getActivePlayers = (players: Player[]) => {
             return b.experience.arenaXP - a.experience.arenaXP;
         }
         return b.plays.length - a.plays.length;
-    }).map((plyr, plyrIndex) => {
-        return {
-            ...plyr,
-            label: plyrIndex + 1 + ` ` + plyr.name,
-        }
-    });
-    // console.log(`Active Players`, activePlayers);
+    }).map(pla => newPlayerType(pla));
     return activePlayers;
 }
 

@@ -394,11 +394,12 @@ export default function Xuruko({ Component, pageProps, router }) {
     let [commands, setCommands] = useState(defaultCommands);
     let [year, setYear] = useState(new Date().getFullYear());
     let [useLocalStorage, setUseLocalStorage] = useState(true);
-    let [command, setCommand] = useState(defaultCommands.Update);
     let [players, setPlayers] = useState([]);
     let [playersToSelect, setPlayersToSelect] = useState([]);
     let [databasePlayers, setDatabasePlayers] = useState([]);
     let [filteredPlayers, setFilteredPlayers] = useState(players);
+    let [command, setCommand] = useState(defaultCommands.Update);
+    let [commandsToNotInclude, setCommandsToNotInclude] = useState([`!com`, `!add`, `!res`, `!set`, `!giv`]);
 
     const setBrowserUI = () => {
       if (brwser == `` && (navigator.userAgent.match(/edg/i) || navigator.userAgent.includes(`edg`) || navigator.userAgent.includes(`Edg`))) {
@@ -419,19 +420,19 @@ export default function Xuruko({ Component, pageProps, router }) {
       }
     }
 
-    const setPlayersUI = async () => {
-      let storedPlayers = JSON.parse(localStorage.getItem(`players`));
-      if (storedPlayers && useLocalStorage) {
-        if (useDatabase != true) {
-          setPlayers(storedPlayers);
-          setFilteredPlayers(storedPlayers);
-          dev() && console.log(`Players`, getActivePlayers(storedPlayers));
-        }
-      } else {
-        setPlayers(defaultPlayers);
-        dev() && console.log(`Players`, getActivePlayers(defaultPlayers));
-      }
-    }
+    // const setPlayersUIFromLocalStorage = async () => {
+    //   let storedPlayers = JSON.parse(localStorage.getItem(`players`));
+    //   if (storedPlayers && useLocalStorage) {
+    //     if (useDatabase != true) {
+    //       setPlayers(storedPlayers);
+    //       setFilteredPlayers(storedPlayers);
+    //       dev() && console.log(`Players`, getActivePlayers(storedPlayers));
+    //     }
+    //   } else {
+    //     setPlayers(defaultPlayers);
+    //     dev() && console.log(`Players`, getActivePlayers(defaultPlayers));
+    //   }
+    // }
 
     useEffect(() => {
       setLoading(true);
@@ -453,7 +454,7 @@ export default function Xuruko({ Component, pageProps, router }) {
       setThemeUI();
       setBrowserUI();
       setSideBarUI();
-      setPlayersUI();
+      // setPlayersUIFromLocalStorage();
 
       setBodyClasses(`${rte= `` ? rte : `Index`} pageWrapContainer ${page != `` ? page?.toUpperCase() : `Home`} ${devEnv ? `devMode` : `prodMode`} ${onMac ? `isMac` : `isWindows`} ${mobile ? `mobile` : `desktop`}`);
 
@@ -473,7 +474,7 @@ export default function Xuruko({ Component, pageProps, router }) {
 
     }, [rte, user, users, authState, dark])
 
-    return <StateContext.Provider value={{ router, rte, setRte, updates, setUpdates, content, setContent, width, setWidth, user, setUser, page, setPage, mobileMenu, setMobileMenu, users, setUsers, authState, setAuthState, emailField, setEmailField, devEnv, setDevEnv, mobileMenuBreakPoint, platform, setPlatform, focus, setFocus, highScore, setHighScore, color, setColor, dark, setDark, colorPref, setColorPref, qotd, setQotd, alertOpen, setAlertOpen, mobile, setMobile, systemStatus, setSystemStatus, loading, setLoading, anim, setAnimComplete, IDs, setIDs, categories, setCategories, browser, setBrowser, onMac, rearranging, setRearranging, buttonText, setButtonText, gameFormStep, setGameFormStep, players, setPlayers, filteredPlayers, setFilteredPlayers, useLocalStorage, setUseLocalStorage, command, setCommand, commands, setCommands, playersToSelect, setPlayersToSelect, databasePlayers, setDatabasePlayers, useDatabase, setUseDatabase }}>
+    return <StateContext.Provider value={{ router, rte, setRte, updates, setUpdates, content, setContent, width, setWidth, user, setUser, page, setPage, mobileMenu, setMobileMenu, users, setUsers, authState, setAuthState, emailField, setEmailField, devEnv, setDevEnv, mobileMenuBreakPoint, platform, setPlatform, focus, setFocus, highScore, setHighScore, color, setColor, dark, setDark, colorPref, setColorPref, qotd, setQotd, alertOpen, setAlertOpen, mobile, setMobile, systemStatus, setSystemStatus, loading, setLoading, anim, setAnimComplete, IDs, setIDs, categories, setCategories, browser, setBrowser, onMac, rearranging, setRearranging, buttonText, setButtonText, gameFormStep, setGameFormStep, players, setPlayers, filteredPlayers, setFilteredPlayers, useLocalStorage, setUseLocalStorage, command, setCommand, commands, setCommands, playersToSelect, setPlayersToSelect, databasePlayers, setDatabasePlayers, useDatabase, setUseDatabase, commandsToNotInclude, setCommandsToNotInclude }}>
       {(browser != `chrome` || onMac) ? <AnimatePresence mode={`wait`}>
         <motion.div className={bodyClasses} key={router.route} initial="pageInitial" animate="pageAnimate" exit="pageExit" transition={{ duration: 0.35 }} variants={{
           pageInitial: {

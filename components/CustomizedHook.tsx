@@ -70,7 +70,7 @@ function Tag(props: TagProps) {
         <div className="levelNumColumn">{option?.level?.num}</div>
         <div className="levelImageColumn"><img width={30} src={calcPlayerLevelImage(option?.level?.name)} alt={option?.level?.name} /></div>
         <div className="playerHookTagDetails playerDetailsColumn">
-          <div className="playerName">{option?.label}</div>
+          <div className="playerName">{option?.name}</div>
           <div className="playerEXP">{option?.experience?.arenaXP}</div>
           <div className="plays">
             <div className={`playsContainer`}>
@@ -148,7 +148,7 @@ const Listbox = styled(`ul`)(
   list-style: none;
   background-color: ${theme.palette.mode === 'dark' ? '#141414' : '#fff'};
   overflow: auto;
-  max-height: 180px;
+  max-height: 350px;
   border-radius: 4px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   z-index: 1;
@@ -207,6 +207,7 @@ export default function CustomizedHook(props) {
   const { players, playersToSelect, setPlayersToSelect } = useContext<any>(StateContext);
 
   const adjustPlayersToSelect = (e: any, val: any) => {
+    // console.log(`adjustPlayersToSelect`, {e, val});
     setPlayersToSelect(val);
   }
 
@@ -225,15 +226,10 @@ export default function CustomizedHook(props) {
     multiple: true,
     defaultValue: [],
     id: `players-search-complete`,
-    options: getActivePlayers(players).map(plyr => {
-      return {
-        ...plyr,
-        label: plyr.name,
-      }
-    }),
+    options: getActivePlayers(players),
     getOptionLabel: (option) => option.label,
-    isOptionEqualToValue: (option, value) => option.id === value.id,
     onChange: (e, val: any) => adjustPlayersToSelect(e, val),
+    isOptionEqualToValue: (option, value) => option.id === value.id,
   });
 
   return (
@@ -260,7 +256,7 @@ export default function CustomizedHook(props) {
                     <div className="levelNumColumn">{option?.level?.num}</div>
                     <div className="levelImageColumn"><img width={30} src={calcPlayerLevelImage(option?.level?.name)} alt={option?.level?.name} /></div>
                     <div className="playerDetailsColumn">
-                      <div className="playerName">{option?.label}</div>
+                      <div className="playerName">{option?.name}</div>
                       <div className="playerEXP">{option?.experience?.arenaXP}</div>
                       <div className="plays">
                         <div className={`playsContainer`}>

@@ -1,6 +1,5 @@
 import React from 'react';
 import CodeBlock from "./CodeBlock";
-import Player from '../models/Player';
 import Command from "../models/Command";
 import { defaultCommands } from "./Commands";
 import { StateContext } from "../pages/_app";
@@ -11,15 +10,19 @@ import { calcPlayerCharacterIcon } from "../common/CharacterIcons";
 import { Autocomplete, Badge, TextField, ToggleButton, ToggleButtonGroup } from "@mui/material";
 import { calcPlayerCharacterTimesPlayed, calcPlayerCharactersPlayed, calcPlayerLevelImage, getActivePlayers, getCharacterTitle } from "./smasherscape";
 
+export const getDefaultPlayer = (number) => {return {
+    id: number, name: `Player-${number}`, label: `Player-${number}`
+}};
+
 export default function CommandsForm(props) {
-    let [playerOne, setPlayerOne] = useState({});
-    let [playerTwo, setPlayerTwo] = useState({});
     let [characters, setCharacters] = useState([]);
     let [condition, setCondition] = useState(`vs`);
     let [charOne, setCharOne] = useState(`Character-One`);
     let [charTwo, setCharTwo] = useState(`Character-Two`);
+    let [playerOne, setPlayerOne] = useState<any>(getDefaultPlayer(1));
+    let [playerTwo, setPlayerTwo] = useState<any>(getDefaultPlayer(2));
     let [stocksTaken, setStocksTaken] = useState<any>(`Stocks-Taken-From-Winner`);
-    const { players, command, setCommand, playersToSelect } = useContext<any>(StateContext);
+    const { players, command, setCommand, playersToSelect, commandsToNotInclude } = useContext<any>(StateContext);
 
     const adjustStocks = (e, val) => {
         if (val) {
@@ -54,16 +57,15 @@ export default function CommandsForm(props) {
 
     const adjustPlayers = (e, val, winnerOrLoser) => {
         if (val) {
-            console.log(`Val`, val);
             if (winnerOrLoser == `winner`) {
                 if (typeof val == `string`) {
-                    setPlayerOne(val);   
+                    setPlayerOne(getActivePlayers(players).find(plyr => plyr.label.toLowerCase() == val.toLowerCase()));   
                 } else {
                     setPlayerOne(val);
                 }
             } else {
                 if (typeof val == `string`) {
-                    setPlayerTwo(val);
+                    setPlayerTwo(getActivePlayers(players).find(plyr => plyr.label.toLowerCase() == val.toLowerCase()));
                 } else {
                     setPlayerTwo(val);
                 }
@@ -86,6 +88,9 @@ export default function CommandsForm(props) {
                     setCharTwo(val.key);
                 }
             }
+        } else {
+            setPlayerOne(getDefaultPlayer(1));
+            setPlayerTwo(getDefaultPlayer(2));
         }
     }
 
@@ -112,7 +117,7 @@ export default function CommandsForm(props) {
             } else if (command.command == `!giv`) {
                 return `!giv playerName (xp) amount`;
             } else {
-                return `!upd ${playerOne} ${condition} ${playerTwo} with ${charOne} vs ${charTwo} ${stocksTaken}`;
+                return `!upd ${playerOne?.name} ${condition} ${playerTwo?.name} with ${charOne} vs ${charTwo} ${stocksTaken}`;
             }
         }
     }
@@ -135,11 +140,11 @@ export default function CommandsForm(props) {
             <ToggleButtonGroup
                 exclusive
                 color="primary"
-                value={command}
                 aria-label="Platform"
                 onChange={(e, val) => val && setCommand(val)}
+                value={command}
             >
-                {Object.values(defaultCommands).filter(cmd => ![`!com`, `!add`, `!res`, `!set`, `!giv`].includes(cmd.command)).map((comm: Command, commIndex) => {
+                {Object.values(defaultCommands).filter(cmd => !commandsToNotInclude.includes(cmd.command)).map((comm: Command, commIndex) => {
                     return (
                         <ToggleButton key={commIndex} size={`small`} value={comm}>
                             <span className={`buttonInnerText`}>{comm?.command}</span>
@@ -158,16 +163,11 @@ export default function CommandsForm(props) {
                                 autoHighlight
                                 id="combo-box-demo"
                                 sx={{ width: `100%` }}
-                                options={getActivePlayers(players).map((plyr: Player, plyrIndex) => {
-                                    return {
-                                        ...plyr,
-                                        label: plyrIndex + 1 + ` ` + plyr.name,
-                                    }
-                                }).filter(plyr => plyr?.name != playerTwo)}
                                 getOptionLabel={(option) => option.label}
                                 onChange={(e, val: any) => adjustPlayers(e, val, `winner`)}
                                 onInputChange={(e, val: any) => adjustPlayers(e, val, `winner`)}
                                 isOptionEqualToValue={(option, value) => option.id === value.id}
+                                options={getActivePlayers(players).filter(plyr => plyr?.id != playerTwo?.id)}
                                 renderInput={(params) => <TextField name={`players`} {...params} label="Players..." />}
                                 renderOption={(props: any, playerOption: any) => {
                                     return (
@@ -225,16 +225,11 @@ export default function CommandsForm(props) {
                                 autoHighlight
                                 id="combo-box-demo"
                                 sx={{ width: `100%` }}
-                                options={getActivePlayers(players).map((plyr: Player, plyrIndex) => {
-                                    return {
-                                        ...plyr,
-                                        label: plyrIndex + 1 + ` ` + plyr.name,
-                                    }
-                                }).filter(plyr => plyr.name != playerOne)}
                                 getOptionLabel={(option) => option.label}
                                 onChange={(e, val: any) => adjustPlayers(e, val, `loser`)}
                                 onInputChange={(e, val: any) => adjustPlayers(e, val, `loser`)}
                                 isOptionEqualToValue={(option, value) => option.id === value.id}
+                                options={getActivePlayers(players).filter(plyr => plyr.id != playerOne?.id)}
                                 renderInput={(params) => <TextField name={`players`} {...params} label="Players..." />}
                                 renderOption={(props: any, playerOption: any) => {
                                     return (
