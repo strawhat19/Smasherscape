@@ -10,7 +10,7 @@ import { StateContext } from '../pages/_app';
 import Experience from '../models/Experience';
 import { Characters } from '../common/Characters';
 import PlayerCard, { calcPlayerLosses, calcPlayerWins } from './PlayerCard';
-import { calcPlayerDeaths, calcPlayerKDRatio, calcPlayerKills } from './PlayerRecord';
+import { calcPlayerDeaths, calcPlayerKDRatio, calcPlayerKills, removeTrailingZeroDecimal } from './PlayerRecord';
 
 export const publicAssetLink = `https://github.com/strawhat19/Smasherscape/blob/main`;
 export const calcPlayerCharacterTimesPlayed = (plyr: Player, char) => plyr.plays.map(ply => ply.character).filter(ply => ply.toLowerCase() == char || ply.toLowerCase().includes(char)).length;
@@ -26,6 +26,7 @@ export const removeEmptyParams = (object) => {
 }
 
 export const newPlayerType = (player: Player, customObject = true) => {
+
     let level: Level = new Level(player.level.name, player.level.num) as Level;
     let experience: Experience = new Experience(player.experience.nextLevelAt, player.experience.remainingXP, player.experience.arenaXP, player.experience.xp) as Experience;
     let plays: Play[] = player.plays.map((play: Play) => {
@@ -33,12 +34,15 @@ export const newPlayerType = (player: Player, customObject = true) => {
         let newPlay = new Play(date, loser, winner, stocks, character, stocksTaken, lossStocks, otherCharacter);
         return removeEmptyParams(newPlay) as Play;
     }) as Play[];
+
     let wins = calcPlayerWins(player);
     let losses = calcPlayerLosses(player);
+    let ratio = (wins/(wins+losses)) * 100;
     let kills = calcPlayerKills(player, plays);
     let deaths = calcPlayerDeaths(player, plays);
     let kdRatio = calcPlayerKDRatio(player, plays);
     experience = removeEmptyParams(experience) as Experience;
+
     let newPlayer: Player = new Player({
         ...player,
         level,
@@ -48,12 +52,16 @@ export const newPlayerType = (player: Player, customObject = true) => {
         deaths,
         kdRatio,
         wins,
-        losses
+        losses,
+        ratio,
+        percentage: (ratio) > 100 ? 100 : parseFloat(removeTrailingZeroDecimal(ratio)),
     }) as Player;
+
     return new Player(removeEmptyParams(newPlayer)) as Player;
 }
 
-export const getActivePlayers = (players: Player[]) => {
+export const getActivePlayers = (players: any[], customObject = true) => {
+   if (customObject) {
     let activePlayers: Player[] = players.filter(plyr => (plyr.active || !plyr.disabled)).sort((a, b) => {
         if (b.experience.arenaXP !== a.experience.arenaXP) {
             return b.experience.arenaXP - a.experience.arenaXP;
@@ -61,6 +69,15 @@ export const getActivePlayers = (players: Player[]) => {
         return b.plays.length - a.plays.length;
     }).map(pla => newPlayerType(pla));
     return activePlayers;
+   } else {
+    let activePlayers = players.filter(plyr => (plyr.active || !plyr.disabled)).sort((a, b) => {
+        if (b.experience.arenaXP !== a.experience.arenaXP) {
+            return b.experience.arenaXP - a.experience.arenaXP;
+        }
+        return b.plays.length - a.plays.length;
+    });
+    return activePlayers;
+   }
 }
 
 export const calcPlayerLevelImage = (levelName) => {

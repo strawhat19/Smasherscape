@@ -141,7 +141,7 @@ const StyledTag = styled(Tag)<TagProps>(
 const Listbox = styled(`ul`)(
   ({ theme }) => `
   width: 95%;
-  max-width: 350px;
+  max-width: 400px;
   margin: 50px 0 0;
   padding: 1em 0;
   position: absolute;
@@ -222,15 +222,16 @@ export default function CustomizedHook(props) {
     focused,
     setAnchorEl,
     getClearProps,
+    // limitTags,
   } = useAutocomplete({
     multiple: true,
     defaultValue: [],
     id: `players-search-complete`,
     options: getActivePlayers(players),
     getOptionLabel: (option) => option.label,
-    // noOptionsText: `No Player(s) Found for Search`,
     onChange: (e, val: any) => adjustPlayersToSelect(e, val),
     isOptionEqualToValue: (option, value) => option.id === value.id,
+    // limitTags: 2,
   });
 
   return (
@@ -254,11 +255,11 @@ export default function CustomizedHook(props) {
               <li className={`customHookOption`} key={index} {...getOptionProps({ option, index })}>
                 <div>
                   <div className="autocompleteOption">
-                    <div className="levelNumColumn">{option?.level?.num}</div>
+                    <div className="levelNumColumn">Lv {option?.level?.num}</div>
                     <div className="levelImageColumn"><img width={30} src={calcPlayerLevelImage(option?.level?.name)} alt={option?.level?.name} /></div>
                     <div className="playerDetailsColumn">
                       <div className="playerName">{option?.name}</div>
-                      <div className="playerEXP">{option?.experience?.arenaXP}</div>
+                      <div className="playerEXP">Exp: {option?.experience?.arenaXP}</div>
                       <div className="plays">
                         <div className={`playsContainer`}>
                           {calcPlayerCharactersPlayed(option).map((char, charIndex) => {

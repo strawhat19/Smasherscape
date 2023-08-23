@@ -70,6 +70,12 @@ export default function CommandsForm(props) {
                     setPlayerTwo(val);
                 }
             }
+        } else {
+            if (winnerOrLoser == `winner`) {
+                setPlayerOne(getDefaultPlayer(1));
+            } else {
+                setPlayerTwo(getDefaultPlayer(2));
+            }
         }
     }
 
@@ -88,9 +94,6 @@ export default function CommandsForm(props) {
                     setCharTwo(val.key);
                 }
             }
-        } else {
-            setPlayerOne(getDefaultPlayer(1));
-            setPlayerTwo(getDefaultPlayer(2));
         }
     }
 
@@ -178,7 +181,7 @@ export default function CommandsForm(props) {
                                                 <div className="levelImageColumn"><img width={30} src={calcPlayerLevelImage(playerOption?.level?.name)} alt={playerOption?.level?.name} /></div>
                                                 <div className="playerDetailsColumn">
                                                     <div className="playerName">{playerOption?.name}</div>
-                                                    <div className="playerEXP">{playerOption?.experience?.arenaXP}</div>
+                                                    <div className="playerEXP">Exp: {playerOption?.experience?.arenaXP}</div>
                                                     <div className="plays">
                                                         <div className={`playsContainer`}>
                                                             {calcPlayerCharactersPlayed(playerOption).map((char, charIndex) => {
@@ -242,7 +245,7 @@ export default function CommandsForm(props) {
                                                 <div className="levelImageColumn"><img width={30} src={calcPlayerLevelImage(playerOption?.level?.name)} alt={playerOption?.level?.name} /></div>
                                                 <div className="playerDetailsColumn">
                                                     <div className="playerName">{playerOption?.name}</div>
-                                                    <div className="playerEXP">{playerOption?.experience?.arenaXP}</div>
+                                                    <div className="playerEXP">Exp: {playerOption?.experience?.arenaXP}</div>
                                                     <div className="plays">
                                                         <div className={`playsContainer`}>
                                                             {calcPlayerCharactersPlayed(playerOption).map((char, charIndex) => {

@@ -51,7 +51,7 @@ export const calcPlayerDeaths = (player: Player, plays: Play[]) => {
 export const calcPlayerKDRatio = (player: Player, plays: Play[]) => {
     let kd = calcPlayerKills(player, plays) / calcPlayerDeaths(player, plays);
     let kdRatio = removeTrailingZeroDecimal(kd);
-    return kdRatio;
+    return parseFloat(kdRatio);
 }
 
 function PlayerRecord(props) {
@@ -153,7 +153,7 @@ function PlayerRecord(props) {
                                 autoHighlight
                                 id="combo-box-demo"
                                 sx={{ width: `100%` }}
-                                options={getActivePlayers(players).filter(playr => playr.name != plyr.name && (plyr.plays.map(ply => ply.winner).includes(playr.name) || plyr.plays.map(ply => ply.loser).includes(playr.name)))}
+                                options={players.filter(playr => playr.name != plyr.name && (plyr.plays.map(ply => ply.winner).includes(playr.name) || plyr.plays.map(ply => ply.loser).includes(playr.name)))}
                                 getOptionLabel={(option) => option.label}
                                 onChange={(e, val: any) => searchRecordPlayers(e, val)}
                                 onInputChange={(e, val: any) => searchRecordPlayers(e, val)}
@@ -163,11 +163,11 @@ function PlayerRecord(props) {
                                     return (
                                         <div key={option.id} {...props}>
                                             <div className="autocompleteOption">
-                                                <div className="levelNumColumn">{option?.level?.num}</div>
+                                                <div className="levelNumColumn">Lv {option?.level?.num}</div>
                                                 <div className="levelImageColumn"><img width={30} src={calcPlayerLevelImage(option?.level?.name)} alt={option?.level?.name} /></div>
                                                 <div className="playerDetailsColumn">
                                                     <div className="playerName">{option?.label}</div>
-                                                    <div className="playerEXP">{option?.experience?.arenaXP}</div>
+                                                    <div className="playerEXP">Exp: {option?.experience?.arenaXP}</div>
                                                     <div className="plays">
                                                         <div className={`playsContainer`}>
                                                             {calcPlayerCharactersPlayed(option).map((char, charIndex) => {

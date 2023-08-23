@@ -29,6 +29,8 @@ export default class Player {
     losses?: Play[],
     deaths?: number,
     kdRatio?: number,
+    ratio?: number,
+    percentage?: any,
     playerLink?: any,
     preferences?: any,
     username?: string,

@@ -15,7 +15,7 @@ import { calcPlayerLosses, calcPlayerWins } from './PlayerCard';
 import { calcPlayerLevelAndExperience } from '../common/Levels';
 import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
 import { FormEvent, useContext, useEffect, useRef, useState } from 'react';
-import { calcPlayerDeaths, calcPlayerKDRatio, calcPlayerKills } from './PlayerRecord';
+import { calcPlayerDeaths, calcPlayerKDRatio, calcPlayerKills, removeTrailingZeroDecimal } from './PlayerRecord';
 import { doc, setDoc, collection, addDoc, getDocs, onSnapshot, deleteDoc, updateDoc } from 'firebase/firestore';
 import { StateContext, showAlert, defaultPlayers, formatDate, generateUniqueID, dev } from '../pages/_app';
 import { calcPlayerCharacterTimesPlayed, calcPlayerCharactersPlayed, calcPlayerLevelImage, getActivePlayers, getCharacterTitle, isInvalid, newPlayerType } from './smasherscape';
@@ -49,7 +49,7 @@ export const getCharacterObjects = () => {
 }
 
 export const getUniqueCharactersPlayed = (players) => {
-    return [...new Set(players.flatMap((p: Player) => p.plays.flatMap((play: Play) => [play.character, play.otherCharacter]) ))].sort()
+    return [...new Set(players.flatMap((p: Player) => p.plays.flatMap((play: Play) => [play.character, play.otherCharacter]) ))].sort();
 }
 
 export const playerConverter = {
@@ -110,8 +110,13 @@ export const createPlayer = (playerName, playerIndex, databasePlayers): Player =
         } as Experience,
     };
 
-    playerObj.wins = calcPlayerWins(playerObj);
-    playerObj.losses = calcPlayerLosses(playerObj);
+    let wins = calcPlayerWins(playerObj);
+    let losses = calcPlayerLosses(playerObj);
+    let ratio = (wins/(wins+losses)) * 100;
+    playerObj.wins = wins;
+    playerObj.losses = losses;
+    playerObj.ratio = ratio;
+    playerObj.percentage = (ratio) > 100 ? 100 : parseFloat(removeTrailingZeroDecimal(ratio));
     playerObj.kills = calcPlayerKills(playerObj, []);
     playerObj.deaths = calcPlayerDeaths(playerObj, []);
     playerObj.kdRatio = calcPlayerKDRatio(playerObj, []);
@@ -210,10 +215,9 @@ export default function PlayerForm(props) {
             dev() && console.log(`Database Update for Players`, playersFromDatabase.map(pla => newPlayerType(pla)));
             setPlayers(playersFromDatabase);
             setDatabasePlayers(playersFromDatabase);
-            // setFilteredPlayers(playersFromDatabase);
             setFilteredPlayers(getActivePlayers(playersFromDatabase));
             localStorage.setItem(`players`, JSON.stringify(playersFromDatabase));
-            if (playersFromDatabase.length < 2 ) {
+            if (getActivePlayers(playersFromDatabase).length < 2) {
                 setCommand(defaultCommands.Delete);
                 setCommandsToNotInclude([`!com`, `!add`, `!res`, `!set`, `!giv`, `!upd`]);
             } else {
@@ -269,7 +273,7 @@ export default function PlayerForm(props) {
         let playersToDelete = commandParams.filter((comm, commIndex) => commIndex != 0 && comm);
 
         playersToDelete.forEach(player => {
-            let playerDB: Player = filteredPlayers.find(plyr => plyr?.name.toLowerCase() == player.toLowerCase() || plyr?.name.toLowerCase().includes(player.toLowerCase()));
+            let playerDB: Player = getActivePlayers(players).find(plyr => plyr?.name.toLowerCase() == player.toLowerCase() || plyr?.name.toLowerCase().includes(player.toLowerCase()));
             if (playerDB) {
                 playersToDeleteFromDB.push(playerDB);
             }
@@ -386,20 +390,22 @@ export default function PlayerForm(props) {
     }
 
     const updatePlayers = (commandParams) => {
-        let playerOne = commandParams[1].toLowerCase();
-        let condition = commandParams[2].toLowerCase();
-        let playerTwo = commandParams[3].toLowerCase();
         let date = moment().format(`h:mm:ss a, MMMM Do YYYY`);
+        // let currentDateTimeStamp = formatDate(new Date());
+        let playerOneName = commandParams[1].toLowerCase();
+        let conditionName = commandParams[2].toLowerCase();
+        let playerTwoName = commandParams[3].toLowerCase();
+        // let date = currentDateTimeStamp;
 
-        let playerOneDB: Player = players.find(plyr => plyr?.name.toLowerCase() == playerOne || plyr?.name.toLowerCase().includes(playerOne));
-        let playerTwoDB: Player = players.find(plyr => plyr?.name.toLowerCase() == playerTwo || plyr?.name.toLowerCase().includes(playerTwo));
+        let playerOneDB = getActivePlayers(players, false).find(plyr => plyr?.name.toLowerCase() == playerOneName || plyr?.name.toLowerCase().includes(playerOneName));
+        let playerTwoDB = getActivePlayers(players, false).find(plyr => plyr?.name.toLowerCase() == playerTwoName || plyr?.name.toLowerCase().includes(playerTwoName));
 
         let characterOne;
         let characterTwo;
         let stocksTaken;
 
-        let winCons = [`beats`, `defeats`, `conquers`, `vanquishes`, `fells`, `kills`];
-        let loseCons = [`loses-to`, `falls-to`, `defeated-by`];
+        let winCons = [`beat`, `beats`, `has-beaten`, `destroys`, `destroyed`, `defeats`, `defeated`, `has-defeated`, `conquers`, `vanquishes`, `vanquished`, `fells`, `crushes`, `kills`, `killed`];
+        let loseCons = [`loses-to`, `falls-to`, `defeated-by`, `destroyed-by`];
 
         if (commandParams.length >= 8) {
             characterOne = commandParams[5].toLowerCase();
@@ -408,23 +414,24 @@ export default function PlayerForm(props) {
         }
 
         if (!playerOneDB || !playerTwoDB) {
+            console.log(`Can't Find Players`, {playerOneDB, playerTwoDB});
             showAlert(`Can't Find Players`, <h1>
                 Can't find players with those names.
             </h1>, `65%`, `35%`);
             return;
-        } else if (!winCons.includes(condition) && !loseCons.includes(condition)) {
+        } else if (!winCons.includes(conditionName) && !loseCons.includes(conditionName)) {
             showAlert(`Missing Condition`, <h1>
                 Did player one win or lose?
             </h1>, `65%`, `35%`);
             return;
         } else if (!characterOne || !characterTwo) {
-            console.log(`Missing Characters`, !characterOne, !characterTwo);
+            // console.log(`Missing Characters`, !characterOne, !characterTwo);
             showAlert(`Missing Characters`, <h1>
                 Which Charcaters Did They Play?
             </h1>, `65%`, `35%`);
             return;
         } else if (!Characters[characterOne] || !Characters[characterTwo]) {
-            devEnv && console.log(`Cannot Find Characters`, {characterOne, characterTwo}, !Characters[characterOne], !Characters[characterTwo]);
+            // devEnv && console.log(`Cannot Find Characters`, {characterOne, characterTwo}, !Characters[characterOne], !Characters[characterTwo]);
             showAlert(`Cannot Find Characters`, <h1>
                 Can't find characters with those names.
             </h1>, `65%`, `35%`);
@@ -436,12 +443,12 @@ export default function PlayerForm(props) {
             return;
         } else {
 
-            let winner = winCons.includes(condition) ? playerOne : playerTwo;
-            let loser = winCons.includes(condition) ? playerTwo : playerOne;
-            let winnerDB: Player = players.find(plyr => plyr?.name.toLowerCase() == winner || plyr?.name.toLowerCase().includes(winner));
-            let loserDB: Player = players.find(plyr => plyr?.name.toLowerCase() == loser || plyr?.name.toLowerCase().includes(loser));
-            let winChar = winCons.includes(condition) ? Characters[characterOne] : Characters[characterTwo];
-            let loseChar = winCons.includes(condition) ? Characters[characterTwo] : Characters[characterOne];
+            let winner = winCons.includes(conditionName) ? playerOneName : playerTwoName;
+            let loser = winCons.includes(conditionName) ? playerTwoName : playerOneName;
+            let winnerDB = (playerOneDB?.name?.toLowerCase() == winner || playerOneDB?.name.toLowerCase().includes(winner)) ? playerOneDB : playerTwoDB;
+            let loserDB = (playerTwoDB?.name?.toLowerCase() == loser || playerTwoDB?.name.toLowerCase().includes(loser)) ? playerTwoDB : playerOneDB;
+            let winChar = winCons.includes(conditionName) ? Characters[characterOne] : Characters[characterTwo];
+            let loseChar = winCons.includes(conditionName) ? Characters[characterTwo] : Characters[characterOne];
             
             let stocks: Stock[] = [
                 {
@@ -481,8 +488,8 @@ export default function PlayerForm(props) {
                 }
             ];
 
-            let updatedPlayers: Player[] = players.map((plyr: Player) => {
-                if (plyr?.name.toLowerCase() == winner || plyr?.name.toLowerCase().includes(winner)) {
+            let updatedPlayers: any[] = getActivePlayers(players, false).map((plyr) => {
+                if (plyr?.id == winnerDB?.id) {
                     plyr.experience.arenaXP = (plyr?.xpModifier ? (plyr.experience.arenaXP * plyr?.xpModifier) : plyr.experience.arenaXP) + 400;
                     plyr.plays.push({
                         otherCharacter: loseChar,
@@ -497,8 +504,19 @@ export default function PlayerForm(props) {
 
                     calcPlayerLevelAndExperience(plyr);
 
-                    return plyr as Player;
-                } else if (plyr?.name.toLowerCase() == loser || plyr?.name.toLowerCase().includes(loser)) {
+                    let wins = calcPlayerWins(plyr);
+                    let losses = calcPlayerLosses(plyr);
+                    let ratio = (wins/(wins+losses)) * 100;
+                    plyr.wins = wins;
+                    plyr.losses = losses;
+                    plyr.ratio = ratio;
+                    plyr.percentage = (ratio) > 100 ? 100 : parseFloat(removeTrailingZeroDecimal(ratio));
+                    plyr.kills = calcPlayerKills(plyr, plyr.plays);
+                    plyr.deaths = calcPlayerDeaths(plyr, plyr.plays);
+                    plyr.kdRatio = calcPlayerKDRatio(plyr, plyr.plays);
+
+                    return plyr;
+                } else if (plyr?.id == loserDB?.id) {
                     plyr.experience.arenaXP = (plyr?.xpModifier ? (plyr.experience.arenaXP * plyr?.xpModifier) : plyr.experience.arenaXP) + (100 * stocksTaken);
                     plyr.plays.push({
                         otherCharacter: winChar,
@@ -513,14 +531,30 @@ export default function PlayerForm(props) {
 
                     calcPlayerLevelAndExperience(plyr);
 
-                    return plyr as Player;
+                    let wins = calcPlayerWins(plyr);
+                    let losses = calcPlayerLosses(plyr);
+                    let ratio = (wins/(wins+losses)) * 100;
+                    plyr.wins = wins;
+                    plyr.losses = losses;
+                    plyr.ratio = ratio;
+                    plyr.percentage = (ratio) > 100 ? 100 : parseFloat(removeTrailingZeroDecimal(ratio));
+                    plyr.kills = calcPlayerKills(plyr, plyr.plays);
+                    plyr.deaths = calcPlayerDeaths(plyr, plyr.plays);
+                    plyr.kdRatio = calcPlayerKDRatio(plyr, plyr.plays);
+
+                    return plyr;
                 } else {
-                    return plyr as Player;
+                    return plyr;
                 }
             });
 
-            updatePlayersDB(updatedPlayers);
-            setPlayers(updatedPlayers);
+            if (useDatabase == true) {
+                updatePlayerInDB(winnerDB, updatedPlayers.find(plyr => plyr.id == winnerDB.id));
+                updatePlayerInDB(loserDB, updatedPlayers.find(plyr => plyr.id == loserDB.id));
+            } else {
+                updatePlayersDB(updatedPlayers);
+                setPlayers(updatedPlayers);
+            }
         }
     }
 
@@ -578,7 +612,7 @@ export default function PlayerForm(props) {
                                 <div className="levelImageColumn"><img width={30} src={calcPlayerLevelImage(playerOption?.level?.name)} alt={playerOption?.level?.name} /></div>
                                 <div className="playerDetailsColumn">
                                     <div className="playerName">{playerOption?.name}</div>
-                                    <div className="playerEXP">{playerOption?.experience?.arenaXP}</div>
+                                    <div className="playerEXP">Exp: {playerOption?.experience?.arenaXP}</div>
                                     <div className="plays">
                                         <div className={`playsContainer`}>
                                             {calcPlayerCharactersPlayed(playerOption).map((char, charIndex) => {

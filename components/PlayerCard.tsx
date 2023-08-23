@@ -5,7 +5,7 @@ import PlayerRecord from './PlayerRecord';
 import { StateContext } from '../pages/_app';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
-import { calcPlayerCharacterTimesPlayed, calcPlayerCharactersPlayed, calcPlayerLevelImage, getCharacterTitle, publicAssetLink } from './smasherscape';
+import { calcPlayerCharacterTimesPlayed, calcPlayerCharactersPlayed, calcPlayerLevelImage, getActivePlayers, getCharacterTitle, publicAssetLink } from './smasherscape';
 
 export const calcPlayerWins = (plyr: Player) => plyr.plays.filter(ply => ply.winner.toLowerCase() == plyr.name.toLowerCase()).length;
 export const calcPlayerLosses = (plyr: Player) => plyr.plays.filter(ply => ply.loser.toLowerCase() == plyr.name.toLowerCase()).length;
@@ -14,23 +14,7 @@ export default function PlayerCard(props) {
     const { filteredPlayers, setFilteredPlayers } = useContext<any>(StateContext);
     let { plyr } = props;
     
-    const setPlayerExpanded = (player: Player) => {
-        let updatedPlayers: Player[] = filteredPlayers.map((plyr: Player) => {
-            if (plyr?.id == player?.id) {
-                if (plyr.expanded) {
-                    plyr.expanded = !plyr.expanded;
-                    return plyr as Player;
-                } else {
-                    plyr.expanded = true;
-                    return plyr as Player;
-                }
-            } else {
-                return plyr as Player;
-            }
-        });
-        setFilteredPlayers(updatedPlayers);
-        return updatedPlayers;
-    }
+    const setPlayerExpanded = (player: Player) => setFilteredPlayers(filteredPlayers.map(plyr => plyr.id == player.id ? { ...player, expanded: !player.expanded } : plyr));
 
     return <div id={plyr.id} className={`playerCard ${plyr?.expanded ? `expandedPlayerCard` : `collapsedPlayerCard`}`}>
     <div className="gridCard" onClick={(e) => setPlayerExpanded(plyr)}>

@@ -1,12 +1,9 @@
 import '../main.scss';
 import '../xuruko.scss';
 import '../concentration.scss';
-import app, { db } from '../firebase';
 import ReactDOM from 'react-dom/client';
 import { AnimatePresence, motion } from 'framer-motion';
 import { defaultCommands } from '../components/Commands';
-import { collection, onSnapshot } from "firebase/firestore";
-import { getActivePlayers } from '../components/smasherscape';
 import { createContext, useRef, useState, useEffect } from 'react';
 
 export const StateContext = createContext({});
@@ -399,7 +396,7 @@ export default function Xuruko({ Component, pageProps, router }) {
     let [databasePlayers, setDatabasePlayers] = useState([]);
     let [filteredPlayers, setFilteredPlayers] = useState(players);
     let [command, setCommand] = useState(defaultCommands.Update);
-    let [deleteCompletely, setDeleteCompletely] = useState(true);
+    let [deleteCompletely, setDeleteCompletely] = useState(false);
     let [sameNamePlayeredEnabled, setSameNamePlayeredEnabled] = useState(false);
     let [commandsToNotInclude, setCommandsToNotInclude] = useState([`!com`, `!add`, `!res`, `!set`, `!giv`]);
 
