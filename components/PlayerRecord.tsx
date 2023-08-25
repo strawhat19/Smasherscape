@@ -151,7 +151,7 @@ function PlayerRecord(props) {
                             <div className="inputBG materialBG"></div>
                             <Autocomplete
                                 autoHighlight
-                                id="combo-box-demo"
+                                id={`recordPlayerSearch-${plyr.id}`}
                                 sx={{ width: `100%` }}
                                 options={players.filter(playr => playr.name != plyr.name && (plyr.plays.map(ply => ply.winner).includes(playr.name) || plyr.plays.map(ply => ply.loser).includes(playr.name)))}
                                 getOptionLabel={(option) => option.label}
@@ -190,7 +190,7 @@ function PlayerRecord(props) {
                             <div className="inputBG materialBG"></div>
                             <Autocomplete
                                 autoHighlight
-                                id="combo-box-demo"
+                                id={`recordPlayerCharacterSearch-${plyr.id}`}
                                 sx={{ width: `100%` }}
                                 options={getCharacterObjs(true)}
                                 getOptionLabel={(option) => option.label}

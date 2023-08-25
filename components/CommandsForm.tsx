@@ -158,13 +158,13 @@ export default function CommandsForm(props) {
         </div>
         <section className={`formsSection`}>
             <form onSubmit={(e) => submitCommandsForm(e)} className={`commandsForm gridForm`} action="submit">
-            <div className={`commandInputs ${command.command == `!upd` ? `expanded` : `collapsed`}`}>
+                <div className={`commandInputs ${command.command == `!upd` ? `expanded` : `collapsed`}`}>
                     <div className="updateRow updateTopRow">
                         <div className={`playerSearchAuto inputWrapper materialBGInputWrapper`}>
                             <div className="inputBG materialBG"></div>
                             <Autocomplete
                                 autoHighlight
-                                id="combo-box-demo"
+                                id="playerSearchAuto-1"
                                 sx={{ width: `100%` }}
                                 getOptionLabel={(option) => option.label}
                                 onChange={(e, val: any) => adjustPlayers(e, val, `winner`)}
@@ -204,7 +204,7 @@ export default function CommandsForm(props) {
                             <div className="inputBG materialBG"></div>
                             <Autocomplete
                                 autoHighlight
-                                id="combo-box-demo"
+                                id="conditionAuto-1"
                                 sx={{ width: `100%` }}
                                 options={[{id: 1, label: `Defeats`}, {id: 2, label: `Loses-to`}]}
                                 getOptionLabel={(option) => option.label}
@@ -228,7 +228,7 @@ export default function CommandsForm(props) {
                             <div className="inputBG materialBG"></div>
                             <Autocomplete
                                 autoHighlight
-                                id="combo-box-demo"
+                                id="playerSearchAuto-2"
                                 sx={{ width: `100%` }}
                                 getOptionLabel={(option) => option.label}
                                 onChange={(e, val: any) => adjustPlayers(e, val, `loser`)}
@@ -270,7 +270,7 @@ export default function CommandsForm(props) {
                             <div className="inputBG materialBG"></div>
                             <Autocomplete
                                 autoHighlight
-                                id="combo-box-demo"
+                                id="characterSearchAuto-1"
                                 sx={{ width: `100%` }}
                                 options={getCharacterObjs()}
                                 getOptionLabel={(option) => option.label}
@@ -293,11 +293,11 @@ export default function CommandsForm(props) {
                                 }}
                             />
                         </div>
-                        <div className={`conditionAuto smallAuto inputWrapper materialBGInputWrapper`}>
+                        <div className={`conditionAuto stocksAuto smallAuto inputWrapper materialBGInputWrapper`}>
                             <div className="inputBG materialBG"></div>
                             <Autocomplete
                                 autoHighlight
-                                id="combo-box-demo"
+                                id="stocksAuto-1"
                                 sx={{ width: `100%` }}
                                 options={[{id: 0, label: `0 Stock(s)`}, {id: 1, label: `1 Stock(s)`}, {id: 2, label: `2 Stock(s)`}]}
                                 getOptionLabel={(option) => option.label}
@@ -321,7 +321,7 @@ export default function CommandsForm(props) {
                             <div className="inputBG materialBG"></div>
                             <Autocomplete
                                 autoHighlight
-                                id="combo-box-demo"
+                                id="characterSearchAuto-2"
                                 sx={{ width: `100%` }}
                                 options={getCharacterObjs()}
                                 getOptionLabel={(option) => option.label}

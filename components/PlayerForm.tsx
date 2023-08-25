@@ -595,7 +595,7 @@ export default function PlayerForm(props) {
             <Autocomplete
                 autoHighlight
                 ref={searchInput}
-                id="combo-box-demo"
+                id="playerSearchAuto-1"
                 sx={{ width: `100%` }}
                 options={getActivePlayers(players)}
                 getOptionLabel={(option) => option.label}
@@ -631,12 +631,15 @@ export default function PlayerForm(props) {
                 }}
             />
         </div>
-        <div id={`commandsInput`} className={`inputWrapper`}><div className="inputBG"></div><input ref={commandsInput} type="text" className="commands" name={`commands`} placeholder={`Enter Commands...`} /></div>
+        <div id={`commandsInput`} className={`inputWrapper`}>
+            <div className="inputBG"></div>
+            <input ref={commandsInput} type="text" className="commands" name={`commands`} placeholder={`Enter Commands...`} />
+        </div>
         <div className={`characterSearchAuto inputWrapper materialBGInputWrapper`}>
             <div className="inputBG materialBG"></div>
             <Autocomplete
                 autoHighlight
-                id="combo-box-demo"
+                id="characterSearchAuto-1"
                 sx={{ width: `100%` }}
                 options={getCharacterObjs(true)}
                 getOptionLabel={(option) => option.label}
