@@ -490,12 +490,18 @@ export default function PlayerForm(props) {
 
             let updatedPlayers: any[] = getActivePlayers(players, false).map((plyr) => {
                 if (plyr?.id == winnerDB?.id) {
+                    plyr.updated = formatDate(new Date());
+                    plyr.lastUpdated = formatDate(new Date());
                     plyr.experience.arenaXP = (plyr?.xpModifier ? (plyr.experience.arenaXP * plyr?.xpModifier) : plyr.experience.arenaXP) + 400;
+                    let playUIDs = plyr.plays.some(ply => ply.uuid) ? plyr.plays.map(ply => ply?.uuid) : players.map(plr => plr.uuid);
+                    let playUUID = playUIDs.length > 0 ? generateUniqueID(playUIDs) : generateUniqueID();
                     plyr.plays.push({
+                        id: `player-${plyr.name}-play-${playUUID}`,
                         otherCharacter: loseChar,
                         winner: winnerDB?.name,
                         loser: loserDB?.name,
                         character: winChar,
+                        uuid: playUUID,
                         stocksTaken,
                         lossStocks,
                         stocks,
@@ -517,12 +523,18 @@ export default function PlayerForm(props) {
 
                     return plyr;
                 } else if (plyr?.id == loserDB?.id) {
+                    plyr.updated = formatDate(new Date());
+                    plyr.lastUpdated = formatDate(new Date());
                     plyr.experience.arenaXP = (plyr?.xpModifier ? (plyr.experience.arenaXP * plyr?.xpModifier) : plyr.experience.arenaXP) + (100 * stocksTaken);
+                    let playUIDs = plyr.plays.map(ply => ply?.uuid);
+                    let playUUID = playUIDs.length > 0 ? generateUniqueID(playUIDs) : generateUniqueID();
                     plyr.plays.push({
+                        id: `player-${plyr.name}-play-${playUUID}`,
                         otherCharacter: winChar,
                         winner: winnerDB?.name,
                         loser: loserDB?.name,
                         character: loseChar,
+                        uuid: playUUID,
                         stocksTaken,
                         lossStocks,
                         stocks,
@@ -562,29 +574,33 @@ export default function PlayerForm(props) {
         e.preventDefault();
         let field = commandsInput.current as HTMLInputElement;
         if (field.name == `commands`) {
-            let command = field?.value.toLowerCase();
-            let commandParams = command.split(` `);
-            let firstCommand = commandParams[0];
-            
-            if (command != ``) {
-                if (firstCommand.includes(`!upd`)) {
-                    updatePlayers(commandParams);
-                } else if (firstCommand.includes(`!add`)) {
-                    addPlayers(commandParams);
-                } else if (firstCommand.includes(`!del`)) {
-                    deletePlayers(commandParams);
-                } else if (firstCommand.includes(`!res`)) {
-                    resetPlayers(commandParams);
-                } else if (firstCommand.includes(`!giv`)) {
-                    giveParameter(commandParams);
-                } else if (firstCommand.includes(`!set`)) {
-                    setParameter(commandParams);
-                } else {
-                    showCommands();
-                }
-            }
+            let commandFromForm = field?.value.toLowerCase();
+            processCommands(commandFromForm);
         } else {
             return;
+        }
+    }
+
+    const processCommands = (commandFromForm) => {
+        let commandParams = commandFromForm.split(` `);
+        let firstCommand = commandParams[0];
+        
+        if (commandFromForm != ``) {
+            if (firstCommand.includes(`!upd`)) {
+                updatePlayers(commandParams);
+            } else if (firstCommand.includes(`!add`)) {
+                addPlayers(commandParams);
+            } else if (firstCommand.includes(`!del`)) {
+                deletePlayers(commandParams);
+            } else if (firstCommand.includes(`!res`)) {
+                resetPlayers(commandParams);
+            } else if (firstCommand.includes(`!giv`)) {
+                giveParameter(commandParams);
+            } else if (firstCommand.includes(`!set`)) {
+                setParameter(commandParams);
+            } else {
+                showCommands();
+            }
         }
     }
 
