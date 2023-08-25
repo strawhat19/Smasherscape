@@ -62,6 +62,65 @@ export const playerConverter = {
     }
 };
 
+export const updatePlayerPlays = (playState) => {
+    let {
+        plyr, 
+        date,
+        stocks,
+        players, 
+        winChar, 
+        loserDB, 
+        winnerDB, 
+        loseChar, 
+        lossStocks, 
+        stocksTaken, 
+        winnerOrLoser, 
+    } = playState;
+
+    plyr.updated = formatDate(new Date());
+    plyr.lastUpdated = formatDate(new Date());
+
+    let prevExp = plyr.experience.arenaXP;
+    let newExp = winnerOrLoser == `winner` ? prevExp + (400 * plyr?.xpModifier) : prevExp + ((100 * plyr?.xpModifier) * stocksTaken);
+    let expGained = newExp - prevExp;
+    plyr.experience.arenaXP = newExp;
+
+    let playUIDs = plyr.plays.some(ply => ply.uuid) ? plyr.plays.map(ply => ply?.uuid) : players.map(plr => plr.uuid);
+    let playUUID = playUIDs.length > 0 ? generateUniqueID(playUIDs) : generateUniqueID();
+    
+    plyr.plays.push({
+        otherCharacter: winnerOrLoser == `winner` ? loseChar : winChar,
+        character: winnerOrLoser == `winner` ? winChar : loseChar,
+        id: `player-${plyr.name}-play-${playUUID}`,
+        winner: winnerDB?.name,
+        loser: loserDB?.name,
+        uuid: playUUID,
+        stocksTaken,
+        lossStocks,
+        expGained,
+        prevExp,
+        newExp,
+        stocks,
+        date
+    });
+
+    calcPlayerLevelAndExperience(plyr);
+
+    let wins = calcPlayerWins(plyr);
+    let losses = calcPlayerLosses(plyr);
+    let ratio = (wins/(wins+losses)) * 100;
+
+    plyr.wins = wins;
+    plyr.losses = losses;
+    plyr.ratio = ratio;
+    plyr.percentage = (ratio) > 100 ? 100 : parseFloat(removeTrailingZeroDecimal(ratio));
+    plyr.kills = calcPlayerKills(plyr, plyr.plays);
+    plyr.deaths = calcPlayerDeaths(plyr, plyr.plays);
+    plyr.kdRatio = calcPlayerKDRatio(plyr, plyr.plays);
+
+    return plyr;
+}
+
 export const createPlayer = (playerName, playerIndex, databasePlayers): Player => {
 
     let currentDateTimeStamp = formatDate(new Date());
@@ -488,72 +547,24 @@ export default function PlayerForm(props) {
                 }
             ];
 
+            let playState = {
+                date,
+                stocks,
+                players, 
+                winChar, 
+                loserDB, 
+                winnerDB, 
+                loseChar, 
+                lossStocks, 
+                stocksTaken,  
+            }
+
             let updatedPlayers: any[] = getActivePlayers(players, false).map((plyr) => {
                 if (plyr?.id == winnerDB?.id) {
-                    plyr.updated = formatDate(new Date());
-                    plyr.lastUpdated = formatDate(new Date());
-                    plyr.experience.arenaXP = (plyr?.xpModifier ? (plyr.experience.arenaXP * plyr?.xpModifier) : plyr.experience.arenaXP) + 400;
-                    let playUIDs = plyr.plays.some(ply => ply.uuid) ? plyr.plays.map(ply => ply?.uuid) : players.map(plr => plr.uuid);
-                    let playUUID = playUIDs.length > 0 ? generateUniqueID(playUIDs) : generateUniqueID();
-                    plyr.plays.push({
-                        id: `player-${plyr.name}-play-${playUUID}`,
-                        otherCharacter: loseChar,
-                        winner: winnerDB?.name,
-                        loser: loserDB?.name,
-                        character: winChar,
-                        uuid: playUUID,
-                        stocksTaken,
-                        lossStocks,
-                        stocks,
-                        date
-                    });
-
-                    calcPlayerLevelAndExperience(plyr);
-
-                    let wins = calcPlayerWins(plyr);
-                    let losses = calcPlayerLosses(plyr);
-                    let ratio = (wins/(wins+losses)) * 100;
-                    plyr.wins = wins;
-                    plyr.losses = losses;
-                    plyr.ratio = ratio;
-                    plyr.percentage = (ratio) > 100 ? 100 : parseFloat(removeTrailingZeroDecimal(ratio));
-                    plyr.kills = calcPlayerKills(plyr, plyr.plays);
-                    plyr.deaths = calcPlayerDeaths(plyr, plyr.plays);
-                    plyr.kdRatio = calcPlayerKDRatio(plyr, plyr.plays);
-
+                    updatePlayerPlays({...playState, plyr, winnerOrLoser: `winner`});
                     return plyr;
                 } else if (plyr?.id == loserDB?.id) {
-                    plyr.updated = formatDate(new Date());
-                    plyr.lastUpdated = formatDate(new Date());
-                    plyr.experience.arenaXP = (plyr?.xpModifier ? (plyr.experience.arenaXP * plyr?.xpModifier) : plyr.experience.arenaXP) + (100 * stocksTaken);
-                    let playUIDs = plyr.plays.map(ply => ply?.uuid);
-                    let playUUID = playUIDs.length > 0 ? generateUniqueID(playUIDs) : generateUniqueID();
-                    plyr.plays.push({
-                        id: `player-${plyr.name}-play-${playUUID}`,
-                        otherCharacter: winChar,
-                        winner: winnerDB?.name,
-                        loser: loserDB?.name,
-                        character: loseChar,
-                        uuid: playUUID,
-                        stocksTaken,
-                        lossStocks,
-                        stocks,
-                        date
-                    });
-
-                    calcPlayerLevelAndExperience(plyr);
-
-                    let wins = calcPlayerWins(plyr);
-                    let losses = calcPlayerLosses(plyr);
-                    let ratio = (wins/(wins+losses)) * 100;
-                    plyr.wins = wins;
-                    plyr.losses = losses;
-                    plyr.ratio = ratio;
-                    plyr.percentage = (ratio) > 100 ? 100 : parseFloat(removeTrailingZeroDecimal(ratio));
-                    plyr.kills = calcPlayerKills(plyr, plyr.plays);
-                    plyr.deaths = calcPlayerDeaths(plyr, plyr.plays);
-                    plyr.kdRatio = calcPlayerKDRatio(plyr, plyr.plays);
-
+                    updatePlayerPlays({...playState, plyr, winnerOrLoser: `loser`});
                     return plyr;
                 } else {
                     return plyr;
