@@ -1,14 +1,15 @@
 import Play from '../models/Play';
-import { Badge } from '@mui/material';
 import Player from '../models/Player';
 import { StateContext } from '../pages/_app';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import { useContext, useState, useEffect } from 'react';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
+import AutoCompletePlayerOption from './AutoCompletePlayerOption';
 import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
+import { getCharacterTitle, publicAssetLink } from './smasherscape';
+import AutoCompleteCharacterOption from './AutoCompleteCharacterOption';
 import { getAllCharacters, getUniqueCharactersPlayed, searchBlur } from './PlayerForm';
-import { calcPlayerCharacterTimesPlayed, calcPlayerCharactersPlayed, calcPlayerLevelImage, getActivePlayers, getCharacterTitle, publicAssetLink } from './smasherscape';
 
 export const parseDate = (dateStr: any) => {
     const parts = dateStr.split(`, `);
@@ -137,7 +138,7 @@ function PlayerRecord(props) {
         <ul className="recordList">
             <h3 className={`greenRecordText`}>
                 <div className={`flex playerRecordBegin`}>
-                    Player Record
+                    {plyr?.name}'s Record
                     <span className={`recordPlays ${plyr?.plays?.length > 0 ? `populated` : `empty`}`}>
                         {plyr?.plays?.length > 0 && <span className={`goldText`}>K/D: <span className="whiteText kdRatioNum">{calcPlayerKDRatio(plyr, plays)}</span></span>}
                         <span className={`greenText`}>Kills: <span className="whiteText">{calcPlayerKills(plyr, plays)}</span></span>
@@ -159,28 +160,10 @@ function PlayerRecord(props) {
                                 onInputChange={(e, val: any) => searchRecordPlayers(e, val)}
                                 isOptionEqualToValue={(option, value) => option.id === value.id}
                                 renderInput={(params) => <TextField name={`search`} onBlur={(e) => searchBlur(e, filteredPlayers)} {...params} label="Player(s)..." />}
-                                renderOption={(props: any, option: any) => {
+                                renderOption={(props: any, playerOption: any) => {
                                     return (
-                                        <div key={option.id} {...props}>
-                                            <div className="autocompleteOption">
-                                                <div className="levelNumColumn">Lv {option?.level?.num}</div>
-                                                <div className="levelImageColumn"><img width={30} src={calcPlayerLevelImage(option?.level?.name)} alt={option?.level?.name} /></div>
-                                                <div className="playerDetailsColumn">
-                                                    <div className="playerName">{option?.label}</div>
-                                                    <div className="playerEXP">Exp: {option?.experience?.arenaXP}</div>
-                                                    <div className="plays">
-                                                        <div className={`playsContainer`}>
-                                                            {calcPlayerCharactersPlayed(option).map((char, charIndex) => {
-                                                                return (
-                                                                    <Badge title={`Played ${getCharacterTitle(char)} ${calcPlayerCharacterTimesPlayed(option, char)} Time(s)`} key={charIndex} badgeContent={calcPlayerCharacterTimesPlayed(option, char)} color="primary">
-                                                                        <img className={`charImg`} width={25} src={calcPlayerCharacterIcon(char)} alt={getCharacterTitle(char)} />
-                                                                    </Badge>
-                                                                )
-                                                            })}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                        <div key={playerOption.id} {...props}>
+                                            <AutoCompletePlayerOption playerOption={playerOption}  />
                                         </div>
                                     )
                                 }}
@@ -198,15 +181,10 @@ function PlayerRecord(props) {
                                 onInputChange={(e, val: any) => searchRecordCharacters(e, val)}
                                 isOptionEqualToValue={(option, value) => option.id === value.id}
                                 renderInput={(params) => <TextField name={`characters`} {...params} label="Character(s)..." />}
-                                renderOption={(props: any, option: any) => {
+                                renderOption={(props: any, characterOption: any) => {
                                     return (
-                                        <div key={option.id} {...props}>
-                                            <div className="autocompleteOption characterOption">
-                                                <div className="characterIndex">{option?.id}</div>
-                                                <img className={`charImg`} width={25} src={option.image} alt={option.label} />
-                                                <div className="spacer"></div>
-                                                <div className="characterName">{option?.label}</div>
-                                            </div>
+                                        <div key={characterOption.id} {...props}>
+                                            <AutoCompleteCharacterOption characterOption={characterOption} />
                                         </div>
                                     )
                                 }}

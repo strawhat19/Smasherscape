@@ -3,13 +3,15 @@ import '../xuruko.scss';
 import '../concentration.scss';
 import { db } from '../firebase';
 import ReactDOM from 'react-dom/client';
+import { parseDate } from '../components/PlayerRecord';
 import { AnimatePresence, motion } from 'framer-motion';
 import { defaultCommands } from '../components/Commands';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { createContext, useRef, useState, useEffect } from 'react';
 
 export const StateContext = createContext({});
-export const databasePlayersCollectionName = 2 > 1 ? `players` : `players`;
+export const productionPlayersCollectionName = `players`;
+export const databasePlayersCollectionName = 2 > 1 ? productionPlayersCollectionName : productionPlayersCollectionName;
 
 export const getPage = () => {
   return capitalizeAllWords(window.location.pathname.replace(`/`,``));
@@ -27,7 +29,7 @@ export const getAllPlays = (players) => {
       return true;
     }
     return false;
-  }).sort((a, b) => new Date(b.date) - new Date(a.date));
+  }).sort((a, b) => parseDate(b.date) - parseDate(a.date));
   return allPlays;
 }
 
@@ -441,6 +443,7 @@ export default function Xuruko({ Component, pageProps, router }) {
     let [command, setCommand] = useState(defaultCommands.Update);
     let [deleteCompletely, setDeleteCompletely] = useState(false);
     let [sameNamePlayeredEnabled, setSameNamePlayeredEnabled] = useState(false);
+    let [noPlayersFoundMessage, setNoPlayersFoundMessage] = useState(`No Players Found`);
     let [commandsToNotInclude, setCommandsToNotInclude] = useState([`!com`, `!add`, `!res`, `!set`, `!giv`]);
 
     const setBrowserUI = () => {
@@ -504,16 +507,6 @@ export default function Xuruko({ Component, pageProps, router }) {
       setSystemStatus(`${getPage()} Loaded.`);
       setTimeout(() => setLoading(false), 1500);
 
-      // if (dev()) {
-        // console.log(`brwser`, brwser);
-        // console.log(`App`, router.route);
-      // }
-  
-      // return () => {
-      //   window.removeEventListener(`resize`, () => windowEvents());
-      //   window.removeEventListener(`scroll`, () => windowEvents());
-      // }
-
     }, [rte, user, users, authState, dark])
 
     useEffect(() => {
@@ -540,7 +533,7 @@ export default function Xuruko({ Component, pageProps, router }) {
       };
     }, [])
 
-    return <StateContext.Provider value={{ router, rte, setRte, updates, setUpdates, content, setContent, width, setWidth, user, setUser, page, setPage, mobileMenu, setMobileMenu, users, setUsers, authState, setAuthState, emailField, setEmailField, devEnv, setDevEnv, mobileMenuBreakPoint, platform, setPlatform, focus, setFocus, highScore, setHighScore, color, setColor, dark, setDark, colorPref, setColorPref, qotd, setQotd, alertOpen, setAlertOpen, mobile, setMobile, systemStatus, setSystemStatus, loading, setLoading, anim, setAnimComplete, IDs, setIDs, categories, setCategories, browser, setBrowser, onMac, rearranging, setRearranging, buttonText, setButtonText, gameFormStep, setGameFormStep, players, setPlayers, filteredPlayers, setFilteredPlayers, useLocalStorage, setUseLocalStorage, command, setCommand, commands, setCommands, playersToSelect, setPlayersToSelect, databasePlayers, setDatabasePlayers, useDatabase, setUseDatabase, commandsToNotInclude, setCommandsToNotInclude, sameNamePlayeredEnabled, setSameNamePlayeredEnabled, deleteCompletely, setDeleteCompletely }}>
+    return <StateContext.Provider value={{ router, rte, setRte, updates, setUpdates, content, setContent, width, setWidth, user, setUser, page, setPage, mobileMenu, setMobileMenu, users, setUsers, authState, setAuthState, emailField, setEmailField, devEnv, setDevEnv, mobileMenuBreakPoint, platform, setPlatform, focus, setFocus, highScore, setHighScore, color, setColor, dark, setDark, colorPref, setColorPref, qotd, setQotd, alertOpen, setAlertOpen, mobile, setMobile, systemStatus, setSystemStatus, loading, setLoading, anim, setAnimComplete, IDs, setIDs, categories, setCategories, browser, setBrowser, onMac, rearranging, setRearranging, buttonText, setButtonText, gameFormStep, setGameFormStep, players, setPlayers, filteredPlayers, setFilteredPlayers, useLocalStorage, setUseLocalStorage, command, setCommand, commands, setCommands, playersToSelect, setPlayersToSelect, databasePlayers, setDatabasePlayers, useDatabase, setUseDatabase, commandsToNotInclude, setCommandsToNotInclude, sameNamePlayeredEnabled, setSameNamePlayeredEnabled, deleteCompletely, setDeleteCompletely, noPlayersFoundMessage, setNoPlayersFoundMessage }}>
       {(browser != `chrome` || onMac) ? <AnimatePresence mode={`wait`}>
         <motion.div className={bodyClasses} key={router.route} initial="pageInitial" animate="pageAnimate" exit="pageExit" transition={{ duration: 0.35 }} variants={{
           pageInitial: {

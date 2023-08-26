@@ -21,7 +21,7 @@ export default function CommandsForm(props) {
     let [playerOne, setPlayerOne] = useState<any>(getDefaultPlayer(1));
     let [playerTwo, setPlayerTwo] = useState<any>(getDefaultPlayer(2));
     let [stocksTaken, setStocksTaken] = useState<any>(`Stocks-Taken-From-Winner`);
-    const { players, command, setCommand, playersToSelect, commandsToNotInclude } = useContext<any>(StateContext);
+    const { players, command, setCommand, playersToSelect, commandsToNotInclude, filteredPlayers } = useContext<any>(StateContext);
 
     const adjustStocks = (e, val) => {
         if (val) {
@@ -133,12 +133,27 @@ export default function CommandsForm(props) {
                 {Object.values(defaultCommands).filter(cmd => !commandsToNotInclude.includes(cmd.command)).map((comm: Command, commIndex) => {
                     return (
                         <ToggleButton key={commIndex} size={`small`} value={comm}>
-                            <span className={`buttonInnerText`}>{comm?.command}</span>
+                            <span className={`buttonInnerText`}>
+                                {comm?.icon}
+                                <div>{comm?.shortDescription}</div>
+                            </span>
                         </ToggleButton>
                     )
                 })}
             </ToggleButtonGroup>
         </div>
+        <ul className="commandsList commandToCopy">
+            <li className={`listedCommand`} title={renderCommand(command)}>
+                <div className="commandDetails flex gap15">
+                    <CodeBlock custombutton={true} border={`solid 2px white`} id={`commandToRender`} language={`js`} codeTitle={<>
+                        {command?.icon}
+                        <div className={`desc`}>{command?.shortDescription}</div>
+                    </>}>
+                        {renderCommand(command)}
+                    </CodeBlock>
+                </div>
+            </li>
+        </ul>
         <section className={`formsSection`}>
             <form onSubmit={(e) => submitCommandsForm(e)} className={`commandsForm ${command.command == `!upd` ? `updateCommandForm` : `customHookInputContainer`} gridForm`} action="submit">
                 <div className={`commandInputs ${command.command == `!upd` ? `expanded` : `collapsed`}`}>
@@ -150,7 +165,7 @@ export default function CommandsForm(props) {
                                 id="playerSearchAutoPlayer1"
                                 sx={{ width: `100%` }}
                                 clearText={`NO PLAYERS`}
-                                getOptionLabel={(option) => option.label}
+                                getOptionLabel={(option) => option.name}
                                 onChange={(e, val: any) => adjustPlayers(e, val, `winner`)}
                                 onInputChange={(e, val: any) => adjustPlayers(e, val, `winner`)}
                                 isOptionEqualToValue={(option, value) => option.id === value.id}
@@ -159,28 +174,8 @@ export default function CommandsForm(props) {
                                 noOptionsText={`No Player(s) Found for Search`}
                                 renderOption={(props: any, playerOption: any) => {
                                     return (
-                                        // <PlayerOption key={playerOption.id} playerOption={playerOption} {...props} />
                                         <div key={playerOption.id} {...props}>
                                             <AutoCompletePlayerOption playerOption={playerOption} />
-                                            {/* <div className="autocompleteOption">
-                                                <div className="levelNumColumn">Lv {playerOption?.level?.num}</div>
-                                                <div className="levelImageColumn"><img width={30} src={calcPlayerLevelImage(playerOption?.level?.name)} alt={playerOption?.level?.name} /></div>
-                                                <div className="playerDetailsColumn">
-                                                    <div className="playerName">{playerOption?.name}</div>
-                                                    <div className="playerEXP">Exp: {playerOption?.experience?.arenaXP}</div>
-                                                    <div className="plays">
-                                                        <div className={`playsContainer`}>
-                                                            {calcPlayerCharactersPlayed(playerOption).map((char, charIndex) => {
-                                                                return (
-                                                                    <Badge title={`Played ${getCharacterTitle(char)} ${calcPlayerCharacterTimesPlayed(playerOption, char)} Time(s)`} key={charIndex} badgeContent={calcPlayerCharacterTimesPlayed(playerOption, char)} color="primary">
-                                                                        <img className={`charImg`} width={25} src={calcPlayerCharacterIcon(char)} alt={getCharacterTitle(char)} />
-                                                                    </Badge>
-                                                                )
-                                                            })}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div> */}
                                         </div>
                                     )
                                 }}
@@ -192,10 +187,10 @@ export default function CommandsForm(props) {
                                 autoHighlight
                                 id="conditionAuto-1"
                                 sx={{ width: `100%` }}
-                                options={[{id: 1, label: `Defeats`}, {id: 2, label: `Loses-to`}]}
                                 getOptionLabel={(option) => option.label}
                                 onChange={(e, val: any) => adjustCondition(e, val)}
                                 onInputChange={(e, val: any) => adjustCondition(e, val)}
+                                options={[{id: 1, label: `Defeats`}, {id: 2, label: `Loses-to`}]}
                                 isOptionEqualToValue={(option, value) => option.id === value.id}
                                 renderInput={(params) => <TextField name={`condition`} {...params} label="Condition..." />}
                                 noOptionsText={`No Condition(s) Found for Search`}
@@ -216,7 +211,7 @@ export default function CommandsForm(props) {
                                 autoHighlight
                                 id="playerSearchAutoPlayer2"
                                 sx={{ width: `100%` }}
-                                getOptionLabel={(option) => option.label}
+                                getOptionLabel={(option) => option.name}
                                 onChange={(e, val: any) => adjustPlayers(e, val, `loser`)}
                                 onInputChange={(e, val: any) => adjustPlayers(e, val, `loser`)}
                                 isOptionEqualToValue={(option, value) => option.id === value.id}
@@ -225,28 +220,8 @@ export default function CommandsForm(props) {
                                 noOptionsText={`No Player(s) Found for Search`}
                                 renderOption={(props: any, playerOption: any) => {
                                     return (
-                                        // <PlayerOption key={playerOption.id} playerOption={playerOption} {...props} />
                                         <div key={playerOption.id} {...props}>
                                             <AutoCompletePlayerOption playerOption={playerOption} />
-                                            {/* <div className="autocompleteOption">
-                                                <div className="levelNumColumn">Lv {playerOption?.level?.num}</div>
-                                                <div className="levelImageColumn"><img width={30} src={calcPlayerLevelImage(playerOption?.level?.name)} alt={playerOption?.level?.name} /></div>
-                                                <div className="playerDetailsColumn">
-                                                    <div className="playerName">{playerOption?.name}</div>
-                                                    <div className="playerEXP">Exp: {playerOption?.experience?.arenaXP}</div>
-                                                    <div className="plays">
-                                                        <div className={`playsContainer`}>
-                                                            {calcPlayerCharactersPlayed(playerOption).map((char, charIndex) => {
-                                                                return (
-                                                                    <Badge title={`Played ${getCharacterTitle(char)} ${calcPlayerCharacterTimesPlayed(playerOption, char)} Time(s)`} key={charIndex} badgeContent={calcPlayerCharacterTimesPlayed(playerOption, char)} color="primary">
-                                                                        <img className={`charImg`} width={25} src={calcPlayerCharacterIcon(char)} alt={getCharacterTitle(char)} />
-                                                                    </Badge>
-                                                                )
-                                                            })}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div> */}
                                         </div>
                                     )
                                 }}
@@ -269,7 +244,6 @@ export default function CommandsForm(props) {
                                 noOptionsText={`No Character(s) Found for Search`}
                                 renderOption={(props: any, characterOption: any) => {
                                     return (
-                                        // <CharacterOption key={characterOption.id} characterOption={characterOption} {...props} />
                                         <div key={characterOption.id} {...props}>
                                             <AutoCompleteCharacterOption characterOption={characterOption} />
                                         </div>
@@ -337,15 +311,6 @@ export default function CommandsForm(props) {
                 <button className={`formSubmitButton`} type={`submit`}>Submit</button>
             </form>
         </section>
-        <ul className="commandsList commandToCopy">
-            <li className={`listedCommand`} title={renderCommand(command)}>
-                <div className="commandDetails flex gap15">
-                    <CodeBlock custombutton={true} border={`solid 2px white`} id={`commandToRender`} language={`js`} codeTitle={<div className={`desc`}>{command?.description}</div>}>
-                        {renderCommand(command)}
-                    </CodeBlock>
-                </div>
-            </li>
-        </ul>
         </>
     )
 }

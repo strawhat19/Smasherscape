@@ -77,7 +77,6 @@ export const updatePlayerStats = (plyr, plays) => {
 
 export const updatePlayerPlays = (playState) => {
     let currentDateTimeStamp = formatDate(new Date());
-    
     let {
         plyr, 
         date,
@@ -102,7 +101,9 @@ export const updatePlayerPlays = (playState) => {
         character: winnerOrLoser == `winner` ? winChar : loseChar,
         id: `player-${plyr.name}-play-${playUUID}`,
         winner: winnerDB?.name,
+        winnerID: winnerDB?.id,
         loser: loserDB?.name,
+        loserID: loserDB?.id,
         uuid: playUUID,
         stocksTaken,
         lossStocks,
@@ -230,7 +231,7 @@ export default function PlayerForm(props) {
 
     const searchInput = useRef();
     const commandsInput = useRef();
-    const { players, setPlayers, filteredPlayers, setFilteredPlayers, devEnv, useDatabase, useLocalStorage, commands, databasePlayers, sameNamePlayeredEnabled, deleteCompletely } = useContext<any>(StateContext);
+    const { players, setPlayers, filteredPlayers, setFilteredPlayers, devEnv, useDatabase, useLocalStorage, commands, databasePlayers, sameNamePlayeredEnabled, deleteCompletely, noPlayersFoundMessage } = useContext<any>(StateContext);
 
     const updatePlayersDB = (updatedPlayers: Player[]) => {
         devEnv && console.log(`Updated Players`, getActivePlayers(updatedPlayers));
@@ -290,16 +291,17 @@ export default function PlayerForm(props) {
             if (firstCommand.includes(`!upd`)) {
                 updatePlayers(commandParams);
             } else if (firstCommand.includes(`!add`)) {
-                addPlayersWithParameters({
-                    players, 
-                    setPlayers, 
-                    useDatabase, 
-                    commandParams, 
-                    databasePlayers, 
-                    updatePlayersDB,
-                    setFilteredPlayers, 
-                    sameNamePlayeredEnabled, 
-                });
+                addPlayers(commandParams);
+                // addPlayersWithParameters({
+                //     players, 
+                //     setPlayers, 
+                //     useDatabase, 
+                //     commandParams, 
+                //     databasePlayers, 
+                //     updatePlayersDB,
+                //     setFilteredPlayers, 
+                //     sameNamePlayeredEnabled, 
+                // });
             } else if (firstCommand.includes(`!del`)) {
                 deletePlayers(commandParams);
             } else if (firstCommand.includes(`!res`)) {
@@ -346,36 +348,49 @@ export default function PlayerForm(props) {
     //     };
     // }, [])
 
-    const searchPlayers = (e: any, value?: any, type?) => {
+    const searchPlayers = (e: any, itemsToSearch?: any, type?) => {
         let field = e.target as HTMLInputElement;
         if (field && field.name == `commands`) return;
-        if (!value) value = field.value;
-        if (value && value != ``) {
+        if (!itemsToSearch) itemsToSearch = field.value;
+        if (itemsToSearch && itemsToSearch != ``) {
             if (type == `playerName`) {
-                if (typeof value == `string`) {
+                if (Array.isArray(itemsToSearch) && itemsToSearch.length > 0) {
+                    setFilteredPlayers(getActivePlayers(players).filter((plyr: Player) => {
+                        return itemsToSearch.map(playr => playr.name.toLowerCase()).includes(plyr.name.toLowerCase());
+                    }));
+                } else if (typeof itemsToSearch == `string`) {
                     setFilteredPlayers(getActivePlayers(players).filter((plyr: Player) => {
                         return Object.values(plyr).some(val =>
-                            typeof val === `string` && val.toLowerCase().includes(value?.toLowerCase())
+                            typeof val === `string` && val.toLowerCase().includes(itemsToSearch?.toLowerCase())
                         );
                     }));
                 } else {
                     setFilteredPlayers(getActivePlayers(players).filter((plyr: Player) => {
                         return Object.values(plyr).some(val =>
-                            typeof val === `string` && val.toLowerCase().includes(value?.name?.toLowerCase())
+                            typeof val === `string` && val.toLowerCase().includes(itemsToSearch?.name?.toLowerCase())
                         );
                     }));
                 }
             } else {
-                if (typeof value == `string`) {
+                if (Array.isArray(itemsToSearch) && itemsToSearch.length > 0) {
+                    setFilteredPlayers(getActivePlayers(players).filter((plyr: Player) => {
+                        return itemsToSearch.map(playr => playr.name.toLowerCase()).includes(plyr.name.toLowerCase());
+                    }));
+                    // setFilteredPlayers(getActivePlayers(players).filter((plyr: Player) => {
+                    //     return plyr.plays.map(ply => ply.character).some(char =>
+                    //         typeof char === `string` && char.toLowerCase().includes(itemsToSearch?.toLowerCase())
+                    //     );
+                    // }));
+                } else if (typeof itemsToSearch == `string`) {
                     setFilteredPlayers(getActivePlayers(players).filter((plyr: Player) => {
                         return plyr.plays.map(ply => ply.character).some(char =>
-                            typeof char === `string` && char.toLowerCase().includes(value?.toLowerCase())
+                            typeof char === `string` && char.toLowerCase().includes(itemsToSearch?.toLowerCase())
                         );
                     }));
                 } else {
                     setFilteredPlayers(getActivePlayers(players).filter((plyr: Player) => {
                         return plyr.plays.map(ply => ply.character).some(char =>
-                            typeof char === `string` && char.toLowerCase().includes(value?.label?.toLowerCase())
+                            typeof char === `string` && char.toLowerCase().includes(itemsToSearch?.label?.toLowerCase())
                         );
                     }));
                 }
@@ -690,7 +705,7 @@ export default function PlayerForm(props) {
                     id="playerSearchAuto-1"
                     sx={{ width: `100%` }}
                     options={getActivePlayers(players)}
-                    getOptionLabel={(option) => option.label}
+                    getOptionLabel={(option) => option.name}
                     onChange={(e, val: any) => searchPlayers(e, val, `playerName`)}
                     isOptionEqualToValue={(option, value) => option.id === value.id}
                     onInputChange={(e, val: any) => searchPlayers(e, val, `playerName`)}
@@ -705,10 +720,35 @@ export default function PlayerForm(props) {
                     }}
                 />
             </div>
+            {/* <div className={`playerSearchAuto inputWrapper materialBGInputWrapper`}>
+                <div className="inputBG materialBG"></div>
+                <Autocomplete
+                    multiple
+                    limitTags={2}
+                    autoHighlight
+                    ref={searchInput}
+                    id="playerSearchAuto-1"
+                    sx={{ width: `100%` }}
+                    options={getActivePlayers(players)}
+                    getOptionLabel={(option) => option.name}
+                    noOptionsText={`No Player(s) Found for Search`}
+                    onChange={(e, val: any) => searchPlayers(e, val, `playerName`)}
+                    isOptionEqualToValue={(option, value) => option.id === value.id}
+                    onInputChange={(e, val: any) => searchPlayers(e, val, `playerName`)}
+                    renderInput={(params) => <TextField name={`search`} onBlur={(e) => searchBlur(e, filteredPlayers)} {...params} label="Search Player(s) by Name..." />}
+                    renderOption={(props: any, playerOption: any) => {
+                        return (
+                            <div key={playerOption.id} {...props}>
+                                <AutoCompletePlayerOption playerOption={playerOption} />
+                            </div>
+                        )
+                    }}
+                />
+            </div> */}
         </>}
         <div id={`commandsInput`} className={`inputWrapper`}>
             <div className="inputBG"></div>
-            <input ref={commandsInput} type="text" className="commands" name={`commands`} placeholder={databasePlayers.length > 0 ? `Enter Commands...` : `No Players Found, Try !add insertPlayerNameWithNoSpaces`} />
+            <input ref={commandsInput} type="text" className="commands" name={`commands`} placeholder={databasePlayers.length > 0 ? `Enter Commands...` : `${noPlayersFoundMessage}, Try !add insertPlayerNameWithNoSpaces`} />
         </div>
         {(getActivePlayers(players).length > 0 && getAllPlays(getActivePlayers(players)).length > 0) && <>
             <div className={`characterSearchAuto inputWrapper materialBGInputWrapper`}>

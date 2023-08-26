@@ -24,8 +24,10 @@ export const defaultCommands = {
     name: `Delete`,
     command: `!del`,
     example: `!del name(s) of player(s)`,
+    icon: <i className="fas fa-trash"></i>,
     triggers: [`!del`, `!x`, `!delete`, `!remove`],
-    description: `Delete Player or Player(s) separated by spaces`,
+    shortDescription: `Delete Player or Player(s) from Leaderboard`,
+    description: `Delete Player or Player(s) from Leaderboard separated by spaces`,
   },
   Reset: {
     id: 4,
@@ -38,8 +40,10 @@ export const defaultCommands = {
     id: 5,
     name: `Update`,
     command: `!upd`,
-    description: `Update Leaderboard`,
+    icon: <i className="fas fa-wrench"></i>,
+    description: `Update Player(s) in Leaderboard`,
     triggers: [`!upd`, `!update`, `!game`, `!match`],
+    shortDescription: `Update Player(s) in Leaderboard`,
     example: `!upd winner vs loser with winChar vs loseChar stocksTakenFromWinner`,
   },
   Set: {
@@ -63,8 +67,7 @@ export const defaultCommands = {
 export function Commands(props) {
   let { commands, devEnv } = props;
   let [commandsToRender, setCommandsToRender] = useState<Command[]>(Object.values(commands).map((comm: Command) => {
-    let { id, name, command, description, triggers, example } = comm;
-    let commandObj = new Command(id, name, command, description, triggers, example);
+    let commandObj = new Command(comm);
     Object.keys(commandObj).forEach(key => isInvalid(commandObj[key]) && delete commandObj[key]);
     return commandObj as Command;
   }));

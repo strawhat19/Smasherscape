@@ -6,9 +6,9 @@ import Level from '../models/Level';
 import Player from '../models/Player';
 import PlayerForm from './PlayerForm';
 import CommandsForm from './CommandsForm';
-import { StateContext, getActivePlayersJSON } from '../pages/_app';
 import Experience from '../models/Experience';
 import { Characters } from '../common/Characters';
+import { StateContext, getActivePlayersJSON } from '../pages/_app';
 import PlayerCard, { calcPlayerLosses, calcPlayerWins } from './PlayerCard';
 import { calcPlayerDeaths, calcPlayerKDRatio, calcPlayerKills, removeTrailingZeroDecimal } from './PlayerRecord';
 
@@ -117,7 +117,7 @@ export const isInvalid = (item) => {
 }
 
 export default function Smasherscape(props) {
-    const { filteredPlayers, players } = useContext<any>(StateContext);
+    const { filteredPlayers, players, noPlayersFoundMessage } = useContext<any>(StateContext);
 
     return <Main className={`smasherscapeLeaderboard`}>
         {getActivePlayers(players).length > 0 && <CommandsForm />}
@@ -126,11 +126,15 @@ export default function Smasherscape(props) {
             {getActivePlayers(filteredPlayers)?.length == 0 && <>
                 <div className="gridCard">
                     <h1 className={`runescape_large noPlayersFound`}>
-                        No Players Found
+                        {noPlayersFoundMessage}
                     </h1>
                 </div>
             </>}
-            {getActivePlayers(filteredPlayers)?.length > 0 && getActivePlayers(filteredPlayers)?.map((plyr, plyrIndex) => <PlayerCard plyr={plyr} key={plyrIndex} />)}
+            {getActivePlayers(filteredPlayers)?.length > 0 && getActivePlayers(filteredPlayers)?.map((plyr, plyrIndex) => {
+                return (
+                    <PlayerCard plyr={plyr} key={plyrIndex} />
+                )
+            })}
         </div>
     </Main>
 }

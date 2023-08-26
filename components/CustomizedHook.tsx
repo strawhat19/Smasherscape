@@ -1,16 +1,12 @@
 import * as React from 'react';
 import { useContext } from "react";
-import { Badge } from '@mui/material';
 import Player from '../models/Player';
 import { StateContext } from '../pages/_app';
 import { styled } from '@mui/material/styles';
+import { getActivePlayers } from './smasherscape';
 import { autocompleteClasses } from '@mui/material/Autocomplete';
-import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
-import useAutocomplete, { AutocompleteGetTagProps } from '@mui/base/useAutocomplete';
-import { calcPlayerCharactersPlayed, calcPlayerLevelImage, getActivePlayers, getCharacterTitle } from './smasherscape';
-import PlayerOption from './PlayerOption';
-import PlayerHookTag from './PlayerHookTag';
 import AutoCompletePlayerOption from './AutoCompletePlayerOption';
+import useAutocomplete, { AutocompleteGetTagProps } from '@mui/base/useAutocomplete';
 
 const Root = styled(`div`)(
   ({ theme }) => `
@@ -69,35 +65,13 @@ function Tag(props: TagProps) {
   const { option, player, label, onDelete, ...other } = props;
   let playerOption = option;
   return (
-    // <PlayerOption key={playerOption.id} playerOption={playerOption} {...other} />
-    // <PlayerHookTag key={playerOption.id} playerOption={playerOption} onDelete={onDelete} other={other}  />
     <div className={`playerHookTag`} {...other}>
       <AutoCompletePlayerOption className={`styledTaggetTag`} playerOption={playerOption} />
       <i className="fas fa-times tagCloseIcon" onClick={onDelete}></i>
-      {/* <div className="autocompleteOption">
-        <div className="levelNumColumn">{option?.level?.num}</div>
-        <div className="levelImageColumn"><img width={30} src={calcPlayerLevelImage(option?.level?.name)} alt={option?.level?.name} /></div>
-        <div className="playerHookTagDetails playerDetailsColumn">
-          <div className="playerName">{option?.label}</div>
-          <div className="playerEXP">{option?.experience?.arenaXP}</div>
-          <div className="plays">
-            <div className={`playsContainer`}>
-              {calcPlayerCharactersPlayed(option).map((char, charIndex) => {
-                return (
-                  <img title={getCharacterTitle(char)} key={charIndex} className={`charImg`} width={25} src={calcPlayerCharacterIcon(char)} alt={getCharacterTitle(char)} />
-                )
-              })}
-            </div>
-          </div>
-        </div>
-      </div> */}
     </div>
   );
 }
 
-// background: ${
-//   theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : '#fafafa'
-// };
 const StyledTag = styled(Tag)<TagProps>(
   ({ theme }) => `
   column-gap: 15px;
@@ -123,6 +97,8 @@ const StyledTag = styled(Tag)<TagProps>(
     border-color: ${theme.palette.mode === 'dark' ? '#177ddc' : '#40a9ff'};
     background-color: ${theme.palette.mode === 'dark' ? '#003b57' : '#e6f7ff'};
   }
+
+  // background: ${theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : '#fafafa'};
 
   // & span {
   //   overflow: hidden;
@@ -168,7 +144,7 @@ const Listbox = styled(`ul`)(
     width: 95%;
 
     &:hover {
-      background: #d7d7d7 !important;
+      background: #f5f5f5 !important;
     }
 
     width: 100%
@@ -227,7 +203,6 @@ export default function CustomizedHook(props) {
     focused,
     setAnchorEl,
     getClearProps,
-    // limitTags,
   } = useAutocomplete({
     multiple: true,
     defaultValue: [],
@@ -236,7 +211,6 @@ export default function CustomizedHook(props) {
     getOptionLabel: (option) => option.label,
     onChange: (e, val: any) => adjustPlayersToSelect(e, val),
     isOptionEqualToValue: (option, value) => option.id === value.id,
-    // limitTags: 2,
   });
 
   return (

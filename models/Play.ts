@@ -11,6 +11,8 @@ export default class Play {
     stocksTaken: number,
     lossStocks: Stock[],
     otherCharacter: string,
+    winnerID?: string,
+    loserID?: string,
     expGained?: any,
     prevExp?: any,
     newExp?: any,
