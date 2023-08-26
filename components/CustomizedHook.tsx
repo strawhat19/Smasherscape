@@ -9,6 +9,7 @@ import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
 import useAutocomplete, { AutocompleteGetTagProps } from '@mui/base/useAutocomplete';
 import { calcPlayerCharacterTimesPlayed, calcPlayerCharactersPlayed, calcPlayerLevelImage, getActivePlayers, getCharacterTitle } from './smasherscape';
 import PlayerOption from './PlayerOption';
+import PlayerHookTag from './PlayerHookTag';
 
 const Root = styled(`div`)(
   ({ theme }) => `
@@ -68,26 +69,7 @@ function Tag(props: TagProps) {
   let playerOption = option;
   return (
     // <PlayerOption key={playerOption.id} playerOption={playerOption} {...other} />
-    <div className={`playerHookTag`} {...other}>
-      <div className="autocompleteOption">
-        <div className="levelNumColumn">{playerOption?.level?.num}</div>
-        <div className="levelImageColumn"><img width={30} src={calcPlayerLevelImage(playerOption?.level?.name)} alt={playerOption?.level?.name} /></div>
-        <div className="playerHookTagDetails playerDetailsColumn">
-          <div className="playerName">{playerOption?.name}</div>
-          <div className="playerEXP">{playerOption?.experience?.arenaXP}</div>
-          <div className="plays">
-            <div className={`playsContainer`}>
-              {calcPlayerCharactersPlayed(playerOption).map((char, charIndex) => {
-                return (
-                  <img title={getCharacterTitle(char)} key={charIndex} className={`charImg`} width={25} src={calcPlayerCharacterIcon(char)} alt={getCharacterTitle(char)} />
-                )
-              })}
-            </div>
-          </div>
-        </div>
-      </div>
-      <i className="fas fa-times tagCloseIcon" onClick={onDelete}></i>
-    </div>
+    <PlayerHookTag key={playerOption.id} playerOption={playerOption} onDelete={onDelete} other={other}  />
   );
 }
 
@@ -256,7 +238,8 @@ export default function CustomizedHook(props) {
           {(groupedOptions).map((option, index) => 
             (
               <li className={`customHookOption`} key={index} {...getOptionProps({ option, index })}>
-                <div>
+                <PlayerOption playerOption={option}  />
+                {/* <div>
                   <div className="autocompleteOption">
                     <div className="levelNumColumn">Lv {option?.level?.num}</div>
                     <div className="levelImageColumn"><img width={30} src={calcPlayerLevelImage(option?.level?.name)} alt={option?.level?.name} /></div>
@@ -276,7 +259,7 @@ export default function CustomizedHook(props) {
                       </div>
                     </div>
                   </div>
-                </div>
+                </div> */}
               </li>
             )
           )}

@@ -1,11 +1,10 @@
 import  moment from 'moment';
+import { db } from '../firebase';
 import Play from '../models/Play';
 import Role from '../models/Role';
 import Stock from '../models/Stock';
 import Level from '../models/Level';
-import { Badge } from '@mui/material';
 import Player from '../models/Player';
-import app, { db } from '../firebase';
 import Experience from '../models/Experience';
 import TextField from '@mui/material/TextField';
 import { Characters } from '../common/Characters';
@@ -13,29 +12,37 @@ import Autocomplete from '@mui/material/Autocomplete';
 import { Commands, defaultCommands } from './Commands';
 import { calcPlayerLosses, calcPlayerWins } from './PlayerCard';
 import { calcPlayerLevelAndExperience } from '../common/Levels';
+import { FormEvent, useContext, useEffect, useRef } from 'react';
+import AutoCompletePlayerOption from './AutoCompletePlayerOption';
 import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
-import { FormEvent, useContext, useEffect, useRef, useState } from 'react';
+import AutoCompleteCharacterOption from './AutoCompleteCharacterOption';
+import { getActivePlayers, isInvalid, newPlayerType } from './smasherscape';
+import { doc, setDoc, collection, onSnapshot, deleteDoc, updateDoc } from 'firebase/firestore';
 import { StateContext, showAlert, defaultPlayers, formatDate, generateUniqueID, dev } from '../pages/_app';
-import { doc, setDoc, collection, addDoc, getDocs, onSnapshot, deleteDoc, updateDoc } from 'firebase/firestore';
 import { calcPlayerDeaths, calcPlayerKDRatio, calcPlayerKills, removeTrailingZeroDecimal } from './PlayerRecord';
-import { calcPlayerCharacterTimesPlayed, calcPlayerCharactersPlayed, calcPlayerLevelImage, getActivePlayers, getCharacterTitle, isInvalid, newPlayerType } from './smasherscape';
-import PlayerOption from './PlayerOption';
-import CharacterOption from './CharacterOption';
 
 export const addPlayerToDB = async (playerObj: Player) => await setDoc(doc(db, `players`, playerObj?.ID), playerObj);
 export const deletePlayerFromDB = async (playerObj: Player) => await deleteDoc(doc(db, `players`, playerObj?.ID));
+
+export const winCons = [`beat`, `beats`, `has-beaten`, `destroys`, `destroyed`, `defeats`, `defeated`, `has-defeated`, `conquers`, `vanquishes`, `vanquished`, `fells`, `crushes`, `kills`, `killed`];
+export const loseCons = [`loses-to`, `falls-to`, `defeated-by`, `destroyed-by`];
+
 export const updatePlayerInDB = async (playerObj: Player, parameters) => {
     await updateDoc(doc(db, `players`, playerObj?.ID), parameters);
 };
+
+export const getAllCharacters = () => {
+    return Object.entries(Characters).filter(char => char[0] === char[0].charAt(0).toUpperCase() + char[0].slice(1));
+}
+
+export const getUniqueCharactersPlayed = (players) => {
+    return [...new Set(players.flatMap((p: Player) => p.plays.flatMap((play: Play) => [play.character, play.otherCharacter]) ))].sort();
+}
 
 export const searchBlur = (e: any, filteredPlayers: Player[]) => {
     if (filteredPlayers?.length == 0) {
         e.target.value = ``;
     }
-}
-
-export const getAllCharacters = () => {
-    return Object.entries(Characters).filter(char => char[0] === char[0].charAt(0).toUpperCase() + char[0].slice(1));
 }
 
 export const getCharacterObjects = () => {
@@ -48,10 +55,6 @@ export const getCharacterObjects = () => {
             shortcuts: Object.entries(Characters).filter(entry => entry[1] == char[1]).map(entr => entr[0]),
         }
     })
-}
-
-export const getUniqueCharactersPlayed = (players) => {
-    return [...new Set(players.flatMap((p: Player) => p.plays.flatMap((play: Play) => [play.character, play.otherCharacter]) ))].sort();
 }
 
 export const playerConverter = {
@@ -186,50 +189,59 @@ export const createPlayer = (playerName, playerIndex, databasePlayers): Player =
     return playerObj;
 }
 
+export const addPlayersWithParameters = (addPlayersParams) => {
+    let {
+        players, 
+        setPlayers, 
+        useDatabase, 
+        commandParams, 
+        databasePlayers, 
+        updatePlayersDB,
+        setFilteredPlayers, 
+        sameNamePlayeredEnabled, 
+    } = addPlayersParams;
+    
+    let playersToAdd = commandParams.filter((comm, commIndex) => commIndex != 0 && comm);
+    [...new Set(playersToAdd)].forEach((plyr: any, plyrIndex) => {
+        let playerObj: Player = createPlayer(plyr, plyrIndex, databasePlayers);
+        if (useDatabase == true) {
+            if (sameNamePlayeredEnabled) {
+                addPlayerToDB(playerObj);
+                return playerObj;
+            } else {
+                if (!getActivePlayers(players).map(playr => playr.name.toLowerCase()).some(nam => nam == plyr.toLowerCase())) {
+                    addPlayerToDB(playerObj);
+                    return playerObj;
+                } else {
+                    showAlert(`Player(s) Added Already`, <h1>
+                        Player(s) with those name(s) already exist.
+                    </h1>, `65%`, `35%`);
+                    return;
+                }
+            }
+        } else {
+            if (!getActivePlayers(players).map(playr => playr.name.toLowerCase()).some(nam => nam == plyr.toLowerCase())) {
+                setPlayers(prevPlayers => {
+                    let updatedPlayers: Player[] = [...prevPlayers, playerObj];
+                    setFilteredPlayers(updatedPlayers);
+                    updatePlayersDB(updatedPlayers);
+                    return updatedPlayers;
+                });
+            } else {
+                showAlert(`Player(s) Added Already`, <h1>
+                    Player(s) with those name(s) already exist.
+                </h1>, `65%`, `35%`);
+                return;
+            }
+        }
+    })
+}
+
 export default function PlayerForm(props) {
 
     const searchInput = useRef();
     const commandsInput = useRef();
     const { players, setPlayers, filteredPlayers, setFilteredPlayers, devEnv, useDatabase, useLocalStorage, commands, databasePlayers, setDatabasePlayers, setCommand, setCommandsToNotInclude, sameNamePlayeredEnabled, deleteCompletely } = useContext<any>(StateContext);
-
-    const searchPlayers = (e: any, value?: any, type?) => {
-        let field = e.target as HTMLInputElement;
-        if (field && field.name == `commands`) return;
-        if (!value) value = field.value;
-        if (value && value != ``) {
-            if (type == `playerName`) {
-                if (typeof value == `string`) {
-                    setFilteredPlayers(players.filter((plyr: Player) => {
-                        return Object.values(plyr).some(val =>
-                            typeof val === `string` && val.toLowerCase().includes(value?.toLowerCase())
-                        );
-                    }));
-                } else {
-                    setFilteredPlayers(players.filter((plyr: Player) => {
-                        return Object.values(plyr).some(val =>
-                            typeof val === `string` && val.toLowerCase().includes(value?.name?.toLowerCase())
-                        );
-                    }));
-                }
-            } else {
-                if (typeof value == `string`) {
-                    setFilteredPlayers(players.filter((plyr: Player) => {
-                        return plyr.plays.map(ply => ply.character).some(char =>
-                            typeof char === `string` && char.toLowerCase().includes(value?.toLowerCase())
-                        );
-                    }));
-                } else {
-                    setFilteredPlayers(players.filter((plyr: Player) => {
-                        return plyr.plays.map(ply => ply.character).some(char =>
-                            typeof char === `string` && char.toLowerCase().includes(value?.label?.toLowerCase())
-                        );
-                    }));
-                }
-            }
-        } else {
-            setFilteredPlayers(players);
-        }
-    }
 
     const updatePlayersDB = (updatedPlayers: Player[]) => {
         devEnv && console.log(`Updated Players`, getActivePlayers(updatedPlayers));
@@ -270,11 +282,55 @@ export default function PlayerForm(props) {
         }
     }
 
+    const handleCommands = (e: FormEvent) => {
+        e.preventDefault();
+        let field = commandsInput.current as HTMLInputElement;
+        if (field.name == `commands`) {
+            let commandFromForm = field?.value.toLowerCase();
+            processCommands(commandFromForm);
+        } else {
+            return;
+        }
+    }
+
+    const processCommands = (commandFromForm) => {
+        let commandParams = commandFromForm.split(` `);
+        let firstCommand = commandParams[0];
+        
+        if (commandFromForm != ``) {
+            if (firstCommand.includes(`!upd`)) {
+                updatePlayers(commandParams);
+            } else if (firstCommand.includes(`!add`)) {
+                addPlayersWithParameters({
+                    players, 
+                    setPlayers, 
+                    useDatabase, 
+                    commandParams, 
+                    databasePlayers, 
+                    updatePlayersDB,
+                    setFilteredPlayers, 
+                    sameNamePlayeredEnabled, 
+                });
+            } else if (firstCommand.includes(`!del`)) {
+                deletePlayers(commandParams);
+            } else if (firstCommand.includes(`!res`)) {
+                resetPlayers(commandParams);
+            } else if (firstCommand.includes(`!giv`)) {
+                giveParameter(commandParams);
+            } else if (firstCommand.includes(`!set`)) {
+                setParameter(commandParams);
+            } else {
+                showCommands();
+            }
+        }
+    }
+
     useEffect(() => {
         const unsubscribeFromSmasherScapeSnapShot = onSnapshot(collection(db, `players`), (querySnapshot) => {
             const playersFromDatabase = [];
             querySnapshot.forEach((doc) => playersFromDatabase.push(doc.data()));
-            dev() && console.log(`Database Update for Players`, playersFromDatabase.map(pla => newPlayerType(pla)));
+            dev() && console.log(`All Database Players`, playersFromDatabase.map(pla => newPlayerType(pla)));
+            dev() && console.log(`Active Database Players`, getActivePlayers(playersFromDatabase.map(pla => newPlayerType(pla))));
             setPlayers(playersFromDatabase);
             setDatabasePlayers(playersFromDatabase);
             setFilteredPlayers(getActivePlayers(playersFromDatabase));
@@ -292,6 +348,45 @@ export default function PlayerForm(props) {
             unsubscribeFromSmasherScapeSnapShot();
         };
     }, [])
+
+    const searchPlayers = (e: any, value?: any, type?) => {
+        let field = e.target as HTMLInputElement;
+        if (field && field.name == `commands`) return;
+        if (!value) value = field.value;
+        if (value && value != ``) {
+            if (type == `playerName`) {
+                if (typeof value == `string`) {
+                    setFilteredPlayers(players.filter((plyr: Player) => {
+                        return Object.values(plyr).some(val =>
+                            typeof val === `string` && val.toLowerCase().includes(value?.toLowerCase())
+                        );
+                    }));
+                } else {
+                    setFilteredPlayers(players.filter((plyr: Player) => {
+                        return Object.values(plyr).some(val =>
+                            typeof val === `string` && val.toLowerCase().includes(value?.name?.toLowerCase())
+                        );
+                    }));
+                }
+            } else {
+                if (typeof value == `string`) {
+                    setFilteredPlayers(players.filter((plyr: Player) => {
+                        return plyr.plays.map(ply => ply.character).some(char =>
+                            typeof char === `string` && char.toLowerCase().includes(value?.toLowerCase())
+                        );
+                    }));
+                } else {
+                    setFilteredPlayers(players.filter((plyr: Player) => {
+                        return plyr.plays.map(ply => ply.character).some(char =>
+                            typeof char === `string` && char.toLowerCase().includes(value?.label?.toLowerCase())
+                        );
+                    }));
+                }
+            }
+        } else {
+            setFilteredPlayers(players);
+        }
+    }
 
     const addPlayers = (commandParams) => {
         let playersToAdd = commandParams.filter((comm, commIndex) => commIndex != 0 && comm);
@@ -466,9 +561,6 @@ export default function PlayerForm(props) {
         let characterTwo;
         let stocksTaken;
 
-        let winCons = [`beat`, `beats`, `has-beaten`, `destroys`, `destroyed`, `defeats`, `defeated`, `has-defeated`, `conquers`, `vanquishes`, `vanquished`, `fells`, `crushes`, `kills`, `killed`];
-        let loseCons = [`loses-to`, `falls-to`, `defeated-by`, `destroyed-by`];
-
         if (commandParams.length >= 8) {
             characterOne = commandParams[5].toLowerCase();
             characterTwo = commandParams[7].toLowerCase();
@@ -493,7 +585,7 @@ export default function PlayerForm(props) {
             </h1>, `65%`, `35%`);
             return;
         } else if (!Characters[characterOne] || !Characters[characterTwo]) {
-            // devEnv && console.log(`Cannot Find Characters`, {characterOne, characterTwo}, !Characters[characterOne], !Characters[characterTwo]);
+            // devEnv && console.log(`Cannot Find Characters`, !Characters[characterOne], !Characters[characterTwo]);
             showAlert(`Cannot Find Characters`, <h1>
                 Can't find characters with those names.
             </h1>, `65%`, `35%`);
@@ -584,40 +676,6 @@ export default function PlayerForm(props) {
         }
     }
 
-    const handleCommands = (e: FormEvent) => {
-        e.preventDefault();
-        let field = commandsInput.current as HTMLInputElement;
-        if (field.name == `commands`) {
-            let commandFromForm = field?.value.toLowerCase();
-            processCommands(commandFromForm);
-        } else {
-            return;
-        }
-    }
-
-    const processCommands = (commandFromForm) => {
-        let commandParams = commandFromForm.split(` `);
-        let firstCommand = commandParams[0];
-        
-        if (commandFromForm != ``) {
-            if (firstCommand.includes(`!upd`)) {
-                updatePlayers(commandParams);
-            } else if (firstCommand.includes(`!add`)) {
-                addPlayers(commandParams);
-            } else if (firstCommand.includes(`!del`)) {
-                deletePlayers(commandParams);
-            } else if (firstCommand.includes(`!res`)) {
-                resetPlayers(commandParams);
-            } else if (firstCommand.includes(`!giv`)) {
-                giveParameter(commandParams);
-            } else if (firstCommand.includes(`!set`)) {
-                setParameter(commandParams);
-            } else {
-                showCommands();
-            }
-        }
-    }
-
     return <section className={`formsSection`}>
     <form id={`playerForm`} onSubmit={(e) => handleCommands(e)} action="submit" className="gridForm">
         <div className={`inputWrapper materialBGInputWrapper`}>
@@ -636,28 +694,9 @@ export default function PlayerForm(props) {
                 noOptionsText={`No Player(s) Found for Search`}
                 renderOption={(props: any, playerOption: any) => {
                     return (
-                        <PlayerOption key={playerOption.id} playerOption={playerOption} {...props} />
-                        // <div key={playerOption.id} {...props}>
-                        //     <div className="autocompleteOption">
-                        //         <div className="levelNumColumn">Lv {playerOption?.level?.num}</div>
-                        //         <div className="levelImageColumn"><img width={30} src={calcPlayerLevelImage(playerOption?.level?.name)} alt={playerOption?.level?.name} /></div>
-                        //         <div className="playerDetailsColumn">
-                        //             <div className="playerName">{playerOption?.name}</div>
-                        //             <div className="playerEXP">Exp: {playerOption?.experience?.arenaXP}</div>
-                        //             <div className="plays">
-                        //                 <div className={`playsContainer`}>
-                        //                     {calcPlayerCharactersPlayed(playerOption).map((char, charIndex) => {
-                        //                         return (
-                        //                             <Badge title={`Played ${getCharacterTitle(char)} ${calcPlayerCharacterTimesPlayed(playerOption, char)} Time(s)`} key={charIndex} badgeContent={calcPlayerCharacterTimesPlayed(playerOption, char)} color="primary">
-                        //                                 <img className={`charImg`} width={25} src={calcPlayerCharacterIcon(char)} alt={getCharacterTitle(char)} />
-                        //                             </Badge>
-                        //                         )
-                        //                     })}
-                        //                 </div>
-                        //             </div>
-                        //         </div>
-                        //     </div>
-                        // </div>
+                        <div key={playerOption.id} {...props}>
+                            <AutoCompletePlayerOption playerOption={playerOption} />
+                        </div>
                     )
                 }}
             />
@@ -681,7 +720,9 @@ export default function PlayerForm(props) {
                 noOptionsText={`No Character(s) Found for Search`}
                 renderOption={(props: any, characterOption: any) => {
                     return (
-                       <CharacterOption key={characterOption.id} characterOption={characterOption} {...props} />
+                        <div key={characterOption.id} {...props}>
+                            <AutoCompleteCharacterOption characterOption={characterOption} />
+                        </div>
                     )
                 }}
             />
