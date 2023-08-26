@@ -12,7 +12,7 @@ export default function AutoCompletePlayerOption(props) {
             </div>
             <div className="playerDetailsColumn">
                 <div className="playerName">{playerOption?.name}</div>
-                <div className="playerEXP">Exp: {playerOption?.experience?.arenaXP}</div>
+                <div className="playerEXP">Exp: {playerOption?.experience?.arenaXP?.toLocaleString(`en`)}</div>
                 <div className="plays">
                     <div className={`playsContainer`}>
                         {calcPlayerCharactersPlayed(playerOption).map((char, charIndex) => {

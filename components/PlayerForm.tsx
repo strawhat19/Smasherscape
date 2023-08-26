@@ -5,19 +5,19 @@ import Role from '../models/Role';
 import Stock from '../models/Stock';
 import Level from '../models/Level';
 import Player from '../models/Player';
+import { Commands } from './Commands';
 import Experience from '../models/Experience';
 import TextField from '@mui/material/TextField';
 import { Characters } from '../common/Characters';
 import Autocomplete from '@mui/material/Autocomplete';
-import { Commands, defaultCommands } from './Commands';
 import { calcPlayerLosses, calcPlayerWins } from './PlayerCard';
 import { calcPlayerLevelAndExperience } from '../common/Levels';
 import { FormEvent, useContext, useEffect, useRef } from 'react';
 import AutoCompletePlayerOption from './AutoCompletePlayerOption';
 import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
+import { doc, setDoc, deleteDoc, updateDoc } from 'firebase/firestore';
 import AutoCompleteCharacterOption from './AutoCompleteCharacterOption';
 import { getActivePlayers, isInvalid, newPlayerType } from './smasherscape';
-import { doc, setDoc, collection, onSnapshot, deleteDoc, updateDoc } from 'firebase/firestore';
 import { calcPlayerDeaths, calcPlayerKDRatio, calcPlayerKills, removeTrailingZeroDecimal } from './PlayerRecord';
 import { StateContext, showAlert, defaultPlayers, formatDate, generateUniqueID, dev, countObjectKeys, getActivePlayersJSON, databasePlayersCollectionName, getAllPlays } from '../pages/_app';
 
@@ -230,7 +230,7 @@ export default function PlayerForm(props) {
 
     const searchInput = useRef();
     const commandsInput = useRef();
-    const { players, setPlayers, filteredPlayers, setFilteredPlayers, devEnv, useDatabase, useLocalStorage, commands, databasePlayers, setDatabasePlayers, setCommand, setCommandsToNotInclude, sameNamePlayeredEnabled, deleteCompletely } = useContext<any>(StateContext);
+    const { players, setPlayers, filteredPlayers, setFilteredPlayers, devEnv, useDatabase, useLocalStorage, commands, databasePlayers, sameNamePlayeredEnabled, deleteCompletely } = useContext<any>(StateContext);
 
     const updatePlayersDB = (updatedPlayers: Player[]) => {
         devEnv && console.log(`Updated Players`, getActivePlayers(updatedPlayers));
@@ -247,6 +247,17 @@ export default function PlayerForm(props) {
         showAlert(`Here are the RukoBot Commands so far: (Hover to Click to Copy)`, <div className={`alertInner`}>
             <Commands commands={commands} devEnv={devEnv} />
         </div>, `85%`, `auto`);
+    }
+
+    const handleCommands = (e: FormEvent) => {
+        e.preventDefault();
+        let field = commandsInput.current as HTMLInputElement;
+        if (field.name == `commands`) {
+            let commandFromForm = field?.value.toLowerCase();
+            processCommands(commandFromForm);
+        } else {
+            return;
+        }
     }
 
     const getCharacterObjs = (active) => {
@@ -268,17 +279,6 @@ export default function PlayerForm(props) {
                     image: calcPlayerCharacterIcon(char[0])
                 }
             })
-        }
-    }
-
-    const handleCommands = (e: FormEvent) => {
-        e.preventDefault();
-        let field = commandsInput.current as HTMLInputElement;
-        if (field.name == `commands`) {
-            let commandFromForm = field?.value.toLowerCase();
-            processCommands(commandFromForm);
-        } else {
-            return;
         }
     }
 

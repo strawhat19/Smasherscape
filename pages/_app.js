@@ -520,7 +520,6 @@ export default function Xuruko({ Component, pageProps, router }) {
       const unsubscribeFromSmasherScapeSnapShot = onSnapshot(collection(db, databasePlayersCollectionName), (querySnapshot) => {
         const playersFromDatabase = [];
         querySnapshot.forEach((doc) => playersFromDatabase.push(doc.data()));
-        // dev() && console.log(`All Database Players JSON`, playersFromDatabase);
         
         setPlayers(playersFromDatabase);
         setDatabasePlayers(playersFromDatabase);
@@ -537,9 +536,9 @@ export default function Xuruko({ Component, pageProps, router }) {
       });
 
       return () => {
-          unsubscribeFromSmasherScapeSnapShot();
+        unsubscribeFromSmasherScapeSnapShot();
       };
-  }, [])
+    }, [])
 
     return <StateContext.Provider value={{ router, rte, setRte, updates, setUpdates, content, setContent, width, setWidth, user, setUser, page, setPage, mobileMenu, setMobileMenu, users, setUsers, authState, setAuthState, emailField, setEmailField, devEnv, setDevEnv, mobileMenuBreakPoint, platform, setPlatform, focus, setFocus, highScore, setHighScore, color, setColor, dark, setDark, colorPref, setColorPref, qotd, setQotd, alertOpen, setAlertOpen, mobile, setMobile, systemStatus, setSystemStatus, loading, setLoading, anim, setAnimComplete, IDs, setIDs, categories, setCategories, browser, setBrowser, onMac, rearranging, setRearranging, buttonText, setButtonText, gameFormStep, setGameFormStep, players, setPlayers, filteredPlayers, setFilteredPlayers, useLocalStorage, setUseLocalStorage, command, setCommand, commands, setCommands, playersToSelect, setPlayersToSelect, databasePlayers, setDatabasePlayers, useDatabase, setUseDatabase, commandsToNotInclude, setCommandsToNotInclude, sameNamePlayeredEnabled, setSameNamePlayeredEnabled, deleteCompletely, setDeleteCompletely }}>
       {(browser != `chrome` || onMac) ? <AnimatePresence mode={`wait`}>
