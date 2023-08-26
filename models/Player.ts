@@ -11,6 +11,7 @@ export default class Player {
     name?: string,
     level?: Level,
     plays?: Play[],
+    properties?: number,
     expanded?: boolean,
     experience?: Experience,
     xpModifier?: number,

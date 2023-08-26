@@ -1,7 +1,8 @@
-import app, { db } from '../../../firebase';
+import { db } from '../../../firebase';
+import { doc, setDoc } from 'firebase/firestore';
+import { databasePlayersCollectionName } from '../../_app';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { createPlayer } from '../../../components/PlayerForm';
-import { doc, setDoc, collection, addDoc, getDocs, onSnapshot } from 'firebase/firestore';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === `POST`) {
@@ -13,7 +14,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
 
       const newPlayer: any = createPlayer(playerName, 0, databasePlayers);
-      await setDoc(doc(db, `players`, newPlayer?.ID), newPlayer);
+      await setDoc(doc(db, databasePlayersCollectionName, newPlayer?.ID), newPlayer);
 
       res.status(201).json(newPlayer);
     } catch (error) {

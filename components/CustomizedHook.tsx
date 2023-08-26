@@ -7,9 +7,10 @@ import { styled } from '@mui/material/styles';
 import { autocompleteClasses } from '@mui/material/Autocomplete';
 import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
 import useAutocomplete, { AutocompleteGetTagProps } from '@mui/base/useAutocomplete';
-import { calcPlayerCharacterTimesPlayed, calcPlayerCharactersPlayed, calcPlayerLevelImage, getActivePlayers, getCharacterTitle } from './smasherscape';
+import { calcPlayerCharactersPlayed, calcPlayerLevelImage, getActivePlayers, getCharacterTitle } from './smasherscape';
 import PlayerOption from './PlayerOption';
 import PlayerHookTag from './PlayerHookTag';
+import AutoCompletePlayerOption from './AutoCompletePlayerOption';
 
 const Root = styled(`div`)(
   ({ theme }) => `
@@ -69,7 +70,28 @@ function Tag(props: TagProps) {
   let playerOption = option;
   return (
     // <PlayerOption key={playerOption.id} playerOption={playerOption} {...other} />
-    <PlayerHookTag key={playerOption.id} playerOption={playerOption} onDelete={onDelete} other={other}  />
+    // <PlayerHookTag key={playerOption.id} playerOption={playerOption} onDelete={onDelete} other={other}  />
+    <div className={`playerHookTag`} {...other}>
+      <AutoCompletePlayerOption className={`styledTaggetTag`} playerOption={playerOption} />
+      <i className="fas fa-times tagCloseIcon" onClick={onDelete}></i>
+      {/* <div className="autocompleteOption">
+        <div className="levelNumColumn">{option?.level?.num}</div>
+        <div className="levelImageColumn"><img width={30} src={calcPlayerLevelImage(option?.level?.name)} alt={option?.level?.name} /></div>
+        <div className="playerHookTagDetails playerDetailsColumn">
+          <div className="playerName">{option?.label}</div>
+          <div className="playerEXP">{option?.experience?.arenaXP}</div>
+          <div className="plays">
+            <div className={`playsContainer`}>
+              {calcPlayerCharactersPlayed(option).map((char, charIndex) => {
+                return (
+                  <img title={getCharacterTitle(char)} key={charIndex} className={`charImg`} width={25} src={calcPlayerCharacterIcon(char)} alt={getCharacterTitle(char)} />
+                )
+              })}
+            </div>
+          </div>
+        </div>
+      </div> */}
+    </div>
   );
 }
 
@@ -83,9 +105,9 @@ const StyledTag = styled(Tag)<TagProps>(
   display: flex;
   flex-direction: row;
   align-items: center;
-  height: 24px;
-  margin: 2px;
+  margin: 0px;
   line-height: 22px;
+  height: var(--customTagHeight);
   border: 1px solid ${theme.palette.mode === 'dark' ? '#303030' : '#e8e8e8'};
   border-radius: 2px;
   box-sizing: content-box;
@@ -97,19 +119,17 @@ const StyledTag = styled(Tag)<TagProps>(
   color: white;
   border-radius: 8px;
   border: 2px solid black;
-  min-height: 30px;
-
   &:focus {
     border-color: ${theme.palette.mode === 'dark' ? '#177ddc' : '#40a9ff'};
     background-color: ${theme.palette.mode === 'dark' ? '#003b57' : '#e6f7ff'};
   }
 
-  & span {
-    overflow: hidden;
-    white-space: nowrap;
-    min-width: fit-content;
-    text-overflow: ellipsis;
-  }
+  // & span {
+  //   overflow: hidden;
+  //   white-space: nowrap;
+  //   min-width: fit-content;
+  //   text-overflow: ellipsis;
+  // }
 
   & i {
     cursor: pointer;
@@ -126,11 +146,11 @@ const StyledTag = styled(Tag)<TagProps>(
 const Listbox = styled(`ul`)(
   ({ theme }) => `
   width: 95%;
-  max-width: 400px;
   margin: 50px 0 0;
   padding: 1em 0;
   position: absolute;
   list-style: none;
+  max-width: var(--autocompleteMaxWidth);
   background-color: ${theme.palette.mode === 'dark' ? '#141414' : '#fff'};
   overflow: auto;
   max-height: 350px;
@@ -220,13 +240,13 @@ export default function CustomizedHook(props) {
   });
 
   return (
-    <Root className={`customHookRoot`}>
-      <div {...getRootProps()} className={`customHookRootProps`}>
+    <Root className={`customHookRoot rootOfCustomHook`}>
+      <div {...getRootProps()} className={`customHookRootProps getRootProps`}>
         <div className={`playerHookInputWrapper`}>
           <div className="playerHookInputBG"></div>
-          <InputWrapper className={`customHookRoot ${focused ? `focused` : ``}`} ref={setAnchorEl}>
+          <InputWrapper className={`customHookRoot customHookRootInputWrapper ${focused ? `focused` : ``}`} ref={setAnchorEl}>
             {value.filter(v => playersToSelect.map(plyr => plyr.name).includes(v.name)).map((option: any, index: number) => (
-              <StyledTag {...getTagProps({ index })} label={option.label} player={option} option={option} />
+              <div key={index} className={`styledTagWithProps`}><StyledTag {...getTagProps({ index })} label={option.label} player={option} option={option} /></div>
             ))}
             <input className={`playerHookInput`} placeholder={`Start Typing or Click Here to Enter Player(s) to Delete`} {...getInputProps()} />
             <i style={{width: 20, cursor: `pointer`}} className="fas fa-times clearAllTagsIcon" {...getClearProps()}></i>
@@ -238,9 +258,10 @@ export default function CustomizedHook(props) {
           {(groupedOptions).map((option, index) => 
             (
               <li className={`customHookOption`} key={index} {...getOptionProps({ option, index })}>
-                <PlayerOption playerOption={option}  />
-                {/* <div>
-                  <div className="autocompleteOption">
+                {/* <PlayerOption playerOption={option}  /> */}
+                <div>
+                  <AutoCompletePlayerOption className={`playerSelectedInCustomHook`} playerOption={option} />
+                  {/* <div className="autocompleteOption">
                     <div className="levelNumColumn">Lv {option?.level?.num}</div>
                     <div className="levelImageColumn"><img width={30} src={calcPlayerLevelImage(option?.level?.name)} alt={option?.level?.name} /></div>
                     <div className="playerDetailsColumn">
@@ -258,8 +279,8 @@ export default function CustomizedHook(props) {
                         </div>
                       </div>
                     </div>
-                  </div>
-                </div> */}
+                  </div> */}
+                </div>
               </li>
             )
           )}

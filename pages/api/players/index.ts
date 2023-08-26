@@ -1,12 +1,13 @@
 import { db } from '../../../firebase';
 import { collection, getDocs } from 'firebase/firestore';
+import { databasePlayersCollectionName } from '../../_app';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getActivePlayers, newPlayerType } from '../../../components/smasherscape';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === `GET`) {
     try {
-      const playersSnapshot = await getDocs(collection(db, `players`));
+      const playersSnapshot = await getDocs(collection(db, databasePlayersCollectionName));
       const players = playersSnapshot.docs.map(doc => doc.data());
       res.status(200).json(getActivePlayers(players).map(plyr => newPlayerType(plyr)));
     } catch (error) {

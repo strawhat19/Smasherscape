@@ -1,12 +1,15 @@
 import '../main.scss';
 import '../xuruko.scss';
 import '../concentration.scss';
+import { db } from '../firebase';
 import ReactDOM from 'react-dom/client';
 import { AnimatePresence, motion } from 'framer-motion';
 import { defaultCommands } from '../components/Commands';
+import { collection, onSnapshot } from 'firebase/firestore';
 import { createContext, useRef, useState, useEffect } from 'react';
 
 export const StateContext = createContext({});
+export const databasePlayersCollectionName = 2 > 1 ? `players` : `players`;
 
 export const getPage = () => {
   return capitalizeAllWords(window.location.pathname.replace(`/`,``));
@@ -14,6 +17,212 @@ export const getPage = () => {
 
 export const getCurrentPageName = () => {
   return window.location.hash.slice(window.location.hash.lastIndexOf(`/`)).replace(`/`, ``);
+};
+
+export const getAllPlays = (players) => {
+  const playUUIDs = new Set();
+  let allPlays = players.map(player => player.plays).reduce((acc, curr) => acc.concat(curr), []).filter(play => {
+    if (!playUUIDs.has(play.uuid)) {
+      playUUIDs.add(play.uuid);
+      return true;
+    }
+    return false;
+  }).sort((a, b) => new Date(b.date) - new Date(a.date));
+  return allPlays;
+}
+
+export const getTimezone = (date) => {
+  const timeZoneString = new Intl.DateTimeFormat(undefined, {timeZoneName: `short`}).format(date);
+  const match = timeZoneString.match(/\b([A-Z]{3,5})\b/);
+  return match ? match[1] : ``;
+}
+
+export const setThemeUI = () => {
+  localStorage.setItem(`alertOpen`, false);
+  document.documentElement.setAttribute(`data-theme`, `dark`);
+  localStorage.setItem(`theme`, `dark`);
+}
+
+export const getNumberFromString = (string) => {
+  let result = string.match(/\d+/);
+  let number = parseInt(result[0]);
+  return number;
+}
+
+export const createXML = (xmlString) => {
+  let div = document.createElement(`div`);
+  div.innerHTML = xmlString.trim();
+  return div.firstChild;
+}
+
+export const replaceAll = (str, search, replacement) => {
+  return str.replace(new RegExp(search, `g`), replacement);
+}
+
+export const capWords = (str) => {
+  return str.replace(/\b\w/g, (match) => {
+    return match.toUpperCase();
+  });
+}
+
+export const cutOffTextAndReplace = (string, end, replacement) => {
+  if (!replacement) {
+    replacement = `...` || `-`;
+  }
+  return string?.length > end ? string?.substring(0, end - 1) + replacement : string;
+};
+
+export const getFormValuesFromFields = (formFields) => {
+  for (let i = 0; i < formFields.length; i++) {
+    let field = formFields[i];
+    if (field.type != `submit`) {
+      console.log(field.type, field.value);
+    };
+  }
+};
+
+export const genUUIDNumbers = (existingIDs) => {
+  let newID;
+  do {
+    newID = Math.floor(Math.random() * 1000000); // generate a random integer between 0 and 999999
+  } while (existingIDs.includes(newID)); // keep generating a new ID until it's not already in the existing IDs array
+  return newID;
+}
+
+export const updateOrAdd = (obj, arr) => {
+  let index = arr.findIndex((item) => item.name === obj.name);
+  if (index !== -1) {
+    arr[index] = obj;
+  } else {
+    arr.push(obj);
+  }
+  return arr;
+};
+
+export const getActivePlayersJSON = (players) => {
+  let activePlayers = players.filter(plyr => (plyr.active || !plyr.disabled)).sort((a, b) => {
+    if (b.experience.arenaXP !== a.experience.arenaXP) {
+      return b.experience.arenaXP - a.experience.arenaXP;
+    }
+    return b.plays.length - a.plays.length;
+  });
+  return activePlayers;
+}
+
+export const removeDuplicateObjectFromArray = (arrayOfObjects) => {
+  const uniqueArray = arrayOfObjects?.filter((value, index) => {
+    const _value = JSON.stringify(value);
+    return index === arrayOfObjects?.findIndex((obj) => {
+        return JSON.stringify(obj) === _value;
+    });
+  });
+  return uniqueArray;
+};
+
+export const setSideBarUI = () => {
+  let toc = document.querySelector(`.nextra-toc`);
+  let tocMinimized = JSON.parse(localStorage.getItem(`tocMinimized`));
+  if (toc) {
+    if (tocMinimized) {
+      toc.classList.add(`minimized`);
+    } else {
+      toc.classList.remove(`minimized`);
+    };
+  }
+}
+
+export const dev = (item, source) => {
+  if (window && window.location.host.includes(`local`)) {
+    if (item) {
+      console.log(`Dev Log`, item);
+    } else if (item && source) {
+      console.log(`Dev Log`, item, `From`, source);
+    }
+    return true;
+  } else {
+    return false;
+  }
+}
+
+export const generateUniqueID = (existingIDs) => {
+  const generateID = () => {
+    let id = Math.random().toString(36).substr(2, 9);
+    return Array.from(id).map(char => {
+      return Math.random() > 0.5 ? char.toUpperCase() : char;
+    }).join(``);
+  };
+  let newID = generateID();
+  if (existingIDs && existingIDs.length > 0) {
+    while (existingIDs.includes(newID)) {
+      newID = generateID();
+    }
+  }
+  return newID;
+};
+
+export const countObjectKeys = (obj) => {
+  let count = 0;
+  // Base condition to check if the input is an object
+  if (typeof obj === 'object' && obj !== null) {
+    for (const key in obj) {
+      count++; // Count the current key
+      count += countObjectKeys(obj[key]); // Recursively count keys in nested objects
+    }
+    // If the object is an array, iterate over its elements
+    if (Array.isArray(obj)) {
+      obj.forEach(item => {
+          count += countObjectKeys(item); // Recursively count keys in nested objects within the array
+      });
+    }
+  }
+  return count;
+}
+
+export const capitalizeAllWords = (string, underScores) => {
+  let newString;
+  if (underScores) {
+    if (string != null || string != undefined) {
+      const words = string.replace(/_/g, ` `).split(` `);
+      const capitalizedWords = words.map((word) => {
+        newString = word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+        return newString;
+      });
+      newString = capitalizedWords.join(`_`);
+      return newString;
+    }
+  } else {
+    if (string != null || string != undefined) {
+      newString = string.split(` `).map((word) => word?.charAt(0)?.toUpperCase() + word?.slice(1).toLowerCase()).join(` `);
+      return newString;
+    }
+  }
+};
+
+export const formatDate = (date, specificPortion) => {
+  let hours = date.getHours();
+  let minutes = date.getMinutes();
+  let ampm = hours >= 12 ? `PM` : `AM`;
+  hours = hours % 12;
+  hours = hours ? hours : 12; // the hour `0` should be `12`
+  minutes = minutes < 10 ? `0` + minutes : minutes;
+  let strTime = hours + `:` + minutes + ` ` + ampm;
+  let strTimeNoSpaces = hours + `:` + minutes + `_` + ampm;
+  let completedDate = strTime + ` ` + (date.getMonth() + 1) + `/` + date.getDate() + `/` + date.getFullYear();
+  let timezone = getTimezone(date);
+
+  if (specificPortion == `time`) {
+    completedDate = strTime;
+  } else if (specificPortion == `date`) {
+    completedDate = (date.getMonth() + 1) + `-` + date.getDate() + `-` + date.getFullYear();
+  } else if (specificPortion == `timezone`) {
+    completedDate = strTime + ` ` + (date.getMonth() + 1) + `-` + date.getDate() + `-` + date.getFullYear() + ` ` + timezone;
+  } else if (specificPortion == `timezoneNoSpaces`) {
+    completedDate = strTimeNoSpaces + `_` + (date.getMonth() + 1) + `-` + date.getDate() + `-` + date.getFullYear() + `_` + timezone;
+  } else {
+    completedDate = strTime + ` ` + (date.getMonth() + 1) + `-` + date.getDate() + `-` + date.getFullYear() + ` ` + timezone;
+  }
+
+  return completedDate;
 };
 
 export const defaultPlayers = [
@@ -66,172 +275,6 @@ export const defaultPlayers = [
     },
   },
 ];
-
-export const getTimezone = (date) => {
-  const timeZoneString = new Intl.DateTimeFormat(undefined, {timeZoneName: `short`}).format(date);
-  const match = timeZoneString.match(/\b([A-Z]{3,5})\b/);
-  return match ? match[1] : ``;
-}
-
-export const formatDate = (date, specificPortion) => {
-  let hours = date.getHours();
-  let minutes = date.getMinutes();
-  let ampm = hours >= 12 ? `PM` : `AM`;
-  hours = hours % 12;
-  hours = hours ? hours : 12; // the hour `0` should be `12`
-  minutes = minutes < 10 ? `0` + minutes : minutes;
-  let strTime = hours + `:` + minutes + ` ` + ampm;
-  let strTimeNoSpaces = hours + `:` + minutes + `_` + ampm;
-  let completedDate = strTime + ` ` + (date.getMonth() + 1) + `/` + date.getDate() + `/` + date.getFullYear();
-  let timezone = getTimezone(date);
-
-  if (specificPortion == `time`) {
-    completedDate = strTime;
-  } else if (specificPortion == `date`) {
-    completedDate = (date.getMonth() + 1) + `-` + date.getDate() + `-` + date.getFullYear();
-  } else if (specificPortion == `timezone`) {
-    completedDate = strTime + ` ` + (date.getMonth() + 1) + `-` + date.getDate() + `-` + date.getFullYear() + ` ` + timezone;
-  } else if (specificPortion == `timezoneNoSpaces`) {
-    completedDate = strTimeNoSpaces + `_` + (date.getMonth() + 1) + `-` + date.getDate() + `-` + date.getFullYear() + `_` + timezone;
-  } else {
-    completedDate = strTime + ` ` + (date.getMonth() + 1) + `-` + date.getDate() + `-` + date.getFullYear() + ` ` + timezone;
-  }
-
-  return completedDate;
-};
-
-export const generateUniqueID = (existingIDs) => {
-  const generateID = () => {
-    let id = Math.random().toString(36).substr(2, 9);
-    return Array.from(id).map(char => {
-      return Math.random() > 0.5 ? char.toUpperCase() : char;
-    }).join(``);
-  };
-  let newID = generateID();
-  if (existingIDs && existingIDs.length > 0) {
-    while (existingIDs.includes(newID)) {
-      newID = generateID();
-    }
-  }
-  return newID;
-};
-
-export const dev = (item, source) => {
-  if (window && window.location.host.includes(`local`)) {
-    if (item) {
-      console.log(`Dev Log`, item);
-    } else if (item && source) {
-      console.log(`Dev Log`, item, `From`, source);
-    }
-    return true;
-  } else {
-    return false;
-  }
-}
-
-export const setThemeUI = () => {
-  localStorage.setItem(`alertOpen`, false);
-  document.documentElement.setAttribute(`data-theme`, `dark`);
-  localStorage.setItem(`theme`, `dark`);
-}
-
-export const getNumberFromString = (string) => {
-  let result = string.match(/\d+/);
-  let number = parseInt(result[0]);
-  return number;
-}
-
-export const createXML = (xmlString) => {
-  let div = document.createElement(`div`);
-  div.innerHTML = xmlString.trim();
-  return div.firstChild;
-}
-
-export const replaceAll = (str, search, replacement) => {
-  return str.replace(new RegExp(search, `g`), replacement);
-}
-
-export const capWords = (str) => {
-  return str.replace(/\b\w/g, (match) => {
-    return match.toUpperCase();
-  });
-}
-
-export const capitalizeAllWords = (string, underScores) => {
-  let newString;
-  if (underScores) {
-    if (string != null || string != undefined) {
-      const words = string.replace(/_/g, ` `).split(` `);
-      const capitalizedWords = words.map((word) => {
-        newString = word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-        return newString;
-      });
-      newString = capitalizedWords.join(`_`);
-      return newString;
-    }
-  } else {
-    if (string != null || string != undefined) {
-      newString = string.split(` `).map((word) => word?.charAt(0)?.toUpperCase() + word?.slice(1).toLowerCase()).join(` `);
-      return newString;
-    }
-  }
-};
-
-export const cutOffTextAndReplace = (string, end, replacement) => {
-  if (!replacement) {
-    replacement = `...` || `-`;
-  }
-  return string?.length > end ? string?.substring(0, end - 1) + replacement : string;
-};
-
-export const removeDuplicateObjectFromArray = (arrayOfObjects) => {
-  const uniqueArray = arrayOfObjects?.filter((value, index) => {
-    const _value = JSON.stringify(value);
-    return index === arrayOfObjects?.findIndex((obj) => {
-        return JSON.stringify(obj) === _value;
-    });
-  });
-  return uniqueArray;
-};
-
-export const getFormValuesFromFields = (formFields) => {
-  for (let i = 0; i < formFields.length; i++) {
-    let field = formFields[i];
-    if (field.type != `submit`) {
-      console.log(field.type, field.value);
-    };
-  }
-};
-
-export const updateOrAdd = (obj, arr) => {
-  let index = arr.findIndex((item) => item.name === obj.name);
-  if (index !== -1) {
-    arr[index] = obj;
-  } else {
-    arr.push(obj);
-  }
-  return arr;
-};
-
-export const genUUIDNumbers = (existingIDs) => {
-  let newID;
-  do {
-    newID = Math.floor(Math.random() * 1000000); // generate a random integer between 0 and 999999
-  } while (existingIDs.includes(newID)); // keep generating a new ID until it's not already in the existing IDs array
-  return newID;
-}
-
-export const setSideBarUI = () => {
-  let toc = document.querySelector(`.nextra-toc`);
-  let tocMinimized = JSON.parse(localStorage.getItem(`tocMinimized`));
-  if (toc) {
-    if (tocMinimized) {
-      toc.classList.add(`minimized`);
-    } else {
-      toc.classList.remove(`minimized`);
-    };
-  }
-}
 
 export const getRGBAColorFromHue = (hue, alpha) => {
   const saturation = 1;
@@ -369,6 +412,7 @@ export default function Xuruko({ Component, pageProps, router }) {
     let [onMac, setOnMac] = useState(false);
     let [focus, setFocus] = useState(false);
     let [browser, setBrowser] = useState(``);
+    let [players, setPlayers] = useState([]);
     let [devEnv, setDevEnv] = useState(false);
     let [mobile, setMobile] = useState(false);
     let [loading, setLoading] = useState(true);
@@ -391,7 +435,6 @@ export default function Xuruko({ Component, pageProps, router }) {
     let [commands, setCommands] = useState(defaultCommands);
     let [year, setYear] = useState(new Date().getFullYear());
     let [useLocalStorage, setUseLocalStorage] = useState(true);
-    let [players, setPlayers] = useState([]);
     let [playersToSelect, setPlayersToSelect] = useState([]);
     let [databasePlayers, setDatabasePlayers] = useState([]);
     let [filteredPlayers, setFilteredPlayers] = useState(players);
@@ -425,11 +468,11 @@ export default function Xuruko({ Component, pageProps, router }) {
     //     if (useDatabase != true) {
     //       setPlayers(storedPlayers);
     //       setFilteredPlayers(storedPlayers);
-    //       dev() && console.log(`Players`, getActivePlayers(storedPlayers));
+    //       dev() && console.log(`Players`, getActivePlayersJSON(storedPlayers));
     //     }
     //   } else {
     //     setPlayers(defaultPlayers);
-    //     dev() && console.log(`Players`, getActivePlayers(defaultPlayers));
+    //     dev() && console.log(`Players`, getActivePlayersJSON(defaultPlayers));
     //   }
     // }
 
@@ -472,6 +515,31 @@ export default function Xuruko({ Component, pageProps, router }) {
       // }
 
     }, [rte, user, users, authState, dark])
+
+    useEffect(() => {
+      const unsubscribeFromSmasherScapeSnapShot = onSnapshot(collection(db, databasePlayersCollectionName), (querySnapshot) => {
+        const playersFromDatabase = [];
+        querySnapshot.forEach((doc) => playersFromDatabase.push(doc.data()));
+        // dev() && console.log(`All Database Players JSON`, playersFromDatabase);
+        
+        setPlayers(playersFromDatabase);
+        setDatabasePlayers(playersFromDatabase);
+        setFilteredPlayers(getActivePlayersJSON(playersFromDatabase));
+        localStorage.setItem(`players`, JSON.stringify(playersFromDatabase));
+
+        if (getActivePlayersJSON(playersFromDatabase).length < 2) {
+          setCommand(defaultCommands.Delete);
+          setCommandsToNotInclude([`!com`, `!add`, `!res`, `!set`, `!giv`, `!upd`]);
+        } else {
+          setCommand(defaultCommands.Update);
+          setCommandsToNotInclude([`!com`, `!add`, `!res`, `!set`, `!giv`]);
+        }
+      });
+
+      return () => {
+          unsubscribeFromSmasherScapeSnapShot();
+      };
+  }, [])
 
     return <StateContext.Provider value={{ router, rte, setRte, updates, setUpdates, content, setContent, width, setWidth, user, setUser, page, setPage, mobileMenu, setMobileMenu, users, setUsers, authState, setAuthState, emailField, setEmailField, devEnv, setDevEnv, mobileMenuBreakPoint, platform, setPlatform, focus, setFocus, highScore, setHighScore, color, setColor, dark, setDark, colorPref, setColorPref, qotd, setQotd, alertOpen, setAlertOpen, mobile, setMobile, systemStatus, setSystemStatus, loading, setLoading, anim, setAnimComplete, IDs, setIDs, categories, setCategories, browser, setBrowser, onMac, rearranging, setRearranging, buttonText, setButtonText, gameFormStep, setGameFormStep, players, setPlayers, filteredPlayers, setFilteredPlayers, useLocalStorage, setUseLocalStorage, command, setCommand, commands, setCommands, playersToSelect, setPlayersToSelect, databasePlayers, setDatabasePlayers, useDatabase, setUseDatabase, commandsToNotInclude, setCommandsToNotInclude, sameNamePlayeredEnabled, setSameNamePlayeredEnabled, deleteCompletely, setDeleteCompletely }}>
       {(browser != `chrome` || onMac) ? <AnimatePresence mode={`wait`}>

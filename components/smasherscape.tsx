@@ -6,7 +6,7 @@ import Level from '../models/Level';
 import Player from '../models/Player';
 import PlayerForm from './PlayerForm';
 import CommandsForm from './CommandsForm';
-import { StateContext } from '../pages/_app';
+import { StateContext, getActivePlayersJSON } from '../pages/_app';
 import Experience from '../models/Experience';
 import { Characters } from '../common/Characters';
 import PlayerCard, { calcPlayerLosses, calcPlayerWins } from './PlayerCard';
@@ -60,7 +60,7 @@ export const newPlayerType = (player: Player, customObject = true) => {
 }
 
 export const getActivePlayers = (players: any[], customObject = true) => {
-   if (customObject) {
+   if (customObject == true) {
     let activePlayers: Player[] = players.filter(plyr => (plyr.active || !plyr.disabled)).sort((a, b) => {
         if (b.experience.arenaXP !== a.experience.arenaXP) {
             return b.experience.arenaXP - a.experience.arenaXP;
@@ -69,13 +69,7 @@ export const getActivePlayers = (players: any[], customObject = true) => {
     }).map(pla => newPlayerType(pla));
     return activePlayers;
    } else {
-    let activePlayers = players.filter(plyr => (plyr.active || !plyr.disabled)).sort((a, b) => {
-        if (b.experience.arenaXP !== a.experience.arenaXP) {
-            return b.experience.arenaXP - a.experience.arenaXP;
-        }
-        return b.plays.length - a.plays.length;
-    });
-    return activePlayers;
+    getActivePlayersJSON(players);
    }
 }
 
@@ -123,10 +117,10 @@ export const isInvalid = (item) => {
 }
 
 export default function Smasherscape(props) {
-    const { filteredPlayers, devEnv } = useContext<any>(StateContext);
+    const { filteredPlayers, players } = useContext<any>(StateContext);
 
     return <Main className={`smasherscapeLeaderboard`}>
-        <CommandsForm />
+        {getActivePlayers(players).length > 0 && <CommandsForm />}
         <PlayerForm />
         <div id={props.id} className={`${props.className} playerGrid ${getActivePlayers(filteredPlayers)?.length == 0 ? `empty` : `populated`}`}>
             {getActivePlayers(filteredPlayers)?.length == 0 && <>

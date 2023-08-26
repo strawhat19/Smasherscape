@@ -18,22 +18,16 @@ import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
 import AutoCompleteCharacterOption from './AutoCompleteCharacterOption';
 import { getActivePlayers, isInvalid, newPlayerType } from './smasherscape';
 import { doc, setDoc, collection, onSnapshot, deleteDoc, updateDoc } from 'firebase/firestore';
-import { StateContext, showAlert, defaultPlayers, formatDate, generateUniqueID, dev } from '../pages/_app';
 import { calcPlayerDeaths, calcPlayerKDRatio, calcPlayerKills, removeTrailingZeroDecimal } from './PlayerRecord';
+import { StateContext, showAlert, defaultPlayers, formatDate, generateUniqueID, dev, countObjectKeys, getActivePlayersJSON, databasePlayersCollectionName, getAllPlays } from '../pages/_app';
 
-export const addPlayerToDB = async (playerObj: Player) => await setDoc(doc(db, `players`, playerObj?.ID), playerObj);
-export const deletePlayerFromDB = async (playerObj: Player) => await deleteDoc(doc(db, `players`, playerObj?.ID));
+export const deletePlayerFromDB = async (playerObj: Player) => await deleteDoc(doc(db, databasePlayersCollectionName, playerObj?.ID));
+export const addPlayerToDB = async (playerObj: Player) => await setDoc(doc(db, databasePlayersCollectionName, playerObj?.ID), playerObj);
+export const updatePlayerInDB = async (playerObj: Player, parameters) => await updateDoc(doc(db, databasePlayersCollectionName, playerObj?.ID), parameters);
+export const getAllCharacters = () => Object.entries(Characters).filter(char => char[0] === char[0].charAt(0).toUpperCase() + char[0].slice(1));
 
 export const winCons = [`beat`, `beats`, `has-beaten`, `destroys`, `destroyed`, `defeats`, `defeated`, `has-defeated`, `conquers`, `vanquishes`, `vanquished`, `fells`, `crushes`, `kills`, `killed`];
 export const loseCons = [`loses-to`, `falls-to`, `defeated-by`, `destroyed-by`];
-
-export const updatePlayerInDB = async (playerObj: Player, parameters) => {
-    await updateDoc(doc(db, `players`, playerObj?.ID), parameters);
-};
-
-export const getAllCharacters = () => {
-    return Object.entries(Characters).filter(char => char[0] === char[0].charAt(0).toUpperCase() + char[0].slice(1));
-}
 
 export const getUniqueCharactersPlayed = (players) => {
     return [...new Set(players.flatMap((p: Player) => p.plays.flatMap((play: Play) => [play.character, play.otherCharacter]) ))].sort();
@@ -67,31 +61,41 @@ export const playerConverter = {
     }
 };
 
+export const updatePlayerStats = (plyr, plays) => {
+    let wins = calcPlayerWins(plyr);
+    let losses = calcPlayerLosses(plyr);
+    let ratio = (wins/(wins+losses)) * 100;
+    plyr.wins = wins;
+    plyr.losses = losses;
+    plyr.ratio = ratio;
+    plyr.percentage = (ratio) > 100 ? 100 : parseFloat(removeTrailingZeroDecimal(ratio));
+    plyr.kills = calcPlayerKills(plyr, plays);
+    plyr.deaths = calcPlayerDeaths(plyr, plays);
+    plyr.kdRatio = calcPlayerKDRatio(plyr, plays);
+    return plyr;
+}
+
 export const updatePlayerPlays = (playState) => {
+    let currentDateTimeStamp = formatDate(new Date());
+    
     let {
         plyr, 
         date,
         stocks,
-        players, 
         winChar, 
         loserDB, 
         winnerDB, 
         loseChar, 
+        playUUID,
         lossStocks, 
         stocksTaken, 
         winnerOrLoser, 
     } = playState;
 
-    plyr.updated = formatDate(new Date());
-    plyr.lastUpdated = formatDate(new Date());
-
     let prevExp = plyr.experience.arenaXP;
     let newExp = winnerOrLoser == `winner` ? prevExp + (400 * plyr?.xpModifier) : prevExp + ((100 * plyr?.xpModifier) * stocksTaken);
     let expGained = newExp - prevExp;
     plyr.experience.arenaXP = newExp;
-
-    let playUIDs = plyr.plays.some(ply => ply.uuid) ? plyr.plays.map(ply => ply?.uuid) : players.map(plr => plr.uuid);
-    let playUUID = playUIDs.length > 0 ? generateUniqueID(playUIDs) : generateUniqueID();
     
     plyr.plays.push({
         otherCharacter: winnerOrLoser == `winner` ? loseChar : winChar,
@@ -111,17 +115,11 @@ export const updatePlayerPlays = (playState) => {
 
     calcPlayerLevelAndExperience(plyr);
 
-    let wins = calcPlayerWins(plyr);
-    let losses = calcPlayerLosses(plyr);
-    let ratio = (wins/(wins+losses)) * 100;
+    updatePlayerStats(plyr, plyr.plays);
 
-    plyr.wins = wins;
-    plyr.losses = losses;
-    plyr.ratio = ratio;
-    plyr.percentage = (ratio) > 100 ? 100 : parseFloat(removeTrailingZeroDecimal(ratio));
-    plyr.kills = calcPlayerKills(plyr, plyr.plays);
-    plyr.deaths = calcPlayerDeaths(plyr, plyr.plays);
-    plyr.kdRatio = calcPlayerKDRatio(plyr, plyr.plays);
+    plyr.updated = currentDateTimeStamp;
+    plyr.lastUpdated = currentDateTimeStamp;
+    plyr.properties = countObjectKeys(plyr);
 
     return plyr;
 }
@@ -136,7 +134,7 @@ export const createPlayer = (playerName, playerIndex, databasePlayers): Player =
     let id = `${uniqueIndex}_Player_${displayName}_${currentDateTimeStampNoSpaces}_${uuid}`;
     let ID = `${uniqueIndex} ${displayName} ${currentDateTimeStamp} ${uuid}`;
 
-    let playerObj: Player = {
+    let plyr: Player = {
         id,
         ID,
         uuid,
@@ -174,19 +172,10 @@ export const createPlayer = (playerName, playerIndex, databasePlayers): Player =
         } as Experience,
     };
 
-    let wins = calcPlayerWins(playerObj);
-    let losses = calcPlayerLosses(playerObj);
-    let ratio = (wins/(wins+losses)) * 100;
-    
-    playerObj.wins = wins;
-    playerObj.losses = losses;
-    playerObj.ratio = ratio;
-    playerObj.percentage = (ratio) > 100 ? 100 : parseFloat(removeTrailingZeroDecimal(ratio));
-    playerObj.kills = calcPlayerKills(playerObj, []);
-    playerObj.deaths = calcPlayerDeaths(playerObj, []);
-    playerObj.kdRatio = calcPlayerKDRatio(playerObj, []);
+    updatePlayerStats(plyr, []);
+    plyr.properties = countObjectKeys(plyr);
 
-    return playerObj;
+    return plyr;
 }
 
 export const addPlayersWithParameters = (addPlayersParams) => {
@@ -326,28 +315,36 @@ export default function PlayerForm(props) {
     }
 
     useEffect(() => {
-        const unsubscribeFromSmasherScapeSnapShot = onSnapshot(collection(db, `players`), (querySnapshot) => {
-            const playersFromDatabase = [];
-            querySnapshot.forEach((doc) => playersFromDatabase.push(doc.data()));
-            dev() && console.log(`All Database Players`, playersFromDatabase.map(pla => newPlayerType(pla)));
-            dev() && console.log(`Active Database Players`, getActivePlayers(playersFromDatabase.map(pla => newPlayerType(pla))));
-            setPlayers(playersFromDatabase);
-            setDatabasePlayers(playersFromDatabase);
-            setFilteredPlayers(getActivePlayers(playersFromDatabase));
-            localStorage.setItem(`players`, JSON.stringify(playersFromDatabase));
-            if (getActivePlayers(playersFromDatabase).length < 2) {
-                setCommand(defaultCommands.Delete);
-                setCommandsToNotInclude([`!com`, `!add`, `!res`, `!set`, `!giv`, `!upd`]);
-            } else {
-                setCommand(defaultCommands.Update);
-                setCommandsToNotInclude([`!com`, `!add`, `!res`, `!set`, `!giv`]);
-            }
-        });
+        if (getActivePlayers(players).length > 0) {
+            dev() && console.log(`All Database Players`, players.map(pla => newPlayerType(pla)));
+            dev() && console.log(`Active Database Players`, getActivePlayers(players.map(pla => newPlayerType(pla))));
+            dev() && console.log(`All Active Plays`, getAllPlays(getActivePlayers(players.map(pla => newPlayerType(pla)))));
+        }
+    }, [players])
 
-        return () => {
-            unsubscribeFromSmasherScapeSnapShot();
-        };
-    }, [])
+    // useEffect(() => {
+    //     const unsubscribeFromSmasherScapeSnapShot = onSnapshot(collection(db, databasePlayersCollectionName), (querySnapshot) => {
+    //         const playersFromDatabase = [];
+    //         querySnapshot.forEach((doc) => playersFromDatabase.push(doc.data()));
+    //         dev() && console.log(`All Database Players`, playersFromDatabase.map(pla => newPlayerType(pla)));
+    //         dev() && console.log(`Active Database Players`, getActivePlayers(playersFromDatabase.map(pla => newPlayerType(pla))));
+    //         setPlayers(playersFromDatabase);
+    //         setDatabasePlayers(playersFromDatabase);
+    //         setFilteredPlayers(getActivePlayers(playersFromDatabase));
+    //         localStorage.setItem(`players`, JSON.stringify(playersFromDatabase));
+    //         if (getActivePlayers(playersFromDatabase).length < 2) {
+    //             setCommand(defaultCommands.Delete);
+    //             setCommandsToNotInclude([`!com`, `!add`, `!res`, `!set`, `!giv`, `!upd`]);
+    //         } else {
+    //             setCommand(defaultCommands.Update);
+    //             setCommandsToNotInclude([`!com`, `!add`, `!res`, `!set`, `!giv`]);
+    //         }
+    //     });
+
+    //     return () => {
+    //         unsubscribeFromSmasherScapeSnapShot();
+    //     };
+    // }, [])
 
     const searchPlayers = (e: any, value?: any, type?) => {
         let field = e.target as HTMLInputElement;
@@ -356,13 +353,13 @@ export default function PlayerForm(props) {
         if (value && value != ``) {
             if (type == `playerName`) {
                 if (typeof value == `string`) {
-                    setFilteredPlayers(players.filter((plyr: Player) => {
+                    setFilteredPlayers(getActivePlayers(players).filter((plyr: Player) => {
                         return Object.values(plyr).some(val =>
                             typeof val === `string` && val.toLowerCase().includes(value?.toLowerCase())
                         );
                     }));
                 } else {
-                    setFilteredPlayers(players.filter((plyr: Player) => {
+                    setFilteredPlayers(getActivePlayers(players).filter((plyr: Player) => {
                         return Object.values(plyr).some(val =>
                             typeof val === `string` && val.toLowerCase().includes(value?.name?.toLowerCase())
                         );
@@ -370,13 +367,13 @@ export default function PlayerForm(props) {
                 }
             } else {
                 if (typeof value == `string`) {
-                    setFilteredPlayers(players.filter((plyr: Player) => {
+                    setFilteredPlayers(getActivePlayers(players).filter((plyr: Player) => {
                         return plyr.plays.map(ply => ply.character).some(char =>
                             typeof char === `string` && char.toLowerCase().includes(value?.toLowerCase())
                         );
                     }));
                 } else {
-                    setFilteredPlayers(players.filter((plyr: Player) => {
+                    setFilteredPlayers(getActivePlayers(players).filter((plyr: Player) => {
                         return plyr.plays.map(ply => ply.character).some(char =>
                             typeof char === `string` && char.toLowerCase().includes(value?.label?.toLowerCase())
                         );
@@ -384,7 +381,7 @@ export default function PlayerForm(props) {
                 }
             }
         } else {
-            setFilteredPlayers(players);
+            setFilteredPlayers(getActivePlayers(players));
         }
     }
 
@@ -443,7 +440,8 @@ export default function PlayerForm(props) {
                     if (deleteCompletely) {
                         return deletePlayerFromDB(playerDB);
                     } else {
-                        return updatePlayerInDB(playerDB, {disabled: true, active: false})
+                        let currentDateTimeStamp = formatDate(new Date());
+                        return updatePlayerInDB(playerDB, {disabled: true, active: false, updated: currentDateTimeStamp, lastUpdated: currentDateTimeStamp })
                     }
                 } else {
                     setPlayers(prevPlayers => {
@@ -554,8 +552,8 @@ export default function PlayerForm(props) {
         let playerTwoName = commandParams[3].toLowerCase();
         // let date = currentDateTimeStamp;
 
-        let playerOneDB = getActivePlayers(players, false).find(plyr => plyr?.name.toLowerCase() == playerOneName || plyr?.name.toLowerCase().includes(playerOneName));
-        let playerTwoDB = getActivePlayers(players, false).find(plyr => plyr?.name.toLowerCase() == playerTwoName || plyr?.name.toLowerCase().includes(playerTwoName));
+        let playerOneDB = getActivePlayersJSON(players).find(plyr => plyr?.name.toLowerCase() == playerOneName || plyr?.name.toLowerCase().includes(playerOneName));
+        let playerTwoDB = getActivePlayersJSON(players).find(plyr => plyr?.name.toLowerCase() == playerTwoName || plyr?.name.toLowerCase().includes(playerTwoName));
 
         let characterOne;
         let characterTwo;
@@ -579,18 +577,19 @@ export default function PlayerForm(props) {
             </h1>, `65%`, `35%`);
             return;
         } else if (!characterOne || !characterTwo) {
-            // console.log(`Missing Characters`, !characterOne, !characterTwo);
+            console.log(`Missing Characters`, !characterOne, !characterTwo);
             showAlert(`Missing Characters`, <h1>
                 Which Charcaters Did They Play?
             </h1>, `65%`, `35%`);
             return;
         } else if (!Characters[characterOne] || !Characters[characterTwo]) {
-            // devEnv && console.log(`Cannot Find Characters`, !Characters[characterOne], !Characters[characterTwo]);
+            console.log(`Cannot Find Characters`, !Characters[characterOne], !Characters[characterTwo]);
             showAlert(`Cannot Find Characters`, <h1>
                 Can't find characters with those names.
             </h1>, `65%`, `35%`);
             return;
         } else if (stocksTaken >= 3) {
+            console.log(`Invalid Stocks Taken`, stocksTaken);
             showAlert(`Invalid Stocks Taken`, <h1>
                 Stocks taken should be less than 3.
             </h1>, `65%`, `35%`);
@@ -642,6 +641,9 @@ export default function PlayerForm(props) {
                 }
             ];
 
+            let playUIDs = getAllPlays(players).some(ply => ply.uuid) ? getAllPlays(players).map(ply => ply?.uuid) : players.map(plr => plr.uuid);
+            let playUUID = playUIDs.length > 0 ? generateUniqueID(playUIDs) : generateUniqueID();
+
             let playState = {
                 date,
                 stocks,
@@ -649,12 +651,13 @@ export default function PlayerForm(props) {
                 winChar, 
                 loserDB, 
                 winnerDB, 
-                loseChar, 
+                loseChar,
+                playUUID,
                 lossStocks, 
                 stocksTaken,  
             }
 
-            let updatedPlayers: any[] = getActivePlayers(players, false).map((plyr) => {
+            let updatedPlayers: any[] = getActivePlayersJSON(players).map((plyr) => {
                 if (plyr?.id == winnerDB?.id) {
                     updatePlayerPlays({...playState, plyr, winnerOrLoser: `winner`});
                     return plyr;
@@ -677,56 +680,60 @@ export default function PlayerForm(props) {
     }
 
     return <section className={`formsSection`}>
-    <form id={`playerForm`} onSubmit={(e) => handleCommands(e)} action="submit" className="gridForm">
-        <div className={`inputWrapper materialBGInputWrapper`}>
-            <div className="inputBG materialBG"></div>
-            <Autocomplete
-                autoHighlight
-                ref={searchInput}
-                id="playerSearchAuto-1"
-                sx={{ width: `100%` }}
-                options={getActivePlayers(players)}
-                getOptionLabel={(option) => option.label}
-                onChange={(e, val: any) => searchPlayers(e, val, `playerName`)}
-                isOptionEqualToValue={(option, value) => option.id === value.id}
-                onInputChange={(e, val: any) => searchPlayers(e, val, `playerName`)}
-                renderInput={(params) => <TextField name={`search`} onBlur={(e) => searchBlur(e, filteredPlayers)} {...params} label="Search Player(s) by Name..." />}
-                noOptionsText={`No Player(s) Found for Search`}
-                renderOption={(props: any, playerOption: any) => {
-                    return (
-                        <div key={playerOption.id} {...props}>
-                            <AutoCompletePlayerOption playerOption={playerOption} />
-                        </div>
-                    )
-                }}
-            />
-        </div>
+    <form id={`playerForm`} onSubmit={(e) => handleCommands(e)} action="submit" className={`gridForm ${getActivePlayers(players).length > 0 ? `populated ${getActivePlayers(players).length} ${getAllPlays(getActivePlayers(players)).length > 0 ? `hasPlays` : `noPlays`}` : `empty`}`}>
+        {getActivePlayers(players).length > 0 && <>
+            <div className={`playerSearchAuto inputWrapper materialBGInputWrapper`}>
+                <div className="inputBG materialBG"></div>
+                <Autocomplete
+                    autoHighlight
+                    ref={searchInput}
+                    id="playerSearchAuto-1"
+                    sx={{ width: `100%` }}
+                    options={getActivePlayers(players)}
+                    getOptionLabel={(option) => option.label}
+                    onChange={(e, val: any) => searchPlayers(e, val, `playerName`)}
+                    isOptionEqualToValue={(option, value) => option.id === value.id}
+                    onInputChange={(e, val: any) => searchPlayers(e, val, `playerName`)}
+                    renderInput={(params) => <TextField name={`search`} onBlur={(e) => searchBlur(e, filteredPlayers)} {...params} label="Search Player(s) by Name..." />}
+                    noOptionsText={`No Player(s) Found for Search`}
+                    renderOption={(props: any, playerOption: any) => {
+                        return (
+                            <div key={playerOption.id} {...props}>
+                                <AutoCompletePlayerOption playerOption={playerOption} />
+                            </div>
+                        )
+                    }}
+                />
+            </div>
+        </>}
         <div id={`commandsInput`} className={`inputWrapper`}>
             <div className="inputBG"></div>
-            <input ref={commandsInput} type="text" className="commands" name={`commands`} placeholder={`Enter Commands...`} />
+            <input ref={commandsInput} type="text" className="commands" name={`commands`} placeholder={databasePlayers.length > 0 ? `Enter Commands...` : `No Players Found, Try !add insertPlayerNameWithNoSpaces`} />
         </div>
-        <div className={`characterSearchAuto inputWrapper materialBGInputWrapper`}>
-            <div className="inputBG materialBG"></div>
-            <Autocomplete
-                autoHighlight
-                id="characterSearchAuto-1"
-                sx={{ width: `100%` }}
-                options={getCharacterObjs(true)}
-                getOptionLabel={(option) => option.label}
-                onChange={(e, val: any) => searchPlayers(e, val, `searchCharacters`)}
-                onInputChange={(e, val: any) => searchPlayers(e, val, `searchCharacters`)}
-                isOptionEqualToValue={(option, value) => option.id === value.id}
-                renderInput={(params) => <TextField name={`characters`} {...params} label="Search Player(s) by Character(s) Played..." />}
-                noOptionsText={`No Character(s) Found for Search`}
-                renderOption={(props: any, characterOption: any) => {
-                    return (
-                        <div key={characterOption.id} {...props}>
-                            <AutoCompleteCharacterOption characterOption={characterOption} />
-                        </div>
-                    )
-                }}
-            />
-        </div>
+        {(getActivePlayers(players).length > 0 && getAllPlays(getActivePlayers(players)).length > 0) && <>
+            <div className={`characterSearchAuto inputWrapper materialBGInputWrapper`}>
+                <div className="inputBG materialBG"></div>
+                <Autocomplete
+                    autoHighlight
+                    id="characterSearchAuto-1"
+                    sx={{ width: `100%` }}
+                    options={getCharacterObjs(true)}
+                    getOptionLabel={(option) => option.label}
+                    onChange={(e, val: any) => searchPlayers(e, val, `searchCharacters`)}
+                    onInputChange={(e, val: any) => searchPlayers(e, val, `searchCharacters`)}
+                    isOptionEqualToValue={(option, value) => option.id === value.id}
+                    renderInput={(params) => <TextField name={`characters`} {...params} label="Search Player(s) by Character(s) Played..." />}
+                    noOptionsText={`No Character(s) Found for Search`}
+                    renderOption={(props: any, characterOption: any) => {
+                        return (
+                            <div key={characterOption.id} {...props}>
+                                <AutoCompleteCharacterOption characterOption={characterOption} />
+                            </div>
+                        )
+                    }}
+                />
+            </div>
+        </>}
         <button className={`formSubmitButton`} type={`submit`}>Submit</button>
     </form>
 </section>
