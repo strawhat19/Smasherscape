@@ -9,6 +9,8 @@ import { Characters } from "../common/Characters";
 import { calcPlayerCharacterIcon } from "../common/CharacterIcons";
 import { Autocomplete, Badge, TextField, ToggleButton, ToggleButtonGroup } from "@mui/material";
 import { calcPlayerCharacterTimesPlayed, calcPlayerCharactersPlayed, calcPlayerLevelImage, getActivePlayers, getCharacterTitle } from "./smasherscape";
+import PlayerOption from './PlayerOption';
+import CharacterOption from './CharacterOption';
 
 export const getDefaultPlayer = (number) => {return {
     id: number, name: `Player-${number}`, label: `Player-${number}`
@@ -175,27 +177,28 @@ export default function CommandsForm(props) {
                                 noOptionsText={`No Player(s) Found for Search`}
                                 renderOption={(props: any, playerOption: any) => {
                                     return (
-                                        <div key={playerOption.id} {...props}>
-                                            <div className="autocompleteOption">
-                                                <div className="levelNumColumn">Lv {playerOption?.level?.num}</div>
-                                                <div className="levelImageColumn"><img width={30} src={calcPlayerLevelImage(playerOption?.level?.name)} alt={playerOption?.level?.name} /></div>
-                                                <div className="playerDetailsColumn">
-                                                    <div className="playerName">{playerOption?.name}</div>
-                                                    <div className="playerEXP">Exp: {playerOption?.experience?.arenaXP}</div>
-                                                    <div className="plays">
-                                                        <div className={`playsContainer`}>
-                                                            {calcPlayerCharactersPlayed(playerOption).map((char, charIndex) => {
-                                                                return (
-                                                                    <Badge title={`Played ${getCharacterTitle(char)} ${calcPlayerCharacterTimesPlayed(playerOption, char)} Time(s)`} key={charIndex} badgeContent={calcPlayerCharacterTimesPlayed(playerOption, char)} color="primary">
-                                                                        <img className={`charImg`} width={25} src={calcPlayerCharacterIcon(char)} alt={getCharacterTitle(char)} />
-                                                                    </Badge>
-                                                                )
-                                                            })}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        <PlayerOption key={playerOption.id} playerOption={playerOption} {...props} />
+                                        // <div key={playerOption.id} {...props}>
+                                        //     <div className="autocompleteOption">
+                                        //         <div className="levelNumColumn">Lv {playerOption?.level?.num}</div>
+                                        //         <div className="levelImageColumn"><img width={30} src={calcPlayerLevelImage(playerOption?.level?.name)} alt={playerOption?.level?.name} /></div>
+                                        //         <div className="playerDetailsColumn">
+                                        //             <div className="playerName">{playerOption?.name}</div>
+                                        //             <div className="playerEXP">Exp: {playerOption?.experience?.arenaXP}</div>
+                                        //             <div className="plays">
+                                        //                 <div className={`playsContainer`}>
+                                        //                     {calcPlayerCharactersPlayed(playerOption).map((char, charIndex) => {
+                                        //                         return (
+                                        //                             <Badge title={`Played ${getCharacterTitle(char)} ${calcPlayerCharacterTimesPlayed(playerOption, char)} Time(s)`} key={charIndex} badgeContent={calcPlayerCharacterTimesPlayed(playerOption, char)} color="primary">
+                                        //                                 <img className={`charImg`} width={25} src={calcPlayerCharacterIcon(char)} alt={getCharacterTitle(char)} />
+                                        //                             </Badge>
+                                        //                         )
+                                        //                     })}
+                                        //                 </div>
+                                        //             </div>
+                                        //         </div>
+                                        //     </div>
+                                        // </div>
                                     )
                                 }}
                             />
@@ -239,27 +242,28 @@ export default function CommandsForm(props) {
                                 noOptionsText={`No Player(s) Found for Search`}
                                 renderOption={(props: any, playerOption: any) => {
                                     return (
-                                        <div key={playerOption.id} {...props}>
-                                            <div className="autocompleteOption">
-                                                <div className="levelNumColumn">Lv {playerOption?.level?.num}</div>
-                                                <div className="levelImageColumn"><img width={30} src={calcPlayerLevelImage(playerOption?.level?.name)} alt={playerOption?.level?.name} /></div>
-                                                <div className="playerDetailsColumn">
-                                                    <div className="playerName">{playerOption?.name}</div>
-                                                    <div className="playerEXP">Exp: {playerOption?.experience?.arenaXP}</div>
-                                                    <div className="plays">
-                                                        <div className={`playsContainer`}>
-                                                            {calcPlayerCharactersPlayed(playerOption).map((char, charIndex) => {
-                                                                return (
-                                                                    <Badge title={`Played ${getCharacterTitle(char)} ${calcPlayerCharacterTimesPlayed(playerOption, char)} Time(s)`} key={charIndex} badgeContent={calcPlayerCharacterTimesPlayed(playerOption, char)} color="primary">
-                                                                        <img className={`charImg`} width={25} src={calcPlayerCharacterIcon(char)} alt={getCharacterTitle(char)} />
-                                                                    </Badge>
-                                                                )
-                                                            })}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        <PlayerOption key={playerOption.id} playerOption={playerOption} {...props} />
+                                        // <div key={playerOption.id} {...props}>
+                                        //     <div className="autocompleteOption">
+                                        //         <div className="levelNumColumn">Lv {playerOption?.level?.num}</div>
+                                        //         <div className="levelImageColumn"><img width={30} src={calcPlayerLevelImage(playerOption?.level?.name)} alt={playerOption?.level?.name} /></div>
+                                        //         <div className="playerDetailsColumn">
+                                        //             <div className="playerName">{playerOption?.name}</div>
+                                        //             <div className="playerEXP">Exp: {playerOption?.experience?.arenaXP}</div>
+                                        //             <div className="plays">
+                                        //                 <div className={`playsContainer`}>
+                                        //                     {calcPlayerCharactersPlayed(playerOption).map((char, charIndex) => {
+                                        //                         return (
+                                        //                             <Badge title={`Played ${getCharacterTitle(char)} ${calcPlayerCharacterTimesPlayed(playerOption, char)} Time(s)`} key={charIndex} badgeContent={calcPlayerCharacterTimesPlayed(playerOption, char)} color="primary">
+                                        //                                 <img className={`charImg`} width={25} src={calcPlayerCharacterIcon(char)} alt={getCharacterTitle(char)} />
+                                        //                             </Badge>
+                                        //                         )
+                                        //                     })}
+                                        //                 </div>
+                                        //             </div>
+                                        //         </div>
+                                        //     </div>
+                                        // </div>
                                     )
                                 }}
                             />
@@ -279,16 +283,9 @@ export default function CommandsForm(props) {
                                 isOptionEqualToValue={(option, value) => option.id === value.id}
                                 renderInput={(params) => <TextField name={`characters`} {...params} label="Characters..." />}
                                 noOptionsText={`No Character(s) Found for Search`}
-                                renderOption={(props: any, option: any) => {
+                                renderOption={(props: any, characterOption: any) => {
                                     return (
-                                        <div key={option?.id} {...props}>
-                                            <div className="autocompleteOption characterOption">
-                                                <div className="characterIndex">{option?.id}</div>
-                                                <img className={`charImg`} width={25} src={option.image} alt={option.label} />
-                                                <div className="spacer"></div>
-                                                <div className="characterName">{option?.label}</div>
-                                            </div>
-                                        </div>
+                                        <CharacterOption key={characterOption.id} characterOption={characterOption} {...props} />
                                     )
                                 }}
                             />
@@ -330,16 +327,9 @@ export default function CommandsForm(props) {
                                 isOptionEqualToValue={(option, value) => option.id === value.id}
                                 renderInput={(params) => <TextField name={`characters`} {...params} label="Characters..." />}
                                 noOptionsText={`No Character(s) Found for Search`}
-                                renderOption={(props: any, option: any) => {
+                                renderOption={(props: any, characterOption: any) => {
                                     return (
-                                        <div key={option?.label} {...props}>
-                                            <div className="autocompleteOption characterOption">
-                                                <div className="characterIndex">{option?.id}</div>
-                                                <img className={`charImg`} width={25} src={option.image} alt={option.label} />
-                                                <div className="spacer"></div>
-                                                <div className="characterName">{option?.label}</div>
-                                            </div>
-                                        </div>
+                                        <CharacterOption key={characterOption.id} characterOption={characterOption} {...props} />
                                     )
                                 }}
                             />

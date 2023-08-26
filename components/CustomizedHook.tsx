@@ -8,6 +8,7 @@ import { autocompleteClasses } from '@mui/material/Autocomplete';
 import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
 import useAutocomplete, { AutocompleteGetTagProps } from '@mui/base/useAutocomplete';
 import { calcPlayerCharacterTimesPlayed, calcPlayerCharactersPlayed, calcPlayerLevelImage, getActivePlayers, getCharacterTitle } from './smasherscape';
+import PlayerOption from './PlayerOption';
 
 const Root = styled(`div`)(
   ({ theme }) => `
@@ -64,17 +65,19 @@ interface TagProps extends ReturnType<AutocompleteGetTagProps> {
 
 function Tag(props: TagProps) {
   const { option, player, label, onDelete, ...other } = props;
+  let playerOption = option;
   return (
+    // <PlayerOption key={playerOption.id} playerOption={playerOption} {...other} />
     <div className={`playerHookTag`} {...other}>
       <div className="autocompleteOption">
-        <div className="levelNumColumn">{option?.level?.num}</div>
-        <div className="levelImageColumn"><img width={30} src={calcPlayerLevelImage(option?.level?.name)} alt={option?.level?.name} /></div>
+        <div className="levelNumColumn">{playerOption?.level?.num}</div>
+        <div className="levelImageColumn"><img width={30} src={calcPlayerLevelImage(playerOption?.level?.name)} alt={playerOption?.level?.name} /></div>
         <div className="playerHookTagDetails playerDetailsColumn">
-          <div className="playerName">{option?.name}</div>
-          <div className="playerEXP">{option?.experience?.arenaXP}</div>
+          <div className="playerName">{playerOption?.name}</div>
+          <div className="playerEXP">{playerOption?.experience?.arenaXP}</div>
           <div className="plays">
             <div className={`playsContainer`}>
-              {calcPlayerCharactersPlayed(option).map((char, charIndex) => {
+              {calcPlayerCharactersPlayed(playerOption).map((char, charIndex) => {
                 return (
                   <img title={getCharacterTitle(char)} key={charIndex} className={`charImg`} width={25} src={calcPlayerCharacterIcon(char)} alt={getCharacterTitle(char)} />
                 )
