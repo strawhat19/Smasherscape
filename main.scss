@@ -180,11 +180,6 @@ html[class~="dark"] {
     // }
 
     .line {
-        display: flex;
-        grid-gap: 15px;
-        align-items: center;
-        flex-direction: column;
-        justify-content: space-between;
         &::before {
             color: var(--softWhite) !important;
         }

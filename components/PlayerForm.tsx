@@ -245,8 +245,8 @@ export default function PlayerForm(props) {
     }
 
     const showCommands = () => {
-        showAlert(`Here are the RukoBot Commands so far: (Hover to Click to Copy)`, <div className={`alertInner`}>
-            <Commands commands={commands} devEnv={devEnv} />
+        showAlert(`Here are the Smasherscape Commands so far`, <div className={`alertInner`}>
+            <Commands id={`commandsList`} commands={commands} devEnv={devEnv} />
         </div>, `85%`, `auto`);
     }
 

@@ -26,7 +26,7 @@ export default function PlayerCard(props) {
                     <img width={70} src={`${publicAssetLink}/assets/smasherscape/OSRS_Top_Hat.png?raw=true`} alt={`Tophat Logo`} />
                     <h3 className={`blackTextShadow slimmed`}>Xuruko's<br />SmasherScape</h3>
                 </div>
-                <h2 title={plyr?.name} className={`bluePurpleTextShadow textOverflow overrideWithInlineBlock`}>{plyr?.name}</h2>
+                <h2 title={plyr?.name} className={`playerNameText bluePurpleTextShadow textOverflow overrideWithInlineBlock`}>{plyr?.name}</h2>
             </div>
             <div className="cardMiddleRow">
                 <div className="imgLeftCol">

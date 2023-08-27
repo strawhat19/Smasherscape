@@ -5,6 +5,7 @@ export default class Command {
     uuid?: any,
     name?: string,
     icon?: string,
+    label?: string,
     command?: string,
     example?: string,
     triggers?: string[],

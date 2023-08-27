@@ -1105,6 +1105,16 @@ div[role="presentation"] {
     &.commandToCopy {
         width: 96%;
         margin: 20px auto 0;
+        .copySubmit {
+            right: 80px;
+        }
+        .line {
+            display: flex;
+            grid-gap: 15px;
+            align-items: center;
+            flex-direction: column;
+            justify-content: space-between;
+        }
         li {
             .commandDetails {
                 font-size: 1.7em;
@@ -1236,6 +1246,12 @@ div[role="presentation"] {
         &:not(.commandsFormSubmit) {
             display: none;
         }
+    }
+}
+
+@media (max-width: 992px) {
+    .trailingDesc {
+        display: none;
     }
 }
 
@@ -1371,6 +1387,9 @@ div[role="presentation"] {
 }
 
 @media (max-width: 677px) {
+    .playerNameText {
+        text-align: center;
+    }
     .recordList {
         h3 {
             font-size: 1.6em !important;
@@ -1579,9 +1598,12 @@ div[role="presentation"] {
            margin: 0 0.3em 0 0;
        } 
        &[data-custombutton="true"] {
-           min-height: 79%;
-           align-items: center;
-           justify-content: center;
+        //    min-height: 79%;
+        //    align-items: center;
+            top: 7px;
+            min-height: 80%;
+            align-items: flex-start;
+            justify-content: center;
             button {
                 left: -7px;
                 max-width: 71px;
@@ -1640,6 +1662,13 @@ div[role="presentation"] {
                 justify-content: center;
                 border: 3px solid black;
                 background: rgba(255, 255, 255, 0.65);
+                .buttonRowText {
+                    grid-gap: 5px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    // @media ()
+                }
             }
             &.Mui-selected {
                 color: var(--smasherscapeBlue2);

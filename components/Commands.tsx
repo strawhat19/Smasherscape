@@ -17,7 +17,7 @@ export const defaultCommands = {
     command: `!add`,
     example: `!add name(s) of player(s)`,
     triggers: [`!add`, `!new`, `!create`, `!player`],
-    description: `Add Player or Player(s) separated by spaces`,
+    description: `Add Player(s) separated by spaces`,
   },
   Delete: {
     id: 3,
@@ -26,8 +26,8 @@ export const defaultCommands = {
     example: `!del name(s) of player(s)`,
     icon: <i className="fas fa-trash-alt"></i>,
     triggers: [`!del`, `!x`, `!delete`, `!remove`],
-    shortDescription: `Delete Player or Player(s) from Leaderboard`,
-    description: `Delete Player or Player(s) from Leaderboard separated by spaces`,
+    shortDescription: `Delete Player(s) from Leaderboard`,
+    description: `Delete Player(s) from Leaderboard separated by spaces`,
   },
   Reset: {
     id: 4,
@@ -65,7 +65,7 @@ export const defaultCommands = {
 };
 
 export function Commands(props) {
-  let { commands, devEnv } = props;
+  let { id, commands, devEnv } = props;
   let [commandsToRender, setCommandsToRender] = useState<Command[]>(Object.values(commands).map((comm: Command) => {
     let commandObj = new Command(comm);
     Object.keys(commandObj).forEach(key => isInvalid(commandObj[key]) && delete commandObj[key]);
@@ -75,7 +75,7 @@ export function Commands(props) {
   devEnv && console.log(`Commands`, commandsToRender);
 
   return (
-    <ul className={`commandsList`}>
+    <ul id={id} className={`commandsList`}>
       {commandsToRender.map((comm: Command, commIndex) => {
         let commandMessage = comm?.example ? comm?.example : comm?.command;
         return (

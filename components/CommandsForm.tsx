@@ -131,11 +131,16 @@ export default function CommandsForm(props) {
                 value={command}
             >
                 {Object.values(defaultCommands).filter(cmd => !commandsToNotInclude.includes(cmd.command)).map((comm: Command, commIndex) => {
+                    let desc = comm?.shortDescription;
+                    let trailingDesc = desc.split(` `).filter((word, wordIndex) => wordIndex != 0).join(` `);
                     return (
                         <ToggleButton key={commIndex} size={`small`} value={comm}>
                             <span className={`buttonInnerText`}>
                                 {comm?.icon}
-                                <div>{comm?.shortDescription}</div>
+                                <div className={`buttonRowText`}>
+                                    <div className={`buttonRowTextInner`}>{comm?.name}</div>
+                                    <div className={`trailingDesc buttonRowTextInner`}>{trailingDesc}</div>
+                                </div>
                             </span>
                         </ToggleButton>
                     )
