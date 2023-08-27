@@ -1,7 +1,14 @@
-import React, { useState } from 'react';
+import Parameters from '../models/Parameters';
+import { StateContext } from '../pages/_app';
+import { processCommandsWithParameters, updatePlayersDB } from './PlayerForm';
+import React, { useState, useContext } from 'react';
+
 export default function CodeBlock(props) {
     let [clicked, setClicked] = useState(false);
     let [CMDClicked, setCMDClicked] = useState(false);
+
+    const { players, setPlayers, setFilteredPlayers, useDatabase, databasePlayers, sameNamePlayeredEnabled, deleteCompletely } = useContext<any>(StateContext);
+
     const handleCopyClick = (e, type?) => {
         if (type == `copy`) {
             setCMDClicked(true);
@@ -9,7 +16,24 @@ export default function CodeBlock(props) {
             setTimeout(() => setCMDClicked(false), 1500);
         } else {
             setClicked(true);
-            console.log(`Send Command`, props.children, type);
+
+            let command = props.children;
+            let commandParams = command.split(` `);
+            const parameters = new Parameters({
+                command,
+                players, 
+                setPlayers, 
+                useDatabase, 
+                commandParams, 
+                databasePlayers, 
+                updatePlayersDB,
+                deleteCompletely,
+                setFilteredPlayers, 
+                sameNamePlayeredEnabled,
+            })
+
+            console.log(`Send Command`, parameters);
+            processCommandsWithParameters(parameters);
             // navigator.clipboard.writeText(props.children);
             setTimeout(() => setClicked(false), 1500);
         }

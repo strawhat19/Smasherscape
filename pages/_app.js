@@ -615,12 +615,10 @@ export default function Xuruko({ Component, pageProps, router }) {
           if (useDatabase != true) {
             setPlayers(storedPlayers);
             setFilteredPlayers(storedPlayers);
-            // dev() && console.log(`Players`, getActivePlayersJSON(storedPlayers, true));
           }
         } else {
           setPlayers(defaultPlayers);
           setFilteredPlayers(getActivePlayersJSON(defaultPlayers));
-          // dev() && console.log(`Players`, getActivePlayersJSON(defaultPlayers, true));
         }
       }
     }, [])
