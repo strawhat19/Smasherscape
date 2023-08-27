@@ -13,7 +13,9 @@ import PlayerCard, { calcPlayerLosses, calcPlayerWins } from './PlayerCard';
 import { calcPlayerDeaths, calcPlayerKDRatio, calcPlayerKills, removeTrailingZeroDecimal } from './PlayerRecord';
 
 export const publicAssetLink = `https://github.com/strawhat19/Smasherscape/blob/main`;
-export const calcPlayerCharacterTimesPlayed = (plyr: Player, char) => plyr.plays.map(ply => ply.character).filter(ply => ply.toLowerCase() == char || ply.toLowerCase().includes(char)).length;
+export const calcPlayerCharacterTimesPlayed = (plyr: Player, char) => plyr.plays.map(ply => ply.character).filter(charPlayed => charPlayed.toLowerCase() == char || charPlayed.toLowerCase().includes(char)).length;
+
+export const calcPlaysCharacterTimesPlayed = (plys: Play[], char) => plys.map(ply => ply.character).filter(charPlayed =>  char.shortcuts.includes(charPlayed.toLowerCase())).length;
 
 export const getCharacterTitle = (char) => {
     if (char.split(` `).length > 1) char = char.split(` `).join(``).toLowerCase();

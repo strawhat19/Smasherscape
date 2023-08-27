@@ -675,7 +675,7 @@ export default function PlayerForm(props) {
     }
 
     return <section className={`formsSection`}>
-    <form id={`playerForm`} onSubmit={(e) => handleCommands(e)} action="submit" className={`gridForm ${getActivePlayers(players).length > 0 ? `populated ${getActivePlayers(players).length} ${getAllPlays(getActivePlayers(players)).length > 0 ? `hasPlays` : `noPlays`}` : `empty`}`}>
+    <form id={`playerForm`} onSubmit={(e) => handleCommands(e)} action="submit" className={`gridForm ${getActivePlayers(players).length > 0 ? `populated ${getActivePlayers(players).length} ${getAllPlays(getActivePlayers(players)).length > 0 ? `hasPlays` : `noPlays`}` : `empty`} ${devEnv ? `hasCommandsPerm` : `noCommandsPerm`}`}>
         {getActivePlayers(players).length > 0 && <>
             <div className={`playerSearchAuto inputWrapper materialBGInputWrapper`}>
                 <div className="inputBG materialBG"></div>
@@ -700,31 +700,6 @@ export default function PlayerForm(props) {
                     }}
                 />
             </div>
-            {/* <div className={`playerSearchAuto inputWrapper materialBGInputWrapper`}>
-                <div className="inputBG materialBG"></div>
-                <Autocomplete
-                    multiple
-                    limitTags={2}
-                    autoHighlight
-                    ref={searchInput}
-                    id="playerSearchAuto-1"
-                    sx={{ width: `100%` }}
-                    options={getActivePlayers(players)}
-                    getOptionLabel={(option) => option.name}
-                    noOptionsText={`No Player(s) Found for Search`}
-                    onChange={(e, val: any) => searchPlayers(e, val, `playerName`)}
-                    isOptionEqualToValue={(option, value) => option.id === value.id}
-                    onInputChange={(e, val: any) => searchPlayers(e, val, `playerName`)}
-                    renderInput={(params) => <TextField name={`search`} onBlur={(e) => searchBlur(e, filteredPlayers)} {...params} label="Search Player(s) by Name..." />}
-                    renderOption={(props: any, playerOption: any) => {
-                        return (
-                            <div key={playerOption.id} {...props}>
-                                <PlayerOption playerOption={playerOption} />
-                            </div>
-                        )
-                    }}
-                />
-            </div> */}
         </>}
         {devEnv && <div id={`commandsInput`} className={`inputWrapper`}>
             <div className="inputBG"></div>

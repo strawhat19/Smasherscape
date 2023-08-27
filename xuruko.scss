@@ -724,6 +724,11 @@ form {
         grid-template-columns: 1fr 1fr;
     }
     &#playerForm {
+        &.noPlays {
+            &.noCommandsPerm {
+                grid-template-columns: 1fr;
+            }
+        }
         &:has(.Mui-focused), &:has(.MuiAutocomplete-hasClearIcon) {
             .MuiTextField-root {
                 padding-top: 1em;
@@ -919,7 +924,7 @@ div[role="presentation"] {
     transition: var(--transition);
     background: transparent !important;
     &.characterOption {
-        grid-template-columns: 20px 35px 10px 1fr;
+        grid-template-columns: 20px 35px 10px 1fr 1fr;
     }
     &.singularLabel {
         grid-template-columns: 1fr;

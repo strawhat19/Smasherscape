@@ -23,6 +23,11 @@ export const getCurrentPageName = () => {
   return window.location.hash.slice(window.location.hash.lastIndexOf(`/`)).replace(`/`, ``);
 };
 
+export const getAllPlaysJSON = (players) => {
+  let allPlays = players.map(player => player.plays).reduce((acc, curr) => acc.concat(curr), []).sort((a, b) => parseDate(b.date) - parseDate(a.date));
+  return allPlays;
+}
+
 export const getAllPlays = (players) => {
   const playUUIDs = new Set();
   let allPlays = players.map(player => player.plays).reduce((acc, curr) => acc.concat(curr), []).filter(play => {
