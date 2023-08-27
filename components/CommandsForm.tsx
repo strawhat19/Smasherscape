@@ -150,7 +150,7 @@ export default function CommandsForm(props) {
         <ul className="commandsList commandToCopy">
             <li className={`listedCommand`} title={renderCommand(command)}>
                 <div className="commandDetails flex gap15">
-                    <CodeBlock custombutton={true} border={`solid 2px white`} id={`commandToRender`} language={`js`} codeTitle={<>
+                    <CodeBlock commandToCopy={true} custombutton={true} border={`solid 2px white`} id={`commandToRender`} language={`js`} codeTitle={<>
                         {command?.icon}
                         <div className={`desc`}>{command?.shortDescription}</div>
                     </>}>

@@ -1253,6 +1253,9 @@ div[role="presentation"] {
     .trailingDesc {
         display: none;
     }
+    .line {
+        align-items: flex-start !important;
+    }
 }
 
 @media (max-width: 768px) {

@@ -465,7 +465,7 @@ export const showAlert = async (title, component, width, height) => {
 
   // Add a click event listener to the overlay that dismisses the alert if clicked outside the alert content
   overlay.addEventListener(`click`, (e) => {
-    if (!alertDialog.contains(e.target)) {
+    if (!alertDialog.contains(e.target) && !e.target.classList.contains(`alertActionButton`)) {
       // Click occurred outside the alert content
       // Fade out the alert and overlay
       alertDialog.style.opacity = 0;

@@ -726,10 +726,10 @@ export default function PlayerForm(props) {
                 />
             </div> */}
         </>}
-        <div id={`commandsInput`} className={`inputWrapper`}>
+        {devEnv && <div id={`commandsInput`} className={`inputWrapper`}>
             <div className="inputBG"></div>
             <input ref={commandsInput} type="text" className="commands" name={`commands`} placeholder={((useDatabase == true && databasePlayers.length > 0) || (useDatabase == false && getActivePlayers(players).length > 0)) ? `Enter Commands...` : `${noPlayersFoundMessage}, Try !add insertPlayerNameWithNoSpaces`} />
-        </div>
+        </div>}
         {(getActivePlayers(players).length > 0 && getAllPlays(getActivePlayers(players)).length > 0) && <>
             <div className={`characterSearchAuto inputWrapper materialBGInputWrapper`}>
                 <div className="inputBG materialBG"></div>
