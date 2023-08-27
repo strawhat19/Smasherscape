@@ -1,16 +1,16 @@
 
 import Main from './Main';
-import { db } from '../firebase';
 import Play from '../models/Play';
 import { useContext } from 'react';
 import Level from '../models/Level';
 import Player from '../models/Player';
 import PlayerForm from './PlayerForm';
-import PlayerCard from './PlayerCard';
 import CommandsForm from './CommandsForm';
-import { StateContext } from '../pages/_app';
 import Experience from '../models/Experience';
 import { Characters } from '../common/Characters';
+import { StateContext, getActivePlayersJSON } from '../pages/_app';
+import PlayerCard, { calcPlayerLosses, calcPlayerWins } from './PlayerCard';
+import { calcPlayerDeaths, calcPlayerKDRatio, calcPlayerKills, removeTrailingZeroDecimal } from './PlayerRecord';
 
 export const publicAssetLink = `https://github.com/strawhat19/Smasherscape/blob/main`;
 export const calcPlayerCharacterTimesPlayed = (plyr: Player, char) => plyr.plays.map(ply => ply.character).filter(ply => ply.toLowerCase() == char || ply.toLowerCase().includes(char)).length;
@@ -25,33 +25,52 @@ export const removeEmptyParams = (object) => {
     return object;
 }
 
-export const newPlayerType = (player: Player) => {
-    let { id, name, expanded, xpModifier } = player;
+export const newPlayerType = (player: Player, customObject = true) => {
+
     let level: Level = new Level(player.level.name, player.level.num) as Level;
     let experience: Experience = new Experience(player.experience.nextLevelAt, player.experience.remainingXP, player.experience.arenaXP, player.experience.xp) as Experience;
     let plays: Play[] = player.plays.map((play: Play) => {
-        let { date, loser, winner, stocks, character, stocksTaken, lossStocks, otherCharacter } = play;
-        let newPlay = new Play(date, loser, winner, stocks, character, stocksTaken, lossStocks, otherCharacter);
-        return removeEmptyParams(newPlay) as Play;
+        let newPlay = new Play(removeEmptyParams({...play}));
+        return newPlay as Play;
     }) as Play[];
+
+    let wins = calcPlayerWins(player);
+    let losses = calcPlayerLosses(player);
+    let ratio = (wins/(wins+losses)) * 100;
+    let kills = calcPlayerKills(player, plays);
+    let deaths = calcPlayerDeaths(player, plays);
+    let kdRatio = calcPlayerKDRatio(player, plays);
     experience = removeEmptyParams(experience) as Experience;
-    let newPlayer: Player = new Player(id, name, level, plays, expanded, experience, xpModifier) as Player;
-    return removeEmptyParams(newPlayer) as Player;
+
+    let newPlayer: Player = new Player({
+        ...player,
+        level,
+        plays,
+        experience,
+        kills,
+        deaths,
+        kdRatio,
+        wins,
+        losses,
+        ratio,
+        percentage: (ratio) > 100 ? 100 : parseFloat(removeTrailingZeroDecimal(ratio)),
+    }) as Player;
+
+    return new Player(removeEmptyParams(newPlayer)) as Player;
 }
 
-export const getActivePlayers = (players: Player[]) => {
-    return players
-        .filter(plyr => !plyr.disabled)
-        .sort((a,b) => {
-            if (b.experience.arenaXP !== a.experience.arenaXP) {
-                return b.experience.arenaXP - a.experience.arenaXP;
-            }
-            return b.plays.length - a.plays.length;
-        })
-        .map((player: Player) => {
-            let newPlayer = newPlayerType(player);
-            return newPlayer;
-        });
+export const getActivePlayers = (players: any[], customObject = true) => {
+   if (customObject == true) {
+    let activePlayers: Player[] = players.filter(plyr => (plyr.active || !plyr.disabled)).sort((a, b) => {
+        if (b.experience.arenaXP !== a.experience.arenaXP) {
+            return b.experience.arenaXP - a.experience.arenaXP;
+        }
+        return b.plays.length - a.plays.length;
+    }).map(pla => newPlayerType(pla));
+    return activePlayers;
+   } else {
+    getActivePlayersJSON(players);
+   }
 }
 
 export const calcPlayerLevelImage = (levelName) => {
@@ -98,20 +117,24 @@ export const isInvalid = (item) => {
 }
 
 export default function Smasherscape(props) {
-    const { filteredPlayers, devEnv } = useContext<any>(StateContext);
+    const { filteredPlayers, players, noPlayersFoundMessage } = useContext<any>(StateContext);
 
     return <Main className={`smasherscapeLeaderboard`}>
-        <CommandsForm />
+        {getActivePlayers(players).length > 0 && <CommandsForm />}
         <PlayerForm />
         <div id={props.id} className={`${props.className} playerGrid ${getActivePlayers(filteredPlayers)?.length == 0 ? `empty` : `populated`}`}>
             {getActivePlayers(filteredPlayers)?.length == 0 && <>
                 <div className="gridCard">
                     <h1 className={`runescape_large noPlayersFound`}>
-                        No Players Found
+                        {noPlayersFoundMessage}
                     </h1>
                 </div>
             </>}
-            {getActivePlayers(filteredPlayers)?.length > 0 && getActivePlayers(filteredPlayers)?.map((plyr, plyrIndex) => <PlayerCard plyr={plyr} key={plyrIndex} />)}
+            {getActivePlayers(filteredPlayers)?.length > 0 && getActivePlayers(filteredPlayers)?.map((plyr, plyrIndex) => {
+                return (
+                    <PlayerCard plyr={plyr} key={plyrIndex} />
+                )
+            })}
         </div>
     </Main>
 }

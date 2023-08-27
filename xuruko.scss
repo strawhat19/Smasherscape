@@ -12,6 +12,7 @@ html, body {
 
 :root {
     --red: #f63460;
+    --autocompleteMaxWidth: 435px;
     --smasherscapeYellow: #fcfc05;
     --smasherscapeGreen: #6ced52;
     --smasherscapeGreen2: #1edc78;
@@ -24,10 +25,14 @@ html, body {
     --smasherscapeCream: #f5f581;
     --smasherscapePurple: #7b4e9b;
     --win: var(--smasherscapeGreen2);
+    --customHookInputContainerHeight: 55px;
+    --playerDetailsColumnGaps: 1fr 110px 85px;
     --smasherscapeBlue2Transparent: rgba(49, 168, 229, 0.35);
     --smasherscapeBlue2Transparent2: rgba(49, 168, 229, 0.55);
     --smasherscapeGreen2Transparent: rgba(30, 220, 120, 0.35);
     --smasherscapeGreen2Transparent2: rgba(30, 220, 120, 0.55);
+    --customTagHeight: calc(var(--customHookInputContainerHeight) - 15);
+    --customHookRootHeight: calc(var(--customHookInputContainerHeight) - 10);
     --xurukoGradientGreenBlue: linear-gradient(90deg, var(--smasherscapeGreen2), var(--smasherscapeBlue2));
     --xurukoGradientBlueGreen: linear-gradient(90deg, var(--smasherscapeBlue2), var(--smasherscapeGreen2));
     --xurukoGradientGreenBlueTransparent: linear-gradient(90deg, var(--smasherscapeGreen2Transparent), var(--smasherscapeBlue2Transparent));
@@ -193,7 +198,7 @@ li {
                         }
                         @media (max-width: 1800px) {
                             top: 15px;
-                            font-size: 2.1em;
+                            font-size: 2em;
                             letter-spacing: 2px;
                         }
                         @media (max-width: 1500px) {
@@ -552,9 +557,53 @@ footer {
     .commandsForm {
         gap: 15px;
         z-index: 2;
-        margin: 15px auto 20px;
+        margin: 15px auto 0px;
         grid-template-columns: 1fr;
         transition: var(--transition);
+        &.customHookInputContainer {
+            margin: 20px auto 10px;
+            &:not(:has(.Mui-focused)) {
+                height: var(--customHookInputContainerHeight);
+                min-height: var(--customHookInputContainerHeight);
+                max-height: var(--customHookInputContainerHeight);
+            }
+            .rootOfCustomHook {
+                height: var(--customHookInputContainerHeight);
+                min-height: var(--customHookInputContainerHeight);
+                max-height: var(--customHookInputContainerHeight);
+                .customHookRootProps.getRootProps {
+                    height: var(--customHookRootHeight);
+                    min-height: var(--customHookRootHeight);
+                    max-height: var(--customHookRootHeight);
+                }
+            }
+            .customHookRootInputWrapper {
+                width: 99.6%;
+                padding: 7px 10px;
+                max-height: var(--customHookInputContainerHeight);
+                .styledTagWithProps {
+                    justify-content: center;
+                    width: -moz-fit-content;
+                    align-items: center;
+                    width: fit-content;
+                    display: flex;
+                    height: 100%;
+                    div {
+                        &:first-child {
+                            .playerDetailsColumn {
+                                // grid-template-columns: 1fr 95px 99px;
+                                grid-template-columns: var(--playerDetailsColumnGaps);
+                            }
+                        }
+                    }
+                }
+                .playerHookInput {
+                    // height: var(--customHookRootHeight);
+                    height: var(--customHookInputContainerHeight);
+                    max-height: var(--customHookInputContainerHeight);
+                }
+            }
+        }
         .playerHookInputWrapper {
             position: relative;
             display: grid;
@@ -571,13 +620,14 @@ footer {
             }
         }
         .customHookRoot {
+            gap: 10px;
             z-index: 1;
-            width: 99.5%;
+            width: 99%;
             margin: 0 auto;
             border-radius: 8px;
             align-items: center;
-            max-height: fit-content;
             border: 3px solid black;
+            // max-height: fit-content;
             background: rgba(255, 255, 255, 0.65) !important;
             .playerHookInput {
                 font-size: 18px;
@@ -600,6 +650,14 @@ footer {
                 padding: 5px 0 0;
                 transition: var(--transition);
                 grid-template-columns: 1fr 350px 1fr;
+                &:has(.Mui-focused), &:has(.MuiAutocomplete-hasClearIcon) {
+                    .MuiTextField-root {
+                        padding-top: 1em;
+                        .MuiFormLabel-root {
+                            padding: 15px 0 0 10px;
+                        }
+                    }
+                }
                 &.collapsed {
                     margin: 0;
                     opacity: 0;
@@ -650,13 +708,31 @@ input[type="search"] {
 }
 
 form {
-    gap: 5%;
-    width: 95%;
+    gap: 15px;
+    width: 96%;
     display: grid;
     align-items: center;
     margin: 15px auto 5px;
     justify-content: center;
+    transition: var(--transition);
     grid-template-columns: 1fr 1fr 1fr;
+    &.empty {
+        grid-template-columns: 1fr;
+    }
+    &.noPlays {
+        gap: 20px;
+        grid-template-columns: 1fr 1fr;
+    }
+    &#playerForm {
+        &:has(.Mui-focused), &:has(.MuiAutocomplete-hasClearIcon) {
+            .MuiTextField-root {
+                padding-top: 1em;
+                .MuiFormLabel-root {
+                    padding: 15px 0 0 10px;
+                }
+            }
+        }
+    }
     .inputWrapper {
         position: relative;
         max-height: 91px;
@@ -685,6 +761,7 @@ form {
             background: rgba(255,255,255,0.65) !important;
             &.MuiAutocomplete-input {
                 min-height: 36px !important;
+                font-family: 'RuneScape Chat Bold' !important;
             }
             &[type="search"] {
                 border: 3px solid black;
@@ -751,18 +828,27 @@ form {
 }
 
 .MuiAutocomplete-root {
+    transition: var(--transition);
     .MuiOutlinedInput-root {
         padding-right: 35px !important;
     }
     .MuiTextField-root {
-        padding-top: 1em;
+        padding-top: 0;
         .MuiFormLabel-root {
             color: black;
-            padding: 15px 0 0 10px;
+            padding: 10px 0 0 10px;
             font-family: "RuneScape Chat Bold", Montserrat, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
             Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
         }
     }
+    // &.Mui-focused {
+    //     .MuiTextField-root {
+    //         padding-top: 1em;
+    //         .MuiFormLabel-root {
+    //             padding: 15px 0 0 10px;
+    //         }
+    //     }
+    // }
 }
 
 .recordForms {
@@ -787,7 +873,8 @@ form {
 .MuiAutocomplete-endAdornment {
     width: 100%;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: center;
+    // justify-content: space-between;
     button:nth-child(2) {
         max-width: max-content !important;
         min-width: fit-content !important;
@@ -795,10 +882,10 @@ form {
 }
 
 div[role="presentation"] {
-    background: var(--softWhite);
     backdrop-filter: blur(5px);
     z-index: 12 !important;
-    width: 95% !important;
+    width: 100% !important;
+    background: white;
     border-radius: 8px;
     margin: 0 auto;
     display: flex;
@@ -808,8 +895,15 @@ div[role="presentation"] {
     }
     font-family: "RuneScape Chat Bold", Montserrat, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
         Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+    .playerDetailsColumn {
+        .playerStats {
+            .playerStatDetails {
+                font-size: 0.85em;
+            }
+        }
+    }
     @media (min-width: 767px) {
-        max-width: 350px;
+        max-width: var(--autocompleteMaxWidth);
     }
 }
 
@@ -821,7 +915,7 @@ div[role="presentation"] {
     margin: 0 auto 0 0;
     border-radius: 8px;
     align-items: center;
-    width: 96.5% !important;
+    width: 100% !important;
     transition: var(--transition);
     background: transparent !important;
     &.characterOption {
@@ -830,16 +924,53 @@ div[role="presentation"] {
     &.singularLabel {
         grid-template-columns: 1fr;
     }
-    grid-template-columns: 20px 35px 1fr;
+    grid-template-columns: 45px 35px 1fr;
     font-family: "RuneScape Chat Bold", Montserrat, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
         Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+    .subtleTextInLabel {
+        font-size: 0.95em;
+        font-style: italic;
+    }
     .levelImageColumn {
         text-align: left;
     }
     .playerDetailsColumn {
         display: grid;
         align-items: center;
-        grid-template-columns: 1fr 1fr 99px;
+        grid-template-columns: var(--playerDetailsColumnGaps);
+        // grid-template-columns: 1fr 1fr 99px;
+        .playerStats {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            grid-gap: 0px;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: space-between;
+            .playerStatDetails {
+                display: flex;
+                grid-gap: 5px;
+                font-weight: 900;
+                max-height: 12px;
+                font-size: 0.95em;
+                padding-bottom: 3px;
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+                .statDetailLabelSmall {
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
+                    justify-content: flex-end;
+                    .subtleTextInLabel {
+                        display: flex;
+                        font-size: 0.85em;
+                        align-items: flex-end;
+                        justify-content: center;
+                    }
+                }
+            }
+        }
         &.playerHookTagDetails {
             grid-template-columns: 1fr 50px 85px;
         }
@@ -853,8 +984,8 @@ div[role="presentation"] {
                 display: grid;
                 align-items: center;
                 padding-top: 0px !important;
-                grid-template-columns: auto auto auto;
                 justify-content: flex-end !important;
+                grid-template-columns: auto auto auto;
                 img {
                     margin: 0;
                     padding: 0;
@@ -864,12 +995,14 @@ div[role="presentation"] {
         }
     }
     .levelNumColumn {
-        text-align: center;
+        text-align: left;
     }
     .MuiBadge-badge {
         width: auto;
+        font-weight: 900;
         padding: 0 !important;
         font-size: 10px !important;
+        transform: scale(0.8) translate(35%, -35%);
     }
     @media (max-width: 855px) and (min-width: 768px) {
         .playerDetailsColumn {
@@ -919,6 +1052,9 @@ div[role="presentation"] {
     font-family: "RuneScape Chat";
     color: var(--smasherscapeGreen);
     text-shadow: 2px 2px 0px black;
+    .playerRecordBegin {
+        font-size: 0.9em;
+    }
     @media (max-width: 1425px) {
         font-size: 1.9em !important;
     }
@@ -967,8 +1103,8 @@ div[role="presentation"] {
     display: grid;
     text-align: left;
     &.commandToCopy {
-        width: 95%;
-        margin: 0 auto;
+        width: 96%;
+        margin: 20px auto 0;
         li {
             .commandDetails {
                 font-size: 1.7em;
@@ -1042,6 +1178,14 @@ div[role="presentation"] {
             }
         }
     }
+}
+
+.justifyContentCenter {
+    justify-content: center !important;
+}
+
+.alignItemsCenter {
+    align-items: center !important;
 }
 
 .center {
@@ -1189,6 +1333,17 @@ div[role="presentation"] {
         .formsSection {
             .commandsForm {
                 grid-gap: 5px !important;
+                &.customHookInputContainer {
+                    max-height: 50px !important;
+                    .customHookRoot {
+                        overflow: hidden;
+                        max-height: 50px !important;
+                        .customHookListBox {
+                            overflow: hidden;
+                            max-height: 35px !important;
+                        }
+                    }
+                }
                 .commandInputs {
                     .updateRow {
                         gap: 5px;
@@ -1396,9 +1551,25 @@ div[role="presentation"] {
     width: 100%;
     text-shadow: 1px 1px 0px black;
     .codeTitle {
+        display: flex;
+        grid-gap: 15px;
         font-size: 1.2em;
         font-weight: 900;
-        text-decoration: underline;
+        padding: 0 35px 5px;
+        align-items: baseline;
+        max-width: fit-content;
+        border-bottom-left-radius: 4px;
+        border-bottom-right-radius: 4px;
+        border-bottom: 3px solid white;
+        // .desc {
+        //     text-decoration: underline;
+        // }
+    }
+    .copyText {
+        color: white;
+        font-size: 16px;
+        font-weight: 500;
+        font-family: 'RuneScape Chat';
     }
     div {
        &[data-custombutton="false"] {
@@ -1412,7 +1583,8 @@ div[role="presentation"] {
            align-items: center;
            justify-content: center;
             button {
-                max-width: 30px;
+                left: -7px;
+                max-width: 71px;
                 * {
                     height: 56%;
                 }
@@ -1442,13 +1614,15 @@ div[role="presentation"] {
     }
     div[role="group"] {
         width: 100%;
-        grid-gap: 15px;
+        height: 65px;
         display: flex;
+        grid-gap: 15px;
         margin: 0 auto;
         align-items: center;
         justify-content: center;
         button {
             width: 100%;
+            height: 100%;
             color: black;
             font-weight: 900;
             font-size: 1.2em;
@@ -1458,7 +1632,12 @@ div[role="presentation"] {
             background: var(--xurukoGradientBlueGreen);
             .buttonInnerText {
                 width: 100%;
+                height: 100%;
+                display: flex;
+                grid-gap: 1em;
                 border-radius: 8px;
+                align-items: center;
+                justify-content: center;
                 border: 3px solid black;
                 background: rgba(255, 255, 255, 0.65);
             }

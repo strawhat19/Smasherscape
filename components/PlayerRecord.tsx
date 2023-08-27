@@ -1,14 +1,15 @@
 import Play from '../models/Play';
-import { Badge } from '@mui/material';
 import Player from '../models/Player';
+import PlayerOption from './PlayerOption';
 import { StateContext } from '../pages/_app';
 import TextField from '@mui/material/TextField';
+import CharacterOption from './CharacterOption';
 import Autocomplete from '@mui/material/Autocomplete';
 import { useContext, useState, useEffect } from 'react';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
+import { getCharacterTitle, publicAssetLink } from './smasherscape';
 import { getAllCharacters, getUniqueCharactersPlayed, searchBlur } from './PlayerForm';
-import { calcPlayerCharacterTimesPlayed, calcPlayerCharactersPlayed, calcPlayerLevelImage, getActivePlayers, getCharacterTitle, publicAssetLink } from './smasherscape';
 
 export const parseDate = (dateStr: any) => {
     const parts = dateStr.split(`, `);
@@ -17,6 +18,41 @@ export const parseDate = (dateStr: any) => {
     const datePartWithoutSuffix = datePart.replace(/(\d+)(st|nd|rd|th)/, `$1`);
     const newDateStr = `${datePartWithoutSuffix}, ${timePart}`;
     return new Date(newDateStr) as any;
+}
+
+export const removeTrailingZeroDecimal = (number) => {
+    let num = typeof number == `string` ? parseFloat(number) : number;
+    const wholeNumber = Math.trunc(num);
+    const decimalPart = num - wholeNumber;
+    let resultingNumber;
+    if (decimalPart === 0) {
+        resultingNumber = wholeNumber;
+    } else {
+        resultingNumber = num.toFixed(1);
+    }
+    return isNaN(resultingNumber) ? 0 : resultingNumber;
+}
+
+export const calcPlayerKills = (player: Player, plays: Play[]) => {
+    let wins = plays.filter(ply => ply?.winner == player?.name)?.length;
+    let losses = plays.filter(ply => ply?.winner != player?.name);
+    let lossKills = losses?.map(loss => loss?.stocksTaken)?.reduce((partialSum, a) => partialSum + a, 0);
+    let winKills = wins * 3;
+    return winKills + lossKills;
+}
+
+export const calcPlayerDeaths = (player: Player, plays: Play[]) => {
+    let losses = plays.filter(ply => ply?.winner != player?.name)?.length;
+    let wins = plays.filter(ply => ply?.winner == player?.name);
+    let winDeaths = wins?.map(win => win?.stocksTaken)?.reduce((partialSum, a) => partialSum + a, 0);
+    let lossDeaths = losses * 3;
+    return lossDeaths + winDeaths;
+}
+
+export const calcPlayerKDRatio = (player: Player, plays: Play[]) => {
+    let kd = calcPlayerKills(player, plays) / calcPlayerDeaths(player, plays);
+    let kdRatio = removeTrailingZeroDecimal(kd);
+    return parseFloat(kdRatio);
 }
 
 function PlayerRecord(props) {
@@ -58,60 +94,28 @@ function PlayerRecord(props) {
     devEnv && console.log(`Search Record Characters`, {e, value, plays});
   }
 
-  const getCharacterObjs = (active) => {
-    if (active == true) {
-        return getAllCharacters().filter(char => getUniqueCharactersPlayed(players).includes(char[1])).filter(char => plyr?.plays.map(ply => ply.otherCharacter).includes(char[1])).map((char, charIndex) => {
-            return {
-                id: charIndex + 1,
-                key: char[0],
-                label: char[1],
-                image: calcPlayerCharacterIcon(char[0])
-            }
-        })
-    } else {
-        return getAllCharacters().map((char, charIndex) => {
-            return {
-                id: charIndex + 1,
-                key: char[0],
-                label: char[1],
-                image: calcPlayerCharacterIcon(char[0])
-            }
-        })
+    const getCharacterObjs = (active) => {
+        if (active == true) {
+            return getAllCharacters().filter(char => getUniqueCharactersPlayed(players).includes(char[1]))
+            .filter(char => plyr?.plays.map(ply => ply.otherCharacter).includes(char[1])).map((char, charIndex) => {
+                return {
+                    id: charIndex + 1,
+                    key: char[0],
+                    label: char[1],
+                    image: calcPlayerCharacterIcon(char[0])
+                }
+            })
+        } else {
+            return getAllCharacters().map((char, charIndex) => {
+                return {
+                    id: charIndex + 1,
+                    key: char[0],
+                    label: char[1],
+                    image: calcPlayerCharacterIcon(char[0])
+                }
+            })
+        }
     }
-}
-
-  const removeTrailingZeroDecimal = (number) => {
-    let num = typeof number == `string` ? parseFloat(number) : number;
-    const wholeNumber = Math.trunc(num);
-    const decimalPart = num - wholeNumber;
-    if (decimalPart === 0) {
-      return wholeNumber;
-    } else {
-      return num.toFixed(1);
-    }
-  }
-
-  const calcPlayerKills = (player: Player, plays: Play[]) => {
-    let wins = plays.filter(ply => ply?.winner == player?.name)?.length;
-    let losses = plays.filter(ply => ply?.winner != player?.name);
-    let lossKills = losses?.map(loss => loss?.stocksTaken)?.reduce((partialSum, a) => partialSum + a, 0);
-    let winKills = wins * 3;
-    return winKills + lossKills;
-  }
-
-  const calcPlayerDeaths = (player: Player, plays: Play[]) => {
-    let losses = plays.filter(ply => ply?.winner != player?.name)?.length;
-    let wins = plays.filter(ply => ply?.winner == player?.name);
-    let winDeaths = wins?.map(win => win?.stocksTaken)?.reduce((partialSum, a) => partialSum + a, 0);
-    let lossDeaths = losses * 3;
-    return lossDeaths + winDeaths;
-  }
-
-  const calcPlayerKDRatio = (player: Player, plays: Play[]) => {
-    let kd = calcPlayerKills(player, plays) / calcPlayerDeaths(player, plays);
-    let kdRatio = removeTrailingZeroDecimal(kd);
-    return kdRatio;
-  }
 
   const calcWinLoseRatio = (playerOne, playerTwo) => {
     let playerOneDB: Player = players.find(plyr => plyr?.name == playerOne || plyr?.name.toLowerCase().includes(playerOne));
@@ -134,7 +138,7 @@ function PlayerRecord(props) {
         <ul className="recordList">
             <h3 className={`greenRecordText`}>
                 <div className={`flex playerRecordBegin`}>
-                    Player Record
+                    {plyr?.name}'s Record
                     <span className={`recordPlays ${plyr?.plays?.length > 0 ? `populated` : `empty`}`}>
                         {plyr?.plays?.length > 0 && <span className={`goldText`}>K/D: <span className="whiteText kdRatioNum">{calcPlayerKDRatio(plyr, plays)}</span></span>}
                         <span className={`greenText`}>Kills: <span className="whiteText">{calcPlayerKills(plyr, plays)}</span></span>
@@ -148,41 +152,18 @@ function PlayerRecord(props) {
                             <div className="inputBG materialBG"></div>
                             <Autocomplete
                                 autoHighlight
-                                id="combo-box-demo"
+                                id={`recordPlayerSearch-${plyr.id}`}
                                 sx={{ width: `100%` }}
-                                options={getActivePlayers(players).map(plyr => {
-                                    return {
-                                        ...plyr,
-                                        label: plyr.name,
-                                    }
-                                }).filter(playr => playr.name != plyr.name && (plyr.plays.map(ply => ply.winner).includes(playr.name) || plyr.plays.map(ply => ply.loser).includes(playr.name)))}
+                                options={players.filter(playr => playr.name != plyr.name && (plyr.plays.map(ply => ply.winner).includes(playr.name) || plyr.plays.map(ply => ply.loser).includes(playr.name)))}
                                 getOptionLabel={(option) => option.label}
                                 onChange={(e, val: any) => searchRecordPlayers(e, val)}
                                 onInputChange={(e, val: any) => searchRecordPlayers(e, val)}
                                 isOptionEqualToValue={(option, value) => option.id === value.id}
                                 renderInput={(params) => <TextField name={`search`} onBlur={(e) => searchBlur(e, filteredPlayers)} {...params} label="Player(s)..." />}
-                                renderOption={(props: any, option: any) => {
+                                renderOption={(props: any, playerOption: any) => {
                                     return (
-                                        <div key={props?.key} {...props}>
-                                            <div className="autocompleteOption">
-                                                <div className="levelNumColumn">{option?.level?.num}</div>
-                                                <div className="levelImageColumn"><img width={30} src={calcPlayerLevelImage(option?.level?.name)} alt={option?.level?.name} /></div>
-                                                <div className="playerDetailsColumn">
-                                                    <div className="playerName">{option?.label}</div>
-                                                    <div className="playerEXP">{option?.experience?.arenaXP}</div>
-                                                    <div className="plays">
-                                                        <div className={`playsContainer`}>
-                                                            {calcPlayerCharactersPlayed(option).map((char, charIndex) => {
-                                                                return (
-                                                                    <Badge title={`Played ${getCharacterTitle(char)} ${calcPlayerCharacterTimesPlayed(option, char)} Time(s)`} key={charIndex} badgeContent={calcPlayerCharacterTimesPlayed(option, char)} color="primary">
-                                                                        <img className={`charImg`} width={25} src={calcPlayerCharacterIcon(char)} alt={getCharacterTitle(char)} />
-                                                                    </Badge>
-                                                                )
-                                                            })}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                        <div key={playerOption.id} {...props}>
+                                            <PlayerOption playerOption={playerOption}  />
                                         </div>
                                     )
                                 }}
@@ -192,7 +173,7 @@ function PlayerRecord(props) {
                             <div className="inputBG materialBG"></div>
                             <Autocomplete
                                 autoHighlight
-                                id="combo-box-demo"
+                                id={`recordPlayerCharacterSearch-${plyr.id}`}
                                 sx={{ width: `100%` }}
                                 options={getCharacterObjs(true)}
                                 getOptionLabel={(option) => option.label}
@@ -200,15 +181,10 @@ function PlayerRecord(props) {
                                 onInputChange={(e, val: any) => searchRecordCharacters(e, val)}
                                 isOptionEqualToValue={(option, value) => option.id === value.id}
                                 renderInput={(params) => <TextField name={`characters`} {...params} label="Character(s)..." />}
-                                renderOption={(props: any, option: any) => {
+                                renderOption={(props: any, characterOption: any) => {
                                     return (
-                                        <div key={props?.key} {...props}>
-                                            <div className="autocompleteOption characterOption">
-                                                <div className="characterIndex">{option?.id}</div>
-                                                <img className={`charImg`} width={25} src={option.image} alt={option.label} />
-                                                <div className="spacer"></div>
-                                                <div className="characterName">{option?.label}</div>
-                                            </div>
+                                        <div key={characterOption.id} {...props}>
+                                            <CharacterOption characterOption={characterOption} />
                                         </div>
                                     )
                                 }}

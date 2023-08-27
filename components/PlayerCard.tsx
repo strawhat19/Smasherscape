@@ -5,34 +5,18 @@ import PlayerRecord from './PlayerRecord';
 import { StateContext } from '../pages/_app';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
-import { calcPlayerCharacterTimesPlayed, calcPlayerCharactersPlayed, calcPlayerLevelImage, getCharacterTitle, publicAssetLink } from './smasherscape';
+import { calcPlayerCharacterTimesPlayed, calcPlayerCharactersPlayed, calcPlayerLevelImage, getActivePlayers, getCharacterTitle, publicAssetLink } from './smasherscape';
 
 export const calcPlayerWins = (plyr: Player) => plyr.plays.filter(ply => ply.winner.toLowerCase() == plyr.name.toLowerCase()).length;
 export const calcPlayerLosses = (plyr: Player) => plyr.plays.filter(ply => ply.loser.toLowerCase() == plyr.name.toLowerCase()).length;
 
 export default function PlayerCard(props) {
-    const { players, setFilteredPlayers } = useContext<any>(StateContext);
+    const { filteredPlayers, setFilteredPlayers } = useContext<any>(StateContext);
     let { plyr } = props;
     
-    const setPlayerExpanded = (player: Player) => {
-        let updatedPlayers: Player[] = players.map((plyr: Player) => {
-            if (plyr?.id == player?.id) {
-                if (plyr.expanded) {
-                    plyr.expanded = !plyr.expanded;
-                    return plyr as Player;
-                } else {
-                    plyr.expanded = true;
-                    return plyr as Player;
-                }
-            } else {
-                return plyr as Player;
-            }
-        });
-        setFilteredPlayers(updatedPlayers);
-        return updatedPlayers;
-    }
+    const setPlayerExpanded = (player: Player) => setFilteredPlayers(filteredPlayers.map(plyr => plyr.id == player.id ? { ...player, expanded: !player.expanded } : plyr));
 
-    return <div className={`playerCard ${plyr?.expanded ? `expandedPlayerCard` : `collapsedPlayerCard`}`}>
+    return <div id={`playerCard-${plyr.id}`} className={`playerCard ${plyr?.expanded ? `expandedPlayerCard` : `collapsedPlayerCard`}`}>
     <div className="gridCard" onClick={(e) => setPlayerExpanded(plyr)}>
         <LazyLoadImage effect="blur" src={`${publicAssetLink}/assets/smasherscape/OSRS_Card_Empty.png?raw=true`} className={`cardBG`} alt={`Smasherscape Player Card`} />
         <LazyLoadImage effect="blur" src={`${publicAssetLink}/assets/smasherscape/OSRS_Card_Template_Border_Only.png?raw=true`} className={`cardBG border`} alt={`Smasherscape Player Card`} />
@@ -42,7 +26,7 @@ export default function PlayerCard(props) {
                     <img width={70} src={`${publicAssetLink}/assets/smasherscape/OSRS_Top_Hat.png?raw=true`} alt={`Tophat Logo`} />
                     <h3 className={`blackTextShadow slimmed`}>Xuruko's<br />SmasherScape</h3>
                 </div>
-                <h2 className={`bluePurpleTextShadow`}>{plyr?.name}</h2>
+                <h2 title={plyr?.name} className={`bluePurpleTextShadow textOverflow overrideWithInlineBlock`}>{plyr?.name}</h2>
             </div>
             <div className="cardMiddleRow">
                 <div className="imgLeftCol">
