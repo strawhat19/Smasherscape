@@ -8,6 +8,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { defaultCommands } from '../components/Commands';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { createContext, useRef, useState, useEffect } from 'react';
+import { newPlayerType } from '../components/smasherscape';
 
 export const StateContext = createContext({});
 export const productionPlayersCollectionName = `players`;
@@ -102,14 +103,14 @@ export const updateOrAdd = (obj, arr) => {
   return arr;
 };
 
-export const getActivePlayersJSON = (players) => {
+export const getActivePlayersJSON = (players, customObject = false) => {
   let activePlayers = players.filter(plyr => (plyr.active || !plyr.disabled)).sort((a, b) => {
     if (b.experience.arenaXP !== a.experience.arenaXP) {
       return b.experience.arenaXP - a.experience.arenaXP;
     }
     return b.plays.length - a.plays.length;
   });
-  return activePlayers;
+  return customObject == true ? activePlayers.map(plyr => newPlayerType(plyr)) : activePlayers;
 }
 
 export const removeDuplicateObjectFromArray = (arrayOfObjects) => {
@@ -522,8 +523,8 @@ export default function Xuruko({ Component, pageProps, router }) {
     let [year, setYear] = useState(new Date().getFullYear());
     let [playersToSelect, setPlayersToSelect] = useState([]);
     let [databasePlayers, setDatabasePlayers] = useState([]);
-    let [filteredPlayers, setFilteredPlayers] = useState(players);
     let [command, setCommand] = useState(defaultCommands.Update);
+    let [filteredPlayers, setFilteredPlayers] = useState(players);
     let [deleteCompletely, setDeleteCompletely] = useState(false);
     let [sameNamePlayeredEnabled, setSameNamePlayeredEnabled] = useState(false);
     let [noPlayersFoundMessage, setNoPlayersFoundMessage] = useState(`No Players Found`);
@@ -609,12 +610,12 @@ export default function Xuruko({ Component, pageProps, router }) {
           if (useDatabase != true) {
             setPlayers(storedPlayers);
             setFilteredPlayers(storedPlayers);
-            dev() && console.log(`Players`, getActivePlayersJSON(storedPlayers));
+            // dev() && console.log(`Players`, getActivePlayersJSON(storedPlayers, true));
           }
         } else {
           setPlayers(defaultPlayers);
           setFilteredPlayers(getActivePlayersJSON(defaultPlayers));
-          dev() && console.log(`Players`, getActivePlayersJSON(defaultPlayers));
+          // dev() && console.log(`Players`, getActivePlayersJSON(defaultPlayers, true));
         }
       }
     }, [])

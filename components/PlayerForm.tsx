@@ -19,7 +19,7 @@ import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
 import { doc, setDoc, deleteDoc, updateDoc } from 'firebase/firestore';
 import { getActivePlayers, isInvalid, newPlayerType } from './smasherscape';
 import { calcPlayerDeaths, calcPlayerKDRatio, calcPlayerKills, removeTrailingZeroDecimal } from './PlayerRecord';
-import { StateContext, showAlert, defaultPlayers, formatDate, generateUniqueID, dev, countObjectKeys, getActivePlayersJSON, databasePlayersCollectionName, getAllPlays } from '../pages/_app';
+import { StateContext, showAlert, defaultPlayers, formatDate, generateUniqueID, countObjectKeys, getActivePlayersJSON, databasePlayersCollectionName, getAllPlays } from '../pages/_app';
 
 export const deletePlayerFromDB = async (playerObj: Player) => await deleteDoc(doc(db, databasePlayersCollectionName, playerObj?.ID));
 export const addPlayerToDB = async (playerObj: Player) => await setDoc(doc(db, databasePlayersCollectionName, playerObj?.ID), playerObj);
