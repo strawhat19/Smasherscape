@@ -1,11 +1,11 @@
 import * as React from 'react';
 import { useContext } from "react";
 import Player from '../models/Player';
+import PlayerOption from './PlayerOption';
 import { StateContext } from '../pages/_app';
 import { styled } from '@mui/material/styles';
 import { getActivePlayers } from './smasherscape';
 import { autocompleteClasses } from '@mui/material/Autocomplete';
-import AutoCompletePlayerOption from './AutoCompletePlayerOption';
 import useAutocomplete, { AutocompleteGetTagProps } from '@mui/base/useAutocomplete';
 
 const Root = styled(`div`)(
@@ -66,7 +66,7 @@ function Tag(props: TagProps) {
   let playerOption = option;
   return (
     <div className={`playerHookTag`} {...other}>
-      <AutoCompletePlayerOption className={`styledTaggetTag`} playerOption={playerOption} />
+      <PlayerOption className={`styledTaggetTag`} playerOption={playerOption} />
       <i className="fas fa-times tagCloseIcon" onClick={onDelete}></i>
     </div>
   );
@@ -232,28 +232,8 @@ export default function CustomizedHook(props) {
           {(groupedOptions).map((option, index) => 
             (
               <li className={`customHookOption`} key={index} {...getOptionProps({ option, index })}>
-                {/* <PlayerOption playerOption={option}  /> */}
                 <div>
-                  <AutoCompletePlayerOption className={`playerSelectedInCustomHook`} playerOption={option} />
-                  {/* <div className="autocompleteOption">
-                    <div className="levelNumColumn">Lv {option?.level?.num}</div>
-                    <div className="levelImageColumn"><img width={30} src={calcPlayerLevelImage(option?.level?.name)} alt={option?.level?.name} /></div>
-                    <div className="playerDetailsColumn">
-                      <div className="playerName">{option?.name}</div>
-                      <div className="playerEXP">Exp: {option?.experience?.arenaXP}</div>
-                      <div className="plays">
-                        <div className={`playsContainer`}>
-                          {calcPlayerCharactersPlayed(option).map((char, charIndex) => {
-                            return (
-                              <Badge title={`Played ${getCharacterTitle(char)} ${calcPlayerCharacterTimesPlayed(option, char)} Time(s)`} key={charIndex} badgeContent={calcPlayerCharacterTimesPlayed(option, char)} color="primary">
-                                <img className={`charImg`} width={25} src={calcPlayerCharacterIcon(char)} alt={getCharacterTitle(char)} />
-                              </Badge>
-                            )
-                          })}
-                        </div>
-                      </div>
-                    </div>
-                  </div> */}
+                  <PlayerOption className={`playerSelectedInCustomHook`} playerOption={option} />
                 </div>
               </li>
             )

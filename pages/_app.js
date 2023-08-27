@@ -11,7 +11,8 @@ import { createContext, useRef, useState, useEffect } from 'react';
 
 export const StateContext = createContext({});
 export const productionPlayersCollectionName = `players`;
-export const databasePlayersCollectionName = 2 > 1 ? productionPlayersCollectionName : productionPlayersCollectionName;
+export const developmentPlayersCollectionName = `devPlayers`;
+export const databasePlayersCollectionName = developmentPlayersCollectionName;
 
 export const getPage = () => {
   return capitalizeAllWords(window.location.pathname.replace(`/`,``));
@@ -229,53 +230,137 @@ export const formatDate = (date, specificPortion) => {
 
 export const defaultPlayers = [
   {
-    id: 1,
-    expanded: false,
-    name: `Xuruko`,
-    plays: [],
-    level: {
-      num: 1,
-      name: `Bronze Scimitar`
+    "id": "1_Player_Billy_8:30_PM_8-26-2023_EDT_ontQ1dKae",
+    "ID": "1 Billy 8:30 PM 8-26-2023 EDT ontQ1dKae",
+    "uuid": "ontQ1dKae",
+    "uniqueIndex": 1,
+    "displayName": "Billy",
+    "active": true,
+    "xpModifier": 1,
+    "disabled": false,
+    "expanded": false,
+    "playerLink": false,
+    "name": "Billy",
+    "lastUpdatedBy": "1_Player_Billy_8:30_PM_8-26-2023_EDT_ontQ1dKae",
+    "plays": [],
+    "username": "Billy",
+    "created": "8:30 PM 8-26-2023 EDT",
+    "updated": "8:30 PM 8-26-2023 EDT",
+    "lastUpdated": "8:30 PM 8-26-2023 EDT",
+    "label": "1 Billy",
+    "level": {
+        "name": "Bronze Scimitar",
+        "num": 1
     },
-    experience: {
-      xp: 0,
-      arenaXP: 0,
-      nextLevelAt: 83,
-      remainingXP: 83
+    "roles": [
+        {
+            "promoted": "8:30 PM 8-26-2023 EDT",
+            "name": "Player",
+            "level": 1
+        }
+    ],
+    "experience": {
+        "nextLevelAt": 83,
+        "remainingXP": 83,
+        "arenaXP": 0,
+        "xp": 0
     },
+    "wins": 0,
+    "losses": 0,
+    "percentage": 0,
+    "kills": 0,
+    "deaths": 0,
+    "kdRatio": 0,
+    "properties": 41
   },
   {
-    id: 2,
-    expanded: false,
-    name: `Kay`,
-    plays: [],
-    level: {
-      num: 1,
-      name: `Bronze Scimitar`
+    "id": "2_Player_Bob_8:30_PM_8-26-2023_EDT_C2kE3j323",
+    "ID": "2 Bob 8:30 PM 8-26-2023 EDT C2kE3j323",
+    "uuid": "C2kE3j323",
+    "uniqueIndex": 2,
+    "displayName": "Bob",
+    "active": true,
+    "xpModifier": 1,
+    "disabled": false,
+    "expanded": false,
+    "playerLink": false,
+    "name": "Bob",
+    "lastUpdatedBy": "2_Player_Bob_8:30_PM_8-26-2023_EDT_C2kE3j323",
+    "plays": [],
+    "username": "Bob",
+    "created": "8:30 PM 8-26-2023 EDT",
+    "updated": "8:30 PM 8-26-2023 EDT",
+    "lastUpdated": "8:30 PM 8-26-2023 EDT",
+    "label": "2 Bob",
+    "level": {
+        "name": "Bronze Scimitar",
+        "num": 1
     },
-    experience: {
-      xp: 0,
-      arenaXP: 0,
-      nextLevelAt: 83,
-      remainingXP: 83
+    "roles": [
+        {
+            "promoted": "8:30 PM 8-26-2023 EDT",
+            "name": "Player",
+            "level": 1
+        }
+    ],
+    "experience": {
+        "nextLevelAt": 83,
+        "remainingXP": 83,
+        "arenaXP": 0,
+        "xp": 0
     },
+    "wins": 0,
+    "losses": 0,
+    "percentage": 0,
+    "kills": 0,
+    "deaths": 0,
+    "kdRatio": 0,
+    "properties": 41
   },
   {
-    id: 3,
-    expanded: false,
-    name: `Strawhat19`,
-    plays: [],
-    level: {
-      num: 1,
-      name: `Bronze Scimitar`
+    "id": "3_Player_Joe_8:30_PM_8-26-2023_EDT_928q45L5k",
+    "ID": "3 Joe 8:30 PM 8-26-2023 EDT 928q45L5k",
+    "uuid": "928q45L5k",
+    "uniqueIndex": 3,
+    "displayName": "Joe",
+    "active": true,
+    "xpModifier": 1,
+    "disabled": false,
+    "expanded": false,
+    "playerLink": false,
+    "name": "Joe",
+    "lastUpdatedBy": "3_Player_Joe_8:30_PM_8-26-2023_EDT_928q45L5k",
+    "plays": [],
+    "username": "Joe",
+    "created": "8:30 PM 8-26-2023 EDT",
+    "updated": "8:30 PM 8-26-2023 EDT",
+    "lastUpdated": "8:30 PM 8-26-2023 EDT",
+    "label": "3 Joe",
+    "level": {
+        "name": "Bronze Scimitar",
+        "num": 1
     },
-    experience: {
-      xp: 0,
-      arenaXP: 0,
-      nextLevelAt: 83,
-      remainingXP: 83
+    "roles": [
+        {
+            "promoted": "8:30 PM 8-26-2023 EDT",
+            "name": "Player",
+            "level": 1
+        }
+    ],
+    "experience": {
+        "nextLevelAt": 83,
+        "remainingXP": 83,
+        "arenaXP": 0,
+        "xp": 0
     },
-  },
+    "wins": 0,
+    "losses": 0,
+    "percentage": 0,
+    "kills": 0,
+    "deaths": 0,
+    "kdRatio": 0,
+    "properties": 41
+  }
 ];
 
 export const getRGBAColorFromHue = (hue, alpha) => {
@@ -432,11 +517,9 @@ export default function Xuruko({ Component, pageProps, router }) {
     let [systemStatus, setSystemStatus] = useState(``);
     let [buttonText, setButtonText] = useState(`Next`);
     let [rearranging, setRearranging] = useState(false);
-    let [useDatabase, setUseDatabase] = useState(true);
     let [content, setContent] = useState(`defaultContent`);
     let [commands, setCommands] = useState(defaultCommands);
     let [year, setYear] = useState(new Date().getFullYear());
-    let [useLocalStorage, setUseLocalStorage] = useState(true);
     let [playersToSelect, setPlayersToSelect] = useState([]);
     let [databasePlayers, setDatabasePlayers] = useState([]);
     let [filteredPlayers, setFilteredPlayers] = useState(players);
@@ -445,6 +528,9 @@ export default function Xuruko({ Component, pageProps, router }) {
     let [sameNamePlayeredEnabled, setSameNamePlayeredEnabled] = useState(false);
     let [noPlayersFoundMessage, setNoPlayersFoundMessage] = useState(`No Players Found`);
     let [commandsToNotInclude, setCommandsToNotInclude] = useState([`!com`, `!add`, `!res`, `!set`, `!giv`]);
+
+    let [useDatabase, setUseDatabase] = useState(false);
+    let [useLocalStorage, setUseLocalStorage] = useState(true);
 
     const setBrowserUI = () => {
       if (brwser == `` && (navigator.userAgent.match(/edg/i) || navigator.userAgent.includes(`edg`) || navigator.userAgent.includes(`Edg`))) {
@@ -464,20 +550,6 @@ export default function Xuruko({ Component, pageProps, router }) {
         setBrowser(`opera`);
       }
     }
-
-    // const setPlayersUIFromLocalStorage = async () => {
-    //   let storedPlayers = JSON.parse(localStorage.getItem(`players`));
-    //   if (storedPlayers && useLocalStorage) {
-    //     if (useDatabase != true) {
-    //       setPlayers(storedPlayers);
-    //       setFilteredPlayers(storedPlayers);
-    //       dev() && console.log(`Players`, getActivePlayersJSON(storedPlayers));
-    //     }
-    //   } else {
-    //     setPlayers(defaultPlayers);
-    //     dev() && console.log(`Players`, getActivePlayersJSON(defaultPlayers));
-    //   }
-    // }
 
     useEffect(() => {
       setLoading(true);
@@ -499,7 +571,6 @@ export default function Xuruko({ Component, pageProps, router }) {
       setThemeUI();
       setBrowserUI();
       setSideBarUI();
-      // setPlayersUIFromLocalStorage();
 
       setBodyClasses(`${rte= `` ? rte : `Index`} pageWrapContainer ${page != `` ? page?.toUpperCase() : `Home`} ${devEnv ? `devMode` : `prodMode`} ${onMac ? `isMac` : `isWindows`} ${mobile ? `mobile` : `desktop`}`);
 
@@ -510,27 +581,42 @@ export default function Xuruko({ Component, pageProps, router }) {
     }, [rte, user, users, authState, dark])
 
     useEffect(() => {
-      const unsubscribeFromSmasherScapeSnapShot = onSnapshot(collection(db, databasePlayersCollectionName), (querySnapshot) => {
-        const playersFromDatabase = [];
-        querySnapshot.forEach((doc) => playersFromDatabase.push(doc.data()));
-        
-        setPlayers(playersFromDatabase);
-        setDatabasePlayers(playersFromDatabase);
-        setFilteredPlayers(getActivePlayersJSON(playersFromDatabase));
-        localStorage.setItem(`players`, JSON.stringify(playersFromDatabase));
-
-        if (getActivePlayersJSON(playersFromDatabase).length < 2) {
-          setCommand(defaultCommands.Delete);
-          setCommandsToNotInclude([`!com`, `!add`, `!res`, `!set`, `!giv`, `!upd`]);
+      if (useDatabase == true) {
+        const unsubscribeFromSmasherScapeSnapShot = onSnapshot(collection(db, databasePlayersCollectionName), (querySnapshot) => {
+          const playersFromDatabase = [];
+          querySnapshot.forEach((doc) => playersFromDatabase.push(doc.data()));
+          
+          setPlayers(playersFromDatabase);
+          setDatabasePlayers(playersFromDatabase);
+          setFilteredPlayers(getActivePlayersJSON(playersFromDatabase));
+          localStorage.setItem(`players`, JSON.stringify(playersFromDatabase));
+  
+          if (getActivePlayersJSON(playersFromDatabase).length < 2) {
+            setCommand(defaultCommands.Delete);
+            setCommandsToNotInclude([`!com`, `!add`, `!res`, `!set`, `!giv`, `!upd`]);
+          } else {
+            setCommand(defaultCommands.Update);
+            setCommandsToNotInclude([`!com`, `!add`, `!res`, `!set`, `!giv`]);
+          }
+        });
+  
+        return () => {
+          unsubscribeFromSmasherScapeSnapShot();
+        };
+      } else {
+        let storedPlayers = JSON.parse(localStorage.getItem(`players`));
+        if (storedPlayers && useLocalStorage) {
+          if (useDatabase != true) {
+            setPlayers(storedPlayers);
+            setFilteredPlayers(storedPlayers);
+            dev() && console.log(`Players`, getActivePlayersJSON(storedPlayers));
+          }
         } else {
-          setCommand(defaultCommands.Update);
-          setCommandsToNotInclude([`!com`, `!add`, `!res`, `!set`, `!giv`]);
+          setPlayers(defaultPlayers);
+          setFilteredPlayers(getActivePlayersJSON(defaultPlayers));
+          dev() && console.log(`Players`, getActivePlayersJSON(defaultPlayers));
         }
-      });
-
-      return () => {
-        unsubscribeFromSmasherScapeSnapShot();
-      };
+      }
     }, [])
 
     return <StateContext.Provider value={{ router, rte, setRte, updates, setUpdates, content, setContent, width, setWidth, user, setUser, page, setPage, mobileMenu, setMobileMenu, users, setUsers, authState, setAuthState, emailField, setEmailField, devEnv, setDevEnv, mobileMenuBreakPoint, platform, setPlatform, focus, setFocus, highScore, setHighScore, color, setColor, dark, setDark, colorPref, setColorPref, qotd, setQotd, alertOpen, setAlertOpen, mobile, setMobile, systemStatus, setSystemStatus, loading, setLoading, anim, setAnimComplete, IDs, setIDs, categories, setCategories, browser, setBrowser, onMac, rearranging, setRearranging, buttonText, setButtonText, gameFormStep, setGameFormStep, players, setPlayers, filteredPlayers, setFilteredPlayers, useLocalStorage, setUseLocalStorage, command, setCommand, commands, setCommands, playersToSelect, setPlayersToSelect, databasePlayers, setDatabasePlayers, useDatabase, setUseDatabase, commandsToNotInclude, setCommandsToNotInclude, sameNamePlayeredEnabled, setSameNamePlayeredEnabled, deleteCompletely, setDeleteCompletely, noPlayersFoundMessage, setNoPlayersFoundMessage }}>

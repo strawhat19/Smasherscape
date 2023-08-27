@@ -6,17 +6,17 @@ import Stock from '../models/Stock';
 import Level from '../models/Level';
 import Player from '../models/Player';
 import { Commands } from './Commands';
+import PlayerOption from './PlayerOption';
 import Experience from '../models/Experience';
 import TextField from '@mui/material/TextField';
+import CharacterOption from './CharacterOption';
 import { Characters } from '../common/Characters';
 import Autocomplete from '@mui/material/Autocomplete';
 import { calcPlayerLosses, calcPlayerWins } from './PlayerCard';
 import { calcPlayerLevelAndExperience } from '../common/Levels';
 import { FormEvent, useContext, useEffect, useRef } from 'react';
-import AutoCompletePlayerOption from './AutoCompletePlayerOption';
 import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
 import { doc, setDoc, deleteDoc, updateDoc } from 'firebase/firestore';
-import AutoCompleteCharacterOption from './AutoCompleteCharacterOption';
 import { getActivePlayers, isInvalid, newPlayerType } from './smasherscape';
 import { calcPlayerDeaths, calcPlayerKDRatio, calcPlayerKills, removeTrailingZeroDecimal } from './PlayerRecord';
 import { StateContext, showAlert, defaultPlayers, formatDate, generateUniqueID, dev, countObjectKeys, getActivePlayersJSON, databasePlayersCollectionName, getAllPlays } from '../pages/_app';
@@ -250,6 +250,18 @@ export default function PlayerForm(props) {
         </div>, `85%`, `auto`);
     }
 
+    useEffect(() => {
+        if (getActivePlayers(players).length > 0) {
+            let allPlays = getAllPlays(getActivePlayers(players.map(pla => newPlayerType(pla))));
+            console.log(`All ${useDatabase == true ? `Database ` : ``}Players`, players.map(pla => newPlayerType(pla)));
+            console.log(`Active ${useDatabase == true ? `Database ` : ``}Players`, getActivePlayers(players.map(pla => newPlayerType(pla))));
+            allPlays.length > 0 && console.log(`All Active Plays`, allPlays);
+            // dev() && console.log(`All Database Players`, players.map(pla => newPlayerType(pla)));
+            // dev() && console.log(`Active Database Players`, getActivePlayers(players.map(pla => newPlayerType(pla))));
+            // dev() && console.log(`All Active Plays`, getAllPlays(getActivePlayers(players.map(pla => newPlayerType(pla)))));
+        }
+    }, [players])
+
     const handleCommands = (e: FormEvent) => {
         e.preventDefault();
         let field = commandsInput.current as HTMLInputElement;
@@ -315,38 +327,6 @@ export default function PlayerForm(props) {
             }
         }
     }
-
-    useEffect(() => {
-        if (getActivePlayers(players).length > 0) {
-            dev() && console.log(`All Database Players`, players.map(pla => newPlayerType(pla)));
-            dev() && console.log(`Active Database Players`, getActivePlayers(players.map(pla => newPlayerType(pla))));
-            dev() && console.log(`All Active Plays`, getAllPlays(getActivePlayers(players.map(pla => newPlayerType(pla)))));
-        }
-    }, [players])
-
-    // useEffect(() => {
-    //     const unsubscribeFromSmasherScapeSnapShot = onSnapshot(collection(db, databasePlayersCollectionName), (querySnapshot) => {
-    //         const playersFromDatabase = [];
-    //         querySnapshot.forEach((doc) => playersFromDatabase.push(doc.data()));
-    //         dev() && console.log(`All Database Players`, playersFromDatabase.map(pla => newPlayerType(pla)));
-    //         dev() && console.log(`Active Database Players`, getActivePlayers(playersFromDatabase.map(pla => newPlayerType(pla))));
-    //         setPlayers(playersFromDatabase);
-    //         setDatabasePlayers(playersFromDatabase);
-    //         setFilteredPlayers(getActivePlayers(playersFromDatabase));
-    //         localStorage.setItem(`players`, JSON.stringify(playersFromDatabase));
-    //         if (getActivePlayers(playersFromDatabase).length < 2) {
-    //             setCommand(defaultCommands.Delete);
-    //             setCommandsToNotInclude([`!com`, `!add`, `!res`, `!set`, `!giv`, `!upd`]);
-    //         } else {
-    //             setCommand(defaultCommands.Update);
-    //             setCommandsToNotInclude([`!com`, `!add`, `!res`, `!set`, `!giv`]);
-    //         }
-    //     });
-
-    //     return () => {
-    //         unsubscribeFromSmasherScapeSnapShot();
-    //     };
-    // }, [])
 
     const searchPlayers = (e: any, itemsToSearch?: any, type?) => {
         let field = e.target as HTMLInputElement;
@@ -714,7 +694,7 @@ export default function PlayerForm(props) {
                     renderOption={(props: any, playerOption: any) => {
                         return (
                             <div key={playerOption.id} {...props}>
-                                <AutoCompletePlayerOption playerOption={playerOption} />
+                                <PlayerOption playerOption={playerOption} />
                             </div>
                         )
                     }}
@@ -739,7 +719,7 @@ export default function PlayerForm(props) {
                     renderOption={(props: any, playerOption: any) => {
                         return (
                             <div key={playerOption.id} {...props}>
-                                <AutoCompletePlayerOption playerOption={playerOption} />
+                                <PlayerOption playerOption={playerOption} />
                             </div>
                         )
                     }}
@@ -748,7 +728,7 @@ export default function PlayerForm(props) {
         </>}
         <div id={`commandsInput`} className={`inputWrapper`}>
             <div className="inputBG"></div>
-            <input ref={commandsInput} type="text" className="commands" name={`commands`} placeholder={databasePlayers.length > 0 ? `Enter Commands...` : `${noPlayersFoundMessage}, Try !add insertPlayerNameWithNoSpaces`} />
+            <input ref={commandsInput} type="text" className="commands" name={`commands`} placeholder={((useDatabase == true && databasePlayers.length > 0) || (useDatabase == false && getActivePlayers(players).length > 0)) ? `Enter Commands...` : `${noPlayersFoundMessage}, Try !add insertPlayerNameWithNoSpaces`} />
         </div>
         {(getActivePlayers(players).length > 0 && getAllPlays(getActivePlayers(players)).length > 0) && <>
             <div className={`characterSearchAuto inputWrapper materialBGInputWrapper`}>
@@ -767,7 +747,7 @@ export default function PlayerForm(props) {
                     renderOption={(props: any, characterOption: any) => {
                         return (
                             <div key={characterOption.id} {...props}>
-                                <AutoCompleteCharacterOption characterOption={characterOption} />
+                                <CharacterOption characterOption={characterOption} />
                             </div>
                         )
                     }}

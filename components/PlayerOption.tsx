@@ -2,7 +2,7 @@ import { Badge } from "@mui/material";
 import { calcPlayerCharacterIcon } from "../common/CharacterIcons";
 import { calcPlayerCharactersPlayed, calcPlayerCharacterTimesPlayed, calcPlayerLevelImage, getCharacterTitle } from "./smasherscape";
 
-export default function AutoCompletePlayerOption(props) {
+export default function PlayerOption(props) {
     let { playerOption, className } = props;
     return (
         <div className={`autocompleteOption ${className ? className : ``}`}>

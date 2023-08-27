@@ -1,14 +1,14 @@
 import Play from '../models/Play';
 import Player from '../models/Player';
+import PlayerOption from './PlayerOption';
 import { StateContext } from '../pages/_app';
 import TextField from '@mui/material/TextField';
+import CharacterOption from './CharacterOption';
 import Autocomplete from '@mui/material/Autocomplete';
 import { useContext, useState, useEffect } from 'react';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
-import AutoCompletePlayerOption from './AutoCompletePlayerOption';
 import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
 import { getCharacterTitle, publicAssetLink } from './smasherscape';
-import AutoCompleteCharacterOption from './AutoCompleteCharacterOption';
 import { getAllCharacters, getUniqueCharactersPlayed, searchBlur } from './PlayerForm';
 
 export const parseDate = (dateStr: any) => {
@@ -163,7 +163,7 @@ function PlayerRecord(props) {
                                 renderOption={(props: any, playerOption: any) => {
                                     return (
                                         <div key={playerOption.id} {...props}>
-                                            <AutoCompletePlayerOption playerOption={playerOption}  />
+                                            <PlayerOption playerOption={playerOption}  />
                                         </div>
                                     )
                                 }}
@@ -184,7 +184,7 @@ function PlayerRecord(props) {
                                 renderOption={(props: any, characterOption: any) => {
                                     return (
                                         <div key={characterOption.id} {...props}>
-                                            <AutoCompleteCharacterOption characterOption={characterOption} />
+                                            <CharacterOption characterOption={characterOption} />
                                         </div>
                                     )
                                 }}

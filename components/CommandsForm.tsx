@@ -1,14 +1,14 @@
 import React from 'react';
 import CodeBlock from "./CodeBlock";
 import Command from "../models/Command";
+import PlayerOption from './PlayerOption';
 import { defaultCommands } from "./Commands";
 import { StateContext } from "../pages/_app";
 import { useContext, useState } from "react";
 import CustomizedHook from './CustomizedHook';
+import CharacterOption from './CharacterOption';
 import { getActivePlayers } from "./smasherscape";
 import { getCharacterObjects } from './PlayerForm';
-import AutoCompletePlayerOption from './AutoCompletePlayerOption';
-import AutoCompleteCharacterOption from './AutoCompleteCharacterOption';
 import { Autocomplete, TextField, ToggleButton, ToggleButtonGroup } from "@mui/material";
 
 export const getDefaultPlayer = (number) => ({id: number, name: `Player-${number}`, label: `Player-${number}`});
@@ -21,7 +21,7 @@ export default function CommandsForm(props) {
     let [playerOne, setPlayerOne] = useState<any>(getDefaultPlayer(1));
     let [playerTwo, setPlayerTwo] = useState<any>(getDefaultPlayer(2));
     let [stocksTaken, setStocksTaken] = useState<any>(`Stocks-Taken-From-Winner`);
-    const { players, command, setCommand, playersToSelect, commandsToNotInclude, filteredPlayers } = useContext<any>(StateContext);
+    const { players, command, setCommand, playersToSelect, commandsToNotInclude } = useContext<any>(StateContext);
 
     const adjustStocks = (e, val) => {
         if (val) {
@@ -175,7 +175,7 @@ export default function CommandsForm(props) {
                                 renderOption={(props: any, playerOption: any) => {
                                     return (
                                         <div key={playerOption.id} {...props}>
-                                            <AutoCompletePlayerOption playerOption={playerOption} />
+                                            <PlayerOption playerOption={playerOption} />
                                         </div>
                                     )
                                 }}
@@ -221,7 +221,7 @@ export default function CommandsForm(props) {
                                 renderOption={(props: any, playerOption: any) => {
                                     return (
                                         <div key={playerOption.id} {...props}>
-                                            <AutoCompletePlayerOption playerOption={playerOption} />
+                                            <PlayerOption playerOption={playerOption} />
                                         </div>
                                     )
                                 }}
@@ -245,7 +245,7 @@ export default function CommandsForm(props) {
                                 renderOption={(props: any, characterOption: any) => {
                                     return (
                                         <div key={characterOption.id} {...props}>
-                                            <AutoCompleteCharacterOption characterOption={characterOption} />
+                                            <CharacterOption characterOption={characterOption} />
                                         </div>
                                     )
                                 }}
@@ -291,7 +291,7 @@ export default function CommandsForm(props) {
                                 renderOption={(props: any, characterOption: any) => {
                                     return (
                                         <div key={characterOption.id} {...props}>
-                                            <AutoCompleteCharacterOption characterOption={characterOption} />
+                                            <CharacterOption characterOption={characterOption} />
                                         </div>
                                     )
                                 }}

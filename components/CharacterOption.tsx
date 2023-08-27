@@ -1,4 +1,4 @@
-export default function AutoCompleteCharacterOption(props) {
+export default function CharacterOption(props) {
     let { characterOption } = props;
     return (
         <div className="autocompleteOption characterOption">
