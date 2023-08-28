@@ -21,16 +21,12 @@ import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
 import { doc, setDoc, deleteDoc, updateDoc } from 'firebase/firestore';
 import { getActivePlayers, isInvalid, newPlayerType } from './smasherscape';
 import { calcPlayerDeaths, calcPlayerKDRatio, calcPlayerKills, removeTrailingZeroDecimal } from './PlayerRecord';
-import { StateContext, showAlert, formatDate, generateUniqueID, countPropertiesInObject, getActivePlayersJSON, useDatabaseName, getAllPlays, getAllPlaysJSON } from '../pages/_app';
+import { StateContext, showAlert, formatDate, generateUniqueID, countPropertiesInObject, getActivePlayersJSON, useDatabaseName, getAllPlays, getAllPlaysJSON, defaultXPMultiplier, XPGainOnWin, XPGainOnLoserXPForEachStockTaken, winCons, loseCons } from '../pages/_app';
 
-export const defaultXPModifier = 1;
 export const deletePlayerFromDB = async (playerObj: Player) => await deleteDoc(doc(db, useDatabaseName, playerObj?.ID));
 export const addPlayerToDB = async (playerObj: Player) => await setDoc(doc(db, useDatabaseName, playerObj?.ID), playerObj);
 export const updatePlayerInDB = async (playerObj: Player, parameters) => await updateDoc(doc(db, useDatabaseName, playerObj?.ID), parameters);
 export const getAllCharacters = () => Object.entries(Characters).filter(char => char[0] === char[0].charAt(0).toUpperCase() + char[0].slice(1));
-
-export const winCons = [`beat`, `beats`, `has-beaten`, `destroys`, `destroyed`, `defeats`, `defeated`, `has-defeated`, `conquers`, `vanquishes`, `vanquished`, `fells`, `crushes`, `kills`, `killed`];
-export const loseCons = [`loses-to`, `falls-to`, `defeated-by`, `destroyed-by`];
 
 export const getUniqueCharactersPlayed = (players) => {
     return [...new Set(players.flatMap((p: Player) => p.plays.flatMap((play: Play) => [play.character, play.otherCharacter]) ))].sort();
@@ -132,7 +128,7 @@ export const createPlayer = (playerName, playerIndex, databasePlayers): Player =
         plays: [] as Play[],
         type: `Smasherscape`,
         username: displayName,
-        xpModifier: defaultXPModifier,
+        xpModifier: defaultXPMultiplier,
         created: currentDateTimeStamp,
         updated: currentDateTimeStamp,
         lastUpdated: currentDateTimeStamp,
@@ -379,7 +375,7 @@ export const updatePlayerPlays = (playState) => {
     } = playState;
 
     let prevExp = plyr.experience.arenaXP;
-    let newExp = winnerOrLoser == `winner` ? prevExp + (400 * plyr?.xpModifier) : prevExp + ((100 * plyr?.xpModifier) * stocksTaken);
+    let newExp = winnerOrLoser == `winner` ? prevExp + (XPGainOnWin * plyr?.xpModifier) : prevExp + ((XPGainOnLoserXPForEachStockTaken * plyr?.xpModifier) * stocksTaken);
     let expGained = newExp - prevExp;
     plyr.experience.arenaXP = newExp;
     
@@ -725,7 +721,7 @@ export default function PlayerForm(props) {
         </>}
         {devEnv && <div id={`commandsInput`} className={`inputWrapper`}>
             <div className="inputBG"></div>
-            <input ref={commandsInput} type="text" className="commands" name={`commands`} placeholder={getActivePlayers(players).length > 0 ? `Enter Commands...` : `${noPlayersFoundMessage}`} />
+            <input ref={commandsInput} type="text" className="commands" name={`commands`} placeholder={getActivePlayers(players).length > 0 ? `Enter Commands...` : `!add name to add players`} />
         </div>}
         {(getActivePlayers(players).length > 0 && getAllPlays(getActivePlayers(players)).length > 0) && <>
             <div className={`characterSearchAuto inputWrapper materialBGInputWrapper`}>

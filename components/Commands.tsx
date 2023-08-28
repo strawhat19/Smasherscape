@@ -72,7 +72,7 @@ export function Commands(props) {
     return commandObj as Command;
   }));
 
-  devEnv && console.log(`Commands`, commandsToRender);
+  console.log(`Commands`, commandsToRender);
 
   return (
     <ul id={id} className={`commandsList`}>

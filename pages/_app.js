@@ -13,41 +13,30 @@ import { createContext, useRef, useState, useEffect } from 'react';
 export const StateContext = createContext({});
 export const productionPlayersCollectionName = `players`;
 export const developmentPlayersCollectionName = `devPlayers`;
+export const testingPlayersCollectionName = `testPlayers`;
 export const useDatabaseName = productionPlayersCollectionName;
 
-export const getPage = () => {
-  return capitalizeAllWords(window.location.pathname.replace(`/`,``));
-}
+export const defaultWinXP = 400;
+export const testingWinXP = 1000;
+export const defaultXPMultiplier = 5;
+export const XPGainOnWin = defaultWinXP;
+export const globalBonusXPMultiplier = 5;
+export const defaultLoserXPForEachStockTaken = 100;
+export const testingLoserXPForEachStockTaken = 300;
+export const XPGainOnLoserXPForEachStockTaken = defaultLoserXPForEachStockTaken;
+export const loseCons = [`loses-to`, `falls-to`, `defeated-by`, `destroyed-by`, `gets-owned-by`];
+export const winCons = [`beat`, `beats`, `destroys`, `destroyed`, `defeats`, `defeated`, `conquers`, `crushes`, `kills`, `killed`];
 
-export const getCurrentPageName = () => {
-  return window.location.hash.slice(window.location.hash.lastIndexOf(`/`)).replace(`/`, ``);
-};
+export const getPage = () => capitalizeAllWords(window.location.pathname.replace(`/`,``));
 
-export const getAllPlaysJSON = (players) => {
-  let allPlays = players.map(player => player.plays).reduce((acc, curr) => acc.concat(curr), []).sort((a, b) => parseDate(b.date) - parseDate(a.date));
-  return allPlays;
-}
+export const replaceAll = (str, search, replacement) => str.replace(new RegExp(search, `g`), replacement);
 
-export const replaceAll = (str, search, replacement) => {
-  return str.replace(new RegExp(search, `g`), replacement);
-}
+export const getCurrentPageName = () => window.location.hash.slice(window.location.hash.lastIndexOf(`/`)).replace(`/`, ``);
 
 export const capWords = (str) => {
   return str.replace(/\b\w/g, (match) => {
     return match.toUpperCase();
   });
-}
-
-export const getTimezone = (date) => {
-  const timeZoneString = new Intl.DateTimeFormat(undefined, {timeZoneName: `short`}).format(date);
-  const match = timeZoneString.match(/\b([A-Z]{3,5})\b/);
-  return match ? match[1] : ``;
-}
-
-export const setThemeUI = () => {
-  localStorage.setItem(`alertOpen`, false);
-  document.documentElement.setAttribute(`data-theme`, `dark`);
-  localStorage.setItem(`theme`, `dark`);
 }
 
 export const getNumberFromString = (string) => {
@@ -62,20 +51,28 @@ export const createXML = (xmlString) => {
   return div.firstChild;
 }
 
+export const setThemeUI = () => {
+  localStorage.setItem(`alertOpen`, false);
+  document.documentElement.setAttribute(`data-theme`, `dark`);
+  localStorage.setItem(`theme`, `dark`);
+}
+
+export const getTimezone = (date) => {
+  const timeZoneString = new Intl.DateTimeFormat(undefined, {timeZoneName: `short`}).format(date);
+  const match = timeZoneString.match(/\b([A-Z]{3,5})\b/);
+  return match ? match[1] : ``;
+}
+
+export const getAllPlaysJSON = (players) => {
+  let allPlays = players.map(player => player.plays).reduce((acc, curr) => acc.concat(curr), []).sort((a, b) => parseDate(b.date) - parseDate(a.date));
+  return allPlays;
+}
+
 export const cutOffTextAndReplace = (string, end, replacement) => {
   if (!replacement) {
     replacement = `...` || `-`;
   }
   return string?.length > end ? string?.substring(0, end - 1) + replacement : string;
-};
-
-export const getFormValuesFromFields = (formFields) => {
-  for (let i = 0; i < formFields.length; i++) {
-    let field = formFields[i];
-    if (field.type != `submit`) {
-      console.log(field.type, field.value);
-    };
-  }
 };
 
 export const genUUIDNumbers = (existingIDs) => {
@@ -85,6 +82,15 @@ export const genUUIDNumbers = (existingIDs) => {
   } while (existingIDs.includes(newID)); // keep generating a new ID until it's not already in the existing IDs array
   return newID;
 }
+
+export const getFormValuesFromFields = (formFields) => {
+  for (let i = 0; i < formFields.length; i++) {
+    let field = formFields[i];
+    if (field.type != `submit`) {
+      console.log(field.type, field.value);
+    };
+  }
+};
 
 export const updateOrAdd = (obj, arr) => {
   let index = arr.findIndex((item) => item.name === obj.name);
