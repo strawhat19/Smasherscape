@@ -729,6 +729,11 @@ form {
         grid-template-columns: 1fr 1fr;
     }
     &#playerForm {
+        &.hasPlays {
+            &.noCommandsPerm {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
         &.noPlays {
             &.noCommandsPerm {
                 grid-template-columns: 1fr;
