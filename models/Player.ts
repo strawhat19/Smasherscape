@@ -16,6 +16,7 @@ export default class Player {
     experience?: Experience,
     xpModifier?: number,
     ID?: any,
+    uid?: any,
     uuid?: any,
     label?: string,
     bio?: string,

@@ -8,6 +8,7 @@ import Player from '../models/Player';
 import { Commands } from './Commands';
 import PlayerOption from './PlayerOption';
 import Experience from '../models/Experience';
+import Parameters from '../models/Parameters';
 import TextField from '@mui/material/TextField';
 import CharacterOption from './CharacterOption';
 import { Characters } from '../common/Characters';
@@ -19,8 +20,7 @@ import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
 import { doc, setDoc, deleteDoc, updateDoc } from 'firebase/firestore';
 import { getActivePlayers, isInvalid, newPlayerType } from './smasherscape';
 import { calcPlayerDeaths, calcPlayerKDRatio, calcPlayerKills, removeTrailingZeroDecimal } from './PlayerRecord';
-import { StateContext, showAlert, defaultPlayers, formatDate, generateUniqueID, countObjectKeys, getActivePlayersJSON, databasePlayersCollectionName, getAllPlays } from '../pages/_app';
-import Parameters from '../models/Parameters';
+import { StateContext, showAlert, formatDate, generateUniqueID, countObjectKeys, getActivePlayersJSON, databasePlayersCollectionName, getAllPlays } from '../pages/_app';
 
 export const deletePlayerFromDB = async (playerObj: Player) => await deleteDoc(doc(db, databasePlayersCollectionName, playerObj?.ID));
 export const addPlayerToDB = async (playerObj: Player) => await setDoc(doc(db, databasePlayersCollectionName, playerObj?.ID), playerObj);
@@ -34,13 +34,6 @@ export const getUniqueCharactersPlayed = (players) => {
     return [...new Set(players.flatMap((p: Player) => p.plays.flatMap((play: Play) => [play.character, play.otherCharacter]) ))].sort();
 }
 
-export const showCommandsWithParameters = (parameters) => {
-    let { commands, devEnv } = parameters
-    showAlert(`Here are the Smasherscape Commands so far`, <div className={`alertInner`}>
-        <Commands id={`commandsList`} commands={commands} devEnv={devEnv} />
-    </div>, `85%`, `auto`);
-}
-
 export const updatePlayersDB = (updatedPlayers: Player[]) => {
     console.log(`Updated Players`, getActivePlayers(updatedPlayers));
     localStorage.setItem(`players`, JSON.stringify(updatedPlayers));
@@ -52,16 +45,11 @@ export const searchBlur = (e: any, filteredPlayers: Player[]) => {
     }
 }
 
-export const getCharacterObjects = () => {
-    return getAllCharacters().map((char, charIndex) => {
-        return {
-            id: charIndex + 1,
-            key: char[0],
-            label: char[1],
-            image: calcPlayerCharacterIcon(char[0]),
-            shortcuts: Object.entries(Characters).filter(entry => entry[1] == char[1]).map(entr => entr[0]),
-        }
-    })
+export const showCommandsWithParameters = (parameters) => {
+    let { commands, devEnv } = parameters
+    showAlert(`Here are the Smasherscape Commands so far`, <div className={`alertInner`}>
+        <Commands id={`commandsList`} commands={commands} devEnv={devEnv} />
+    </div>, `85%`, `auto`);
 }
 
 export const playerConverter = {
@@ -73,6 +61,23 @@ export const playerConverter = {
         return newPlayerType(playrData);
     }
 };
+
+export const getCharacterObjects = () => {
+    let characterObjects = getAllCharacters().map((char, charIndex) => {
+        return {
+            id: charIndex + 1,
+            key: char[0],
+            label: char[1],
+            image: calcPlayerCharacterIcon(char[0]),
+            shortcuts: Object.entries(Characters).filter(entry => entry[1] == char[1]).map(entr => entr[0]),
+        }
+    });
+    // if (active == true) {
+        // return characterObjects.filter((charObj, charIndex) => filterFunction(charObj, charIndex));
+    // } else {
+        return characterObjects;
+    // }
+}
 
 export const updatePlayerStats = (plyr, plays) => {
     let wins = calcPlayerWins(plyr);
@@ -192,6 +197,53 @@ export const createPlayer = (playerName, playerIndex, databasePlayers): Player =
     return plyr;
 }
 
+export const addPlayersWithParameters = (parameters: Parameters) => {
+    let {
+        players,
+        setPlayers,
+        useDatabase,
+        commandParams,
+        databasePlayers,
+        setFilteredPlayers,
+        sameNamePlayeredEnabled
+    } = parameters;
+
+    let playersToAdd = commandParams.filter((comm, commIndex) => commIndex != 0 && comm);
+    [...new Set(playersToAdd)].forEach((plyr: any, plyrIndex) => {
+        let playerObj: Player = createPlayer(plyr, plyrIndex, databasePlayers);
+        if (useDatabase == true) {
+            if (sameNamePlayeredEnabled) {
+                addPlayerToDB(playerObj);
+                return playerObj;
+            } else {
+                if (!getActivePlayers(players).map(playr => playr.name.toLowerCase()).some(nam => nam == plyr.toLowerCase())) {
+                    addPlayerToDB(playerObj);
+                    return playerObj;
+                } else {
+                    showAlert(`Player(s) Added Already`, <h1>
+                        Player(s) with those name(s) already exist.
+                    </h1>, `65%`, `35%`);
+                    return;
+                }
+            }
+        } else {
+            if (!getActivePlayers(players).map(playr => playr.name.toLowerCase()).some(nam => nam == plyr.toLowerCase())) {
+                setPlayers(prevPlayers => {
+                    let updatedPlayers: Player[] = [...prevPlayers, playerObj];
+                    setFilteredPlayers(updatedPlayers);
+                    updatePlayersDB(updatedPlayers);
+                    return updatedPlayers;
+                });
+            } else {
+                showAlert(`Player(s) Added Already`, <h1>
+                    Player(s) with those name(s) already exist.
+                </h1>, `65%`, `35%`);
+                return;
+            }
+        }
+    })
+}
+
 export const deletePlayersWithParameters = (parameters: Parameters) => {
     let {
         players,
@@ -248,6 +300,95 @@ export const deletePlayersWithParameters = (parameters: Parameters) => {
     }
 }
 
+export const setParametersWithParameters = (parameters: Parameters) => {
+    let {
+        players,
+        setPlayers,
+        commandParams,
+    } = parameters;
+
+
+    let updatedPlayers: Player[] = [];
+    let playerToSet = commandParams[1].toLowerCase();
+    let parameter = commandParams[2].toLowerCase();
+    let amount = parseFloat(commandParams[3]);
+    let playerToSetDB: Player = players.find(plyr => plyr?.name.toLowerCase() == playerToSet || plyr?.name.toLowerCase().includes(playerToSet));
+
+    if (!playerToSetDB) {
+        showAlert(`Can't Find Players`, <h1>
+            Can't find players with that name.
+        </h1>, `65%`, `35%`);
+        return;
+    } else {
+        if (isInvalid(parameter) || isInvalid(amount)) {
+            showAlert(`Please Enter Parameter & Valid Amount`, <h1>
+                Please Enter Parameter such as `xp`.
+                Please Enter Valid Amount such as `100` or `-500`.
+            </h1>, `65%`, `35%`);
+            return;
+        } else {
+            if (parameter == `xp`) {
+                updatedPlayers = players.map(plyr => {
+                    if (plyr?.name.toLowerCase() == playerToSetDB?.name?.toLowerCase() || plyr?.name.toLowerCase().includes(playerToSetDB?.name?.toLowerCase())) {
+                        plyr.xpModifier = amount;
+                        return plyr as Player;
+                    } else {
+                        return plyr as Player;
+                    }
+                });
+            }
+
+            updatePlayersDB(updatedPlayers);
+            setPlayers(updatedPlayers);
+        }
+    }
+}
+
+export const giveParameterWithParameters = (parameters: Parameters) => {
+    let {
+        players,
+        setPlayers,
+        commandParams,
+    } = parameters;
+
+
+    let updatedPlayers: Player[] = [];
+    let playerToGive = commandParams[1].toLowerCase();
+    let parameter = commandParams[2].toLowerCase();
+    let amount = parseFloat(commandParams[3]);
+    let playerToGiveDB: Player = players.find(plyr => plyr?.name.toLowerCase() == playerToGive || plyr?.name.toLowerCase().includes(playerToGive));
+
+    if (!playerToGiveDB) {
+        showAlert(`Can't Find Players`, <h1>
+            Can't find players with that name.
+        </h1>, `65%`, `35%`);
+        return;
+    } else {
+        if (isInvalid(parameter) || isInvalid(amount)) {
+            showAlert(`Please Enter Parameter & Valid Amount`, <h1>
+                Please Enter Parameter such as `xp`.
+                Please Enter Valid Amount such as `100` or `-500`.
+            </h1>, `65%`, `35%`);
+            return;
+        } else {
+            if (parameter == `xp`) {
+                updatedPlayers = players.map(plyr => {
+                    if (plyr?.name.toLowerCase() == playerToGiveDB?.name?.toLowerCase() || plyr?.name.toLowerCase().includes(playerToGiveDB?.name?.toLowerCase())) {
+                        plyr.experience.arenaXP = plyr.experience.arenaXP + (plyr?.xpModifier ? (amount * plyr?.xpModifier) : amount);
+                        calcPlayerLevelAndExperience(plyr);
+                        return plyr as Player;
+                    } else {
+                        return plyr as Player;
+                    }
+                });
+            }
+
+            updatePlayersDB(updatedPlayers);
+            setPlayers(updatedPlayers);
+        }
+    }
+}
+
 export const updatePlayersWithParameters = (parameters: Parameters) => {
     let {
         players,
@@ -257,11 +398,9 @@ export const updatePlayersWithParameters = (parameters: Parameters) => {
     } = parameters;
 
     let date = moment().format(`h:mm:ss a, MMMM Do YYYY`);
-    // let currentDateTimeStamp = formatDate(new Date());
     let playerOneName = commandParams[1].toLowerCase();
     let conditionName = commandParams[2].toLowerCase();
     let playerTwoName = commandParams[3].toLowerCase();
-    // let date = currentDateTimeStamp;
 
     let playerOneDB = getActivePlayersJSON(players).find(plyr => plyr?.name.toLowerCase() == playerOneName || plyr?.name.toLowerCase().includes(playerOneName));
     let playerTwoDB = getActivePlayersJSON(players).find(plyr => plyr?.name.toLowerCase() == playerTwoName || plyr?.name.toLowerCase().includes(playerTwoName));
@@ -401,17 +540,15 @@ export const processCommandsWithParameters = (parameters: Parameters) => {
     if (command != ``) {
         if (firstCommand.includes(`!upd`)) {
             updatePlayersWithParameters(parameters);
+        } else if (firstCommand.includes(`!add`)) {
+            addPlayersWithParameters(parameters);
         } else if (firstCommand.includes(`!del`)) {
             deletePlayersWithParameters(parameters);
-        } 
-        // else if (firstCommand.includes(`!res`)) {
-        //     resetPlayers(commandParams);
-        // } else if (firstCommand.includes(`!giv`)) {
-        //     giveParameter(commandParams);
-        // } else if (firstCommand.includes(`!set`)) {
-        //     setParameter(commandParams);
-        // } 
-        else {
+        } else if (firstCommand.includes(`!giv`)) {
+            giveParameterWithParameters(parameters);
+        } else if (firstCommand.includes(`!set`)) {
+            setParametersWithParameters(parameters);
+        } else {
             showCommandsWithParameters(parameters);
         }
     }
@@ -423,24 +560,12 @@ export default function PlayerForm(props) {
     const commandsInput = useRef();
     const { players, setPlayers, filteredPlayers, setFilteredPlayers, devEnv, useDatabase, commands, databasePlayers, sameNamePlayeredEnabled, deleteCompletely, noPlayersFoundMessage } = useContext<any>(StateContext);
 
-    const resetPlayers = (commandParams) => {
-        setPlayers(defaultPlayers);
-        setFilteredPlayers(defaultPlayers);
-        updatePlayersDB(defaultPlayers);
-    }
-
-    const showCommands = () => {
-        showAlert(`Here are the Smasherscape Commands so far`, <div className={`alertInner`}>
-            <Commands id={`commandsList`} commands={commands} devEnv={devEnv} />
-        </div>, `85%`, `auto`);
-    }
-
     useEffect(() => {
         if (getActivePlayers(players).length > 0) {
             let allPlays = getAllPlays(getActivePlayers(players.map(pla => newPlayerType(pla))));
             console.log(`All ${useDatabase == true ? `Database ` : ``}Players`, players.map(pla => newPlayerType(pla)));
             console.log(`Active ${useDatabase == true ? `Database ` : ``}Players`, getActivePlayers(players.map(pla => newPlayerType(pla))));
-            allPlays.length > 0 && console.log(`All Active Plays`, allPlays);
+            allPlays.length > 0 && console.log(`All Active ${useDatabase == true ? `Database ` : ``}Plays`, allPlays);
         }
     }, [players])
 
@@ -448,8 +573,22 @@ export default function PlayerForm(props) {
         e.preventDefault();
         let field = commandsInput.current as HTMLInputElement;
         if (field.name == `commands`) {
-            let commandFromForm = field?.value.toLowerCase();
-            processCommands(commandFromForm);
+            let command = field?.value.toLowerCase();
+            let commandParams = command.split(` `);
+            const parameters = new Parameters({
+                command,
+                players, 
+                commands,
+                setPlayers, 
+                useDatabase, 
+                commandParams, 
+                databasePlayers, 
+                updatePlayersDB,
+                deleteCompletely,
+                setFilteredPlayers, 
+                sameNamePlayeredEnabled,
+            });
+            processCommandsWithParameters(parameters);
         } else {
             return;
         }
@@ -462,41 +601,12 @@ export default function PlayerForm(props) {
                     id: charIndex + 1,
                     key: char[0],
                     label: char[1],
-                    image: calcPlayerCharacterIcon(char[0])
+                    image: calcPlayerCharacterIcon(char[0]),
+                    shortcuts: Object.entries(Characters).filter(entry => entry[1] == char[1]).map(entr => entr[0]),
                 }
             })
         } else {
-            return getAllCharacters().map((char, charIndex) => {
-                return {
-                    id: charIndex + 1,
-                    key: char[0],
-                    label: char[1],
-                    image: calcPlayerCharacterIcon(char[0])
-                }
-            })
-        }
-    }
-
-    const processCommands = (command) => {
-        let commandParams = command.split(` `);
-        let firstCommand = commandParams[0];
-        
-        if (command != ``) {
-            if (firstCommand.includes(`!upd`)) {
-                updatePlayers(commandParams);
-            } else if (firstCommand.includes(`!add`)) {
-                addPlayers(commandParams);
-            } else if (firstCommand.includes(`!del`)) {
-                deletePlayers(commandParams);
-            } else if (firstCommand.includes(`!res`)) {
-                resetPlayers(commandParams);
-            } else if (firstCommand.includes(`!giv`)) {
-                giveParameter(commandParams);
-            } else if (firstCommand.includes(`!set`)) {
-                setParameter(commandParams);
-            } else {
-                showCommands();
-            }
+            return getCharacterObjects();
         }
     }
 
@@ -528,11 +638,6 @@ export default function PlayerForm(props) {
                     setFilteredPlayers(getActivePlayers(players).filter((plyr: Player) => {
                         return itemsToSearch.map(playr => playr.name.toLowerCase()).includes(plyr.name.toLowerCase());
                     }));
-                    // setFilteredPlayers(getActivePlayers(players).filter((plyr: Player) => {
-                    //     return plyr.plays.map(ply => ply.character).some(char =>
-                    //         typeof char === `string` && char.toLowerCase().includes(itemsToSearch?.toLowerCase())
-                    //     );
-                    // }));
                 } else if (typeof itemsToSearch == `string`) {
                     setFilteredPlayers(getActivePlayers(players).filter((plyr: Player) => {
                         return plyr.plays.map(ply => ply.character).some(char =>
@@ -549,300 +654,6 @@ export default function PlayerForm(props) {
             }
         } else {
             setFilteredPlayers(getActivePlayers(players));
-        }
-    }
-
-    const addPlayers = (commandParams) => {
-        let playersToAdd = commandParams.filter((comm, commIndex) => commIndex != 0 && comm);
-        [...new Set(playersToAdd)].forEach((plyr: any, plyrIndex) => {
-            let playerObj: Player = createPlayer(plyr, plyrIndex, databasePlayers);
-            if (useDatabase == true) {
-                if (sameNamePlayeredEnabled) {
-                    addPlayerToDB(playerObj);
-                    return playerObj;
-                } else {
-                    if (!getActivePlayers(players).map(playr => playr.name.toLowerCase()).some(nam => nam == plyr.toLowerCase())) {
-                        addPlayerToDB(playerObj);
-                        return playerObj;
-                    } else {
-                        showAlert(`Player(s) Added Already`, <h1>
-                            Player(s) with those name(s) already exist.
-                        </h1>, `65%`, `35%`);
-                        return;
-                    }
-                }
-            } else {
-                if (!getActivePlayers(players).map(playr => playr.name.toLowerCase()).some(nam => nam == plyr.toLowerCase())) {
-                    setPlayers(prevPlayers => {
-                        let updatedPlayers: Player[] = [...prevPlayers, playerObj];
-                        setFilteredPlayers(updatedPlayers);
-                        updatePlayersDB(updatedPlayers);
-                        return updatedPlayers;
-                    });
-                } else {
-                    showAlert(`Player(s) Added Already`, <h1>
-                        Player(s) with those name(s) already exist.
-                    </h1>, `65%`, `35%`);
-                    return;
-                }
-            }
-        })
-    }
-
-    const deletePlayers = (commandParams) => {
-        let playersToDeleteFromDB: Player[] = [];
-        let playersToDelete = commandParams.filter((comm, commIndex) => commIndex != 0 && comm);
-
-        playersToDelete.forEach(player => {
-            let playerDB: Player = getActivePlayers(players).find(plyr => plyr?.name.toLowerCase() == player.toLowerCase() || plyr?.name.toLowerCase().includes(player.toLowerCase()));
-            if (playerDB) {
-                playersToDeleteFromDB.push(playerDB);
-            }
-        });
-
-        if (playersToDeleteFromDB.length > 0) {
-            playersToDeleteFromDB.forEach((playerDB: Player) => {
-                (document.querySelector(`.clearAllTagsIcon`) as any).click();
-                if (useDatabase == true) {
-                    if (deleteCompletely) {
-                        return deletePlayerFromDB(playerDB);
-                    } else {
-                        let currentDateTimeStamp = formatDate(new Date());
-                        return updatePlayerInDB(playerDB, {disabled: true, active: false, updated: currentDateTimeStamp, lastUpdated: currentDateTimeStamp })
-                    }
-                } else {
-                    setPlayers(prevPlayers => {
-                        let updatedPlayers: Player[] = prevPlayers.map((plyr: Player) => {
-                            if (plyr.name.toLowerCase() == playerDB.name.toLowerCase()) {
-                                return {
-                                    ...plyr,
-                                    disabled: true
-                                } as Player
-                            } else {
-                                return plyr as Player;
-                            }
-                        });
-                        setFilteredPlayers(updatedPlayers);
-                        updatePlayersDB(updatedPlayers);
-                        return updatedPlayers;
-                    });
-                }
-            })
-        } else {
-            showAlert(`Can't Find Players`, <h1>
-                Can't find players with those names.
-            </h1>, `65%`, `35%`);
-            return;
-        }
-    }
-
-    const setParameter = (commandParams) => {
-        let updatedPlayers: Player[] = [];
-        let playerToSet = commandParams[1].toLowerCase();
-        let parameter = commandParams[2].toLowerCase();
-        let amount = parseFloat(commandParams[3]);
-        let playerToSetDB: Player = players.find(plyr => plyr?.name.toLowerCase() == playerToSet || plyr?.name.toLowerCase().includes(playerToSet));
-
-        if (!playerToSetDB) {
-            showAlert(`Can't Find Players`, <h1>
-                Can't find players with that name.
-            </h1>, `65%`, `35%`);
-            return;
-        } else {
-            if (isInvalid(parameter) || isInvalid(amount)) {
-                showAlert(`Please Enter Parameter & Valid Amount`, <h1>
-                    Please Enter Parameter such as `xp`.
-                    Please Enter Valid Amount such as `100` or `-500`.
-                </h1>, `65%`, `35%`);
-                return;
-            } else {
-                if (parameter == `xp`) {
-                    updatedPlayers = players.map(plyr => {
-                        if (plyr?.name.toLowerCase() == playerToSetDB?.name?.toLowerCase() || plyr?.name.toLowerCase().includes(playerToSetDB?.name?.toLowerCase())) {
-                            plyr.xpModifier = amount;
-                            return plyr as Player;
-                        } else {
-                            return plyr as Player;
-                        }
-                    });
-                }
-
-                updatePlayersDB(updatedPlayers);
-                setPlayers(updatedPlayers);
-            }
-        }
-    }
-
-    const giveParameter = (commandParams) => {
-        let updatedPlayers: Player[] = [];
-        let playerToGive = commandParams[1].toLowerCase();
-        let parameter = commandParams[2].toLowerCase();
-        let amount = parseFloat(commandParams[3]);
-        let playerToGiveDB: Player = players.find(plyr => plyr?.name.toLowerCase() == playerToGive || plyr?.name.toLowerCase().includes(playerToGive));
-
-        if (!playerToGiveDB) {
-            showAlert(`Can't Find Players`, <h1>
-                Can't find players with that name.
-            </h1>, `65%`, `35%`);
-            return;
-        } else {
-            if (isInvalid(parameter) || isInvalid(amount)) {
-                showAlert(`Please Enter Parameter & Valid Amount`, <h1>
-                    Please Enter Parameter such as `xp`.
-                    Please Enter Valid Amount such as `100` or `-500`.
-                </h1>, `65%`, `35%`);
-                return;
-            } else {
-                if (parameter == `xp`) {
-                    updatedPlayers = players.map(plyr => {
-                        if (plyr?.name.toLowerCase() == playerToGiveDB?.name?.toLowerCase() || plyr?.name.toLowerCase().includes(playerToGiveDB?.name?.toLowerCase())) {
-                            plyr.experience.arenaXP = plyr.experience.arenaXP + (plyr?.xpModifier ? (amount * plyr?.xpModifier) : amount);
-                            calcPlayerLevelAndExperience(plyr);
-                            return plyr as Player;
-                        } else {
-                            return plyr as Player;
-                        }
-                    });
-                }
-
-                updatePlayersDB(updatedPlayers);
-                setPlayers(updatedPlayers);
-            }
-        }
-    }
-
-    const updatePlayers = (commandParams) => {
-        let date = moment().format(`h:mm:ss a, MMMM Do YYYY`);
-        // let currentDateTimeStamp = formatDate(new Date());
-        let playerOneName = commandParams[1].toLowerCase();
-        let conditionName = commandParams[2].toLowerCase();
-        let playerTwoName = commandParams[3].toLowerCase();
-        // let date = currentDateTimeStamp;
-
-        let playerOneDB = getActivePlayersJSON(players).find(plyr => plyr?.name.toLowerCase() == playerOneName || plyr?.name.toLowerCase().includes(playerOneName));
-        let playerTwoDB = getActivePlayersJSON(players).find(plyr => plyr?.name.toLowerCase() == playerTwoName || plyr?.name.toLowerCase().includes(playerTwoName));
-
-        let characterOne;
-        let characterTwo;
-        let stocksTaken;
-
-        if (commandParams.length >= 8) {
-            characterOne = commandParams[5].toLowerCase();
-            characterTwo = commandParams[7].toLowerCase();
-            stocksTaken = parseInt(commandParams[8]) || 0;
-        }
-
-        if (!playerOneDB || !playerTwoDB) {
-            console.log(`Can't Find Players`, {playerOneDB, playerTwoDB});
-            showAlert(`Can't Find Players`, <h1>
-                Can't find players with those names.
-            </h1>, `65%`, `35%`);
-            return;
-        } else if (!winCons.includes(conditionName) && !loseCons.includes(conditionName)) {
-            showAlert(`Missing Condition`, <h1>
-                Did player one win or lose?
-            </h1>, `65%`, `35%`);
-            return;
-        } else if (!characterOne || !characterTwo) {
-            console.log(`Missing Characters`, !characterOne, !characterTwo);
-            showAlert(`Missing Characters`, <h1>
-                Which Charcaters Did They Play?
-            </h1>, `65%`, `35%`);
-            return;
-        } else if (!Characters[characterOne] || !Characters[characterTwo]) {
-            console.log(`Cannot Find Characters`, !Characters[characterOne], !Characters[characterTwo]);
-            showAlert(`Cannot Find Characters`, <h1>
-                Can't find characters with those names.
-            </h1>, `65%`, `35%`);
-            return;
-        } else if (stocksTaken >= 3) {
-            console.log(`Invalid Stocks Taken`, stocksTaken);
-            showAlert(`Invalid Stocks Taken`, <h1>
-                Stocks taken should be less than 3.
-            </h1>, `65%`, `35%`);
-            return;
-        } else {
-
-            let winner = winCons.includes(conditionName) ? playerOneName : playerTwoName;
-            let loser = winCons.includes(conditionName) ? playerTwoName : playerOneName;
-            let winnerDB = (playerOneDB?.name?.toLowerCase() == winner || playerOneDB?.name.toLowerCase().includes(winner)) ? playerOneDB : playerTwoDB;
-            let loserDB = (playerTwoDB?.name?.toLowerCase() == loser || playerTwoDB?.name.toLowerCase().includes(loser)) ? playerTwoDB : playerOneDB;
-            let winChar = winCons.includes(conditionName) ? Characters[characterOne] : Characters[characterTwo];
-            let loseChar = winCons.includes(conditionName) ? Characters[characterTwo] : Characters[characterOne];
-            
-            let stocks: Stock[] = [
-                {
-                    character: winChar,
-                }, 
-                {
-                    character: winChar,
-                }, 
-                {
-                    character: winChar,
-                }
-            ].map((stk: Stock, stkIndex) => {
-                if (stkIndex < stocksTaken) {
-                    return {
-                        ...stk,
-                        dead: true
-                    } as Stock
-                } else {
-                    return {
-                        ...stk,
-                    } as Stock
-                }
-            });
-
-            let lossStocks: Stock[] = [
-                {
-                    character: loseChar,
-                    dead: true
-                }, 
-                {
-                    character: loseChar,
-                    dead: true
-                }, 
-                {
-                    character: loseChar,
-                    dead: true
-                }
-            ];
-
-            let playUIDs = getAllPlays(players).some(ply => ply.uuid) ? getAllPlays(players).map(ply => ply?.uuid) : players.map(plr => plr.uuid);
-            let playUUID = playUIDs.length > 0 ? generateUniqueID(playUIDs) : generateUniqueID();
-
-            let playState = {
-                date,
-                stocks,
-                players, 
-                winChar, 
-                loserDB, 
-                winnerDB, 
-                loseChar,
-                playUUID,
-                lossStocks, 
-                stocksTaken,  
-            }
-
-            let updatedPlayers: any[] = getActivePlayersJSON(players).map((plyr) => {
-                if (plyr?.id == winnerDB?.id) {
-                    updatePlayerPlays({...playState, plyr, winnerOrLoser: `winner`});
-                    return plyr;
-                } else if (plyr?.id == loserDB?.id) {
-                    updatePlayerPlays({...playState, plyr, winnerOrLoser: `loser`});
-                    return plyr;
-                } else {
-                    return plyr;
-                }
-            });
-
-            if (useDatabase == true) {
-                updatePlayerInDB(winnerDB, updatedPlayers.find(plyr => plyr.id == winnerDB.id));
-                updatePlayerInDB(loserDB, updatedPlayers.find(plyr => plyr.id == loserDB.id));
-            } else {
-                updatePlayersDB(updatedPlayers);
-                setPlayers(updatedPlayers);
-            }
         }
     }
 

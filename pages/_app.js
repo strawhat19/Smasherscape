@@ -6,9 +6,9 @@ import ReactDOM from 'react-dom/client';
 import { parseDate } from '../components/PlayerRecord';
 import { AnimatePresence, motion } from 'framer-motion';
 import { defaultCommands } from '../components/Commands';
+import { newPlayerType } from '../components/smasherscape';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { createContext, useRef, useState, useEffect } from 'react';
-import { newPlayerType } from '../components/smasherscape';
 
 export const StateContext = createContext({});
 export const productionPlayersCollectionName = `players`;
@@ -28,16 +28,14 @@ export const getAllPlaysJSON = (players) => {
   return allPlays;
 }
 
-export const getAllPlays = (players) => {
-  const playUUIDs = new Set();
-  let allPlays = players.map(player => player.plays).reduce((acc, curr) => acc.concat(curr), []).filter(play => {
-    if (!playUUIDs.has(play.uuid)) {
-      playUUIDs.add(play.uuid);
-      return true;
-    }
-    return false;
-  }).sort((a, b) => parseDate(b.date) - parseDate(a.date));
-  return allPlays;
+export const replaceAll = (str, search, replacement) => {
+  return str.replace(new RegExp(search, `g`), replacement);
+}
+
+export const capWords = (str) => {
+  return str.replace(/\b\w/g, (match) => {
+    return match.toUpperCase();
+  });
 }
 
 export const getTimezone = (date) => {
@@ -62,16 +60,6 @@ export const createXML = (xmlString) => {
   let div = document.createElement(`div`);
   div.innerHTML = xmlString.trim();
   return div.firstChild;
-}
-
-export const replaceAll = (str, search, replacement) => {
-  return str.replace(new RegExp(search, `g`), replacement);
-}
-
-export const capWords = (str) => {
-  return str.replace(/\b\w/g, (match) => {
-    return match.toUpperCase();
-  });
 }
 
 export const cutOffTextAndReplace = (string, end, replacement) => {
@@ -151,6 +139,18 @@ export const dev = (item, source) => {
   } else {
     return false;
   }
+}
+
+export const getAllPlays = (players) => {
+  const playUUIDs = new Set();
+  let allPlays = players.map(player => player.plays).reduce((acc, curr) => acc.concat(curr), []).filter(play => {
+    if (!playUUIDs.has(play.uuid)) {
+      playUUIDs.add(play.uuid);
+      return true;
+    }
+    return false;
+  }).sort((a, b) => parseDate(b.date) - parseDate(a.date));
+  return allPlays;
 }
 
 export const generateUniqueID = (existingIDs) => {
@@ -233,141 +233,6 @@ export const formatDate = (date, specificPortion) => {
 
   return completedDate;
 };
-
-export const defaultPlayers = [
-  {
-    "id": "1_Player_Billy_8:30_PM_8-26-2023_EDT_ontQ1dKae",
-    "ID": "1 Billy 8:30 PM 8-26-2023 EDT ontQ1dKae",
-    "uuid": "ontQ1dKae",
-    "uniqueIndex": 1,
-    "displayName": "Billy",
-    "active": true,
-    "xpModifier": 1,
-    "disabled": false,
-    "expanded": false,
-    "playerLink": false,
-    "name": "Billy",
-    "lastUpdatedBy": "1_Player_Billy_8:30_PM_8-26-2023_EDT_ontQ1dKae",
-    "plays": [],
-    "username": "Billy",
-    "created": "8:30 PM 8-26-2023 EDT",
-    "updated": "8:30 PM 8-26-2023 EDT",
-    "lastUpdated": "8:30 PM 8-26-2023 EDT",
-    "label": "1 Billy",
-    "level": {
-        "name": "Bronze Scimitar",
-        "num": 1
-    },
-    "roles": [
-        {
-            "promoted": "8:30 PM 8-26-2023 EDT",
-            "name": "Player",
-            "level": 1
-        }
-    ],
-    "experience": {
-        "nextLevelAt": 83,
-        "remainingXP": 83,
-        "arenaXP": 0,
-        "xp": 0
-    },
-    "wins": 0,
-    "losses": 0,
-    "percentage": 0,
-    "kills": 0,
-    "deaths": 0,
-    "kdRatio": 0,
-    "properties": 41
-  },
-  {
-    "id": "2_Player_Bob_8:30_PM_8-26-2023_EDT_C2kE3j323",
-    "ID": "2 Bob 8:30 PM 8-26-2023 EDT C2kE3j323",
-    "uuid": "C2kE3j323",
-    "uniqueIndex": 2,
-    "displayName": "Bob",
-    "active": true,
-    "xpModifier": 1,
-    "disabled": false,
-    "expanded": false,
-    "playerLink": false,
-    "name": "Bob",
-    "lastUpdatedBy": "2_Player_Bob_8:30_PM_8-26-2023_EDT_C2kE3j323",
-    "plays": [],
-    "username": "Bob",
-    "created": "8:30 PM 8-26-2023 EDT",
-    "updated": "8:30 PM 8-26-2023 EDT",
-    "lastUpdated": "8:30 PM 8-26-2023 EDT",
-    "label": "2 Bob",
-    "level": {
-        "name": "Bronze Scimitar",
-        "num": 1
-    },
-    "roles": [
-        {
-            "promoted": "8:30 PM 8-26-2023 EDT",
-            "name": "Player",
-            "level": 1
-        }
-    ],
-    "experience": {
-        "nextLevelAt": 83,
-        "remainingXP": 83,
-        "arenaXP": 0,
-        "xp": 0
-    },
-    "wins": 0,
-    "losses": 0,
-    "percentage": 0,
-    "kills": 0,
-    "deaths": 0,
-    "kdRatio": 0,
-    "properties": 41
-  },
-  {
-    "id": "3_Player_Joe_8:30_PM_8-26-2023_EDT_928q45L5k",
-    "ID": "3 Joe 8:30 PM 8-26-2023 EDT 928q45L5k",
-    "uuid": "928q45L5k",
-    "uniqueIndex": 3,
-    "displayName": "Joe",
-    "active": true,
-    "xpModifier": 1,
-    "disabled": false,
-    "expanded": false,
-    "playerLink": false,
-    "name": "Joe",
-    "lastUpdatedBy": "3_Player_Joe_8:30_PM_8-26-2023_EDT_928q45L5k",
-    "plays": [],
-    "username": "Joe",
-    "created": "8:30 PM 8-26-2023 EDT",
-    "updated": "8:30 PM 8-26-2023 EDT",
-    "lastUpdated": "8:30 PM 8-26-2023 EDT",
-    "label": "3 Joe",
-    "level": {
-        "name": "Bronze Scimitar",
-        "num": 1
-    },
-    "roles": [
-        {
-            "promoted": "8:30 PM 8-26-2023 EDT",
-            "name": "Player",
-            "level": 1
-        }
-    ],
-    "experience": {
-        "nextLevelAt": 83,
-        "remainingXP": 83,
-        "arenaXP": 0,
-        "xp": 0
-    },
-    "wins": 0,
-    "losses": 0,
-    "percentage": 0,
-    "kills": 0,
-    "deaths": 0,
-    "kdRatio": 0,
-    "properties": 41
-  }
-];
 
 export const getRGBAColorFromHue = (hue, alpha) => {
   const saturation = 1;
@@ -485,6 +350,141 @@ export const showAlert = async (title, component, width, height) => {
     }
   });
 }
+
+export const defaultPlayers = [
+  {
+    id: `1_Player_Billy_8:30_PM_8-26-2023_EDT_ontQ1dKae`,
+    ID: `1 Billy 8:30 PM 8-26-2023 EDT ontQ1dKae`,
+    uuid: `ontQ1dKae`,
+    uniqueIndex: 1,
+    displayName: `Billy`,
+    active: true,
+    xpModifier: 1,
+    disabled: false,
+    expanded: false,
+    playerLink: false,
+    name: `Billy`,
+    lastUpdatedBy: `1_Player_Billy_8:30_PM_8-26-2023_EDT_ontQ1dKae`,
+    plays: [],
+    username: `Billy`,
+    created: `8:30 PM 8-26-2023 EDT`,
+    updated: `8:30 PM 8-26-2023 EDT`,
+    lastUpdated: `8:30 PM 8-26-2023 EDT`,
+    label: `1 Billy`,
+    level: {
+      name: `Bronze Scimitar`,
+      num: 1
+    },
+    roles: [
+      {
+        promoted: `8:30 PM 8-26-2023 EDT`,
+        name: `Player`,
+        level: 1
+      }
+    ],
+    experience: {
+      nextLevelAt: 83,
+      remainingXP: 83,
+      arenaXP: 0,
+      xp: 0
+    },
+    wins: 0,
+    losses: 0,
+    percentage: 0,
+    kills: 0,
+    deaths: 0,
+    kdRatio: 0,
+    properties: 41
+  },
+  {
+    id: `2_Player_Bob_8:30_PM_8-26-2023_EDT_C2kE3j323`,
+    ID: `2 Bob 8:30 PM 8-26-2023 EDT C2kE3j323`,
+    uuid: `C2kE3j323`,
+    uniqueIndex: 2,
+    displayName: `Bob`,
+    active: true,
+    xpModifier: 1,
+    disabled: false,
+    expanded: false,
+    playerLink: false,
+    name: `Bob`,
+    lastUpdatedBy: `2_Player_Bob_8:30_PM_8-26-2023_EDT_C2kE3j323`,
+    plays: [],
+    username: `Bob`,
+    created: `8:30 PM 8-26-2023 EDT`,
+    updated: `8:30 PM 8-26-2023 EDT`,
+    lastUpdated: `8:30 PM 8-26-2023 EDT`,
+    label: `2 Bob`,
+    level: {
+      name: `Bronze Scimitar`,
+      num: 1
+    },
+    roles: [
+        {
+          promoted: `8:30 PM 8-26-2023 EDT`,
+          name: `Player`,
+          level: 1
+        }
+    ],
+    experience: {
+      nextLevelAt: 83,
+      remainingXP: 83,
+      arenaXP: 0,
+      xp: 0
+    },
+    wins: 0,
+    losses: 0,
+    percentage: 0,
+    kills: 0,
+    deaths: 0,
+    kdRatio: 0,
+    properties: 41
+  },
+  {
+    id: `3_Player_Joe_8:30_PM_8-26-2023_EDT_928q45L5k`,
+    ID: `3 Joe 8:30 PM 8-26-2023 EDT 928q45L5k`,
+    uuid: `928q45L5k`,
+    uniqueIndex: 3,
+    displayName: `Joe`,
+    active: true,
+    xpModifier: 1,
+    disabled: false,
+    expanded: false,
+    playerLink: false,
+    name: `Joe`,
+    lastUpdatedBy: `3_Player_Joe_8:30_PM_8-26-2023_EDT_928q45L5k`,
+    plays: [],
+    username: `Joe`,
+    created: `8:30 PM 8-26-2023 EDT`,
+    updated: `8:30 PM 8-26-2023 EDT`,
+    lastUpdated: `8:30 PM 8-26-2023 EDT`,
+    label: `3 Joe`,
+    level: {
+      name: `Bronze Scimitar`,
+      num: 1
+    },
+    roles: [
+        {
+          promoted: `8:30 PM 8-26-2023 EDT`,
+          name: `Player`,
+          level: 1
+        }
+    ],
+    experience: {
+      nextLevelAt: 83,
+      remainingXP: 83,
+      arenaXP: 0,
+      xp: 0
+    },
+    wins: 0,
+    losses: 0,
+    percentage: 0,
+    kills: 0,
+    deaths: 0,
+    kdRatio: 0,
+    properties: 41
+  }
+];
 
 export default function Xuruko({ Component, pageProps, router }) {
     let brwser = ``;

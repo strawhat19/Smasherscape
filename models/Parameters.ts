@@ -3,14 +3,15 @@ export default class Parameters {
     constructor(parameterObject: {
         command: any, 
         players: any, 
+        commands: any, 
         setPlayers: any, 
         useDatabase: any,
-        commandParams: any, 
+        commandParams: any,
         deleteCompletely: any, 
         databasePlayers?: any, 
         updatePlayersDB?: any,
         setFilteredPlayers?: any, 
-        sameNamePlayeredEnabled?: any,
+        sameNamePlayeredEnabled: any,
     }) {
       Object.assign(this, parameterObject);
     }

@@ -7,7 +7,7 @@ export default function CodeBlock(props) {
     let [clicked, setClicked] = useState(false);
     let [CMDClicked, setCMDClicked] = useState(false);
 
-    const { players, setPlayers, setFilteredPlayers, useDatabase, databasePlayers, sameNamePlayeredEnabled, deleteCompletely } = useContext<any>(StateContext);
+    const { players, setPlayers, setFilteredPlayers, useDatabase, databasePlayers, sameNamePlayeredEnabled, deleteCompletely, commands } = useContext<any>(StateContext);
 
     const handleCopyClick = (e, type?) => {
         if (type == `copy`) {
@@ -22,6 +22,7 @@ export default function CodeBlock(props) {
             const parameters = new Parameters({
                 command,
                 players, 
+                commands,
                 setPlayers, 
                 useDatabase, 
                 commandParams, 

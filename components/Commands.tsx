@@ -29,13 +29,13 @@ export const defaultCommands = {
     shortDescription: `Delete Player(s) from Leaderboard`,
     description: `Delete Player(s) from Leaderboard separated by spaces`,
   },
-  Reset: {
-    id: 4,
-    name: `Reset`,
-    command: `!res`,
-    triggers: [`!res`, `!reset`],
-    description: `Reset Leaderboard`,
-  },
+  // Reset: {
+  //   id: 4,
+  //   name: `Reset`,
+  //   command: `!res`,
+  //   triggers: [`!res`, `!reset`],
+  //   description: `Reset Leaderboard`,
+  // },
   Update: {
     id: 5,
     name: `Update`,
@@ -46,22 +46,22 @@ export const defaultCommands = {
     shortDescription: `Update Player(s) in Leaderboard`,
     example: `!upd winner vs loser with winChar vs loseChar stocksTakenFromWinner`,
   },
-  Set: {
-    id: 6,
-    name: `Set`,
-    command: `!set`,
-    triggers: [`!set`, `!change`],
-    example: `!set playerName (xp) amount`,
-    description: `Set Parameter for Player`,
-  },
-  Give: {
-    id: 7,
-    name: `Give`,
-    command: `!giv`,
-    triggers: [`!giv`, `!give`],
-    example: `!giv playerName (xp) amount`,
-    description: `Give Parameter to Player`,
-  },
+  // Set: {
+  //   id: 6,
+  //   name: `Set`,
+  //   command: `!set`,
+  //   triggers: [`!set`, `!change`],
+  //   example: `!set playerName (xp) amount`,
+  //   description: `Set Parameter for Player`,
+  // },
+  // Give: {
+  //   id: 7,
+  //   name: `Give`,
+  //   command: `!giv`,
+  //   triggers: [`!giv`, `!give`],
+  //   example: `!giv playerName (xp) amount`,
+  //   description: `Give Parameter to Player`,
+  // },
 };
 
 export function Commands(props) {

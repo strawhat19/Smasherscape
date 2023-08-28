@@ -9,7 +9,8 @@ import { useContext, useState, useEffect } from 'react';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
 import { getCharacterTitle, publicAssetLink } from './smasherscape';
-import { getAllCharacters, getUniqueCharactersPlayed, searchBlur } from './PlayerForm';
+import { getAllCharacters, getCharacterObjects, getUniqueCharactersPlayed, searchBlur } from './PlayerForm';
+import { Characters } from '../common/Characters';
 
 export const parseDate = (dateStr: any) => {
     const parts = dateStr.split(`, `);
@@ -102,25 +103,19 @@ function PlayerRecord(props) {
                     id: charIndex + 1,
                     key: char[0],
                     label: char[1],
-                    image: calcPlayerCharacterIcon(char[0])
+                    image: calcPlayerCharacterIcon(char[0]),
+                    shortcuts: Object.entries(Characters).filter(entry => entry[1] == char[1]).map(entr => entr[0]),
                 }
             })
         } else {
-            return getAllCharacters().map((char, charIndex) => {
-                return {
-                    id: charIndex + 1,
-                    key: char[0],
-                    label: char[1],
-                    image: calcPlayerCharacterIcon(char[0])
-                }
-            })
+            return getCharacterObjects();
         }
     }
 
   const calcWinLoseRatio = (playerOne, playerTwo) => {
-    let playerOneDB: Player = players.find(plyr => plyr?.name == playerOne || plyr?.name.toLowerCase().includes(playerOne));
-    let playerTwoDB: Player = players.find(plyr => plyr?.name == playerTwo || plyr?.name.toLowerCase().includes(playerTwo));
-    let plays: Play[] = playerOneDB.plays.filter(ply => ply?.winner == playerTwoDB.name || ply?.loser == playerTwoDB.name);
+    let playerOneDB: Player = players?.find(plyr => plyr?.name.toLowerCase() == playerOne.toLowerCase() || plyr?.name.toLowerCase().includes(playerOne));
+    let playerTwoDB: Player = players?.find(plyr => plyr?.name.toLowerCase() == playerTwo.toLowerCase() || plyr?.name.toLowerCase().includes(playerTwo));
+    let plays: Play[] = playerOneDB?.plays.filter(ply => ply?.winner == playerTwoDB?.name || ply?.loser == playerTwoDB?.name);
     let wins = plays.filter(ply => ply?.winner == playerOneDB?.name)?.length;
     let losses = plays.filter(ply => ply?.loser == playerOneDB?.name)?.length;
     let winRate = (wins/(wins+losses)) * 100;
