@@ -28,10 +28,9 @@ export const loseCons = [`loses-to`, `falls-to`, `defeated-by`, `destroyed-by`, 
 export const winCons = [`beat`, `beats`, `destroys`, `destroyed`, `defeats`, `defeated`, `conquers`, `crushes`, `kills`, `killed`];
 
 export const getPage = () => capitalizeAllWords(window.location.pathname.replace(`/`,``));
-
 export const replaceAll = (str, search, replacement) => str.replace(new RegExp(search, `g`), replacement);
-
 export const getCurrentPageName = () => window.location.hash.slice(window.location.hash.lastIndexOf(`/`)).replace(`/`, ``);
+export const detectIfMobile = () => (typeof window.orientation !== `undefined`) || (navigator.userAgent.indexOf(`IEMobile`) !== -1);
 
 export const capWords = (str) => {
   return str.replace(/\b\w/g, (match) => {

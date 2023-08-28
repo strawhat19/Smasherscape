@@ -128,10 +128,10 @@ export const isInvalid = (item) => {
 }
 
 export default function Smasherscape(props) {
-    const { filteredPlayers, players, noPlayersFoundMessage, devEnv, playersLoading } = useContext<any>(StateContext);
+    const { filteredPlayers, players, noPlayersFoundMessage, devEnv, playersLoading, command } = useContext<any>(StateContext);
 
     return <Main className={`smasherscapeLeaderboard`}>
-        <div>
+        <div className={`AdminArea ${command?.name}`}>
             {devEnv && getActivePlayers(players).length > 0 && <CommandsForm />}
             <PlayerForm />
         </div>

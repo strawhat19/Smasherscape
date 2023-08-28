@@ -6,7 +6,7 @@ export default function Form(props?: any) {
   const loadedRef = useRef(false);
   const [loaded, setLoaded] = useState(false);
   const [alertOpen, setAlertOpen] = useState(false); 
-  const { user, setUser, updates, setUpdates, authState, setAuthState, emailField, setEmailField, users, setFocus } = useContext<any>(StateContext);
+  const { user, setUser, updates, setUpdates, authState, setAuthState, emailField, setEmailField, users, setFocus, mobile } = useContext<any>(StateContext);
 
   const authForm = (e?: any) => {
     e.preventDefault();
@@ -105,9 +105,9 @@ export default function Form(props?: any) {
         console.log(`Sign Up Params`, {name, email, password});
         showAlert(`Whoah There!`, <div className={`formWarning`}>
           <h2 style={{fontSize: `1.5em`}}>
-            Ok so, I haven't quite put user authentication in yet, I will soon! For now, this is not supported yet, apologies!
+            {password == `` ? `Please enter a password` : `Ok so, I haven't quite put user authentication in yet, I will soon! For now, this is not supported yet, apologies!`}
           </h2>
-        </div>, `65%`, `auto`);
+        </div>, (mobile || window.innerWidth <= 768) ? `88%` : `45%`, (mobile || window.innerWidth <= 768) ? `60%` : `auto`);
         setEmailField(false);
         setAuthState(`Next`);
         // setAuthState(`Signed Up`);
@@ -170,7 +170,9 @@ export default function Form(props?: any) {
       </span>
     </div>
     {!user && <input placeholder="Email Address" type="email" name="email" autoComplete={`email`} required />}
-    {!user && emailField && <input placeholder="Password" type="password" name="password" autoComplete={`current-password`} />}
+    {!user && emailField && (
+      <input placeholder="Password" type="password" name="password" autoComplete={`current-password`} required />
+    )}
     {user && window?.location?.href?.includes(`profile`) && <input id="name" className={`name userData`} placeholder="Name" type="text" name="status" />}
     {user && window?.location?.href?.includes(`profile`) && <input id="status" className={`status userData`} placeholder="Status" type="text" name="status" />}
     {user && window?.location?.href?.includes(`profile`) && <input id="bio" className={`bio userData`} placeholder="About You" type="text" name="bio" />}

@@ -156,7 +156,7 @@ export default function CommandsForm(props) {
                 })}
             </ToggleButtonGroup>
         </div>
-        <ul className="commandsList commandToCopy">
+        <ul className={`commandsList commandToCopy ${command?.name}`}>
             <li className={`listedCommand`} title={renderCommand(command)}>
                 <div className="commandDetails flex gap15">
                     <CodeBlock commandToCopy={true} custombutton={true} border={`solid 2px white`} id={`commandToRender`} language={`js`} codeTitle={<>
@@ -323,7 +323,7 @@ export default function CommandsForm(props) {
                 <div className={`commandInputs ${command.command == `!giv` ? `expanded` : `collapsed`}`}>
                     Give Fields
                 </div>
-                <button className={`formSubmitButton`} type={`submit`}>Submit</button>
+                <button className={`formSubmitButton commandsFormSubmit`} type={`submit`}>Submit</button>
             </form>
         </section>
         </>

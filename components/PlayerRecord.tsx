@@ -151,6 +151,17 @@ function PlayerRecord(props) {
                         <span className={`blueText`}>Plays: <span className="whiteText">{plays?.length}</span></span>
                     </span>
                 </div>
+                {plays?.length > 0 && <div className={`playsContainer playerRecordPlaysContainer ${calcPlayerCharactersPlayed(plyr, false)?.length > 0 ? (calcPlayerCharactersPlayed(plyr, false)?.length >= 5 ? `populatedPlays moreThanFive` : `populatedPlays`) : ``}`}>
+                    {calcPlayerCharactersPlayed(plyr, false)?.length > 0 ? calcPlayerCharactersPlayed(plyr, false).map((char, charIndex) => {
+                        return (
+                            <Badge title={`Played ${getCharacterTitle(char)} ${calcPlayerCharacterTimesPlayed(plyr, char)} Time(s)`} key={charIndex} badgeContent={calcPlayerCharacterTimesPlayed(plyr, char)} color="primary">
+                                <img className={`charImg`} width={35} src={calcPlayerCharacterIcon(char)} alt={getCharacterTitle(char)} />
+                            </Badge>
+                        )
+                    }) : <div className={`flex center blackTextShadow slimmed`}>
+                        No Plays Yet
+                    </div>}
+                </div>}
                 {plyr?.plays?.length > 0 && <div className="flex white noShadow recordForms">
                     <form action="submit" className="gridForm recordForm">
                         <div className={`inputWrapper materialBGInputWrapper`}>
@@ -159,7 +170,12 @@ function PlayerRecord(props) {
                                 autoHighlight
                                 id={`recordPlayerSearch-${plyr.id}`}
                                 sx={{ width: `100%` }}
-                                options={players.filter(playr => playr.name != plyr.name && (plyr.plays.map(ply => ply.winner).includes(playr.name) || plyr.plays.map(ply => ply.loser).includes(playr.name)))}
+                                options={players.filter(playr => playr.name != plyr.name && (plyr.plays.map(ply => ply.winner).includes(playr.name) || plyr.plays.map(ply => ply.loser).includes(playr.name))).sort((a, b) => {
+                                    if (b.experience.arenaXP !== a.experience.arenaXP) {
+                                        return b.experience.arenaXP - a.experience.arenaXP;
+                                    }
+                                    return b.plays.length - a.plays.length;
+                                })}
                                 getOptionLabel={(option) => option.label}
                                 onChange={(e, val: any) => searchRecordPlayers(e, val)}
                                 onInputChange={(e, val: any) => searchRecordPlayers(e, val)}
@@ -195,21 +211,10 @@ function PlayerRecord(props) {
                                 }}
                             />
                         </div>
-                        <button className={`formSubmitButton`} type={`submit`}>Submit</button>
+                        <button className={`formSubmitButton recordFormSubmit`} type={`submit`}>Submit</button>
                     </form>
                 </div>}
             </h3>
-            {plays?.length > 0 && <div className={`playsContainer playerRecordPlaysContainer ${calcPlayerCharactersPlayed(plyr, false)?.length > 0 ? `populatedPlays` : ``}`}>
-                {calcPlayerCharactersPlayed(plyr, false)?.length > 0 ? calcPlayerCharactersPlayed(plyr, false).map((char, charIndex) => {
-                    return (
-                        <Badge title={`Played ${getCharacterTitle(char)} ${calcPlayerCharacterTimesPlayed(plyr, char)} Time(s)`} key={charIndex} badgeContent={calcPlayerCharacterTimesPlayed(plyr, char)} color="primary">
-                            <img className={`charImg`} width={35} src={calcPlayerCharacterIcon(char)} alt={getCharacterTitle(char)} />
-                        </Badge>
-                    )
-                }) : <div className={`flex center blackTextShadow slimmed`}>
-                    No Plays Yet
-                </div>}
-            </div>}
             {plays?.length > 0 ? plays.map((ply, plyIndex) => {
                 let isWinner = ply?.winner == plyr?.name;
                 return (

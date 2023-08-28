@@ -771,7 +771,7 @@ export default function PlayerForm(props) {
                 />
             </div>
         </>}
-        <button className={`formSubmitButton`} type={`submit`}>Submit</button>
+        <button className={`formSubmitButton playerFormSubmit`} type={`submit`}>Submit</button>
     </form>
 </section>
 }

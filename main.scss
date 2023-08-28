@@ -328,6 +328,7 @@ article {
         width: 100%;
         display: flex;
         max-height: 18px;
+        text-align: center;
         flex-direction: row;
         align-items: center;
         max-width: fit-content;
@@ -335,6 +336,7 @@ article {
         transform-origin: center !important;
         .spinner {
             font-size: 18px;
+            text-align: center;
             max-width: fit-content;
             transition: var(--transition);
             animation: spin 1s linear infinite;
