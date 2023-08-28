@@ -1,10 +1,11 @@
 import React from 'react';
+import { useDB } from './pages/_app';
 import Form from './components/Form';
 import Footer from './components/footer';
 import NavIcons from './components/NavIcons';
+// import { generateUniqueID } from './pages/_app';
 import { DocsThemeConfig } from 'nextra-theme-docs';
-import NextraSearch from './components/NextraSearch';
-import { generateUniqueID } from './pages/_app';
+// import NextraSearch from './components/NextraSearch';
 
 const config: DocsThemeConfig = {
   primaryHue: 195, // Sky Blue
@@ -40,18 +41,22 @@ const config: DocsThemeConfig = {
     // extraContent: <NextraSearch />
   // },
   search: {
-    // placeholder: `Search...`,
-    component: <>
-    <div className={`navIconsContainer`}>
-      <NavIcons />
-    </div>
-    <div className={`navFormDiv`} style={{order: 0, display: `flex`, flexDirection: `row`, gridGap: 15, justifyContent: `space-between`, alignItems: `center`}}>
-      <section className={`navFormSection`} style={{margin: 0, position: `relative`}}>
-        <Form className={`navForm`} style={{display: `flex`, flexDirection: `row`}} />
-      </section>
-      <NavIcons />
-    </div>
-    </>,
+    ...(useDB() == false && {
+      placeholder: `Search...`,
+    }),
+    ...(useDB() == true && {
+      component: <>
+        <div className={`navIconsContainer`}>
+          <NavIcons />
+        </div>
+        <div className={`navFormDiv`} style={{order: 0, display: `flex`, flexDirection: `row`, gridGap: 15, justifyContent: `space-between`, alignItems: `center`}}>
+          <section className={`navFormSection`} style={{margin: 0, position: `relative`}}>
+            <Form className={`navForm`} style={{display: `flex`, flexDirection: `row`}} />
+          </section>
+          <NavIcons />
+        </div>
+      </>
+    }),
   },
   docsRepositoryBase: 'https://github.com/strawhat19/Smasherscape/',
   footer: {

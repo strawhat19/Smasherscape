@@ -13,6 +13,7 @@ html, body {
 :root {
     --red: #f63460;
     --authFormHeight: 20px;
+    --googleButtonWidth: 15px;
     --tw-ring-color: #007aa3;
     --autocompleteMaxWidth: 435px;
     --smasherscapeYellow: #fcfc05;
@@ -778,10 +779,42 @@ form {
                     width: 20%;
                 }
                 &[type="email"] {
-                    width: calc(60% - 40px);
+                    width: calc((60% - 40px) - var(--googleButtonWidth));
                 }
                 &[type="password"] {
-                    width: calc(40% - 40px);
+                    width: calc((40% - 40px) - var(--googleButtonWidth));
+                }
+            }
+        }
+        .navFormDiv {
+            .navFormSection {
+                &:has(.userSignedIn) {
+                    min-width: 100%;
+                    form {
+                        &.userSignedIn {
+                            display: flex;
+                            align-items: center;
+                            max-width: fit-content;
+                            justify-content: flex-end;
+                            flex-direction: row-reverse !important;
+                            .customUserSection {
+                                padding-left: 10px;
+                                max-width: fit-content;
+                            }
+                            input {
+                                &[type="submit"] {
+                                    top: 0;
+                                    width: 100%;
+                                }
+                                // &[type="email"] {
+                                //     width: calc((60% - 40px) - var(--googleButtonWidth));
+                                // }
+                                // &[type="password"] {
+                                //     width: calc((40% - 40px) - var(--googleButtonWidth));
+                                // }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -850,11 +883,11 @@ form {
             &[type="email"], &[type="password"] {
                 font-size: 14px;
                 padding: 10px 12px;
-                width: calc(100% - 50px);
                 border: 3px solid black;
                 color: black !important;
                 border-radius: 8px !important;
                 background: rgba(255, 255, 255, 0.65) !important;
+                width: calc((100% - 70px) - var(--googleButtonWidth));
                 &:focus-visible {
                     outline: none;
                     box-shadow: 2px 2px 0 0 var(--tw-ring-color), -2px 2px 0 0 var(--tw-ring-color), 2px -2px 0 0 var(--tw-ring-color), -2px -2px 0 0 var(--tw-ring-color), 0px 0px 0 0 var(--tw-ring-color) !important;
@@ -1430,6 +1463,50 @@ div[role="presentation"] {
     position: relative;
     max-width: 265px;
     top: -2px;
+}
+
+// Google Button
+.customUserSection {
+    img {
+        z-index: 1;
+        max-width: 25px;
+        max-height: 25px;
+    }
+    max-width: fit-content;
+    div {
+        &[role="button"] {
+            &[type="dark"] {
+                z-index: 0;
+                top: -5px;
+                right: 5px;
+                max-width: 25px;
+                max-height: 25px;
+                position: relative;
+                flex-direction: row;
+                align-items: center;
+                display: flex !important;
+                box-shadow: none !important;
+                width: max-content !important;
+                justify-content: space-between;
+                border-radius: 100px !important;
+                background: transparent !important;
+                @media (max-width: 768px) {
+                    top: -1px;
+                }
+                div {
+                    max-width: 25px;
+                    max-height: 25px;
+                    align-items: center;
+                    justify-content: center;
+                    display: flex !important;
+                    border-radius: 100px !important;
+                }
+                span {
+                    display: none;
+                }
+            }
+        }
+    }
 }
 
 @media (max-width: 1500px) {

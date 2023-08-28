@@ -1,14 +1,136 @@
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
+import { capitalizeAllWords, StateContext, showAlert, countPropertiesInObject, formatDate } from '../pages/_app';
 import { useContext, useEffect, useRef, useState } from 'react';
-import { capitalizeAllWords, StateContext, showAlert } from '../pages/_app';
+import { addPlayerToDB, addUserToDB, createPlayer } from './PlayerForm';
+import { auth, googleProvider } from '../firebase';
+import PasswordRequired from './PasswordRequired';
+import GoogleButton from 'react-google-button';
+import User from '../models/User';
+import Role from '../models/Role';
+import Player from '../models/Player';
+
+export const formatDateFromFirebase = (timestamp) => {
+  let date;
+  if (typeof timestamp === `number`) {
+    date = new Date(timestamp * 1000);
+  } else {
+    date = new Date(timestamp);
+  }
+  date.setHours(date.getHours() - 5);
+  const options = { weekday: `short`, year: `numeric`, month: `short`, day: `numeric`, hour: `2-digit`, minute: `2-digit`, second: `2-digit`, hour12: true };
+  const formattedDate = date.toLocaleString(`en-US`, options);
+  return `${formattedDate} EST`;
+}
+
+export const createUserFromFirebaseData = (userCredential, type?, name?) => {
+  const firebaseUser = userCredential.user;
+  let currentDateTimeStamp = formatDate(new Date());
+  let { uid, email, emailVerified, photoURL } = firebaseUser;
+  let { creationTime, lastSignInTime } = firebaseUser.metadata;
+  let { lastRefreshAt, passwordHash, passwordUpdatedAt, validSince } = firebaseUser.reloadUserInfo;
+  let createdUser: User = {
+    uid,
+    type,
+    email,
+    id: uid,
+    uuid: uid,
+    source: type,
+    emailVerified,
+    // firebaseUser,
+    playerLink: true,
+    // userCredential,
+    updated: currentDateTimeStamp,
+    lastUpdated: currentDateTimeStamp,
+    created: formatDateFromFirebase(creationTime),
+    validSince: formatDateFromFirebase(validSince),
+    lastRefresh: formatDateFromFirebase(lastRefreshAt),
+    lastSignIn: formatDateFromFirebase(lastSignInTime),
+    ...(type == `Firebase` && {
+      name,
+      password: passwordHash,
+      passwordUpdatedAt: formatDateFromFirebase(passwordUpdatedAt),
+    }),
+    ...(type == `Google` && {
+      image: photoURL,
+    }),
+  }
+  return createdUser;
+}
+
+export const signInWithGoogle = async (databasePlayers, setUser, setAuthState) => {
+  try {
+    let createdGoogleUserFromFirebaseData = null;
+    let userCredential = await signInWithPopup(auth, googleProvider);
+    if (userCredential) createdGoogleUserFromFirebaseData = createUserFromFirebaseData(userCredential, `Google`);
+    
+    if (createdGoogleUserFromFirebaseData != null) {
+      console.log(`Pre User Signed In With Google`, {userCredential, createdGoogleUserFromFirebaseData});
+      let name = capitalizeAllWords(createdGoogleUserFromFirebaseData?.email.split(`@`)[0]);
+      let namesToAdd = [name];
+      namesToAdd.forEach((usr, usrIndex) => {
+        let userPlayerData = createPlayer(usr, usrIndex, databasePlayers);
+        let { uid, email, image, firebaseUserData, playerLink, emailVerified, source, type, validSince, lastRefresh, lastSignIn } = createdGoogleUserFromFirebaseData;
+
+        let playerUserData: any = {
+          ...userPlayerData,
+          uid,
+          type,
+          email,
+          image,
+          source,
+          validSince,
+          playerLink,
+          lastSignIn,
+          lastRefresh,
+          emailVerified,
+          firebaseUserData,
+          roles: userPlayerData.roles.filter((rol: Role) => rol.level == 2).length > 0 ? userPlayerData.roles : [
+            ...userPlayerData.roles, {
+              level: 2,
+              name: `User`,
+              promoted: userPlayerData.created,
+            }
+          ],
+        };
+
+        playerUserData.properties = countPropertiesInObject(playerUserData);
+
+        createdGoogleUserFromFirebaseData = {
+          ...createdGoogleUserFromFirebaseData,
+          uniqueIndex: playerUserData?.uniqueIndex,
+          roles: playerUserData?.roles,
+          uuid: playerUserData?.uuid,
+          ID: playerUserData?.ID,
+          id: playerUserData?.id,
+        }
+
+        createdGoogleUserFromFirebaseData.properties = countPropertiesInObject(createdGoogleUserFromFirebaseData);
+
+        console.log(`User`, {player: playerUserData, user: createdGoogleUserFromFirebaseData});
+        addPlayerToDB(playerUserData);
+        addUserToDB(createdGoogleUserFromFirebaseData);
+        setAuthState(`Sign Out`);
+        setUser(createdGoogleUserFromFirebaseData);
+      })
+    }
+  } catch (error) {
+    if (error.code === `auth/popup-closed-by-user`) {
+      console.log(`User closed Google sign in popup`);
+    } else {
+      console.log(`Error Signing into Google`, error);
+    }
+  }
+}
 
 export default function Form(props?: any) {
   const { style } = props;
   const loadedRef = useRef(false);
   const [loaded, setLoaded] = useState(false);
-  const [alertOpen, setAlertOpen] = useState(false); 
-  const { user, setUser, updates, setUpdates, authState, setAuthState, emailField, setEmailField, users, setFocus, mobile } = useContext<any>(StateContext);
+  const [alertOpen, setAlertOpen] = useState(false);
+  const { user, setUser, updates, setUpdates, authState, setAuthState, emailField, setEmailField, users, setFocus, mobile, databasePlayers } = useContext<any>(StateContext);
 
   const authForm = (e?: any) => {
+    console.log(`Pre User`, user);
     e.preventDefault();
     let formFields = e.target.children;
     let clicked = e?.nativeEvent?.submitter;
@@ -20,20 +142,8 @@ export default function Form(props?: any) {
         console.log(clicked?.value);
         break;
       case `Next`:
-        // getDocs(collection(db, `users`)).then((snapshot) => {
-        //   let latestUsers = snapshot.docs.map((doc: any) => doc.data()).sort((a: any, b: any) => b?.highScore - a?.highScore);
-        //   let macthingEmails = latestUsers.filter((usr: any) => usr?.email.toLowerCase() == email.toLowerCase());
-        //   setUsers(latestUsers);
-        // let arr = [];
-        // setEmailField(true);
-        // if (arr.length > 0) {
-        //   // localStorage.setItem(`account`, JSON.stringify(macthingEmails[0]));
-          // setAuthState(`Sign In`);
-        // } else {
-          setEmailField(true);
-          setAuthState(`Sign Up`);
-        // }
-        // });
+        setEmailField(true);
+        setAuthState(`Sign Up`);
         break;
       case `Back`:
         setUpdates(updates+1);
@@ -45,20 +155,11 @@ export default function Form(props?: any) {
         setAuthState(`Next`);
         setEmailField(false);
         setUpdates(updates+1);
-        // localStorage.removeItem(`user`);
-        // localStorage.removeItem(`users`);
-        // localStorage.removeItem(`lists`);
-        // localStorage.removeItem(`score`);
-        // localStorage.removeItem(`health`);
-        // localStorage.removeItem(`account`);
-        // localStorage.removeItem(`highScore`);
         break;
       case `Save`:
         let emptyFields = [];
         let fieldsToUpdate = [];
-
-        console.log(formFields);
-
+        console.log(`Save`, formFields);
         for (let i = 0; i < formFields.length; i++) {
           const input = formFields[i];
           if (input?.classList?.contains(`userData`)) {
@@ -69,90 +170,62 @@ export default function Form(props?: any) {
             }
           }
         }
-
         if (fieldsToUpdate.length == 0) {
           showAlert(`The Form was NOT Saved.`, `You Can Fill`, emptyFields);
         } else {
-            console.log(`Fields To Update`, fieldsToUpdate);
-        //   let updatedUser = { ...user, updated: formatDate(new Date()) };
-        //   Object.assign(updatedUser, ...([...fieldsToUpdate].map(input => {
-        //     if (input?.classList?.contains(`userData`)) {
-        //       if (input?.id == `bio`) setContent(formFields?.bio?.value);
-        //       return {[input.id]: input.value}
-        //     }
-        //   })));
-          // addOrUpdateUser(user?.id, updatedUser);
+          console.log(`Fields To Update`, fieldsToUpdate);
         }
         break;
       case `Sign In`:
-
         if (password == ``) {
-          showAlert(`Password Required`);
-        } else { // Successful Sign In
-        //   if (password == existingAccount?.password) {
+          showAlert(`Password Required`, <PasswordRequired />, (mobile || window.innerWidth <= 768) ? `88%` : `55%`, (mobile || window.innerWidth <= 768) ? `60%` : `auto`);
+          return;
+        } else { // Sign User In
+          signInWithEmailAndPassword(auth, email, password).then((userCredential: any) => {
+            let existingUser = createUserFromFirebaseData(userCredential, `Firebase`);
+            console.log(`User Signed In`, existingUser);
             setFocus(false);
             setAuthState(`Sign Out`);
-            // setUser(existingAccount);
-            // setColor((existingAccount?.color || `#000000`));
-            // getDocs(collection(db, `users`)).then((snapshot) => setUsers(snapshot.docs.map((doc: any) => doc.data()).sort((a: any, b: any) => b?.highScore - a?.highScore)));
-        //   } else {
-            // showAlert(`Invalid Password`);
-        //   }
+            setUser(existingUser);
+          }).catch((error) => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            showAlert(`<div class="loadingMessage"><h3>${errorMessage}</h3></div>`, `50%`, `35%`);
+            console.log(`Error Signing In`, {
+              error,
+              errorCode,
+              errorMessage
+            });
+            return;
+          });
         }
         break;
       case `Sign Up`:
         let name = capitalizeAllWords(email.split(`@`)[0]);
-        console.log(`Sign Up Params`, {name, email, password});
-        showAlert(`Whoah There!`, <div className={`formWarning`}>
-          <h2 style={{fontSize: `1.5em`}}>
-            {password == `` ? `Please enter a password` : `Ok so, I haven't quite put user authentication in yet, I will soon! For now, this is not supported yet, apologies!`}
-          </h2>
-        </div>, (mobile || window.innerWidth <= 768) ? `88%` : `45%`, (mobile || window.innerWidth <= 768) ? `60%` : `auto`);
-        setEmailField(false);
-        setAuthState(`Next`);
-        // setAuthState(`Signed Up`);
+        if (password == ``) {
+          showAlert(`Password Required`, <PasswordRequired />, (mobile || window.innerWidth <= 768) ? `88%` : `55%`, (mobile || window.innerWidth <= 768) ? `60%` : `auto`);
+          return;
+        } else {
+          console.log(`Sign Up Params`, {name, email, password});
+          createUserWithEmailAndPassword(auth, email, password).then((userCredential: any) => {
+            let newUser = createUserFromFirebaseData(userCredential, `Firebase`);
+            console.log(`User Signed Up`, newUser);
 
-        // getDocs(collection(db, `users`)).then((snapshot) => {
-        //   let latestUsers = snapshot.docs.map((doc: any) => doc.data());
-        //   let macthingEmails = latestUsers.filter((usr: any) => usr?.email.toLowerCase() == email.toLowerCase());
-        //   setUsers(latestUsers);
-        //   if (macthingEmails.length > 0) {
-        //     localStorage.setItem(`account`, JSON.stringify(macthingEmails[0]));
-        //     setAuthState(`Sign In`);
-        //   } else {
-        //     setAuthState(`Sign Up`);
-        //   }
-
-        //   let password = formFields?.password?.value;
-        //   if (password == ``) {
-        //     showAlert(`Password Required`);
-        //   } else {
-        //     setFocus(false);
-        //     let storedHighScore = JSON.parse(localStorage.getItem(`highScore`) as any);
-        //     let potentialUser = { 
-        //       id: users.length + 1, 
-        //       bio: ``,
-        //       color: ``, 
-        //       number: 0,
-        //       status: ``,
-        //       name: name, 
-        //       email: email,
-        //       roles: [`user`],
-        //       password: password, 
-        //       lists: defaultLists,
-        //       updated: formatDate(new Date()), 
-        //       lastSignin: formatDate(new Date()), 
-        //       registered: formatDate(new Date()), 
-        //       highScore: Math.floor(storedHighScore) || 0,
-        //     };
-  
-        //     let uuid = genUUID(latestUsers, potentialUser);
-        //     // addOrUpdateUser(uuid, potentialUser);
-        //     getDocs(collection(db, `users`)).then((snapshot) => setUsers(snapshot.docs.map((doc: any) => doc.data()).sort((a: any, b: any) => b?.highScore - a?.highScore)));
-        //     setAuthState(`Sign Out`);
-        //   }
-        // });
-        break;
+            setAuthState(`Signed Up`);
+            setUser(newUser);
+          }).catch((error) => {
+            const errorMessage = error.message;
+            if (errorMessage) {
+              if (errorMessage.includes(`email-already-in-use`)) {
+                setAuthState(`Sign In`);
+              } else {
+                showAlert(`<div class="loadingMessage"><h3>${errorMessage}</h3></div>`, `50%`, `35%`);
+              }                  
+            }
+            return;
+          });
+        }
+      break;
     };
   }
 
@@ -163,15 +236,15 @@ export default function Form(props?: any) {
   }, [user, users, authState]);
 
   return <>
-  <form id={props.id} onSubmit={authForm} className={`flex authForm ${props.className} ${authState == `Sign Up` || authState == `Sign In` ? `threeInputs` : ``}`} style={style}>
-    <div className={`authStateForm`}>
+  <form id={props.id} onSubmit={authForm} className={`flex authForm ${props.className} ${authState == `Sign Up` || authState == `Sign In` ? `threeInputs` : ``} ${user ? `userSignedIn` : `userSignedOut`}`} style={style}>
+    {!user && <div className={`authStateForm`}>
       <span className={`authFormLabel`}>
         <span className={`authFormPhrase`}>{authState == `Next` ? `Sign Up or Sign In` : authState}</span>
       </span>
-    </div>
+    </div>}
     {!user && <input placeholder="Email Address" type="email" name="email" autoComplete={`email`} required />}
     {!user && emailField && (
-      <input placeholder="Password" type="password" name="password" autoComplete={`current-password`} required />
+      <input placeholder="Password" type="password" name="password" autoComplete={`current-password`} />
     )}
     {user && window?.location?.href?.includes(`profile`) && <input id="name" className={`name userData`} placeholder="Name" type="text" name="status" />}
     {user && window?.location?.href?.includes(`profile`) && <input id="status" className={`status userData`} placeholder="Status" type="text" name="status" />}
@@ -180,6 +253,12 @@ export default function Form(props?: any) {
     {user && window?.location?.href?.includes(`profile`) && <input id="password" className={`editPassword userData`} placeholder="Edit Password" type="password" name="editPassword" autoComplete={`current-password`} />}
     <input className={(user && window?.location?.href?.includes(`profile`) || (authState == `Sign In` || authState == `Sign Up`)) ? `submit half` : `submit full`} type="submit" name="authFormSubmit" value={user ? `Sign Out` : authState} />
     {/* {(authState == `Sign In` || authState == `Sign Up`) && <input id={`back`} className={`back`} type="submit" name="authFormBack" value={`Back`} />} */}
+    {!user && <div title={`Sign In With Google`} className={`customUserSection`}>
+      <GoogleButton onClick={(e) => signInWithGoogle(databasePlayers, setUser, setAuthState)} type="dark" />
+    </div>}
+    {user && <div title={`Sign In With Google`} className={`customUserSection`}>
+      {user?.image ? <img alt={user?.email} src={user?.image}  className={`googleImage`} /> : user?.name?.split[``][0].toUpperCase()}
+    </div>}
     {user && window?.location?.href?.includes(`profile`) && <input id={user?.id} className={`save`} type="submit" name="authFormSave" style={{padding: 0}} value={`Save`} />}
     </form>
   </>

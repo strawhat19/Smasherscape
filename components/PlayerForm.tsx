@@ -2,6 +2,7 @@ import  moment from 'moment';
 import { db } from '../firebase';
 import Play from '../models/Play';
 import Role from '../models/Role';
+import User from '../models/User';
 import Stock from '../models/Stock';
 import Level from '../models/Level';
 import Player from '../models/Player';
@@ -23,6 +24,11 @@ import { getActivePlayers, isInvalid, newPlayerType } from './smasherscape';
 import { calcPlayerDeaths, calcPlayerKDRatio, calcPlayerKills, removeTrailingZeroDecimal } from './PlayerRecord';
 import { StateContext, showAlert, formatDate, generateUniqueID, countPropertiesInObject, getActivePlayersJSON, useDatabaseName, getAllPlays, getAllPlaysJSON, defaultXPMultiplier, XPGainOnWin, XPGainOnLoserXPForEachStockTaken, winCons, loseCons } from '../pages/_app';
 
+export const testUsersDatabaseName = `testUsers`;
+export const productionUsersDatabaseName = `users`;
+export const developmentUsersDatabaseName = `devUsers`;
+export const usersDatabaseName = developmentUsersDatabaseName;
+export const addUserToDB = async (userObj: any) => await setDoc(doc(db, usersDatabaseName, userObj?.ID), userObj);
 export const deletePlayerFromDB = async (playerObj: Player) => await deleteDoc(doc(db, useDatabaseName, playerObj?.ID));
 export const addPlayerToDB = async (playerObj: Player) => await setDoc(doc(db, useDatabaseName, playerObj?.ID), playerObj);
 export const updatePlayerInDB = async (playerObj: Player, parameters) => await updateDoc(doc(db, useDatabaseName, playerObj?.ID), parameters);
@@ -128,9 +134,9 @@ export const createPlayer = (playerName, playerIndex, databasePlayers): Player =
         plays: [] as Play[],
         type: `Smasherscape`,
         username: displayName,
-        xpModifier: defaultXPMultiplier,
         created: currentDateTimeStamp,
         updated: currentDateTimeStamp,
+        xpModifier: defaultXPMultiplier,
         lastUpdated: currentDateTimeStamp,
         label: `${uniqueIndex} ${displayName}`,
         level: {
@@ -744,7 +750,7 @@ export default function PlayerForm(props) {
         </>}
         {devEnv && <div id={`commandsInput`} className={`inputWrapper`}>
             <div className="inputBG"></div>
-            <input ref={commandsInput} type="text" className="commands" name={`commands`} placeholder={getActivePlayers(players).length > 0 ? `Enter Commands...` : `!add name to add players`} />
+            <input ref={commandsInput} type="text" className="commands" name={`commands`} placeholder={getActivePlayers(players).length > 0 ? `Enter Commands...` : `!add name to add players or sign up`} />
         </div>}
         {(getActivePlayers(players).length > 0 && getAllPlays(getActivePlayers(players)).length > 0) && <>
             <div className={`characterSearchAuto inputWrapper materialBGInputWrapper`}>

@@ -1,7 +1,7 @@
 import Parameters from '../models/Parameters';
 import { StateContext } from '../pages/_app';
-import { processCommandsWithParameters, updatePlayersDB } from './PlayerForm';
 import React, { useState, useContext } from 'react';
+import { processCommandsWithParameters, updatePlayersDB } from './PlayerForm';
 
 export default function CodeBlock(props) {
     let [clicked, setClicked] = useState(false);

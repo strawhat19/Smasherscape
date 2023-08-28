@@ -6,12 +6,12 @@ import Level from '../models/Level';
 import Player from '../models/Player';
 import PlayerForm from './PlayerForm';
 import CommandsForm from './CommandsForm';
+import LoadingSpinner from './LoadingSpinner';
 import Experience from '../models/Experience';
 import { Characters } from '../common/Characters';
 import { StateContext, getActivePlayersJSON } from '../pages/_app';
 import PlayerCard, { calcPlayerLosses, calcPlayerWins } from './PlayerCard';
 import { calcPlayerDeaths, calcPlayerKDRatio, calcPlayerKills, parseDate, removeTrailingZeroDecimal } from './PlayerRecord';
-import LoadingSpinner from './LoadingSpinner';
 
 export const publicAssetLink = `https://github.com/strawhat19/Smasherscape/blob/main`;
 export const calcPlayerCharacterTimesPlayed = (plyr: Player, char) => plyr.plays.map(ply => ply.character).filter(charPlayed => charPlayed.toLowerCase() == char || charPlayed.toLowerCase().includes(char)).length;

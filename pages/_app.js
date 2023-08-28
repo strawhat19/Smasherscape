@@ -10,11 +10,12 @@ import { newPlayerType } from '../components/smasherscape';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { createContext, useRef, useState, useEffect } from 'react';
 
+export const useDB = () => false;
 export const StateContext = createContext({});
 export const productionPlayersCollectionName = `players`;
 export const developmentPlayersCollectionName = `devPlayers`;
 export const testingPlayersCollectionName = `testPlayers`;
-export const useDatabaseName = productionPlayersCollectionName;
+export const useDatabaseName = developmentPlayersCollectionName;
 
 export const defaultWinXP = 400;
 export const testingWinXP = 1000;
@@ -541,8 +542,8 @@ export default function Xuruko({ Component, pageProps, router }) {
     let [noPlayersFoundMessage, setNoPlayersFoundMessage] = useState(`No Players Found`);
     let [commandsToNotInclude, setCommandsToNotInclude] = useState([`!com`, `!add`, `!res`, `!set`, `!giv`]);
 
-    let [useDatabase, setUseDatabase] = useState(true);
     let [useLazyLoad, setUseLazyLoad] = useState(false);
+    let [useDatabase, setUseDatabase] = useState(useDB());
     let [useLocalStorage, setUseLocalStorage] = useState(true);
 
     const setBrowserUI = () => {
@@ -561,6 +562,16 @@ export default function Xuruko({ Component, pageProps, router }) {
       } else if (brwser == `` && navigator.userAgent.match(/opr\//i)) {
         brwser = `opera`;
         setBrowser(`opera`);
+      }
+    }
+
+    const setCommandsToShow = (players) => {
+      if (getActivePlayersJSON(players).length < 2) {
+        setCommand(defaultCommands.Delete);
+        setCommandsToNotInclude([`!com`, `!add`, `!res`, `!set`, `!giv`, `!upd`]);
+      } else {
+        setCommand(defaultCommands.Update);
+        setCommandsToNotInclude([`!com`, `!add`, `!res`, `!set`, `!giv`]);
       }
     }
 
@@ -605,13 +616,7 @@ export default function Xuruko({ Component, pageProps, router }) {
           setFilteredPlayers(getActivePlayersJSON(playersFromDatabase));
           localStorage.setItem(`players`, JSON.stringify(playersFromDatabase));
   
-          if (getActivePlayersJSON(playersFromDatabase).length < 2) {
-            setCommand(defaultCommands.Delete);
-            setCommandsToNotInclude([`!com`, `!add`, `!res`, `!set`, `!giv`, `!upd`]);
-          } else {
-            setCommand(defaultCommands.Update);
-            setCommandsToNotInclude([`!com`, `!add`, `!res`, `!set`, `!giv`]);
-          }
+          setCommandsToShow(playersFromDatabase);
         });
   
         return () => {
@@ -623,11 +628,13 @@ export default function Xuruko({ Component, pageProps, router }) {
           if (useDatabase != true) {
             setPlayersLoading(false); 
             setPlayers(storedPlayers);
-            setFilteredPlayers(storedPlayers);
+            setCommandsToShow(storedPlayers);
+            setFilteredPlayers(getActivePlayersJSON(storedPlayers));
           }
         } else {
           setPlayersLoading(false); 
           setPlayers(defaultPlayers);
+          setCommandsToShow(playersFromDatabase);
           setFilteredPlayers(getActivePlayersJSON(defaultPlayers));
         }
       }

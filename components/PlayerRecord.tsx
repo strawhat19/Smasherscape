@@ -1,17 +1,17 @@
 import Play from '../models/Play';
+import { Badge } from '@mui/material';
 import Player from '../models/Player';
 import PlayerOption from './PlayerOption';
 import { StateContext } from '../pages/_app';
 import TextField from '@mui/material/TextField';
 import CharacterOption from './CharacterOption';
+import { Characters } from '../common/Characters';
 import Autocomplete from '@mui/material/Autocomplete';
 import { useContext, useState, useEffect } from 'react';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
-import { calcPlayerCharacterTimesPlayed, calcPlayerCharactersPlayed, getCharacterTitle, publicAssetLink } from './smasherscape';
 import { getAllCharacters, getCharacterObjects, getUniqueCharactersPlayed, searchBlur } from './PlayerForm';
-import { Characters } from '../common/Characters';
-import { Badge } from '@mui/material';
+import { calcPlayerCharacterTimesPlayed, calcPlayerCharactersPlayed, getCharacterTitle, publicAssetLink } from './smasherscape';
 
 export const parseDate = (dateStr: any) => {
     const parts = dateStr.split(`, `);
