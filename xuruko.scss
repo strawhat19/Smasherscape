@@ -756,8 +756,11 @@ form {
                 &[type="submit"] {
                     width: 20%;
                 }
-                &[type="email"], &[type="password"] {
-                    width: calc(50% - 40px);
+                &[type="email"] {
+                    width: calc(60% - 40px);
+                }
+                &[type="password"] {
+                    width: calc(40% - 40px);
                 }
             }
         }

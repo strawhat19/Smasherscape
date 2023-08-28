@@ -580,7 +580,10 @@ export const updatePlayersWithParameters = (parameters: Parameters) => {
 export const processCommandsWithParameters = (parameters: Parameters) => {
     let {
         command,
+        // setLoadingPlayers
     } = parameters as Parameters;
+
+    // setLoadingPlayers(true);
 
     let commandParams = command.split(` `);
     let firstCommand = commandParams[0];
@@ -607,7 +610,7 @@ export default function PlayerForm(props) {
 
     const searchInput = useRef();
     const commandsInput = useRef();
-    const { players, setPlayers, filteredPlayers, setFilteredPlayers, devEnv, useDatabase, commands, databasePlayers, sameNamePlayeredEnabled, deleteCompletely, noPlayersFoundMessage } = useContext<any>(StateContext);
+    const { players, setPlayers, filteredPlayers, setFilteredPlayers, devEnv, useDatabase, commands, databasePlayers, sameNamePlayeredEnabled, deleteCompletely, setLoadingPlayers } = useContext<any>(StateContext);
 
     useEffect(() => {
         if (getActivePlayers(players).length > 0) {
@@ -634,6 +637,7 @@ export default function PlayerForm(props) {
                 databasePlayers, 
                 updatePlayersDB,
                 deleteCompletely,
+                setLoadingPlayers,
                 setFilteredPlayers, 
                 sameNamePlayeredEnabled,
             });

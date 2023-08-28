@@ -23,6 +23,7 @@ export default class Play {
     loserID?: string,
     expGained?: any,
     prevExp?: any,
+    seriesID?:any,
     newExp?: any,
     uuid?: any,
     id?: any,

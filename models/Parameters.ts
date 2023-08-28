@@ -7,9 +7,11 @@ export default class Parameters {
         setPlayers: any, 
         useDatabase: any,
         commandParams: any,
-        deleteCompletely: any, 
-        databasePlayers?: any, 
+        loadingPlayers?: any,
+        setLoadingPlayers: any,
         updatePlayersDB?: any,
+        databasePlayers?: any, 
+        deleteCompletely: any, 
         setFilteredPlayers?: any, 
         sameNamePlayeredEnabled: any,
     }) {

@@ -23,7 +23,7 @@ export default function CommandsForm(props) {
     let [playerOne, setPlayerOne] = useState<any>(getDefaultPlayer(1));
     let [playerTwo, setPlayerTwo] = useState<any>(getDefaultPlayer(2));
     let [stocksTaken, setStocksTaken] = useState<any>(`Stocks-Taken-From-Winner`);
-    const { players, command, setCommand, playersToSelect, commandsToNotInclude, commands, setPlayers, useDatabase, databasePlayers, updatePlayersDB, deleteCompletely, setFilteredPlayers, sameNamePlayeredEnabled } = useContext<any>(StateContext);
+    const { players, command, setCommand, playersToSelect, commandsToNotInclude, commands, setPlayers, useDatabase, databasePlayers, updatePlayersDB, deleteCompletely, setFilteredPlayers, sameNamePlayeredEnabled, setLoadingPlayers } = useContext<any>(StateContext);
 
     const adjustStocks = (e, val) => {
         if (val) {
@@ -116,10 +116,11 @@ export default function CommandsForm(props) {
             commands,
             setPlayers, 
             useDatabase, 
-            commandParams, 
+            commandParams,
             databasePlayers, 
             updatePlayersDB,
             deleteCompletely,
+            setLoadingPlayers, 
             setFilteredPlayers, 
             sameNamePlayeredEnabled,
             command: renderCommand(command),
