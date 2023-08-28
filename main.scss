@@ -250,7 +250,7 @@ html[class~="dark"] {
 }
 
 article {
-    padding: 1em 0;
+    padding: 1em 0 !important;
     main {
         max-width: 100% !important;
         width: 100% !important;
@@ -539,6 +539,12 @@ input {
 }
 
 @media (max-width: 992px) {
+    .navFormDiv {
+        // display: none !important;
+        .navIcons {
+            display: none;
+        }
+    }
     .board {
         &.lists {
             overflow-x: scroll;
@@ -547,6 +553,14 @@ input {
                 font-size: 0.85em;
                 min-width: 48.9% !important;
             }
+        }
+    }
+}
+
+@media (max-width: 835px) {
+    nav {
+        .navFormDiv {
+            display: none !important;
         }
     }
 }
@@ -580,9 +594,6 @@ input {
         .navFormDiv {
             display: flex !important;
         }
-    }
-    .navFormDiv {
-        display: none !important;
     }
 }
 
@@ -841,7 +852,7 @@ section {
 
         &:focus {
             // Active or Was Pushed
-            filter: invert(1) brightness(1.5);
+            filter: invert(0) brightness(1.5);
         }
 
         &:active {
@@ -888,6 +899,10 @@ section {
     padding: 0 !important;
     .submit {
         max-width: fit-content !important;
+    }
+    @media (min-width: 768px) {
+        min-width: 369px;
+        max-width: 420px;
     }
 }
 
@@ -1071,7 +1086,7 @@ textarea {
 .overlay {
     top: 0;
     right: 0;
-    z-index: 13;
+    z-index: 20;
     width: 100%;
     height: 100%;
     display: flex;

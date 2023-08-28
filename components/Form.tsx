@@ -13,6 +13,7 @@ export default function Form(props?: any) {
     let formFields = e.target.children;
     let clicked = e?.nativeEvent?.submitter;
     let email = formFields?.email?.value ?? `email`;
+    let password = formFields?.password?.value ?? `password`;
 
     switch(clicked?.value) {
       default:
@@ -27,16 +28,12 @@ export default function Form(props?: any) {
         // setEmailField(true);
         // if (arr.length > 0) {
         //   // localStorage.setItem(`account`, JSON.stringify(macthingEmails[0]));
-        //   setAuthState(`Sign In`);
+          // setAuthState(`Sign In`);
         // } else {
-        //   setAuthState(`Sign Up`);
+          setEmailField(true);
+          setAuthState(`Sign Up`);
         // }
         // });
-        showAlert(`Whoah There!`, <div className={`formWarning`}>
-          <h2 style={{fontSize: `1.5em`}}>
-            Ok so, I haven't quite put user authentication in yet, I will soon! For now, this is not supported yet, apologies!
-          </h2>
-        </div>, `420px`, `auto`);
         break;
       case `Back`:
         setUpdates(updates+1);
@@ -88,7 +85,6 @@ export default function Form(props?: any) {
         }
         break;
       case `Sign In`:
-        let password = formFields?.password?.value;
 
         if (password == ``) {
           showAlert(`Password Required`);
@@ -106,7 +102,15 @@ export default function Form(props?: any) {
         break;
       case `Sign Up`:
         let name = capitalizeAllWords(email.split(`@`)[0]);
-        setAuthState(`Signed Up`);
+        console.log(`Sign Up Params`, {name, email, password});
+        showAlert(`Whoah There!`, <div className={`formWarning`}>
+          <h2 style={{fontSize: `1.5em`}}>
+            Ok so, I haven't quite put user authentication in yet, I will soon! For now, this is not supported yet, apologies!
+          </h2>
+        </div>, `65%`, `auto`);
+        setAuthState(`Next`);
+        setEmailField(false);
+        // setAuthState(`Signed Up`);
 
         // getDocs(collection(db, `users`)).then((snapshot) => {
         //   let latestUsers = snapshot.docs.map((doc: any) => doc.data());
@@ -160,7 +164,7 @@ export default function Form(props?: any) {
 
   return <>
   <form id={props.id} onSubmit={authForm} className={`flex authForm customButtons ${props.className}`} style={style}>
-      {!user && <input placeholder="Email" type="email" name="email" autoComplete={`email`} required />}
+      {!user && <input placeholder="Email Address" type="email" name="email" autoComplete={`email`} required />}
       {!user && emailField && <input placeholder="Password (Use a password that you dont care about, but its still easy to remember)" type="password" name="password" autoComplete={`current-password`} />}
       {user && window?.location?.href?.includes(`profile`) && <input id="name" className={`name userData`} placeholder="Name" type="text" name="status" />}
       {user && window?.location?.href?.includes(`profile`) && <input id="status" className={`status userData`} placeholder="Status" type="text" name="status" />}
@@ -168,7 +172,7 @@ export default function Form(props?: any) {
       {user && window?.location?.href?.includes(`profile`) && <input id="number" className={`number userData`} placeholder="Favorite Number" type="number" name="number" />}
       {user && window?.location?.href?.includes(`profile`) && <input id="password" className={`editPassword userData`} placeholder="Edit Password" type="password" name="editPassword" autoComplete={`current-password`} />}
       <input className={(user && window?.location?.href?.includes(`profile`) || (authState == `Sign In` || authState == `Sign Up`)) ? `submit half` : `submit full`} type="submit" name="authFormSubmit" value={user ? `Sign Out` : authState} />
-      {(authState == `Sign In` || authState == `Sign Up`) && <input id={`back`} className={`back`} type="submit" name="authFormBack" value={`Back`} />}
+      {/* {(authState == `Sign In` || authState == `Sign Up`) && <input id={`back`} className={`back`} type="submit" name="authFormBack" value={`Back`} />} */}
       {user && window?.location?.href?.includes(`profile`) && <input id={user?.id} className={`save`} type="submit" name="authFormSave" style={{padding: 0}} value={`Save`} />}
     </form>
   </>

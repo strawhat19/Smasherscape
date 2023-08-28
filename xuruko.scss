@@ -12,6 +12,7 @@ html, body {
 
 :root {
     --red: #f63460;
+    --tw-ring-color: #007aa3;
     --autocompleteMaxWidth: 435px;
     --smasherscapeYellow: #fcfc05;
     --smasherscapeGreen: #6ced52;
@@ -24,6 +25,7 @@ html, body {
     --smasherscapeBronze2: #f6cc00;
     --smasherscapeCream: #f5f581;
     --smasherscapePurple: #7b4e9b;
+    --smasherscapeNavyBlue: #1C2432;
     --win: var(--smasherscapeGreen2);
     --customHookInputContainerHeight: 55px;
     --playerDetailsColumnGaps: 1fr 110px 85px;
@@ -525,6 +527,7 @@ nav {
     }
     h1 {
         font-size: 25px !important;
+        margin: 5px 0 0 15px !important;
     }
     a, button {
         font-size: 18px !important;
@@ -739,10 +742,23 @@ form {
         grid-template-columns: 1fr 1fr;
     }
     &#navForm {
+        gap: 0;
         margin: 0;
+        width: 100%;
         max-height: 33.3px !important;
+        @media (max-width: 768px) {
+            flex-wrap: nowrap !important;
+            flex-direction: row !important;
+            display: inline-flex !important;
+        }
         input {
             max-height: 33.3px !important;
+            &[type="submit"] {
+                height: 33.3px;
+                padding: 10px 15px !important;
+                border-top-left-radius: 0px !important;
+                border-bottom-left-radius: 0px !important;
+            }
             &::placeholder {
                 opacity: 0.55;
             }
@@ -751,7 +767,18 @@ form {
                 padding: 10px 12px;
                 border-radius: 8px !important;
                 color: rgb(209, 213, 219) !important;
-                background: var(--smasherscapeBrown) !important;
+                border-top-right-radius: 0px !important;
+                border-bottom-right-radius: 0px !important;
+                background: var(--smasherscapeNavyBlue) !important;
+                &:focus-visible {
+                    outline: none;
+                    box-shadow: 2px 2px 0 0 var(--tw-ring-color), -2px 2px 0 0 var(--tw-ring-color), 2px -2px 0 0 var(--tw-ring-color), -2px -2px 0 0 var(--tw-ring-color), 0px 0px 0 0 var(--tw-ring-color) !important;
+                }
+                // background: var(--smasherscapeBrown) !important;
+                &[type="password"] {
+                    border-left: solid 1px black;
+                    border-radius: 0px !important;
+                }
             }
         }
     }
@@ -1307,7 +1334,25 @@ div[role="presentation"] {
     }
 }
 
+// @media (min-width: 768px) and (max-width: 900px) {
+//     .navIconsContainer {
+//         display: none;
+//     }
+//     .navFormDiv {
+//         display: none !important;
+//     }
+// }
+
+@media (max-width: 835px) {
+    .navIconsContainer {
+        display: flex !important;
+    }
+}
+
 @media (min-width: 768px) {
+    .navIconsContainer {
+        display: none;
+    }
     .formSubmitButton {
         &:not(.commandsFormSubmit) {
             display: none;
@@ -1324,7 +1369,40 @@ div[role="presentation"] {
     }
 }
 
+.navIcons {
+    gap: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    .nx-text-current {
+        gap: 8px;
+        display: flex;
+        color: currentColor;
+        align-items: center;
+        justify-content: space-between;
+        .fa-twitch {
+            top: 2px;
+            position: relative;
+        }
+        .navIconLabel {
+            &.twitch {
+                top: 2px;
+                position: relative;
+            }
+            @media (max-width: 1075px) and (min-width: 835px) {
+                display: none;
+            }
+            @media (max-width: 430px) {
+                display: none;
+            }
+        }
+    }
+}
+
 @media (max-width: 768px) {
+    .nextra-sidebar-container>.nextra-scrollbar {
+        z-index: 0;
+    }
     .dark {
         aside {
             max-height: max-content;
@@ -1333,7 +1411,29 @@ div[role="presentation"] {
             div {
                 &:first-child {
                     &:not(.nx-transition-opacity) {
-                        display: none;
+                        // order: 2;
+                        padding: 0;
+                        .navIconsContainer {
+                            display: none !important;
+                        }
+                        .navFormDiv {
+                            z-index: 1;
+                            width: 90%;
+                            position: relative;
+                            gap: 5px !important;
+                            margin: 25px auto -10px;
+                            a {
+                                display: none;
+                            }
+                            .navFormSection {
+                                padding: 0px !important;
+                                #navForm {
+                                    margin: 0 !important;
+                                    gap: 0px !important;
+                                }
+                            }
+                        }
+                        // display: none;
                     }
                 }
             }
@@ -1481,8 +1581,8 @@ div[role="presentation"] {
         // }
     }
     .cardMiddleRow {
-        grid-gap: 50px;
         flex-direction: column;
+        grid-gap: 40px !important;
         img:not(.charImg) {
             padding: 15px 0 0 0 !important;
         }
