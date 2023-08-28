@@ -421,7 +421,7 @@ export default function PlayerForm(props) {
 
     const searchInput = useRef();
     const commandsInput = useRef();
-    const { players, setPlayers, filteredPlayers, setFilteredPlayers, devEnv, useDatabase, useLocalStorage, commands, databasePlayers, sameNamePlayeredEnabled, deleteCompletely, noPlayersFoundMessage } = useContext<any>(StateContext);
+    const { players, setPlayers, filteredPlayers, setFilteredPlayers, devEnv, useDatabase, commands, databasePlayers, sameNamePlayeredEnabled, deleteCompletely, noPlayersFoundMessage } = useContext<any>(StateContext);
 
     const resetPlayers = (commandParams) => {
         setPlayers(defaultPlayers);
@@ -477,11 +477,11 @@ export default function PlayerForm(props) {
         }
     }
 
-    const processCommands = (commandFromForm) => {
-        let commandParams = commandFromForm.split(` `);
+    const processCommands = (command) => {
+        let commandParams = command.split(` `);
         let firstCommand = commandParams[0];
         
-        if (commandFromForm != ``) {
+        if (command != ``) {
             if (firstCommand.includes(`!upd`)) {
                 updatePlayers(commandParams);
             } else if (firstCommand.includes(`!add`)) {

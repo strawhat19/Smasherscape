@@ -727,6 +727,13 @@ form {
         &.noPlays {
             &.noCommandsPerm {
                 grid-template-columns: 1fr;
+                .inputWrapper {
+                    .inputBG {
+                        &.materialBG {
+                            transform: scale(1,.98);
+                        }
+                    }
+                }
             }
         }
         &:has(.Mui-focused), &:has(.MuiAutocomplete-hasClearIcon) {
