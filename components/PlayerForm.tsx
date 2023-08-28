@@ -165,8 +165,9 @@ export const addPlayersWithParameters = (parameters: Parameters) => {
         useDatabase,
         commandParams,
         databasePlayers,
+        setLoadingPlayers,
         setFilteredPlayers,
-        sameNamePlayeredEnabled
+        sameNamePlayeredEnabled,
     } = parameters;
 
     let playersToAdd = commandParams.filter((comm, commIndex) => commIndex != 0 && comm);
@@ -212,7 +213,8 @@ export const deletePlayersWithParameters = (parameters: Parameters) => {
         useDatabase,
         commandParams,
         deleteCompletely,
-        setFilteredPlayers
+        setLoadingPlayers,
+        setFilteredPlayers,
     } = parameters;
 
     let playersToDeleteFromDB: Player[] = [];
@@ -274,6 +276,7 @@ export const setParametersWithParameters = (parameters: Parameters) => {
         players,
         setPlayers,
         commandParams,
+        setLoadingPlayers
     } = parameters;
 
 
@@ -318,6 +321,7 @@ export const giveParameterWithParameters = (parameters: Parameters) => {
         players,
         setPlayers,
         commandParams,
+        setLoadingPlayers
     } = parameters;
 
 
@@ -428,6 +432,7 @@ export const updatePlayersWithParameters = (parameters: Parameters) => {
         setPlayers,
         useDatabase,
         commandParams,
+        setLoadingPlayers,
         setFilteredPlayers,
     } = parameters;
 
@@ -580,7 +585,7 @@ export const updatePlayersWithParameters = (parameters: Parameters) => {
 export const processCommandsWithParameters = (parameters: Parameters) => {
     let {
         command,
-        // setLoadingPlayers
+        setLoadingPlayers
     } = parameters as Parameters;
 
     // setLoadingPlayers(true);
