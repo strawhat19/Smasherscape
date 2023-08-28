@@ -29,7 +29,7 @@ export default function PlayerCard(props) {
                 <h2 title={plyr?.name} className={`playerNameText bluePurpleTextShadow textOverflow overrideWithInlineBlock`}>{plyr?.name}</h2>
             </div>
             <div className="cardMiddleRow">
-                <div className="imgLeftCol">
+                <div className={`imgLeftCol ${plyr.level.name.split(` `)[0]}`}>
                     <img className={`cardLevelImage`} width={150} src={calcPlayerLevelImage(plyr?.level?.name)} alt={plyr?.level?.name} />
                     <h4 className={`levelName blackTextShadow slimmed ${plyr?.level?.name.split(` `)[0]}`}>{plyr?.level?.name}</h4>
                 </div>

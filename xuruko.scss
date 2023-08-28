@@ -165,14 +165,16 @@ li {
                 }
             }
             .cardMiddleRow {
-                width: 95%;
+                width: 100%;
                 display: flex;
+                grid-gap: 5px;
                 margin: 0 auto;
                 align-items: center;
                 justify-content: space-between;
                 .imgLeftCol {
                     width: 100%;
                     display: flex;
+                    // min-width: 200px;
                     align-items: center;
                     flex-direction: column;
                     justify-content: center;
@@ -203,6 +205,9 @@ li {
                         }
                         @media (max-width: 1500px) {
                             font-size: 1.9em;
+                            &.Adamantite {
+                                font-size: 1.6em;
+                            }
                         }
                         @media (max-width: 1425px) {
                             top: -15px;
