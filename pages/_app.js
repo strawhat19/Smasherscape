@@ -534,6 +534,7 @@ export default function Xuruko({ Component, pageProps, router }) {
     let [year, setYear] = useState(new Date().getFullYear());
     let [playersToSelect, setPlayersToSelect] = useState([]);
     let [databasePlayers, setDatabasePlayers] = useState([]);
+    let [playersLoading, setPlayersLoading] = useState(true);
     let [command, setCommand] = useState(defaultCommands.Update);
     let [filteredPlayers, setFilteredPlayers] = useState(players);
     let [deleteCompletely, setDeleteCompletely] = useState(false);
@@ -599,6 +600,7 @@ export default function Xuruko({ Component, pageProps, router }) {
           const playersFromDatabase = [];
           querySnapshot.forEach((doc) => playersFromDatabase.push(doc.data()));
           
+          setPlayersLoading(false);
           setPlayers(playersFromDatabase);
           setDatabasePlayers(playersFromDatabase);
           setFilteredPlayers(getActivePlayersJSON(playersFromDatabase));
@@ -620,35 +622,39 @@ export default function Xuruko({ Component, pageProps, router }) {
         let storedPlayers = JSON.parse(localStorage.getItem(`players`));
         if (storedPlayers && useLocalStorage) {
           if (useDatabase != true) {
+            setPlayersLoading(false); 
             setPlayers(storedPlayers);
             setFilteredPlayers(storedPlayers);
           }
         } else {
+          setPlayersLoading(false); 
           setPlayers(defaultPlayers);
           setFilteredPlayers(getActivePlayersJSON(defaultPlayers));
         }
       }
     }, [])
 
-    return <StateContext.Provider value={{ router, rte, setRte, updates, setUpdates, content, setContent, width, setWidth, user, setUser, page, setPage, mobileMenu, setMobileMenu, users, setUsers, authState, setAuthState, emailField, setEmailField, devEnv, setDevEnv, mobileMenuBreakPoint, platform, setPlatform, focus, setFocus, highScore, setHighScore, color, setColor, dark, setDark, colorPref, setColorPref, qotd, setQotd, alertOpen, setAlertOpen, mobile, setMobile, systemStatus, setSystemStatus, loading, setLoading, anim, setAnimComplete, IDs, setIDs, categories, setCategories, browser, setBrowser, onMac, rearranging, setRearranging, buttonText, setButtonText, gameFormStep, setGameFormStep, players, setPlayers, filteredPlayers, setFilteredPlayers, useLocalStorage, setUseLocalStorage, command, setCommand, commands, setCommands, playersToSelect, setPlayersToSelect, databasePlayers, setDatabasePlayers, useDatabase, setUseDatabase, commandsToNotInclude, setCommandsToNotInclude, sameNamePlayeredEnabled, setSameNamePlayeredEnabled, deleteCompletely, setDeleteCompletely, noPlayersFoundMessage, setNoPlayersFoundMessage, useLazyLoad, setUseLazyLoad }}>
-      {(browser != `chrome` || onMac) ? <AnimatePresence mode={`wait`}>
-        <motion.div className={bodyClasses} key={router.route} initial="pageInitial" animate="pageAnimate" exit="pageExit" transition={{ duration: 0.35 }} variants={{
-          pageInitial: {
-            opacity: 0,
-            clipPath: `polygon(0 0, 100% 0, 100% 100%, 0% 100%)`,
-          },
-          pageAnimate: {
-            opacity: 1,
-            clipPath: `polygon(0 0, 100% 0, 100% 100%, 0% 100%)`,
-          },
-          pageExit: {
-            opacity: 0,
-            clipPath: `polygon(50% 0, 50% 0, 50% 100%, 50% 100%)`,
-          },
-        }}>
-          <Component {...pageProps} />
-        </motion.div>
-      </AnimatePresence> : <div className={bodyClasses}>
+    return <StateContext.Provider value={{ router, rte, setRte, updates, setUpdates, content, setContent, width, setWidth, user, setUser, page, setPage, mobileMenu, setMobileMenu, users, setUsers, authState, setAuthState, emailField, setEmailField, devEnv, setDevEnv, mobileMenuBreakPoint, platform, setPlatform, focus, setFocus, highScore, setHighScore, color, setColor, dark, setDark, colorPref, setColorPref, qotd, setQotd, alertOpen, setAlertOpen, mobile, setMobile, systemStatus, setSystemStatus, loading, setLoading, anim, setAnimComplete, IDs, setIDs, categories, setCategories, browser, setBrowser, onMac, rearranging, setRearranging, buttonText, setButtonText, gameFormStep, setGameFormStep, players, setPlayers, filteredPlayers, setFilteredPlayers, useLocalStorage, setUseLocalStorage, command, setCommand, commands, setCommands, playersToSelect, setPlayersToSelect, databasePlayers, setDatabasePlayers, useDatabase, setUseDatabase, commandsToNotInclude, setCommandsToNotInclude, sameNamePlayeredEnabled, setSameNamePlayeredEnabled, deleteCompletely, setDeleteCompletely, noPlayersFoundMessage, setNoPlayersFoundMessage, useLazyLoad, setUseLazyLoad, playersLoading, setPlayersLoading }}>
+      {(browser != `chrome` || onMac) ? <div className={bodyClasses}>
+        <AnimatePresence mode={`wait`}>
+          <motion.div className={bodyClasses} key={router.route} initial="pageInitial" animate="pageAnimate" exit="pageExit" transition={{ duration: 0.35 }} variants={{
+            pageInitial: {
+              opacity: 0,
+              clipPath: `polygon(0 0, 100% 0, 100% 100%, 0% 100%)`,
+            },
+            pageAnimate: {
+              opacity: 1,
+              clipPath: `polygon(0 0, 100% 0, 100% 100%, 0% 100%)`,
+            },
+            pageExit: {
+              opacity: 0,
+              clipPath: `polygon(50% 0, 50% 0, 50% 100%, 50% 100%)`,
+            },
+          }}>
+            <Component {...pageProps} />
+          </motion.div>
+        </AnimatePresence>
+      </div> : <div className={bodyClasses}>
         <Component {...pageProps} />
       </div>}
     </StateContext.Provider>

@@ -11,6 +11,7 @@ import { Characters } from '../common/Characters';
 import { StateContext, getActivePlayersJSON } from '../pages/_app';
 import PlayerCard, { calcPlayerLosses, calcPlayerWins } from './PlayerCard';
 import { calcPlayerDeaths, calcPlayerKDRatio, calcPlayerKills, parseDate, removeTrailingZeroDecimal } from './PlayerRecord';
+import LoadingSpinner from './LoadingSpinner';
 
 export const publicAssetLink = `https://github.com/strawhat19/Smasherscape/blob/main`;
 export const calcPlayerCharacterTimesPlayed = (plyr: Player, char) => plyr.plays.map(ply => ply.character).filter(charPlayed => charPlayed.toLowerCase() == char || charPlayed.toLowerCase().includes(char)).length;
@@ -127,7 +128,7 @@ export const isInvalid = (item) => {
 }
 
 export default function Smasherscape(props) {
-    const { filteredPlayers, players, noPlayersFoundMessage, devEnv } = useContext<any>(StateContext);
+    const { filteredPlayers, players, noPlayersFoundMessage, devEnv, playersLoading } = useContext<any>(StateContext);
 
     return <Main className={`smasherscapeLeaderboard`}>
         <div>
@@ -138,7 +139,7 @@ export default function Smasherscape(props) {
             {getActivePlayers(filteredPlayers)?.length == 0 && <>
                 <div className="gridCard">
                     <h1 className={`runescape_large noPlayersFound`}>
-                        {noPlayersFoundMessage}
+                        {playersLoading ? <LoadingSpinner size={42} /> : noPlayersFoundMessage}
                     </h1>
                 </div>
             </>}

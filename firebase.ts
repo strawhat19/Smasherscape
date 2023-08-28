@@ -1,5 +1,6 @@
 import firebase, { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
+import { getAuth, connectAuthEmulator, signInWithEmailAndPassword } from "firebase/auth";
 
 const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_APPID,
