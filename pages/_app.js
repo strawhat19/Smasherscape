@@ -13,7 +13,7 @@ import { createContext, useRef, useState, useEffect } from 'react';
 export const StateContext = createContext({});
 export const productionPlayersCollectionName = `players`;
 export const developmentPlayersCollectionName = `devPlayers`;
-export const databasePlayersCollectionName = developmentPlayersCollectionName;
+export const useDatabaseName = productionPlayersCollectionName;
 
 export const getPage = () => {
   return capitalizeAllWords(window.location.pathname.replace(`/`,``));
@@ -588,7 +588,7 @@ export default function Xuruko({ Component, pageProps, router }) {
 
     useEffect(() => {
       if (useDatabase == true) {
-        const unsubscribeFromSmasherScapeSnapShot = onSnapshot(collection(db, databasePlayersCollectionName), (querySnapshot) => {
+        const unsubscribeFromSmasherScapeSnapShot = onSnapshot(collection(db, useDatabaseName), (querySnapshot) => {
           const playersFromDatabase = [];
           querySnapshot.forEach((doc) => playersFromDatabase.push(doc.data()));
           

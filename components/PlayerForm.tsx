@@ -21,11 +21,11 @@ import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
 import { doc, setDoc, deleteDoc, updateDoc } from 'firebase/firestore';
 import { getActivePlayers, isInvalid, newPlayerType } from './smasherscape';
 import { calcPlayerDeaths, calcPlayerKDRatio, calcPlayerKills, removeTrailingZeroDecimal } from './PlayerRecord';
-import { StateContext, showAlert, formatDate, generateUniqueID, countObjectKeys, getActivePlayersJSON, databasePlayersCollectionName, getAllPlays, getAllPlaysJSON } from '../pages/_app';
+import { StateContext, showAlert, formatDate, generateUniqueID, countObjectKeys, getActivePlayersJSON, useDatabaseName, getAllPlays, getAllPlaysJSON } from '../pages/_app';
 
-export const deletePlayerFromDB = async (playerObj: Player) => await deleteDoc(doc(db, databasePlayersCollectionName, playerObj?.ID));
-export const addPlayerToDB = async (playerObj: Player) => await setDoc(doc(db, databasePlayersCollectionName, playerObj?.ID), playerObj);
-export const updatePlayerInDB = async (playerObj: Player, parameters) => await updateDoc(doc(db, databasePlayersCollectionName, playerObj?.ID), parameters);
+export const deletePlayerFromDB = async (playerObj: Player) => await deleteDoc(doc(db, useDatabaseName, playerObj?.ID));
+export const addPlayerToDB = async (playerObj: Player) => await setDoc(doc(db, useDatabaseName, playerObj?.ID), playerObj);
+export const updatePlayerInDB = async (playerObj: Player, parameters) => await updateDoc(doc(db, useDatabaseName, playerObj?.ID), parameters);
 export const getAllCharacters = () => Object.entries(Characters).filter(char => char[0] === char[0].charAt(0).toUpperCase() + char[0].slice(1));
 
 export const winCons = [`beat`, `beats`, `has-beaten`, `destroys`, `destroyed`, `defeats`, `defeated`, `has-defeated`, `conquers`, `vanquishes`, `vanquished`, `fells`, `crushes`, `kills`, `killed`];
@@ -423,7 +423,7 @@ export const updatePlayersWithParameters = (parameters: Parameters) => {
     if (commandParams.length >= 8) {
         characterOne = commandParams[5].toLowerCase();
         characterTwo = commandParams[7].toLowerCase();
-        stocksTaken = parseInt(commandParams[8]) || commandParams[8] != `Stocks-Taken-From-Winner` ? 0 : `Stocks-Taken-From-Winner`;
+        stocksTaken = commandParams[8] != `Stocks-Taken-From-Winner` ? parseInt(commandParams[8]) || 0 : `Stocks-Taken-From-Winner`;
     }
 
     if (!playerOneDB || !playerTwoDB) {
@@ -519,6 +519,7 @@ export const updatePlayersWithParameters = (parameters: Parameters) => {
             stocksTaken,  
         }
 
+        console.log(`Update Players Play State`, playState);
         let updatedPlayers: any[] = getActivePlayersJSON(players).map((plyr) => {
             if (plyr?.id == winnerDB?.id) {
                 updatePlayerPlays({...playState, plyr, winnerOrLoser: `winner`});

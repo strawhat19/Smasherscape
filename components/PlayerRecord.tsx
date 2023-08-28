@@ -8,9 +8,10 @@ import Autocomplete from '@mui/material/Autocomplete';
 import { useContext, useState, useEffect } from 'react';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
-import { getCharacterTitle, publicAssetLink } from './smasherscape';
+import { calcPlayerCharacterTimesPlayed, calcPlayerCharactersPlayed, getCharacterTitle, publicAssetLink } from './smasherscape';
 import { getAllCharacters, getCharacterObjects, getUniqueCharactersPlayed, searchBlur } from './PlayerForm';
 import { Characters } from '../common/Characters';
+import { Badge } from '@mui/material';
 
 export const parseDate = (dateStr: any) => {
     const parts = dateStr.split(`, `);
@@ -113,7 +114,6 @@ function PlayerRecord(props) {
     }
 
   const calcWinLoseRatio = (playerOne, playerTwo) => {
-    // console.log(`calcWinLoseRatio`, {playerOne, playerTwo});
     let playerOneDB: Player = players?.find(plyr => plyr?.name.toLowerCase() == playerOne.toLowerCase() || plyr?.name.toLowerCase().includes(playerOne));
     let playerTwoDB: Player = players?.find(plyr => plyr?.name.toLowerCase() == playerTwo.toLowerCase() || plyr?.name.toLowerCase().includes(playerTwo));
     let plays: Play[] = playerOneDB?.plays.filter(ply => ply?.winner == playerTwoDB?.name || ply?.loser == playerTwoDB?.name);
@@ -190,6 +190,17 @@ function PlayerRecord(props) {
                     </form>
                 </div>}
             </h3>
+            {plays?.length > 0 && <div className={`playsContainer playerRecordPlaysContainer ${calcPlayerCharactersPlayed(plyr, false)?.length > 0 ? `populatedPlays` : ``}`}>
+                {calcPlayerCharactersPlayed(plyr, false)?.length > 0 ? calcPlayerCharactersPlayed(plyr, false).map((char, charIndex) => {
+                    return (
+                        <Badge title={`Played ${getCharacterTitle(char)} ${calcPlayerCharacterTimesPlayed(plyr, char)} Time(s)`} key={charIndex} badgeContent={calcPlayerCharacterTimesPlayed(plyr, char)} color="primary">
+                            <img className={`charImg`} width={35} src={calcPlayerCharacterIcon(char)} alt={getCharacterTitle(char)} />
+                        </Badge>
+                    )
+                }) : <div className={`flex center blackTextShadow slimmed`}>
+                    No Plays Yet
+                </div>}
+            </div>}
             {plays?.length > 0 ? plays.map((ply, plyIndex) => {
                 let isWinner = ply?.winner == plyr?.name;
                 return (

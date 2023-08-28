@@ -89,7 +89,7 @@ export const calcPlayerLevelImage = (levelName) => {
     else return `${publicAssetLink}/assets/smasherscape/OSRS_Top_Hat.png?raw=true`;
 }
 
-export const calcPlayerCharactersPlayed = (plyr: Player) => {
+export const calcPlayerCharactersPlayed = (plyr: Player, cutOff = true) => {
     let charsPlayed = plyr?.plays?.map(ply => ply?.character);
     let counts = charsPlayed.reduce((acc, char) => {
         acc[char] = (acc[char] || 0) + 1;
@@ -101,7 +101,7 @@ export const calcPlayerCharactersPlayed = (plyr: Player) => {
         // return (new Date(bRecent) as any) - (new Date(aRecent) as any); 
         return parseDate(bRecent) - parseDate(aRecent); 
     }).sort((a: any, b: any) => b[1] - a[1]).map(entry => entry[0].toLowerCase());
-    return sortedCharactersByMostTimesPlayed.slice(0,3);
+    return cutOff == true ? sortedCharactersByMostTimesPlayed.slice(0,3) : sortedCharactersByMostTimesPlayed;
 }
 
 export const isInvalid = (item) => {
