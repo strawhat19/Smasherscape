@@ -59,7 +59,7 @@ export const calcPlayerKDRatio = (player: Player, plays: Play[]) => {
 
 function PlayerRecord(props) {
   let { plyr } = props;
-  const { players, filteredPlayers, devEnv } = useContext<any>(StateContext);
+  const { players, filteredPlayers, devEnv, useLazyLoad } = useContext<any>(StateContext);
   let [plays, setPlays] = useState(plyr?.plays?.sort((a: any, b: any) => parseDate(b.date) - parseDate(a.date)));
 
   useEffect(() => {
@@ -129,8 +129,17 @@ function PlayerRecord(props) {
 
   return (
     <div className={`recordOfPlayer ${plyr?.expanded ? `expanded` : `collapsed`}`}>
-        <LazyLoadImage effect="blur" src={`${publicAssetLink}/assets/smasherscape/OSRS_Card_Empty.png?raw=true`} className={`cardBG`} alt={`Smasherscape Player Card`} />
-        <LazyLoadImage effect="blur" src={`${publicAssetLink}/assets/smasherscape/OSRS_Card_Template_Border_Only.png?raw=true`} className={`cardBG border`} alt={`Smasherscape Player Card`} />
+        {useLazyLoad ? (
+            <>
+                <LazyLoadImage effect="blur" src={`${publicAssetLink}/assets/smasherscape/OSRS_Card_Empty.png?raw=true`} className={`cardBG`} alt={`Smasherscape Player Card`} />
+                <LazyLoadImage effect="blur" src={`${publicAssetLink}/assets/smasherscape/OSRS_Card_Template_Border_Only.png?raw=true`} className={`cardBG border`} alt={`Smasherscape Player Card`} />
+            </>
+        ) : (
+            <>
+                <img src={`${publicAssetLink}/assets/smasherscape/OSRS_Card_Empty.png?raw=true`} className={`cardBG`} alt={`Smasherscape Player Card`} />
+                <img src={`${publicAssetLink}/assets/smasherscape/OSRS_Card_Template_Border_Only.png?raw=true`} className={`cardBG border`} alt={`Smasherscape Player Card`} />
+            </>
+        )}
         <ul className="recordList">
             <h3 className={`greenRecordText`}>
                 <div className={`flex playerRecordBegin`}>

@@ -374,8 +374,14 @@ export const updatePlayerPlays = (playState) => {
         winnerOrLoser, 
     } = playState;
 
-    let prevExp = plyr.experience.arenaXP;
-    let newExp = winnerOrLoser == `winner` ? prevExp + (XPGainOnWin * plyr?.xpModifier) : prevExp + ((XPGainOnLoserXPForEachStockTaken * plyr?.xpModifier) * stocksTaken);
+    let prevExp = plyr?.experience?.arenaXP;
+    let loserPrevExp = loserDB?.experience?.arenaXP;
+    let winnerPrevExp = winnerDB?.experience?.arenaXP;
+    let winnerNewExp = prevExp + (XPGainOnWin * plyr?.xpModifier);
+    let loserNewExp = prevExp + ((XPGainOnLoserXPForEachStockTaken * plyr?.xpModifier) * stocksTaken);
+    let winnerExpGained = winnerNewExp - winnerPrevExp;
+    let loserExpGained = loserNewExp - loserPrevExp;
+    let newExp = winnerOrLoser == `winner` ? winnerNewExp : loserNewExp;
     let expGained = newExp - prevExp;
     plyr.experience.arenaXP = newExp;
     
@@ -383,11 +389,19 @@ export const updatePlayerPlays = (playState) => {
         otherCharacter: winnerOrLoser == `winner` ? loseChar : winChar,
         character: winnerOrLoser == `winner` ? winChar : loseChar,
         id: `player-${plyr.name}-play-${playUUID}`,
+        winnerUUID: winnerDB?.uuid,
+        loserUUID: loserDB?.uuid,
         winner: winnerDB?.name,
         winnerID: winnerDB?.id,
         loser: loserDB?.name,
         loserID: loserDB?.id,
         uuid: playUUID,
+        winnerExpGained,
+        loserExpGained,
+        winnerPrevExp,
+        loserPrevExp,
+        winnerNewExp,
+        loserNewExp,
         stocksTaken,
         lossStocks,
         expGained,

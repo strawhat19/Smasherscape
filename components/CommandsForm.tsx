@@ -245,7 +245,7 @@ export default function CommandsForm(props) {
                             <div className="inputBG materialBG"></div>
                             <Autocomplete
                                 autoHighlight
-                                id="characterSearchAuto-1"
+                                id="characterSearchAutoCommandsForm-1"
                                 sx={{ width: `100%` }}
                                 options={getCharacterObjects()}
                                 getOptionLabel={(option) => option.label}
@@ -292,7 +292,7 @@ export default function CommandsForm(props) {
                             <div className="inputBG materialBG"></div>
                             <Autocomplete
                                 autoHighlight
-                                id="characterSearchAuto-2"
+                                id="characterSearchAutoCommandsForm-2"
                                 sx={{ width: `100%` }}
                                 options={getCharacterObjects()}
                                 getOptionLabel={(option) => option.label}

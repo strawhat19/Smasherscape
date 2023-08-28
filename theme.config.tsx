@@ -1,9 +1,10 @@
 import React from 'react';
 import Form from './components/Form';
 import Footer from './components/footer';
+import NavIcons from './components/NavIcons';
 import { DocsThemeConfig } from 'nextra-theme-docs';
 import NextraSearch from './components/NextraSearch';
-import NavIcons from './components/NavIcons';
+import { generateUniqueID } from './pages/_app';
 
 const config: DocsThemeConfig = {
   primaryHue: 195, // Sky Blue
@@ -46,7 +47,7 @@ const config: DocsThemeConfig = {
     </div>
     <div className={`navFormDiv`} style={{order: 0, display: `flex`, flexDirection: `row`, gridGap: 15, justifyContent: `space-between`, alignItems: `center`}}>
       <section className={`navFormSection`} style={{margin: 0, position: `relative`}}>
-        <Form id="navForm" style={{display: `flex`, flexDirection: `row`}} />
+        <Form className={`navForm`} style={{display: `flex`, flexDirection: `row`}} />
       </section>
       <NavIcons />
     </div>
