@@ -576,6 +576,11 @@ input {
 }
 
 @media (max-width: 1215px) {
+    aside {
+        .navFormDiv {
+            display: flex !important;
+        }
+    }
     .navFormDiv {
         display: none !important;
     }

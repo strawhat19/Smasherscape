@@ -738,6 +738,23 @@ form {
         gap: 20px;
         grid-template-columns: 1fr 1fr;
     }
+    &#navForm {
+        margin: 0;
+        max-height: 33.3px !important;
+        input {
+            max-height: 33.3px !important;
+            &::placeholder {
+                opacity: 0.55;
+            }
+            &[type="email"], &[type="password"] {
+                font-size: 14px;
+                padding: 10px 12px;
+                border-radius: 8px !important;
+                color: rgb(209, 213, 219) !important;
+                background: var(--smasherscapeBrown) !important;
+            }
+        }
+    }
     &#playerForm {
         &.hasPlays {
             &.noCommandsPerm {
