@@ -10,7 +10,7 @@ import Experience from '../models/Experience';
 import { Characters } from '../common/Characters';
 import { StateContext, getActivePlayersJSON } from '../pages/_app';
 import PlayerCard, { calcPlayerLosses, calcPlayerWins } from './PlayerCard';
-import { calcPlayerDeaths, calcPlayerKDRatio, calcPlayerKills, removeTrailingZeroDecimal } from './PlayerRecord';
+import { calcPlayerDeaths, calcPlayerKDRatio, calcPlayerKills, parseDate, removeTrailingZeroDecimal } from './PlayerRecord';
 
 export const publicAssetLink = `https://github.com/strawhat19/Smasherscape/blob/main`;
 export const calcPlayerCharacterTimesPlayed = (plyr: Player, char) => plyr.plays.map(ply => ply.character).filter(charPlayed => charPlayed.toLowerCase() == char || charPlayed.toLowerCase().includes(char)).length;
@@ -95,8 +95,13 @@ export const calcPlayerCharactersPlayed = (plyr: Player) => {
         acc[char] = (acc[char] || 0) + 1;
         return acc;
     }, {});
-    let sortedChars = Object.entries(counts).sort((a: any, b: any) => b[1] - a[1]).map(entry => entry[0].toLowerCase());
-    return sortedChars.slice(0,3);
+    let sortedCharactersByMostTimesPlayed = Object.entries(counts).sort((a, b) => {
+        const aRecent = plyr.plays.find(p => p.character === a[0])?.date;
+        const bRecent = plyr.plays.find(p => p.character === b[0])?.date;
+        // return (new Date(bRecent) as any) - (new Date(aRecent) as any); 
+        return parseDate(bRecent) - parseDate(aRecent); 
+    }).sort((a: any, b: any) => b[1] - a[1]).map(entry => entry[0].toLowerCase());
+    return sortedCharactersByMostTimesPlayed.slice(0,3);
 }
 
 export const isInvalid = (item) => {

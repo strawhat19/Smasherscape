@@ -405,6 +405,7 @@ export const updatePlayersWithParameters = (parameters: Parameters) => {
         setPlayers,
         useDatabase,
         commandParams,
+        setFilteredPlayers,
     } = parameters;
 
     let date = moment().format(`h:mm:ss a, MMMM Do YYYY`);
@@ -536,6 +537,7 @@ export const updatePlayersWithParameters = (parameters: Parameters) => {
         } else {
             updatePlayersDB(updatedPlayers);
             setPlayers(updatedPlayers);
+            setFilteredPlayers(updatedPlayers);
         }
     }
 }

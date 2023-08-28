@@ -535,7 +535,7 @@ export default function Xuruko({ Component, pageProps, router }) {
     let [noPlayersFoundMessage, setNoPlayersFoundMessage] = useState(`No Players Found`);
     let [commandsToNotInclude, setCommandsToNotInclude] = useState([`!com`, `!add`, `!res`, `!set`, `!giv`]);
 
-    let [useDatabase, setUseDatabase] = useState(false);
+    let [useDatabase, setUseDatabase] = useState(true);
     let [useLocalStorage, setUseLocalStorage] = useState(true);
 
     const setBrowserUI = () => {
