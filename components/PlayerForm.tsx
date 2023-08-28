@@ -7,6 +7,7 @@ import Level from '../models/Level';
 import Player from '../models/Player';
 import { Commands } from './Commands';
 import PlayerOption from './PlayerOption';
+import { matchSorter } from 'match-sorter';
 import Experience from '../models/Experience';
 import Parameters from '../models/Parameters';
 import TextField from '@mui/material/TextField';
@@ -713,14 +714,7 @@ export default function PlayerForm(props) {
                     isOptionEqualToValue={(option, value) => option.id === value.id}
                     renderInput={(params) => <TextField name={`characters`} onBlur={(e) => searchBlur(e, filteredPlayers)} {...params} label="Search Player(s) by Character(s) Played..." />}
                     noOptionsText={`No Character(s) Found for Search`}
-                    // filterOptions={(characterOptions, state) => {
-                        // console.log(`Search Players by Character`, {characterOptions, state});
-                        // let input = state.inputValue.toLowerCase();
-                        // let expandedCharacters = characterOptions.filter(charOption => charOption.shortcuts.includes(input) || charOption.label.toLowerCase() == input);
-                        // return input != `` ? expandedCharacters : characterOptions;
-                        // const filtered = matchSorter(characterOptions, state.inputValue, { keys: [`label`, `shortcuts`] });
-                        // return filtered;
-                    // }}
+                    filterOptions={(characterOptions, state) => matchSorter(characterOptions, state.inputValue, { keys: [`label`, `shortcuts`] })}
                     renderOption={(props: any, characterOption: any) => {
                         return (
                             <div key={characterOption.id} {...props}>

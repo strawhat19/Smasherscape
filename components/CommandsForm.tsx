@@ -2,15 +2,16 @@ import React from 'react';
 import CodeBlock from "./CodeBlock";
 import Command from "../models/Command";
 import PlayerOption from './PlayerOption';
+import { matchSorter } from 'match-sorter';
 import { defaultCommands } from "./Commands";
-import { getAllPlaysJSON, StateContext } from "../pages/_app";
 import { useContext, useState } from "react";
+import Parameters from '../models/Parameters';
 import CustomizedHook from './CustomizedHook';
 import CharacterOption from './CharacterOption';
 import { getActivePlayers } from "./smasherscape";
+import { getAllPlaysJSON, StateContext } from "../pages/_app";
 import { getCharacterObjects, processCommandsWithParameters } from './PlayerForm';
 import { Autocomplete, TextField, ToggleButton, ToggleButtonGroup } from "@mui/material";
-import Parameters from '../models/Parameters';
 
 export const getDefaultPlayer = (number) => ({id: number, type: `Default`, name: `Player-${number}`, label: `Player-${number}`});
 
@@ -253,6 +254,7 @@ export default function CommandsForm(props) {
                                 isOptionEqualToValue={(option, value) => option.id === value.id}
                                 renderInput={(params) => <TextField name={`characters`} {...params} label="Characters..." />}
                                 noOptionsText={`No Character(s) Found for Search`}
+                                filterOptions={(characterOptions, state) => matchSorter(characterOptions, state.inputValue, { keys: [`label`, `shortcuts`] })}
                                 renderOption={(props: any, characterOption: any) => {
                                     return (
                                         <div key={characterOption.id} {...props}>
@@ -299,6 +301,7 @@ export default function CommandsForm(props) {
                                 isOptionEqualToValue={(option, value) => option.id === value.id}
                                 renderInput={(params) => <TextField name={`characters`} {...params} label="Characters..." />}
                                 noOptionsText={`No Character(s) Found for Search`}
+                                filterOptions={(characterOptions, state) => matchSorter(characterOptions, state.inputValue, { keys: [`label`, `shortcuts`] })}
                                 renderOption={(props: any, characterOption: any) => {
                                     return (
                                         <div key={characterOption.id} {...props}>
