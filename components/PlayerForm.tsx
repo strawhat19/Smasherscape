@@ -20,7 +20,7 @@ import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
 import { doc, setDoc, deleteDoc, updateDoc } from 'firebase/firestore';
 import { getActivePlayers, isInvalid, newPlayerType } from './smasherscape';
 import { calcPlayerDeaths, calcPlayerKDRatio, calcPlayerKills, removeTrailingZeroDecimal } from './PlayerRecord';
-import { StateContext, showAlert, formatDate, generateUniqueID, countObjectKeys, getActivePlayersJSON, databasePlayersCollectionName, getAllPlays } from '../pages/_app';
+import { StateContext, showAlert, formatDate, generateUniqueID, countObjectKeys, getActivePlayersJSON, databasePlayersCollectionName, getAllPlays, getAllPlaysJSON } from '../pages/_app';
 
 export const deletePlayerFromDB = async (playerObj: Player) => await deleteDoc(doc(db, databasePlayersCollectionName, playerObj?.ID));
 export const addPlayerToDB = async (playerObj: Player) => await setDoc(doc(db, databasePlayersCollectionName, playerObj?.ID), playerObj);
@@ -167,6 +167,7 @@ export const createPlayer = (playerName, playerIndex, databasePlayers): Player =
         name: displayName,
         lastUpdatedBy: id,
         plays: [] as Play[],
+        type: `Smasherscape`,
         username: displayName,
         created: currentDateTimeStamp,
         updated: currentDateTimeStamp,
@@ -705,7 +706,7 @@ export default function PlayerForm(props) {
                     renderOption={(props: any, characterOption: any) => {
                         return (
                             <div key={characterOption.id} {...props}>
-                                <CharacterOption characterOption={characterOption} />
+                                <CharacterOption plays={getAllPlaysJSON(getActivePlayers(players))} type={`All`} characterOption={characterOption} />
                             </div>
                         )
                     }}

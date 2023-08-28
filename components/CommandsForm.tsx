@@ -3,7 +3,7 @@ import CodeBlock from "./CodeBlock";
 import Command from "../models/Command";
 import PlayerOption from './PlayerOption';
 import { defaultCommands } from "./Commands";
-import { StateContext } from "../pages/_app";
+import { getAllPlaysJSON, StateContext } from "../pages/_app";
 import { useContext, useState } from "react";
 import CustomizedHook from './CustomizedHook';
 import CharacterOption from './CharacterOption';
@@ -11,7 +11,7 @@ import { getActivePlayers } from "./smasherscape";
 import { getCharacterObjects } from './PlayerForm';
 import { Autocomplete, TextField, ToggleButton, ToggleButtonGroup } from "@mui/material";
 
-export const getDefaultPlayer = (number) => ({id: number, name: `Player-${number}`, label: `Player-${number}`});
+export const getDefaultPlayer = (number) => ({id: number, type: `Default`, name: `Player-${number}`, label: `Player-${number}`});
 
 export default function CommandsForm(props) {
     let [characters, setCharacters] = useState([]);
@@ -250,7 +250,7 @@ export default function CommandsForm(props) {
                                 renderOption={(props: any, characterOption: any) => {
                                     return (
                                         <div key={characterOption.id} {...props}>
-                                            <CharacterOption characterOption={characterOption} />
+                                            <CharacterOption plays={playerOne.type != `Default` ? playerOne.plays : getAllPlaysJSON(getActivePlayers(players))} type={playerOne.type != `Default` ? `Player` : `All`} characterOption={characterOption} />
                                         </div>
                                     )
                                 }}
@@ -296,7 +296,7 @@ export default function CommandsForm(props) {
                                 renderOption={(props: any, characterOption: any) => {
                                     return (
                                         <div key={characterOption.id} {...props}>
-                                            <CharacterOption characterOption={characterOption} />
+                                            <CharacterOption  plays={playerTwo.type != `Default` ? playerTwo.plays : getAllPlaysJSON(getActivePlayers(players))} type={playerTwo.type != `Default` ? `Player` : `All`} characterOption={characterOption} />
                                         </div>
                                     )
                                 }}

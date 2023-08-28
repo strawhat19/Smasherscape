@@ -18,6 +18,7 @@ export default class Player {
     ID?: any,
     uid?: any,
     uuid?: any,
+    type?: any,
     label?: string,
     bio?: string,
     wins?: Play[],

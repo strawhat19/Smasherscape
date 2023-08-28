@@ -113,6 +113,7 @@ function PlayerRecord(props) {
     }
 
   const calcWinLoseRatio = (playerOne, playerTwo) => {
+    // console.log(`calcWinLoseRatio`, {playerOne, playerTwo});
     let playerOneDB: Player = players?.find(plyr => plyr?.name.toLowerCase() == playerOne.toLowerCase() || plyr?.name.toLowerCase().includes(playerOne));
     let playerTwoDB: Player = players?.find(plyr => plyr?.name.toLowerCase() == playerTwo.toLowerCase() || plyr?.name.toLowerCase().includes(playerTwo));
     let plays: Play[] = playerOneDB?.plays.filter(ply => ply?.winner == playerTwoDB?.name || ply?.loser == playerTwoDB?.name);
@@ -179,7 +180,7 @@ function PlayerRecord(props) {
                                 renderOption={(props: any, characterOption: any) => {
                                     return (
                                         <div key={characterOption.id} {...props}>
-                                            <CharacterOption characterOption={characterOption} />
+                                            <CharacterOption plays={plyr.plays} type={`Other Player`} characterOption={characterOption} />
                                         </div>
                                     )
                                 }}
