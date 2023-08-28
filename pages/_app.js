@@ -634,7 +634,7 @@ export default function Xuruko({ Component, pageProps, router }) {
         } else {
           setPlayersLoading(false); 
           setPlayers(defaultPlayers);
-          setCommandsToShow(playersFromDatabase);
+          setCommandsToShow(defaultPlayers);
           setFilteredPlayers(getActivePlayersJSON(defaultPlayers));
         }
       }
