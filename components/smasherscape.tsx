@@ -17,7 +17,6 @@ export const calcPlayerCharacterTimesPlayed = (plyr: Player, char) => plyr.plays
 
 export const calcPlaysCharacterTimesPlayed = (plys: Play[], type, characterOption) => {
     let playChars = type == `All` ? plys.map(ply => ply.character || ply.otherCharacter) : plys.map(ply => type == `Player` ? ply.character : ply.otherCharacter);
-    console.log(`calcPlaysCharacterTimesPlayed`, {playChars, characterOption});
     return playChars.filter(charPlayed =>  characterOption.label.toLowerCase().includes(charPlayed.toLowerCase())).length;
 };
 

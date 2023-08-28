@@ -16,7 +16,6 @@ export default function CodeBlock(props) {
             setTimeout(() => setCMDClicked(false), 1500);
         } else {
             setClicked(true);
-
             let command = props.children;
             let commandParams = command.split(` `);
             const parameters = new Parameters({
@@ -32,10 +31,7 @@ export default function CodeBlock(props) {
                 setFilteredPlayers, 
                 sameNamePlayeredEnabled,
             })
-
-            console.log(`Send Command`, parameters);
             processCommandsWithParameters(parameters);
-            // navigator.clipboard.writeText(props.children);
             setTimeout(() => setClicked(false), 1500);
         }
     };

@@ -8,8 +8,9 @@ import { useContext, useState } from "react";
 import CustomizedHook from './CustomizedHook';
 import CharacterOption from './CharacterOption';
 import { getActivePlayers } from "./smasherscape";
-import { getCharacterObjects } from './PlayerForm';
+import { getCharacterObjects, processCommandsWithParameters } from './PlayerForm';
 import { Autocomplete, TextField, ToggleButton, ToggleButtonGroup } from "@mui/material";
+import Parameters from '../models/Parameters';
 
 export const getDefaultPlayer = (number) => ({id: number, type: `Default`, name: `Player-${number}`, label: `Player-${number}`});
 
@@ -21,7 +22,7 @@ export default function CommandsForm(props) {
     let [playerOne, setPlayerOne] = useState<any>(getDefaultPlayer(1));
     let [playerTwo, setPlayerTwo] = useState<any>(getDefaultPlayer(2));
     let [stocksTaken, setStocksTaken] = useState<any>(`Stocks-Taken-From-Winner`);
-    const { players, command, setCommand, playersToSelect, commandsToNotInclude } = useContext<any>(StateContext);
+    const { players, command, setCommand, playersToSelect, commandsToNotInclude, commands, setPlayers, useDatabase, databasePlayers, updatePlayersDB, deleteCompletely, setFilteredPlayers, sameNamePlayeredEnabled } = useContext<any>(StateContext);
 
     const adjustStocks = (e, val) => {
         if (val) {
@@ -61,29 +62,6 @@ export default function CommandsForm(props) {
         }
     }
 
-    const renderCommand = (command: Command) => {
-        let commandToReturn;
-        if (characters.length == 0) {
-            setCharacters(getCharacterObjects());
-        }
-        if (command) {
-            if (command.command == `!del`) {
-                commandToReturn = `!del ${playersToSelect.length == 0 ? `name(s) of player(s)` : playersToSelect.map(plyr => {
-                    return (
-                        plyr.name
-                    )
-                }).join(` `)}`;
-            } else if (command.command == `!set`) {
-                commandToReturn = `!set playerName (xp) amount`;
-            } else if (command.command == `!giv`) {
-                commandToReturn = `!giv playerName (xp) amount`;
-            } else {
-                commandToReturn = `!upd ${playerOne?.name} ${condition} ${playerTwo?.name} with ${charOne} vs ${charTwo} ${stocksTaken}`;
-            }
-            return commandToReturn;
-        }
-    }
-
     const adjustPlayers = (e, val, winnerOrLoser) => {
         if (val) {
             if (winnerOrLoser == `winner`) {
@@ -108,15 +86,44 @@ export default function CommandsForm(props) {
         }
     }
 
+    const renderCommand = (command: Command) => {
+        let commandToReturn;
+        if (characters.length == 0) setCharacters(getCharacterObjects());
+        if (command) {
+            if (command.command == `!del`) {
+                commandToReturn = `!del ${playersToSelect.length == 0 ? `name(s) of player(s)` : playersToSelect.map(plyr => {
+                    return (
+                        plyr.name
+                    )
+                }).join(` `)}`;
+            } else if (command.command == `!set`) {
+                commandToReturn = `!set playerName (xp) amount`;
+            } else if (command.command == `!giv`) {
+                commandToReturn = `!giv playerName (xp) amount`;
+            } else {
+                commandToReturn = `!upd ${playerOne?.name || `Player-1`} ${condition} ${playerTwo?.name || `Player-2`} with ${charOne} vs ${charTwo} ${stocksTaken}`;
+            }
+            return commandToReturn;
+        }
+    }
+
     const submitCommandsForm = (e) => {
         e.preventDefault();
-        // let playerForm: any = document.querySelector(`#playerForm`);
-        // let commandsInput: any = document.querySelector(`#commandsInput input`);
-        // let commandToRender = document.querySelector(`#commandToRender`);
-        // if (commandsInput && playerForm) {
-        //     commandsInput.value = commandToRender.innerHTML;
-        //     playerForm.submit();
-        // }
+        let commandParams = renderCommand(command).split(` `);
+        const parameters = new Parameters({
+            players, 
+            commands,
+            setPlayers, 
+            useDatabase, 
+            commandParams, 
+            databasePlayers, 
+            updatePlayersDB,
+            deleteCompletely,
+            setFilteredPlayers, 
+            sameNamePlayeredEnabled,
+            command: renderCommand(command),
+        })
+        processCommandsWithParameters(parameters);
     }
 
     return (
@@ -126,9 +133,9 @@ export default function CommandsForm(props) {
             <ToggleButtonGroup
                 exclusive
                 color="primary"
+                value={command}
                 aria-label="Platform"
                 onChange={(e, val) => val && setCommand(val)}
-                value={command}
             >
                 {Object.values(defaultCommands).filter(cmd => !commandsToNotInclude.includes(cmd.command)).map((comm: Command, commIndex) => {
                     let desc = comm?.shortDescription;
@@ -169,7 +176,6 @@ export default function CommandsForm(props) {
                                 autoHighlight
                                 id="playerSearchAutoPlayer1"
                                 sx={{ width: `100%` }}
-                                clearText={`NO PLAYERS`}
                                 getOptionLabel={(option) => option.name}
                                 onChange={(e, val: any) => adjustPlayers(e, val, `winner`)}
                                 onInputChange={(e, val: any) => adjustPlayers(e, val, `winner`)}
@@ -233,7 +239,7 @@ export default function CommandsForm(props) {
                             />
                         </div>
                     </div>
-                    <div className={`updateRow updateBottomRow ${(playerOne != `Player-One` && playerTwo != `Player-Two` && condition != `vs`) ? `expanded` : `collapsed`}`}>
+                    <div className={`updateRow updateBottomRow ${playerOne && playerTwo && ((typeof playerOne == `string` ? playerOne != `Player-1` : playerOne.type != `Default`) && (typeof playerTwo == `string` ? playerTwo != `Player-2` : playerTwo.type != `Default`) && condition != `vs`) ? `expanded` : `collapsed`}`}>
                         <div className={`characterSearchAuto inputWrapper materialBGInputWrapper`}>
                             <div className="inputBG materialBG"></div>
                             <Autocomplete
@@ -267,7 +273,7 @@ export default function CommandsForm(props) {
                                 onChange={(e, val: any) => adjustStocks(e, val)}
                                 onInputChange={(e, val: any) => adjustStocks(e, val)}
                                 isOptionEqualToValue={(option, value) => option.id === value.id}
-                                renderInput={(params) => <TextField name={`stocks`} {...params} label="Stocks..." />}
+                                renderInput={(params) => <TextField name={`stocks`} {...params} label="Stocks Taken from Winner..." />}
                                 noOptionsText={`No Stock(s) Found for Search`}
                                 renderOption={(props: any, option: any) => {
                                     return (

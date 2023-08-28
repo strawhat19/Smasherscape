@@ -266,14 +266,19 @@ export const deletePlayersWithParameters = (parameters: Parameters) => {
     });
 
     if (playersToDeleteFromDB.length > 0) {
+        let currentDateTimeStamp = formatDate(new Date());
         playersToDeleteFromDB.forEach((playerDB: Player) => {
             (document.querySelector(`.clearAllTagsIcon`) as any).click();
             if (useDatabase == true) {
                 if (deleteCompletely) {
                     return deletePlayerFromDB(playerDB);
                 } else {
-                    let currentDateTimeStamp = formatDate(new Date());
-                    return updatePlayerInDB(playerDB, {disabled: true, active: false, updated: currentDateTimeStamp, lastUpdated: currentDateTimeStamp })
+                    return updatePlayerInDB(playerDB, {
+                        active: false, 
+                        disabled: true, 
+                        updated: currentDateTimeStamp, 
+                        lastUpdated: currentDateTimeStamp 
+                    })
                 }
             } else {
                 setPlayers(prevPlayers => {
@@ -281,7 +286,10 @@ export const deletePlayersWithParameters = (parameters: Parameters) => {
                         if (plyr.name.toLowerCase() == playerDB.name.toLowerCase()) {
                             return {
                                 ...plyr,
-                                disabled: true
+                                active: false,
+                                disabled: true,
+                                updated: currentDateTimeStamp, 
+                                lastUpdated: currentDateTimeStamp 
                             } as Player
                         } else {
                             return plyr as Player;
@@ -413,7 +421,7 @@ export const updatePlayersWithParameters = (parameters: Parameters) => {
     if (commandParams.length >= 8) {
         characterOne = commandParams[5].toLowerCase();
         characterTwo = commandParams[7].toLowerCase();
-        stocksTaken = parseInt(commandParams[8]) || 0;
+        stocksTaken = parseInt(commandParams[8]) || commandParams[8] != `Stocks-Taken-From-Winner` ? 0 : `Stocks-Taken-From-Winner`;
     }
 
     if (!playerOneDB || !playerTwoDB) {
@@ -439,11 +447,12 @@ export const updatePlayersWithParameters = (parameters: Parameters) => {
             Can't find characters with those names.
         </h1>, `65%`, `35%`);
         return;
-    } else if (stocksTaken >= 3) {
+    } else if (stocksTaken == `Stocks-Taken-From-Winner` || stocksTaken < 0 || stocksTaken >= 3) {
         console.log(`Invalid Stocks Taken`, stocksTaken);
-        showAlert(`Invalid Stocks Taken`, <h1>
-            Stocks taken should be less than 3.
-        </h1>, `65%`, `35%`);
+        showAlert(`Invalid Stocks Taken`, <div>
+            <h1>How many stocks were taken from the winner?</h1>
+            <h1>Should be between 0 and 3 Stock(s)</h1>
+        </div>, `65%`, `35%`);
         return;
     } else {
 
@@ -539,6 +548,7 @@ export const processCommandsWithParameters = (parameters: Parameters) => {
     let firstCommand = commandParams[0];
     
     if (command != ``) {
+        console.log(`Send Command`, parameters);
         if (firstCommand.includes(`!upd`)) {
             updatePlayersWithParameters(parameters);
         } else if (firstCommand.includes(`!add`)) {
@@ -701,8 +711,16 @@ export default function PlayerForm(props) {
                     onChange={(e, val: any) => searchPlayers(e, val, `searchCharacters`)}
                     onInputChange={(e, val: any) => searchPlayers(e, val, `searchCharacters`)}
                     isOptionEqualToValue={(option, value) => option.id === value.id}
-                    renderInput={(params) => <TextField name={`characters`} {...params} label="Search Player(s) by Character(s) Played..." />}
+                    renderInput={(params) => <TextField name={`characters`} onBlur={(e) => searchBlur(e, filteredPlayers)} {...params} label="Search Player(s) by Character(s) Played..." />}
                     noOptionsText={`No Character(s) Found for Search`}
+                    // filterOptions={(characterOptions, state) => {
+                        // console.log(`Search Players by Character`, {characterOptions, state});
+                        // let input = state.inputValue.toLowerCase();
+                        // let expandedCharacters = characterOptions.filter(charOption => charOption.shortcuts.includes(input) || charOption.label.toLowerCase() == input);
+                        // return input != `` ? expandedCharacters : characterOptions;
+                        // const filtered = matchSorter(characterOptions, state.inputValue, { keys: [`label`, `shortcuts`] });
+                        // return filtered;
+                    // }}
                     renderOption={(props: any, characterOption: any) => {
                         return (
                             <div key={characterOption.id} {...props}>
