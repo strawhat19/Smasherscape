@@ -757,7 +757,7 @@ form {
                     width: 20%;
                 }
                 &[type="email"], &[type="password"] {
-                    width: calc(50% - 35px);
+                    width: calc(50% - 40px);
                 }
             }
         }
@@ -809,13 +809,19 @@ form {
                 color: black !important;
             }
             &[type="submit"] {
+                top: -5px;
                 width: 20%;
+                font-size: 15px;
+                position: relative;
                 box-shadow: none !important;
                 height: var(--authFormHeight);
                 background: transparent !important;
                 padding: 0px 10px 5px 5px !important;
                 border-top-left-radius: 0px !important;
                 border-bottom-left-radius: 0px !important;
+                @media (max-width: 768px) {
+                    top: 0;
+                }
             }
             &[type="email"], &[type="password"] {
                 font-size: 14px;

@@ -108,8 +108,8 @@ export default function Form(props?: any) {
             Ok so, I haven't quite put user authentication in yet, I will soon! For now, this is not supported yet, apologies!
           </h2>
         </div>, `65%`, `auto`);
-        setAuthState(`Next`);
         setEmailField(false);
+        setAuthState(`Next`);
         // setAuthState(`Signed Up`);
 
         // getDocs(collection(db, `users`)).then((snapshot) => {
