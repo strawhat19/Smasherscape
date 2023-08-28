@@ -21,8 +21,9 @@ import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
 import { doc, setDoc, deleteDoc, updateDoc } from 'firebase/firestore';
 import { getActivePlayers, isInvalid, newPlayerType } from './smasherscape';
 import { calcPlayerDeaths, calcPlayerKDRatio, calcPlayerKills, removeTrailingZeroDecimal } from './PlayerRecord';
-import { StateContext, showAlert, formatDate, generateUniqueID, countObjectKeys, getActivePlayersJSON, useDatabaseName, getAllPlays, getAllPlaysJSON } from '../pages/_app';
+import { StateContext, showAlert, formatDate, generateUniqueID, countPropertiesInObject, getActivePlayersJSON, useDatabaseName, getAllPlays, getAllPlaysJSON } from '../pages/_app';
 
+export const defaultXPModifier = 1;
 export const deletePlayerFromDB = async (playerObj: Player) => await deleteDoc(doc(db, useDatabaseName, playerObj?.ID));
 export const addPlayerToDB = async (playerObj: Player) => await setDoc(doc(db, useDatabaseName, playerObj?.ID), playerObj);
 export const updatePlayerInDB = async (playerObj: Player, parameters) => await updateDoc(doc(db, useDatabaseName, playerObj?.ID), parameters);
@@ -63,6 +64,18 @@ export const playerConverter = {
     }
 };
 
+export const showPropertiesWarning = (type, winner: Player, loser: Player) => {
+    showAlert(`${type == `Critical` ? `Critical! ` : ``}Player is Approaching 20,000 Properties`, <div>
+        <h1>One of the players is approaching 20,000 properties.</h1>
+        <h1>{winner.name}: {winner.properties}, {loser.name}: {loser.properties}</h1>
+        {type == `Critical` ? <h1>This change did not go through, please ask Rakib if he has implemented dynamic scaling yet.</h1> : (
+            <h1>For now the update will go through, but make sure you implement scaling.</h1>
+        )}
+        <h1>For this player, create a new document with the same id as them.</h1>
+        <h1>Then we can continue to update the plays on that new document.</h1>
+    </div>, `65%`, `35%`);
+}
+
 export const getCharacterObjects = () => {
     let characterObjects = getAllCharacters().map((char, charIndex) => {
         return {
@@ -94,56 +107,6 @@ export const updatePlayerStats = (plyr, plays) => {
     return plyr;
 }
 
-export const updatePlayerPlays = (playState) => {
-    let currentDateTimeStamp = formatDate(new Date());
-    let {
-        plyr, 
-        date,
-        stocks,
-        winChar, 
-        loserDB, 
-        winnerDB, 
-        loseChar, 
-        playUUID,
-        lossStocks, 
-        stocksTaken, 
-        winnerOrLoser, 
-    } = playState;
-
-    let prevExp = plyr.experience.arenaXP;
-    let newExp = winnerOrLoser == `winner` ? prevExp + (400 * plyr?.xpModifier) : prevExp + ((100 * plyr?.xpModifier) * stocksTaken);
-    let expGained = newExp - prevExp;
-    plyr.experience.arenaXP = newExp;
-    
-    plyr.plays.push({
-        otherCharacter: winnerOrLoser == `winner` ? loseChar : winChar,
-        character: winnerOrLoser == `winner` ? winChar : loseChar,
-        id: `player-${plyr.name}-play-${playUUID}`,
-        winner: winnerDB?.name,
-        winnerID: winnerDB?.id,
-        loser: loserDB?.name,
-        loserID: loserDB?.id,
-        uuid: playUUID,
-        stocksTaken,
-        lossStocks,
-        expGained,
-        prevExp,
-        newExp,
-        stocks,
-        date
-    });
-
-    calcPlayerLevelAndExperience(plyr);
-
-    updatePlayerStats(plyr, plyr.plays);
-
-    plyr.updated = currentDateTimeStamp;
-    plyr.lastUpdated = currentDateTimeStamp;
-    plyr.properties = countObjectKeys(plyr);
-
-    return plyr;
-}
-
 export const createPlayer = (playerName, playerIndex, databasePlayers): Player => {
 
     let currentDateTimeStamp = formatDate(new Date());
@@ -161,7 +124,6 @@ export const createPlayer = (playerName, playerIndex, databasePlayers): Player =
         uniqueIndex,
         displayName,
         active: true,
-        xpModifier: 1,
         disabled: false,
         expanded: false,
         playerLink: false,
@@ -170,6 +132,7 @@ export const createPlayer = (playerName, playerIndex, databasePlayers): Player =
         plays: [] as Play[],
         type: `Smasherscape`,
         username: displayName,
+        xpModifier: defaultXPModifier,
         created: currentDateTimeStamp,
         updated: currentDateTimeStamp,
         lastUpdated: currentDateTimeStamp,
@@ -194,7 +157,7 @@ export const createPlayer = (playerName, playerIndex, databasePlayers): Player =
     };
 
     updatePlayerStats(plyr, []);
-    plyr.properties = countObjectKeys(plyr);
+    plyr.properties = countPropertiesInObject(plyr);
 
     return plyr;
 }
@@ -399,6 +362,56 @@ export const giveParameterWithParameters = (parameters: Parameters) => {
     }
 }
 
+export const updatePlayerPlays = (playState) => {
+    let currentDateTimeStamp = formatDate(new Date());
+    let {
+        plyr, 
+        date,
+        stocks,
+        winChar, 
+        loserDB, 
+        winnerDB, 
+        loseChar, 
+        playUUID,
+        lossStocks, 
+        stocksTaken, 
+        winnerOrLoser, 
+    } = playState;
+
+    let prevExp = plyr.experience.arenaXP;
+    let newExp = winnerOrLoser == `winner` ? prevExp + (400 * plyr?.xpModifier) : prevExp + ((100 * plyr?.xpModifier) * stocksTaken);
+    let expGained = newExp - prevExp;
+    plyr.experience.arenaXP = newExp;
+    
+    plyr.plays.push({
+        otherCharacter: winnerOrLoser == `winner` ? loseChar : winChar,
+        character: winnerOrLoser == `winner` ? winChar : loseChar,
+        id: `player-${plyr.name}-play-${playUUID}`,
+        winner: winnerDB?.name,
+        winnerID: winnerDB?.id,
+        loser: loserDB?.name,
+        loserID: loserDB?.id,
+        uuid: playUUID,
+        stocksTaken,
+        lossStocks,
+        expGained,
+        prevExp,
+        newExp,
+        stocks,
+        date
+    });
+
+    calcPlayerLevelAndExperience(plyr);
+
+    updatePlayerStats(plyr, plyr.plays);
+
+    plyr.updated = currentDateTimeStamp;
+    plyr.lastUpdated = currentDateTimeStamp;
+    plyr.properties = countPropertiesInObject(plyr);
+
+    return plyr;
+}
+
 export const updatePlayersWithParameters = (parameters: Parameters) => {
     let {
         players,
@@ -532,9 +545,20 @@ export const updatePlayersWithParameters = (parameters: Parameters) => {
             }
         });
 
+        console.log(`Updated Players from Command`, updatedPlayers);
         if (useDatabase == true) {
-            updatePlayerInDB(winnerDB, updatedPlayers.find(plyr => plyr.id == winnerDB.id));
-            updatePlayerInDB(loserDB, updatedPlayers.find(plyr => plyr.id == loserDB.id));
+            let updatedWinner = updatedPlayers.find(plyr => plyr.id == winnerDB.id);
+            let updatedloser = updatedPlayers.find(plyr => plyr.id == loserDB.id);
+            if (winnerDB.properties >= 19900 || loserDB.properties >= 19900) {
+                showPropertiesWarning(`Critical`, winnerDB, loserDB);
+                return;
+            } else {
+                updatePlayerInDB(winnerDB, updatedWinner);
+                updatePlayerInDB(loserDB, updatedloser);
+                if (winnerDB.properties >= 19000 || loserDB.properties >= 19000) {
+                    showPropertiesWarning(`Warning`, winnerDB, loserDB);
+                }
+            }
         } else {
             updatePlayersDB(updatedPlayers);
             setPlayers(updatedPlayers);

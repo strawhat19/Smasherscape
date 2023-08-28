@@ -169,18 +169,18 @@ export const generateUniqueID = (existingIDs) => {
   return newID;
 };
 
-export const countObjectKeys = (obj) => {
+export const countPropertiesInObject = (obj) => {
   let count = 0;
   // Base condition to check if the input is an object
   if (typeof obj === 'object' && obj !== null) {
     for (const key in obj) {
       count++; // Count the current key
-      count += countObjectKeys(obj[key]); // Recursively count keys in nested objects
+      count += countPropertiesInObject(obj[key]); // Recursively count keys in nested objects
     }
     // If the object is an array, iterate over its elements
     if (Array.isArray(obj)) {
       obj.forEach(item => {
-          count += countObjectKeys(item); // Recursively count keys in nested objects within the array
+          count += countPropertiesInObject(item); // Recursively count keys in nested objects within the array
       });
     }
   }
