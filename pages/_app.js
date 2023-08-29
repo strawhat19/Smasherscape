@@ -507,6 +507,8 @@ export default function Xuruko({ Component, pageProps, router }) {
     let [users, setUsers] = useState([]);
     let [user, setUser] = useState(null);
     let [dark, setDark] = useState(false);
+    let [height, setHeight] = useState(0);
+    let [boards, setBoards] = useState([]);
     let [updates, setUpdates] = useState(0);
     let [onMac, setOnMac] = useState(false);
     let [focus, setFocus] = useState(false);
@@ -515,6 +517,7 @@ export default function Xuruko({ Component, pageProps, router }) {
     let [devEnv, setDevEnv] = useState(false);
     let [mobile, setMobile] = useState(false);
     let [loading, setLoading] = useState(true);
+    let [highScore, setHighScore] = useState(0);
     let [platform, setPlatform] = useState(null);
     let [anim, setAnimComplete] = useState(false);
     let [categories, setCategories] = useState([]);
@@ -523,9 +526,12 @@ export default function Xuruko({ Component, pageProps, router }) {
     let [authState, setAuthState] = useState(`Next`);
     let [bodyClasses, setBodyClasses] = useState(``);
     let [mobileMenu, setMobileMenu] = useState(false);
+    let [gameFormStep, setGameFormStep] = useState(1);
     let [emailField, setEmailField] = useState(false);
     let [systemStatus, setSystemStatus] = useState(``);
     let [buttonText, setButtonText] = useState(`Next`);
+    let [rearranging, setRearranging] = useState(false);
+    let [content, setContent] = useState(`defaultContent`)
     let [commands, setCommands] = useState(defaultCommands);
     let [year, setYear] = useState(new Date().getFullYear());
     let [playersToSelect, setPlayersToSelect] = useState([]);
