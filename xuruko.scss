@@ -593,13 +593,13 @@ footer {
     .commandsForm {
         gap: 15px;
         z-index: 2;
-        margin: 15px auto 0px;
+        margin: 0 auto 0;
         grid-template-columns: 1fr;
         transition: var(--transition);
         &.customHookInputContainer {
-            margin: 20px auto 10px;
+            margin: 10px auto 15px;
             @media (max-width: 768px) {
-                margin: 5px auto 30px !important;
+                margin: 0 auto 0 !important;
             }
             &:not(:has(.Mui-focused)) {
                 height: var(--customHookInputContainerHeight);
@@ -741,10 +741,6 @@ footer {
     background: black !important;
 }
 
-input[type="search"] {
-    background: var(--smasherscapeBrown) !important;
-}
-
 .fa-twitch {
     top: 4px;
     font-size: 24px;
@@ -756,8 +752,8 @@ form {
     gap: 15px;
     width: 100%;
     display: grid;
+    margin: 0 auto 0;
     align-items: center;
-    margin: 15px auto 5px;
     justify-content: center;
     transition: var(--transition);
     grid-template-columns: 1fr 1fr 1fr;
@@ -1012,6 +1008,7 @@ form {
 }
 
 .AdminArea, .customSection {
+    gap: 10px;
     width: 90%;
     display: flex;
     margin: 0 auto;
@@ -1034,14 +1031,14 @@ form {
     background: var(--xurukoGradientGreenBlue) !important;
     &.playerFormSubmit {
         @media (max-width: 768px) {
-            margin: -8px auto 0px !important;
+            margin: 0 auto 0 !important;
         }
     }
     &.commandsFormSubmit {
         display: none;
         @media (max-width: 768px) {
             display: flex;
-            margin: -8px auto -5px !important;
+            margin: 0 auto 0 !important;
         }
     }
 }
@@ -1346,7 +1343,7 @@ div[role="presentation"] {
     text-align: left;
     &.commandToCopy {
         width: 100%;
-        margin: 20px auto 0;
+        margin: 0 auto 0;
         .copySubmit {
             right: 80px;
         }
@@ -2024,14 +2021,15 @@ div[role="presentation"] {
     }
 }
 
+.centerPageHeader {
+    font-size: 1.55em;
+    text-align: center;
+}
+
 .toggleButtonsContainer {
     padding: 0;
     width: 100%;
     text-align: center;
-    .toggleButtonsHeader {
-        font-size: 1.55em;
-        padding-bottom: 15px;
-    }
     div[role="group"] {
         width: 100%;
         height: 65px;

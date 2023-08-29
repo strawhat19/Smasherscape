@@ -99,6 +99,10 @@ h6 {
     }
 }
 
+:is(html[class~=dark] .dark\:before\:nx-bg-neutral-800):before {
+    background: var(--smasherscapeGreen2Transparent2) !important;
+}
+
 html[class~="dark"] {
      @supports (-webkit-backdrop-filter:blur(1px)) or ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
         background: rgba(0, 0, 0, 1) !important;
@@ -905,9 +909,37 @@ section {
 }
 
 .nextra-search {
+    &::before {
+        content: "";
+        top: 6px;
+        left: 0;
+        width: 100%;
+        position: absolute;
+        border-radius: 8px;
+        transform: scale(1.015, 1.8);
+        height: calc(var(--authFormHeight) + 10px);
+        background: var(--xurukoGradientGreenBlue) !important;
+        @media (min-width: 768px) {
+            top: 5px;
+            transform: scale(1.05, 1.7);
+        }
+    }
     input {
-        border: 0 !important;
+        // font-size: 14px;
         outline: none !important;
+        border: 3px solid black;
+        color: black !important;
+        // border-radius: 8px !important;
+        background: rgba(255, 255, 255, 0.65) !important;
+    }
+    kbd {
+        color: white;
+        border-width: 2px;
+        border-color: black;
+    }
+    @media (max-width: 768px) {
+        width: 95%;
+        margin: 25px auto -5px;
     }
 }
 

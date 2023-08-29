@@ -1,14 +1,14 @@
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
 import { capitalizeAllWords, StateContext, showAlert, countPropertiesInObject, formatDate, signUpOrSignIn, getActivePlayersJSON } from '../pages/_app';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
 import { addPlayerToDB, addUserToDB, createPlayer } from './PlayerForm';
 import { useContext, useEffect, useRef, useState } from 'react';
 import { auth, googleProvider } from '../firebase';
+import { getActivePlayers } from './smasherscape';
 import PasswordRequired from './PasswordRequired';
 import GoogleButton from 'react-google-button';
 import Player from '../models/Player';
 import Role from '../models/Role';
 import User from '../models/User';
-import { getActivePlayers } from './smasherscape';
 
 export const formatDateFromFirebase = (timestamp) => {
   let date;

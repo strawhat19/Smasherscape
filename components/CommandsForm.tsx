@@ -131,7 +131,6 @@ export default function CommandsForm(props) {
     return (
         <>
         <div className={`toggleButtonsContainer`}>
-            <h2 className={`toggleButtonsHeader`}>Commands Builder Form</h2>
             <ToggleButtonGroup
                 exclusive
                 color="primary"

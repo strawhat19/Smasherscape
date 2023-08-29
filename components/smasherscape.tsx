@@ -1,4 +1,3 @@
-
 import Main from './Main';
 import Play from '../models/Play';
 import { useContext } from 'react';
@@ -29,40 +28,6 @@ export const getCharacterTitle = (char) => {
 export const removeEmptyParams = (object) => {
     Object.keys(object).forEach(key => isInvalid(object[key]) && delete object[key]);
     return object;
-}
-
-export const newPlayerType = (player: Player, customObject = true) => {
-
-    let level: Level = new Level(player.level.name, player.level.num) as Level;
-    let experience: Experience = new Experience(player.experience.nextLevelAt, player.experience.remainingXP, player.experience.arenaXP, player.experience.xp) as Experience;
-    let plays: Play[] = player.plays.map((play: Play) => {
-        let newPlay = new Play(removeEmptyParams(play));
-        return newPlay as Play;
-    }) as Play[];
-
-    let wins = calcPlayerWins(player);
-    let losses = calcPlayerLosses(player);
-    let ratio = (wins/(wins+losses)) * 100;
-    let kills = calcPlayerKills(player, plays);
-    let deaths = calcPlayerDeaths(player, plays);
-    let kdRatio = calcPlayerKDRatio(player, plays);
-    experience = removeEmptyParams(experience) as Experience;
-
-    let newPlayer: Player = new Player({
-        ...player,
-        level,
-        plays,
-        experience,
-        kills,
-        deaths,
-        kdRatio,
-        wins,
-        losses,
-        ratio,
-        percentage: (ratio) > 100 ? 100 : parseFloat(removeTrailingZeroDecimal(ratio)),
-    }) as Player;
-
-    return new Player(removeEmptyParams(newPlayer)) as Player;
 }
 
 export const getActivePlayers = (players: any[], customObject = true) => {
@@ -127,12 +92,49 @@ export const isInvalid = (item) => {
     }
 }
 
+export const newPlayerType = (player: Player, customObject = true) => {
+
+    let level: Level = new Level(player.level.name, player.level.num) as Level;
+    let experience: Experience = new Experience(player.experience.nextLevelAt, player.experience.remainingXP, player.experience.arenaXP, player.experience.xp) as Experience;
+    let plays: Play[] = player.plays.map((play: Play) => {
+        let newPlay = new Play(removeEmptyParams(play));
+        return newPlay as Play;
+    }) as Play[];
+
+    let wins = calcPlayerWins(player);
+    let losses = calcPlayerLosses(player);
+    let ratio = (wins/(wins+losses)) * 100;
+    let kills = calcPlayerKills(player, plays);
+    let deaths = calcPlayerDeaths(player, plays);
+    let kdRatio = calcPlayerKDRatio(player, plays);
+    experience = removeEmptyParams(experience) as Experience;
+
+    let newPlayer: Player = new Player({
+        ...player,
+        level,
+        plays,
+        experience,
+        kills,
+        deaths,
+        kdRatio,
+        wins,
+        losses,
+        ratio,
+        percentage: (ratio) > 100 ? 100 : parseFloat(removeTrailingZeroDecimal(ratio)),
+    }) as Player;
+
+    return new Player(removeEmptyParams(newPlayer)) as Player;
+}
+
 export default function Smasherscape(props) {
     const { filteredPlayers, players, noPlayersFoundMessage, devEnv, playersLoading, command } = useContext<any>(StateContext);
 
     return <Main className={`smasherscapeLeaderboard`}>
         <div className={`AdminArea ${command?.name}`}>
-            {devEnv && getActivePlayers(players).length > 0 && <CommandsForm />}
+            {devEnv && getActivePlayers(players).length > 0 && <>
+                <h2 className={`centerPageHeader toggleButtonsHeader`}>Commands Builder Form</h2>
+                <CommandsForm />
+            </>}
             <PlayerForm />
         </div>
         <div id={props.id} className={`${props.className} playerGrid ${getActivePlayers(filteredPlayers)?.length == 0 ? `empty` : `populated`}`}>
