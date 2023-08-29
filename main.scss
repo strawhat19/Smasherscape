@@ -920,8 +920,8 @@ section {
         height: calc(var(--authFormHeight) + 10px);
         background: var(--xurukoGradientGreenBlue) !important;
         @media (min-width: 768px) {
-            top: 5px;
-            transform: scale(1.05, 1.7);
+            top: 0px;
+            transform: scale(1.05, 1.5);
         }
     }
     input {
@@ -937,6 +937,11 @@ section {
         border-width: 2px;
         border-color: black;
     }
+    @media (min-width: 768px) {
+        input {
+            max-height: 30px !important;
+        }
+    }
     @media (max-width: 768px) {
         width: 95%;
         margin: 25px auto -5px;
@@ -949,6 +954,7 @@ section {
         max-width: fit-content !important;
     }
     @media (min-width: 768px) {
+        top: 2px;
         min-width: 369px;
         max-width: 420px;
     }
