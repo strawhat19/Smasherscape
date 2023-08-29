@@ -1,13 +1,13 @@
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
 import { capitalizeAllWords, StateContext, showAlert, countPropertiesInObject, formatDate } from '../pages/_app';
-import { useContext, useEffect, useRef, useState } from 'react';
 import { addPlayerToDB, addUserToDB, createPlayer } from './PlayerForm';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { auth, googleProvider } from '../firebase';
 import PasswordRequired from './PasswordRequired';
 import GoogleButton from 'react-google-button';
-import User from '../models/User';
-import Role from '../models/Role';
 import Player from '../models/Player';
+import Role from '../models/Role';
+import User from '../models/User';
 
 export const formatDateFromFirebase = (timestamp) => {
   let date;
@@ -69,7 +69,7 @@ export const signInWithGoogle = async (databasePlayers, setUser, setAuthState) =
       let namesToAdd = [name];
       namesToAdd.forEach((usr, usrIndex) => {
         let userPlayerData = createPlayer(usr, usrIndex, databasePlayers);
-        let { uid, email, image, firebaseUserData, playerLink, emailVerified, source, type, validSince, lastRefresh, lastSignIn } = createdGoogleUserFromFirebaseData;
+        let { uid, email, image, playerLink, emailVerified, source, type, validSince, lastRefresh, lastSignIn } = createdGoogleUserFromFirebaseData;
 
         let playerUserData: any = {
           ...userPlayerData,
@@ -83,7 +83,6 @@ export const signInWithGoogle = async (databasePlayers, setUser, setAuthState) =
           lastSignIn,
           lastRefresh,
           emailVerified,
-          firebaseUserData,
           roles: userPlayerData.roles.filter((rol: Role) => rol.level == 2).length > 0 ? userPlayerData.roles : [
             ...userPlayerData.roles, {
               level: 2,

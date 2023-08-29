@@ -789,7 +789,7 @@ form {
         .navFormDiv {
             .navFormSection {
                 &:has(.userSignedIn) {
-                    min-width: 100%;
+                    min-width: 100% !important;
                     form {
                         &.userSignedIn {
                             display: flex;
