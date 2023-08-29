@@ -1,8 +1,9 @@
 import '../main.scss';
 import '../xuruko.scss';
 import '../concentration.scss';
-import { db } from '../firebase';
+import { auth, db } from '../firebase';
 import ReactDOM from 'react-dom/client';
+import { onAuthStateChanged } from 'firebase/auth';
 import { parseDate } from '../components/PlayerRecord';
 import { AnimatePresence, motion } from 'framer-motion';
 import { defaultCommands } from '../components/Commands';
@@ -12,6 +13,7 @@ import { createContext, useRef, useState, useEffect } from 'react';
 
 export const useDB = () => false;
 export const StateContext = createContext({});
+export const signUpOrSignIn = `Sign Up or Sign In`;
 export const productionPlayersCollectionName = `players`;
 export const developmentPlayersCollectionName = `devPlayers`;
 export const testingPlayersCollectionName = `testPlayers`;
@@ -597,10 +599,26 @@ export default function Xuruko({ Component, pageProps, router }) {
       setSideBarUI();
 
       setBodyClasses(`${rte= `` ? rte : `Index`} pageWrapContainer ${page != `` ? page?.toUpperCase() : `Home`} ${devEnv ? `devMode` : `prodMode`} ${onMac ? `isMac` : `isWindows`} ${mobile ? `mobile` : `desktop`}`);
-
+      
       setLoading(false);
       setSystemStatus(`${getPage()} Loaded.`);
       setTimeout(() => setLoading(false), 1500);
+
+      if (useDatabase) {
+        const unsubscribeFromAuthStateListener = onAuthStateChanged(auth, user => {
+          if (user) {
+            setAuthState(`Sign Out`);
+            console.log(`user`, user);
+          } else {
+            dev() && console.log(`user`, user);
+            setUser(null);
+            setAuthState(`Next`);
+          }
+        })
+        return () => {
+          unsubscribeFromAuthStateListener();
+        }
+      }
 
     }, [rte, user, users, authState, dark])
 

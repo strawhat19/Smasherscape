@@ -1,7 +1,7 @@
-import { getAuth } from "firebase/auth";
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { GoogleAuthProvider } from 'firebase/auth';
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 const provider = new GoogleAuthProvider();
 provider.setCustomParameters({ prompt: 'select_account' });

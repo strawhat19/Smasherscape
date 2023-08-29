@@ -35,6 +35,7 @@ export default class Player {
     deaths?: number,
     kdRatio?: number,
     ratio?: number,
+    providerId?: string,
     percentage?: any,
     playerLink?: any,
     preferences?: any,

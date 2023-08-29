@@ -1,5 +1,5 @@
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
-import { capitalizeAllWords, StateContext, showAlert, countPropertiesInObject, formatDate } from '../pages/_app';
+import { capitalizeAllWords, StateContext, showAlert, countPropertiesInObject, formatDate, signUpOrSignIn, getActivePlayersJSON } from '../pages/_app';
 import { addPlayerToDB, addUserToDB, createPlayer } from './PlayerForm';
 import { useContext, useEffect, useRef, useState } from 'react';
 import { auth, googleProvider } from '../firebase';
@@ -8,6 +8,7 @@ import GoogleButton from 'react-google-button';
 import Player from '../models/Player';
 import Role from '../models/Role';
 import User from '../models/User';
+import { getActivePlayers } from './smasherscape';
 
 export const formatDateFromFirebase = (timestamp) => {
   let date;
@@ -23,7 +24,9 @@ export const formatDateFromFirebase = (timestamp) => {
 }
 
 export const createUserFromFirebaseData = (userCredential, type?, name?) => {
-  const firebaseUser = userCredential.user;
+  const firebaseUser = userCredential?.user;
+  const providerId = userCredential?.providerId;
+  const operationType = userCredential?.operationType;
   let currentDateTimeStamp = formatDate(new Date());
   let { uid, email, emailVerified, photoURL } = firebaseUser;
   let { creationTime, lastSignInTime } = firebaseUser.metadata;
@@ -34,8 +37,10 @@ export const createUserFromFirebaseData = (userCredential, type?, name?) => {
     email,
     id: uid,
     uuid: uid,
+    providerId,
     source: type,
     emailVerified,
+    operationType,
     // firebaseUser,
     playerLink: true,
     // userCredential,
@@ -52,6 +57,7 @@ export const createUserFromFirebaseData = (userCredential, type?, name?) => {
     }),
     ...(type == `Google` && {
       image: photoURL,
+      name: capitalizeAllWords(email.split(`@`)[0]),
     }),
   }
   return createdUser;
@@ -62,55 +68,73 @@ export const signInWithGoogle = async (databasePlayers, setUser, setAuthState) =
     let createdGoogleUserFromFirebaseData = null;
     let userCredential = await signInWithPopup(auth, googleProvider);
     if (userCredential) createdGoogleUserFromFirebaseData = createUserFromFirebaseData(userCredential, `Google`);
-    
+
     if (createdGoogleUserFromFirebaseData != null) {
-      console.log(`Pre User Signed In With Google`, {userCredential, createdGoogleUserFromFirebaseData});
-      let name = capitalizeAllWords(createdGoogleUserFromFirebaseData?.email.split(`@`)[0]);
-      let namesToAdd = [name];
-      namesToAdd.forEach((usr, usrIndex) => {
-        let userPlayerData = createPlayer(usr, usrIndex, databasePlayers);
-        let { uid, email, image, playerLink, emailVerified, source, type, validSince, lastRefresh, lastSignIn } = createdGoogleUserFromFirebaseData;
+      let nameToAdd = createdGoogleUserFromFirebaseData?.name;
+      let dbPlayers = getActivePlayers(databasePlayers);
+      let mappedDBPlayers = dbPlayers.map(plyr => plyr?.name?.toLowerCase());
+      let lowerCaseName = nameToAdd.toLowerCase();
 
-        let playerUserData: any = {
-          ...userPlayerData,
-          uid,
-          type,
-          email,
-          image,
-          source,
-          validSince,
-          playerLink,
-          lastSignIn,
-          lastRefresh,
-          emailVerified,
-          roles: userPlayerData.roles.filter((rol: Role) => rol.level == 2).length > 0 ? userPlayerData.roles : [
-            ...userPlayerData.roles, {
-              level: 2,
-              name: `User`,
-              promoted: userPlayerData.created,
-            }
-          ],
-        };
+      if (dbPlayers.length > 0 && (mappedDBPlayers.some(nam => nam == lowerCaseName || nam.includes(lowerCaseName)))) {
+        console.log(`User Exists Already`);
+        showAlert(`Player(s) Added Already`, <h1>
+            Player(s) with those name(s) already exist.
+        </h1>, `65%`, `35%`);
+        return;
+      } else {
+        let namesToAdd = [nameToAdd];
+        namesToAdd.forEach((usr, usrIndex) => {
+          let userPlayerData = createPlayer(usr, usrIndex, databasePlayers);
+          let { uid, email, image, playerLink, emailVerified, source, type, validSince, lastRefresh, lastSignIn, providerId,
+            operationType } = createdGoogleUserFromFirebaseData;
 
-        playerUserData.properties = countPropertiesInObject(playerUserData);
+          let playerUserData: any = {
+            ...userPlayerData,
+            uid,
+            type,
+            email,
+            image,
+            source,
+            providerId,
+            validSince,
+            playerLink,
+            lastSignIn,
+            lastRefresh,
+            operationType,
+            emailVerified,
+            roles: userPlayerData.roles.filter((rol: Role) => rol.level == 2).length > 0 ? userPlayerData.roles : [
+              ...userPlayerData.roles, {
+                level: 2,
+                name: `User`,
+                promoted: userPlayerData.created,
+              }
+            ],
+          };
 
-        createdGoogleUserFromFirebaseData = {
-          ...createdGoogleUserFromFirebaseData,
-          uniqueIndex: playerUserData?.uniqueIndex,
-          roles: playerUserData?.roles,
-          uuid: playerUserData?.uuid,
-          ID: playerUserData?.ID,
-          id: playerUserData?.id,
-        }
+          playerUserData.properties = countPropertiesInObject(playerUserData);
 
-        createdGoogleUserFromFirebaseData.properties = countPropertiesInObject(createdGoogleUserFromFirebaseData);
+          createdGoogleUserFromFirebaseData = {
+            ...createdGoogleUserFromFirebaseData,
+            uniqueIndex: playerUserData?.uniqueIndex,
+            roles: playerUserData?.roles,
+            uuid: playerUserData?.uuid,
+            ID: playerUserData?.ID,
+            id: playerUserData?.id,
+          }
 
-        console.log(`User`, {player: playerUserData, user: createdGoogleUserFromFirebaseData});
-        addPlayerToDB(playerUserData);
-        addUserToDB(createdGoogleUserFromFirebaseData);
-        setAuthState(`Sign Out`);
-        setUser(createdGoogleUserFromFirebaseData);
-      })
+          createdGoogleUserFromFirebaseData.properties = countPropertiesInObject(createdGoogleUserFromFirebaseData);
+
+          let usersAndPlaysState = {player: playerUserData, user: createdGoogleUserFromFirebaseData}
+          
+          if (userCredential.operationType != `signIn`) console.log(`Add To DB`, usersAndPlaysState);
+          if (userCredential.operationType != `signIn`) addPlayerToDB(usersAndPlaysState?.player);
+          if (userCredential.operationType != `signIn`) addUserToDB(usersAndPlaysState?.user);
+
+          console.log(`User`, usersAndPlaysState);
+          setUser(usersAndPlaysState?.user);
+          setAuthState(`Sign Out`);
+        })
+      }
     }
   } catch (error) {
     if (error.code === `auth/popup-closed-by-user`) {
@@ -238,7 +262,7 @@ export default function Form(props?: any) {
   <form id={props.id} onSubmit={authForm} className={`flex authForm ${props.className} ${authState == `Sign Up` || authState == `Sign In` ? `threeInputs` : ``} ${user ? `userSignedIn` : `userSignedOut`}`} style={style}>
     {!user && <div className={`authStateForm`}>
       <span className={`authFormLabel`}>
-        <span className={`authFormPhrase`}>{authState == `Next` ? `Sign Up or Sign In` : authState}</span>
+        <span className={`authFormPhrase`}>{authState == `Next` ? signUpOrSignIn : authState}</span>
       </span>
     </div>}
     {!user && <input placeholder="Email Address" type="email" name="email" autoComplete={`email`} required />}
@@ -252,10 +276,10 @@ export default function Form(props?: any) {
     {user && window?.location?.href?.includes(`profile`) && <input id="password" className={`editPassword userData`} placeholder="Edit Password" type="password" name="editPassword" autoComplete={`current-password`} />}
     <input className={(user && window?.location?.href?.includes(`profile`) || (authState == `Sign In` || authState == `Sign Up`)) ? `submit half` : `submit full`} type="submit" name="authFormSubmit" value={user ? `Sign Out` : authState} />
     {/* {(authState == `Sign In` || authState == `Sign Up`) && <input id={`back`} className={`back`} type="submit" name="authFormBack" value={`Back`} />} */}
-    {!user && <div title={`Sign In With Google`} className={`customUserSection`}>
+    {!user && <div title={`${signUpOrSignIn} With Google`} className={`customUserSection`}>
       <GoogleButton onClick={(e) => signInWithGoogle(databasePlayers, setUser, setAuthState)} type="dark" />
     </div>}
-    {user && <div title={`Sign In With Google`} className={`customUserSection`}>
+    {user && <div title={`${signUpOrSignIn} With Google`} className={`customUserSection`}>
       {user?.image ? <img alt={user?.email} src={user?.image}  className={`googleImage`} /> : user?.name?.split[``][0].toUpperCase()}
     </div>}
     {user && window?.location?.href?.includes(`profile`) && <input id={user?.id} className={`save`} type="submit" name="authFormSave" style={{padding: 0}} value={`Save`} />}
