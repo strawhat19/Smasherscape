@@ -106,7 +106,9 @@ li {
 }
 
 .playerGrid {
+    width: 97%;
     display: grid;
+    margin: 0 auto;
     align-items: center;
     padding: 15px 15px 50px;
     gap: 0px 40px !important;
