@@ -31,11 +31,11 @@ export const removeEmptyParams = (object) => {
     return object;
 }
 
-export const checkUserRole = (user: User, role) => {
-    let userRoleNames = user?.roles?.map(rol => rol?.name);
-    let userRoleLevels = user?.roles?.map(rol => rol?.level);
-    let maxUserRole = Math.max(...userRoleLevels);
+export const checkUserRole = (user: any, role) => {
     if (user && user?.roles && user?.roles?.length > 0) {
+        let userRoleNames = user?.roles?.map(rol => rol?.name);
+        let userRoleLevels = user?.roles?.map(rol => rol?.level);
+        let maxUserRole = Math.max(...userRoleLevels);
         if (typeof role == `string`) {
             let thisRole = defaultPlayerRoles.find(rol => rol?.name == role);
             let userHasRole = userRoleNames.includes(role) || maxUserRole >= thisRole?.level;
@@ -45,6 +45,8 @@ export const checkUserRole = (user: User, role) => {
             let userHasRole = userRoleLevels.includes(role) || maxUserRole >= thisRole?.level;
             return userHasRole;
         }
+    } else {
+        return user && user?.roles && user?.roles?.length > 0;
     }
 }
 

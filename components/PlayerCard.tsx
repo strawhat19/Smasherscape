@@ -11,12 +11,12 @@ export const calcPlayerWins = (plyr: Player) => plyr.plays.filter(ply => ply.win
 export const calcPlayerLosses = (plyr: Player) => plyr.plays.filter(ply => ply.loser.toLowerCase() == plyr.name.toLowerCase()).length;
 
 export default function PlayerCard(props) {
-    const { filteredPlayers, setFilteredPlayers, useLazyLoad } = useContext<any>(StateContext);
     let { plyr } = props;
+    const { user, filteredPlayers, setFilteredPlayers, useLazyLoad } = useContext<any>(StateContext);
     
     const setPlayerExpanded = (player: Player) => setFilteredPlayers(filteredPlayers.map(plyr => plyr.id == player.id ? { ...player, expanded: !player.expanded } : plyr));
 
-    return <div id={`playerCard-${plyr.id}`} className={`playerCard ${plyr?.expanded ? `expandedPlayerCard` : `collapsedPlayerCard`}`}>
+    return <div id={`playerCard-${plyr.id}`} className={`playerCard ${plyr?.expanded ? `expandedPlayerCard` : `collapsedPlayerCard`} ${plyr?.uid ? `playerCardUID-${plyr?.uid} ${user && user?.uid == plyr?.uid ? `playerIsUser userIsPlayer` : ``}` : ``}`}>
     <div className="gridCard" onClick={(e) => setPlayerExpanded(plyr)}>
         {useLazyLoad ? (
             <>
@@ -35,7 +35,10 @@ export default function PlayerCard(props) {
                     <img width={70} src={`${publicAssetLink}/assets/smasherscape/OSRS_Top_Hat.png?raw=true`} alt={`Tophat Logo`} />
                     <h3 className={`blackTextShadow slimmed`}>Xuruko's<br />SmasherScape</h3>
                 </div>
-                <h2 title={plyr?.name} className={`playerNameText bluePurpleTextShadow textOverflow overrideWithInlineBlock`}>{plyr?.name}</h2>
+                <h2 title={plyr?.name} className={`playerNameText bluePurpleTextShadow textOverflow overrideWithInlineBlock`}>
+                    {plyr?.name}
+                    {user && plyr?.uid && user?.uid == plyr?.uid && <img alt={user?.email} src={user?.image}  className={`userImage playerCardUserImage`} />}
+                </h2>
             </div>
             <div className="cardMiddleRow">
                 <div className={`imgLeftCol ${plyr.level.name.split(` `)[0]}`}>

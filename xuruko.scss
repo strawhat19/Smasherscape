@@ -110,7 +110,7 @@ li {
     display: grid;
     margin: 0 auto;
     align-items: center;
-    padding: 15px 15px 50px;
+    padding: 15px 15px 0;
     gap: 0px 40px !important;
     grid-template-columns: 1fr;
     justify-content: space-between;
@@ -1500,6 +1500,23 @@ div[role="presentation"] {
 }
 
 .playerCard {
+    .playerCardUserImage {
+        transform: translateY(-50%);
+        position: absolute;
+        max-height: 28px;
+        right: -5px;
+        top: 20%;
+    }
+    &.userIsPlayer {
+        .cardBG {
+            filter: brightness(0.8) hue-rotate(93deg);
+        }
+        .recordOfPlayer {
+            h3 {
+                background: transparent;
+            }
+        }
+    }
     margin-bottom: 40px;
     &.expandedPlayerCard {
         .logoWithWords {

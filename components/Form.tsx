@@ -1,4 +1,4 @@
-import { capitalizeAllWords, StateContext, showAlert, countPropertiesInObject, formatDate, signUpOrSignIn, defaultPlayerRoles } from '../pages/_app';
+import { capitalizeAllWords, StateContext, showAlert, countPropertiesInObject, formatDate, signUpOrSignIn, defaultPlayerRoles, dev } from '../pages/_app';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
 import { addPlayerToDB, addUserToDB, createPlayer } from './PlayerForm';
 import { useContext, useEffect, useRef, useState } from 'react';
@@ -28,9 +28,13 @@ export const createUserFromFirebaseData = (userCredential, type?, name?) => {
   let currentDateTimeStamp = formatDate(new Date());
   const operationType = userCredential?.operationType;
   const firebaseUser = userCredential?.user || userCredential;
-  let { creationTime, lastSignInTime } = firebaseUser?.metadata;
+  let creationTime = firebaseUser && firebaseUser?.metadata && firebaseUser?.metadata?.creationTime;
+  let lastSignInTime = firebaseUser && firebaseUser?.metadata && firebaseUser?.metadata?.lastSignInTime;
   let { uid, email, emailVerified, photoURL, displayName, phoneNumber } = firebaseUser;
-  let { lastRefreshAt, passwordHash, passwordUpdatedAt, validSince } = firebaseUser?.reloadUserInfo;
+  let lastRefreshAt = firebaseUser && firebaseUser?.reloadUserInfo && firebaseUser?.reloadUserInfo?.lastRefreshAt;
+  let passwordHash = firebaseUser && firebaseUser?.reloadUserInfo && firebaseUser?.reloadUserInfo?.passwordHash;
+  let passwordUpdatedAt = firebaseUser && firebaseUser?.reloadUserInfo && firebaseUser?.reloadUserInfo?.passwordUpdatedAt;
+  let validSince = firebaseUser && firebaseUser?.reloadUserInfo && firebaseUser?.reloadUserInfo?.validSince;
   let createdUser: User = {
     uid,
     type,
@@ -59,13 +63,7 @@ export const createUserFromFirebaseData = (userCredential, type?, name?) => {
       image: photoURL,
       name: capitalizeAllWords(email.split(`@`)[0]),
     }),
-    roles: firebaseUser?.customClaims?.roles || firebaseUser?.roles || [{
-      ...defaultPlayerRoles[0],
-      promoted: currentDateTimeStamp,
-    }, {
-      ...defaultPlayerRoles[1],
-      promoted: currentDateTimeStamp,
-    }],
+    roles: firebaseUser?.customClaims?.roles || firebaseUser?.roles,
   }
   return createdUser;
 }
@@ -81,15 +79,10 @@ export const signInWithGoogle = async (databasePlayers, setUser, setAuthState) =
       let nameToAdd = createdGoogleUserFromFirebaseData?.name;
       let lowerCaseName = nameToAdd.toLowerCase();
       let playerExists = dbPlayers.length > 0 && dbPlayers.find(plyr => plyr.name.toLowerCase() == lowerCaseName || plyr.name.toLowerCase().includes(lowerCaseName));
-      let mappedDBPlayers = dbPlayers.map(plyr => plyr?.name?.toLowerCase());
 
-      if (dbPlayers.length > 0 && (mappedDBPlayers.some(nam => nam == lowerCaseName || nam.includes(lowerCaseName)))) {
-        console.log(`playerExists`, playerExists);
-        // console.log(`User Exists Already`);
-        // showAlert(`Player(s) Added Already`, <h1>
-        //     Player(s) with those name(s) already exist.
-        // </h1>, `65%`, `35%`);
-        // return;
+      if (playerExists) {
+        setUser(playerExists);
+        setAuthState(`Sign Out`);
       } else {
         let namesToAdd = [nameToAdd];
         namesToAdd.forEach((usr, usrIndex) => {
@@ -111,13 +104,7 @@ export const signInWithGoogle = async (databasePlayers, setUser, setAuthState) =
             lastRefresh,
             operationType,
             emailVerified,
-            roles: userPlayerData?.roles || [{
-              ...defaultPlayerRoles[0],
-              promoted: currentDateTimeStamp,
-            }, {
-              ...defaultPlayerRoles[1],
-              promoted: currentDateTimeStamp,
-            }],
+            roles: userPlayerData?.roles,
           };
 
           playerUserData.properties = countPropertiesInObject(playerUserData);
@@ -137,11 +124,14 @@ export const signInWithGoogle = async (databasePlayers, setUser, setAuthState) =
 
           let usersAndPlaysState = {player: playerUserData, user: createdGoogleUserFromFirebaseData}
           
-          if (userCredential.operationType != `signIn`) console.log(`Add To DB`, usersAndPlaysState);
-          if (userCredential.operationType != `signIn`) addPlayerToDB(usersAndPlaysState?.player);
-          if (userCredential.operationType != `signIn`) addUserToDB(usersAndPlaysState?.user);
+          // if (dev()) console.log(`Add To DB`, usersAndPlaysState);
+          addPlayerToDB(usersAndPlaysState?.player);
+          // addUserToDB(usersAndPlaysState?.user);
+          // if (dev() && userCredential.operationType != `signIn`) console.log(`Add To DB`, usersAndPlaysState);
+          // if (userCredential.operationType != `signIn`) addPlayerToDB(usersAndPlaysState?.player);
+          // if (userCredential.operationType != `signIn`) addUserToDB(usersAndPlaysState?.user);
 
-          console.log(`User`, usersAndPlaysState);
+          dev() && console.log(`User`, usersAndPlaysState);
           setUser(usersAndPlaysState?.user);
           setAuthState(`Sign Out`);
         })
@@ -149,7 +139,7 @@ export const signInWithGoogle = async (databasePlayers, setUser, setAuthState) =
     }
   } catch (error) {
     if (error.code === `auth/popup-closed-by-user`) {
-      console.log(`User closed Google sign in popup`);
+      dev() && console.log(`User closed Google sign in popup`);
     } else {
       console.log(`Error Signing into Google`, error);
     }
@@ -296,7 +286,7 @@ export default function Form(props?: any) {
           <GoogleButton onClick={(e) => signInWithGoogle(databasePlayers, setUser, setAuthState)} type="dark" />
         </div>}
         {user && <div title={`Welcome, ${user?.name}`} className={`customUserSection`}>
-          {user?.image ? <img alt={user?.email} src={user?.image}  className={`googleImage`} /> : user?.name?.split[``][0].toUpperCase()}
+          {user?.image ? <img alt={user?.email} src={user?.image}  className={`userImage`} /> : user?.name?.split[``][0].toUpperCase()}
           Welcome, {user?.name}
         </div>}
         {user && window?.location?.href?.includes(`profile`) && <input id={user?.id} className={`save`} type="submit" name="authFormSave" style={{padding: 0}} value={`Save`} />}

@@ -23,7 +23,7 @@ export default function CommandsForm(props) {
     let [playerOne, setPlayerOne] = useState<any>(getDefaultPlayer(1));
     let [playerTwo, setPlayerTwo] = useState<any>(getDefaultPlayer(2));
     let [stocksTaken, setStocksTaken] = useState<any>(`Stocks-Taken-From-Winner`);
-    const { players, command, setCommand, playersToSelect, commandsToNotInclude, commands, setPlayers, useDatabase, databasePlayers, updatePlayersDB, deleteCompletely, setFilteredPlayers, sameNamePlayeredEnabled, setLoadingPlayers } = useContext<any>(StateContext);
+    const { players, command, setCommand, playersToSelect, commandsToNotInclude, commands, setPlayers, useDatabase, databasePlayers, updatePlayersDB, deleteCompletely, setFilteredPlayers, sameNamePlayeredEnabled, setLoadingPlayers, iPhone } = useContext<any>(StateContext);
 
     const adjustStocks = (e, val) => {
         if (val) {
@@ -168,7 +168,7 @@ export default function CommandsForm(props) {
             </li>
         </ul>
         <section className={`formsSection`}>
-            <form onSubmit={(e) => submitCommandsForm(e)} className={`commandsForm ${command.command == `!upd` ? `updateCommandForm` : `customHookInputContainer`} gridForm`} action="submit">
+            <form onSubmit={(e) => submitCommandsForm(e)} className={`commandsForm ${command.command == `!upd` ? `updateCommandForm` : `customHookInputContainer`} gridForm ${iPhone ? `on_iPhoneCommandForm` : `notOn_iPhoneCommandForm`}`} action="submit">
                 <div className={`commandInputs ${command.command == `!upd` ? `expanded` : `collapsed`}`}>
                     <div className="updateRow updateTopRow">
                         <div className={`playerSearchAuto inputWrapper materialBGInputWrapper`}>
@@ -193,7 +193,7 @@ export default function CommandsForm(props) {
                                 }}
                             />
                         </div>
-                        <div className={`conditionAuto smallAuto inputWrapper materialBGInputWrapper`}>
+                        <div className={`conditionAuto smallAuto inputWrapper materialBGInputWrapper ${iPhone ? `on_iPhoneConditionAuto` : `notOn_iPhoneConditionAuto`}`}>
                             <div className="inputBG materialBG"></div>
                             <Autocomplete
                                 autoHighlight
@@ -264,7 +264,7 @@ export default function CommandsForm(props) {
                                 }}
                             />
                         </div>
-                        <div className={`conditionAuto stocksAuto smallAuto inputWrapper materialBGInputWrapper`}>
+                        <div className={`conditionAuto stocksAuto smallAuto inputWrapper materialBGInputWrapper ${iPhone ? `on_iPhoneStocksAuto` : `notOn_iPhoneStocksAuto`}`}>
                             <div className="inputBG materialBG"></div>
                             <Autocomplete
                                 autoHighlight

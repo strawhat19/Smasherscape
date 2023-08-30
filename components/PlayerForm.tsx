@@ -147,7 +147,22 @@ export const createPlayer = (playerName, playerIndex, databasePlayers): Player =
                 promoted: currentDateTimeStamp,
                 name: `Player`,
                 level: 1,
-            }
+            },
+            {
+                promoted: currentDateTimeStamp,
+                name: `User`,
+                level: 2,
+            },
+            // {
+            //     promoted: currentDateTimeStamp,
+            //     name: `Admin`,
+            //     level: 3,
+            // },
+            // {
+            //     promoted: currentDateTimeStamp,
+            //     name: `Owner`,
+            //     level: 3,
+            // },
         ] as Role[],
         experience: {
             xp: 0,
@@ -552,7 +567,7 @@ export const updatePlayersWithParameters = (parameters: Parameters) => {
             stocksTaken,  
         }
 
-        console.log(`Update Players Play State`, playState);
+        dev() && console.log(`Update Players Play State`, playState);
         let updatedPlayers: any[] = getActivePlayersJSON(players).map((plyr) => {
             if (plyr?.id == winnerDB?.id) {
                 updatePlayerPlays({...playState, plyr, winnerOrLoser: `winner`});
@@ -565,7 +580,7 @@ export const updatePlayersWithParameters = (parameters: Parameters) => {
             }
         });
 
-        console.log(`Updated Players from Command`, updatedPlayers);
+        dev() && console.log(`Updated Players from Command`, updatedPlayers);
         if (useDatabase == true) {
             let updatedWinner = updatedPlayers.find(plyr => plyr.id == winnerDB.id);
             let updatedloser = updatedPlayers.find(plyr => plyr.id == loserDB.id);
