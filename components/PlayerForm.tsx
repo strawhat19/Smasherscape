@@ -20,7 +20,7 @@ import { calcPlayerLevelAndExperience } from '../common/Levels';
 import { FormEvent, useContext, useEffect, useRef } from 'react';
 import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
 import { doc, setDoc, deleteDoc, updateDoc } from 'firebase/firestore';
-import { getActivePlayers, isInvalid, newPlayerType } from './smasherscape';
+import { checkUserRole, getActivePlayers, isInvalid, newPlayerType } from './smasherscape';
 import { calcPlayerDeaths, calcPlayerKDRatio, calcPlayerKills, removeTrailingZeroDecimal } from './PlayerRecord';
 import { StateContext, showAlert, formatDate, generateUniqueID, countPropertiesInObject, getActivePlayersJSON, useDatabaseName, getAllPlays, getAllPlaysJSON, defaultXPMultiplier, XPGainOnWin, XPGainOnLoserXPForEachStockTaken, winCons, loseCons } from '../pages/_app';
 
@@ -621,7 +621,7 @@ export default function PlayerForm(props) {
 
     const searchInput = useRef();
     const commandsInput = useRef();
-    const { players, setPlayers, filteredPlayers, setFilteredPlayers, devEnv, useDatabase, commands, databasePlayers, sameNamePlayeredEnabled, deleteCompletely, setLoadingPlayers } = useContext<any>(StateContext);
+    const { user, players, setPlayers, filteredPlayers, setFilteredPlayers, devEnv, useDatabase, commands, databasePlayers, sameNamePlayeredEnabled, deleteCompletely, setLoadingPlayers } = useContext<any>(StateContext);
 
     useEffect(() => {
         if (getActivePlayers(players).length > 0) {
@@ -722,7 +722,7 @@ export default function PlayerForm(props) {
     }
 
     return <section className={`formsSection`}>
-    <form id={`playerForm`} onSubmit={(e) => handleCommands(e)} action="submit" className={`gridForm ${getActivePlayers(players).length > 0 ? `populated ${getActivePlayers(players).length} ${getAllPlays(getActivePlayers(players)).length > 0 ? `hasPlays` : `noPlays`}` : `empty`} ${devEnv ? `hasCommandsPerm` : `noCommandsPerm`}`}>
+    <form id={`playerForm`} onSubmit={(e) => handleCommands(e)} action="submit" className={`gridForm ${getActivePlayers(players).length > 0 ? `populated ${getActivePlayers(players).length} ${getAllPlays(getActivePlayers(players)).length > 0 ? `hasPlays` : `noPlays`}` : `empty`} ${(useDatabase == false || (user && checkUserRole(user, `Admin`))) ? `hasCommandsPerm` : `noCommandsPerm`}`}>
         {getActivePlayers(players).length > 0 && <>
             <div className={`playerSearchAuto inputWrapper materialBGInputWrapper`}>
                 <div className="inputBG materialBG"></div>
@@ -748,7 +748,7 @@ export default function PlayerForm(props) {
                 />
             </div>
         </>}
-        {devEnv && <div id={`commandsInput`} className={`inputWrapper`}>
+        {(useDatabase == false || (user && checkUserRole(user, `Admin`))) && <div id={`commandsInput`} className={`inputWrapper`}>
             <div className="inputBG"></div>
             <input ref={commandsInput} type="text" className="commands" name={`commands`} placeholder={getActivePlayers(players).length > 0 ? `Enter Commands...` : `!add name to add players or sign up`} />
         </div>}

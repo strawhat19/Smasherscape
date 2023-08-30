@@ -9,7 +9,9 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { defaultCommands } from '../components/Commands';
 import { newPlayerType } from '../components/smasherscape';
 import { collection, onSnapshot } from 'firebase/firestore';
+import { createUserFromFirebaseData } from '../components/Form';
 import { createContext, useRef, useState, useEffect } from 'react';
+import User from '../models/User';
 
 export const useDB = () => false;
 export const StateContext = createContext({});
@@ -359,6 +361,29 @@ export const showAlert = async (title, component, width, height) => {
   });
 }
 
+export const defaultPlayerRoles = [
+  {
+    name: `Player`,
+    level: 1,
+  },
+  {
+    name: `User`,
+    level: 2,
+  },
+  {
+    name: `Admin`,
+    level: 3,
+  },
+  {
+    name: `Developer`,
+    level: 4,
+  },
+  {
+    name: `Owner`,
+    level: 5,
+  },
+];
+
 export const defaultPlayers = [
   {
     id: `1_Player_Billy_8:30_PM_8-26-2023_EDT_ontQ1dKae`,
@@ -609,13 +634,19 @@ export default function Xuruko({ Component, pageProps, router }) {
       if (useDatabase == true) {
         const unsubscribeFromAuthStateListener = onAuthStateChanged(auth, user => {
           if (user) {
-            dev() && console.log(`user onAuthStateChange`, user);
-            setUser(user);
+            let name = capitalizeAllWords(user?.email?.split(`@`)[0]);
+            let providerID = user?.providerData[0]?.providerId;
+            let provider = providerID?.includes(`.`) ? providerID?.split(`.`)[0] : providerID;
+            let type = capitalizeAllWords(provider);
+            let customUser = new User(createUserFromFirebaseData(user, type, name));
+            // dev() && console.log(`user onAuthStateChange`, user);
+            setUser(customUser);
             setAuthState(`Sign Out`);
+            dev() && console.log(`User`, customUser);
           } else {
-            dev() && console.log(`user onAuthStateChange`, user);
             setUser(null);
             setAuthState(`Next`);
+            dev() && console.log(`User`, user);
           }
         })
         return () => {

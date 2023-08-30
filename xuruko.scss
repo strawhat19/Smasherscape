@@ -114,6 +114,11 @@ li {
     gap: 0px 40px !important;
     grid-template-columns: 1fr;
     justify-content: space-between;
+    &.populated {
+        .gridCard {
+            cursor: pointer;
+        }
+    }
     @media (min-width: 1291px) {
         &.populated {
             align-items: flex-start;
@@ -128,7 +133,6 @@ li {
         width: 100%;
         height: 100%;
         display: flex;
-        cursor: pointer;
         min-height: 500px;
         position: relative;
         align-items: center;
@@ -303,6 +307,7 @@ li {
                         display: flex;
                         line-height: 1;
                         font-size: 18px;
+                        margin-right: auto;
                         position: relative;
                         align-items: center;
                         justify-content: space-between;
@@ -845,6 +850,7 @@ form {
             position: absolute;
             border-radius: 8px;
             transform: scale(1.02, 1.7);
+            transition: var(--transition);
             height: calc(var(--authFormHeight) + 5px);
             background: var(--xurukoGradientGreenBlue) !important;
         }
@@ -1464,14 +1470,25 @@ div[role="presentation"] {
     top: -2px;
 }
 
+.userSignedIn {
+    .customUserSection {
+        z-index: 1;
+        grid-gap: 10px;
+        display: flex;
+        align-items: center;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+}
+
 // Google Button
 .customUserSection {
+    max-width: fit-content;
     img {
         z-index: 1;
         max-width: 25px;
         max-height: 25px;
     }
-    max-width: fit-content;
     div {
         &[role="button"] {
             &[type="dark"] {
