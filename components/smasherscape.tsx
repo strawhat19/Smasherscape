@@ -1,5 +1,6 @@
 import Main from './Main';
 import Play from '../models/Play';
+import User from '../models/User';
 import { useContext } from 'react';
 import Level from '../models/Level';
 import Player from '../models/Player';
@@ -8,7 +9,7 @@ import CommandsForm from './CommandsForm';
 import LoadingSpinner from './LoadingSpinner';
 import Experience from '../models/Experience';
 import { Characters } from '../common/Characters';
-import { StateContext, getActivePlayersJSON } from '../pages/_app';
+import { StateContext, defaultPlayerRoles, getActivePlayersJSON } from '../pages/_app';
 import PlayerCard, { calcPlayerLosses, calcPlayerWins } from './PlayerCard';
 import { calcPlayerDeaths, calcPlayerKDRatio, calcPlayerKills, parseDate, removeTrailingZeroDecimal } from './PlayerRecord';
 
@@ -28,6 +29,23 @@ export const getCharacterTitle = (char) => {
 export const removeEmptyParams = (object) => {
     Object.keys(object).forEach(key => isInvalid(object[key]) && delete object[key]);
     return object;
+}
+
+export const checkUserRole = (user: User, role) => {
+    let userRoleNames = user?.roles?.map(rol => rol?.name);
+    let userRoleLevels = user?.roles?.map(rol => rol?.level);
+    let maxUserRole = Math.max(...userRoleLevels);
+    if (user && user?.roles && user?.roles?.length > 0) {
+        if (typeof role == `string`) {
+            let thisRole = defaultPlayerRoles.find(rol => rol?.name == role);
+            let userHasRole = userRoleNames.includes(role) || maxUserRole >= thisRole?.level;
+            return userHasRole;
+        } else {
+            let thisRole = defaultPlayerRoles.find(rol => rol?.level == role);
+            let userHasRole = userRoleLevels.includes(role) || maxUserRole >= thisRole?.level;
+            return userHasRole;
+        }
+    }
 }
 
 export const getActivePlayers = (players: any[], customObject = true) => {
@@ -127,11 +145,11 @@ export const newPlayerType = (player: Player, customObject = true) => {
 }
 
 export default function Smasherscape(props) {
-    const { filteredPlayers, players, noPlayersFoundMessage, devEnv, playersLoading, command } = useContext<any>(StateContext);
+    const { user, useDatabase, filteredPlayers, players, noPlayersFoundMessage, devEnv, playersLoading, command } = useContext<any>(StateContext);
 
-    return <Main className={`smasherscapeLeaderboard`}>
+    return <Main className={`smasherscapeLeaderboard`} style={playersLoading ? {paddingTop: 10} : null}>
         <div className={`AdminArea ${command?.name}`}>
-            {devEnv && getActivePlayers(players).length > 0 && <>
+            {getActivePlayers(players).length > 0 && (useDatabase == false || (user && checkUserRole(user, `Admin`))) && <>
                 <h2 className={`centerPageHeader toggleButtonsHeader`}>Commands Builder Form</h2>
                 <CommandsForm />
             </>}

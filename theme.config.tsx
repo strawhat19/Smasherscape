@@ -40,6 +40,13 @@ const config: DocsThemeConfig = {
   // navbar: {
     // extraContent: <NextraSearch />
   // },
+  ...(useDB() == false && {
+    navbar: {
+      extraContent: <div className={`navIconsContainer`}>
+      <NavIcons />
+    </div>
+    }
+  }),
   search: {
     ...(useDB() == false && {
       placeholder: `Search...`,

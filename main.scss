@@ -916,6 +916,7 @@ section {
         width: 100%;
         position: absolute;
         border-radius: 8px;
+        transition: var(--transition);
         transform: scale(1.015, 1.8);
         height: calc(var(--authFormHeight) + 10px);
         background: var(--xurukoGradientGreenBlue) !important;
@@ -949,14 +950,38 @@ section {
 }
 
 .navFormSection {
+    min-width: 260px;
     padding: 0 !important;
     .submit {
         max-width: fit-content !important;
     }
-    @media (min-width: 768px) {
-        top: 2px;
-        min-width: 369px;
-        max-width: 420px;
+    &:has(.userSignedIn) {
+        @media (min-width: 768px) {
+            max-width: fit-content !important;
+        }
+        .authForm {
+            grid-gap: 10px;
+            padding: 0 10px;
+            flex-direction: row-reverse !important;
+            &::before {
+                background: var(--xurukoGradientBlueGreen) !important;
+            }
+        }
+        input[type="submit"] {
+            top: 0;
+            width: 100%;
+            color: black !important;
+            padding-left: 10px !important;
+            background: white !important;
+            border-top-left-radius: 8px !important;
+            border-bottom-left-radius: 8px !important;
+        }  
+    }
+    &:not:has(.userSignedIn) {
+        @media (min-width: 768px) {
+            top: 2px;
+            max-width: 420px;
+        }
     }
 }
 
