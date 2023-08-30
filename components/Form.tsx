@@ -1,4 +1,4 @@
-import { capitalizeAllWords, StateContext, showAlert, countPropertiesInObject, formatDate, signUpOrSignIn } from '../pages/_app';
+import { capitalizeAllWords, StateContext, showAlert, countPropertiesInObject, formatDate, signUpOrSignIn, defaultPlayerRoles } from '../pages/_app';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
 import { addPlayerToDB, addUserToDB, createPlayer } from './PlayerForm';
 import { useContext, useEffect, useRef, useState } from 'react';
@@ -8,7 +8,6 @@ import PasswordRequired from './PasswordRequired';
 import GoogleButton from 'react-google-button';
 import LoadingSpinner from './LoadingSpinner';
 import { signOut } from "firebase/auth";
-import Role from '../models/Role';
 import User from '../models/User';
 
 export const formatDateFromFirebase = (timestamp) => {
@@ -44,9 +43,7 @@ export const createUserFromFirebaseData = (userCredential, type?, name?) => {
     source: type,
     emailVerified,
     operationType,
-    // firebaseUser,
     playerLink: true,
-    // userCredential,
     updated: currentDateTimeStamp,
     lastUpdated: currentDateTimeStamp,
     created: formatDateFromFirebase(creationTime),
@@ -62,6 +59,13 @@ export const createUserFromFirebaseData = (userCredential, type?, name?) => {
       image: photoURL,
       name: capitalizeAllWords(email.split(`@`)[0]),
     }),
+    roles: firebaseUser?.customClaims?.roles || firebaseUser?.roles || [{
+      ...defaultPlayerRoles[0],
+      promoted: currentDateTimeStamp,
+    }, {
+      ...defaultPlayerRoles[1],
+      promoted: currentDateTimeStamp,
+    }],
   }
   return createdUser;
 }
@@ -89,9 +93,9 @@ export const signInWithGoogle = async (databasePlayers, setUser, setAuthState) =
       } else {
         let namesToAdd = [nameToAdd];
         namesToAdd.forEach((usr, usrIndex) => {
+          let currentDateTimeStamp = formatDate(new Date());
           let userPlayerData = createPlayer(usr, usrIndex, databasePlayers);
-          let { uid, email, image, playerLink, emailVerified, source, type, validSince, lastRefresh, lastSignIn, providerId,
-            operationType } = createdGoogleUserFromFirebaseData;
+          let { uid, email, image, playerLink, emailVerified, source, type, validSince, lastRefresh, lastSignIn, providerId, operationType } = createdGoogleUserFromFirebaseData;
 
           let playerUserData: any = {
             ...userPlayerData,
@@ -107,19 +111,21 @@ export const signInWithGoogle = async (databasePlayers, setUser, setAuthState) =
             lastRefresh,
             operationType,
             emailVerified,
-            roles: userPlayerData.roles.filter((rol: Role) => rol.level == 2).length > 0 ? userPlayerData.roles : [
-              ...userPlayerData.roles, {
-                level: 2,
-                name: `User`,
-                promoted: userPlayerData.created,
-              }
-            ],
+            roles: userPlayerData?.roles || [{
+              ...defaultPlayerRoles[0],
+              promoted: currentDateTimeStamp,
+            }, {
+              ...defaultPlayerRoles[1],
+              promoted: currentDateTimeStamp,
+            }],
           };
 
           playerUserData.properties = countPropertiesInObject(playerUserData);
 
           createdGoogleUserFromFirebaseData = {
             ...createdGoogleUserFromFirebaseData,
+            updated: currentDateTimeStamp,
+            lastUpdated: currentDateTimeStamp,
             uniqueIndex: playerUserData?.uniqueIndex,
             roles: playerUserData?.roles,
             uuid: playerUserData?.uuid,

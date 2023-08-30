@@ -934,6 +934,14 @@ form {
         min-height: 55px;
         display: grid;
         width: 99%;
+        &#commandsInput {
+            margin-left: auto;
+            margin-right: 5px;
+            width: 98%;
+            @media (max-width: 768px) {
+                margin-right: 7px;
+            }
+        }
         .inputBG {
             top: 0;
             left: 0;
@@ -1036,6 +1044,7 @@ form {
     border-radius: 8px;
     background: var(--xurukoGradientGreenBlue) !important;
     &.playerFormSubmit {
+        display: none;
         @media (max-width: 768px) {
             margin: 0 auto 0 !important;
         }
@@ -1043,7 +1052,7 @@ form {
     &.commandsFormSubmit {
         display: none;
         @media (max-width: 768px) {
-            display: flex;
+            // display: flex;
             margin: 0 auto 0 !important;
         }
     }
@@ -1563,8 +1572,10 @@ div[role="presentation"] {
 }
 
 @media (min-width: 768px) {
-    .navIconsContainer {
-        display: none;
+    .useDB {
+        .navIconsContainer.showWhenNoDB {
+            display: none;
+        }
     }
     .formSubmitButton {
         &:not(.commandsFormSubmit) {

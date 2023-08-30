@@ -164,8 +164,8 @@ export default function Smasherscape(props) {
                 </div>
             </>}
             {!playersLoading ? getActivePlayers(filteredPlayers)?.length > 0 && getActivePlayers(filteredPlayers)?.map((plyr, plyrIndex) => {
-                return playersLoading ? <LoadingSpinner size={42} /> : <PlayerCard plyr={plyr} key={plyrIndex} />
-            }) : <LoadingSpinner size={42} />}
+                return playersLoading ? <LoadingSpinner size={30} override={true} /> : <PlayerCard plyr={plyr} key={plyrIndex} />
+            }) : <LoadingSpinner size={30} override={true} />}
         </div>
     </Main>
 }

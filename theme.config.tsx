@@ -53,11 +53,11 @@ const config: DocsThemeConfig = {
     }),
     ...(useDB() == true && {
       component: <>
-        <div className={`navIconsContainer`}>
+        <div className={`navIconsContainer showWhenNoDB`}>
           <NavIcons />
         </div>
         <div className={`navFormDiv`} style={{order: 0, display: `flex`, flexDirection: `row`, gridGap: 15, justifyContent: `space-between`, alignItems: `center`}}>
-          <section className={`navFormSection`} style={{margin: 0, position: `relative`}}>
+          <section className={`navFormSection showWhenDB`} style={{margin: 0, position: `relative`}}>
             <Form className={`navForm`} style={{display: `flex`, flexDirection: `row`}} />
           </section>
           <NavIcons />

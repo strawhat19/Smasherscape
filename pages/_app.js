@@ -1,17 +1,17 @@
 import '../main.scss';
 import '../xuruko.scss';
 import '../concentration.scss';
+import User from '../models/User';
 import { auth, db } from '../firebase';
 import ReactDOM from 'react-dom/client';
 import { onAuthStateChanged } from 'firebase/auth';
 import { parseDate } from '../components/PlayerRecord';
 import { AnimatePresence, motion } from 'framer-motion';
 import { defaultCommands } from '../components/Commands';
-import { newPlayerType } from '../components/smasherscape';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { createUserFromFirebaseData } from '../components/Form';
 import { createContext, useRef, useState, useEffect } from 'react';
-import User from '../models/User';
+import { getActivePlayers, newPlayerType } from '../components/smasherscape';
 
 export const useDB = () => false;
 export const StateContext = createContext({});
@@ -70,6 +70,15 @@ export const getTimezone = (date) => {
 export const getAllPlaysJSON = (players) => {
   let allPlays = players.map(player => player.plays).reduce((acc, curr) => acc.concat(curr), []).sort((a, b) => parseDate(b.date) - parseDate(a.date));
   return allPlays;
+}
+
+export const logPlayers = (plyrs, useDatabase) => {
+  if (getActivePlayers(plyrs).length > 0) {
+    let allPlays = getAllPlays(getActivePlayers(plyrs.map(pla => newPlayerType(pla))));
+    dev() && console.log(`All ${useDatabase == true ? `Database ` : ``}Players`, plyrs.map(pla => newPlayerType(pla)));
+    dev() && console.log(`Active ${useDatabase == true ? `Database ` : ``}Players`, getActivePlayers(plyrs.map(pla => newPlayerType(pla))));
+    dev() && allPlays && allPlays?.length > 0 && console.log(`All Active ${useDatabase == true ? `Database ` : ``}Plays`, allPlays);
+  }
 }
 
 export const cutOffTextAndReplace = (string, end, replacement) => {
@@ -602,8 +611,16 @@ export default function Xuruko({ Component, pageProps, router }) {
       }
     }
 
-    // Update UI
+    // Database Updater
+    if (useDB() == false) {
+      useEffect(() => {
+        logPlayers(players, useDatabase);
+      }, [players])
+    }
+
+    // App and User Updater
     useEffect(() => {
+      // App
       setLoading(true);
       setAnimComplete(false);
       setSystemStatus(`Page Loading!`);
@@ -624,13 +641,13 @@ export default function Xuruko({ Component, pageProps, router }) {
       setBrowserUI();
       setSideBarUI();
 
-      setBodyClasses(`${rte= `` ? rte : `Index`} pageWrapContainer ${page != `` ? page?.toUpperCase() : `Home`} ${devEnv ? `devMode` : `prodMode`} ${onMac ? `isMac` : `isWindows`} ${mobile ? `mobile` : `desktop`} ${user ? `userIsSignedIn` : `userIsNotSignedIn`}`);
+      setBodyClasses(`${rte= `` ? rte : `Index`} pageWrapContainer ${page != `` ? page?.toUpperCase() : `Home`} ${devEnv ? `devMode` : `prodMode`} ${onMac ? `isMac` : `isWindows`} ${mobile ? `mobile` : `desktop`} ${user ? `userIsSignedIn` : `userIsNotSignedIn`} ${useDB() == true ? `useDB` : `noDB`}`);
       
       setLoading(false);
       setSystemStatus(`${getPage()} Loaded.`);
-      setTimeout(() => setLoading(false), 1500);
+      // setTimeout(() => setLoading(false), 1500);
 
-      // Updates on User
+      // User
       if (useDatabase == true) {
         const unsubscribeFromAuthStateListener = onAuthStateChanged(auth, user => {
           if (user) {
@@ -639,7 +656,7 @@ export default function Xuruko({ Component, pageProps, router }) {
             let provider = providerID?.includes(`.`) ? providerID?.split(`.`)[0] : providerID;
             let type = capitalizeAllWords(provider);
             let customUser = new User(createUserFromFirebaseData(user, type, name));
-            // dev() && console.log(`user onAuthStateChange`, user);
+            dev() && console.log(`Database User`, user);
             setUser(customUser);
             setAuthState(`Sign Out`);
             dev() && console.log(`User`, customUser);
@@ -656,19 +673,19 @@ export default function Xuruko({ Component, pageProps, router }) {
 
     }, [rte, user, users, authState, dark])
 
-    // Updates from Database
+    // Player Updates
     useEffect(() => {
+      // Players
       if (useDatabase == true) {
         const unsubscribeFromSmasherScapeSnapShot = onSnapshot(collection(db, useDatabaseName), (querySnapshot) => {
           const playersFromDatabase = [];
           querySnapshot.forEach((doc) => playersFromDatabase.push(doc.data()));
-          
           setPlayersLoading(false);
           setPlayers(playersFromDatabase);
           setDatabasePlayers(playersFromDatabase);
           setFilteredPlayers(getActivePlayersJSON(playersFromDatabase));
           localStorage.setItem(`players`, JSON.stringify(playersFromDatabase));
-  
+          logPlayers(playersFromDatabase, useDatabase);
           setCommandsToShow(playersFromDatabase);
         });
   

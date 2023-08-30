@@ -2,7 +2,6 @@ import  moment from 'moment';
 import { db } from '../firebase';
 import Play from '../models/Play';
 import Role from '../models/Role';
-import User from '../models/User';
 import Stock from '../models/Stock';
 import Level from '../models/Level';
 import Player from '../models/Player';
@@ -17,12 +16,12 @@ import { Characters } from '../common/Characters';
 import Autocomplete from '@mui/material/Autocomplete';
 import { calcPlayerLosses, calcPlayerWins } from './PlayerCard';
 import { calcPlayerLevelAndExperience } from '../common/Levels';
-import { FormEvent, useContext, useEffect, useRef } from 'react';
+import { FormEvent, useContext, useRef } from 'react';
 import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
 import { doc, setDoc, deleteDoc, updateDoc } from 'firebase/firestore';
 import { checkUserRole, getActivePlayers, isInvalid, newPlayerType } from './smasherscape';
 import { calcPlayerDeaths, calcPlayerKDRatio, calcPlayerKills, removeTrailingZeroDecimal } from './PlayerRecord';
-import { StateContext, showAlert, formatDate, generateUniqueID, countPropertiesInObject, getActivePlayersJSON, useDatabaseName, getAllPlays, getAllPlaysJSON, defaultXPMultiplier, XPGainOnWin, XPGainOnLoserXPForEachStockTaken, winCons, loseCons } from '../pages/_app';
+import { StateContext, showAlert, formatDate, generateUniqueID, countPropertiesInObject, getActivePlayersJSON, useDatabaseName, getAllPlays, getAllPlaysJSON, defaultXPMultiplier, XPGainOnWin, XPGainOnLoserXPForEachStockTaken, winCons, loseCons, dev, useDB } from '../pages/_app';
 
 export const testUsersDatabaseName = `testUsers`;
 export const productionUsersDatabaseName = `users`;
@@ -600,7 +599,7 @@ export const processCommandsWithParameters = (parameters: Parameters) => {
     let firstCommand = commandParams[0];
     
     if (command != ``) {
-        console.log(`Send Command`, parameters);
+        dev() && console.log(`Command sent to ${useDB() ? `Database` : `Leaderboard`}`, parameters);
         if (firstCommand.includes(`!upd`)) {
             updatePlayersWithParameters(parameters);
         } else if (firstCommand.includes(`!add`)) {
@@ -622,15 +621,6 @@ export default function PlayerForm(props) {
     const searchInput = useRef();
     const commandsInput = useRef();
     const { user, players, setPlayers, filteredPlayers, setFilteredPlayers, devEnv, useDatabase, commands, databasePlayers, sameNamePlayeredEnabled, deleteCompletely, setLoadingPlayers } = useContext<any>(StateContext);
-
-    useEffect(() => {
-        if (getActivePlayers(players).length > 0) {
-            let allPlays = getAllPlays(getActivePlayers(players.map(pla => newPlayerType(pla))));
-            console.log(`All ${useDatabase == true ? `Database ` : ``}Players`, players.map(pla => newPlayerType(pla)));
-            console.log(`Active ${useDatabase == true ? `Database ` : ``}Players`, getActivePlayers(players.map(pla => newPlayerType(pla))));
-            allPlays.length > 0 && console.log(`All Active ${useDatabase == true ? `Database ` : ``}Plays`, allPlays);
-        }
-    }, [players])
 
     const handleCommands = (e?: FormEvent) => {
         e.preventDefault();
