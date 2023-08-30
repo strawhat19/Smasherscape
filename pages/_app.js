@@ -479,11 +479,11 @@ export const defaultPlayers = [
       num: 1
     },
     roles: [
-        {
-          promoted: `8:30 PM 8-26-2023 EDT`,
-          name: `Player`,
-          level: 1
-        }
+      {
+        promoted: `8:30 PM 8-26-2023 EDT`,
+        name: `Player`,
+        level: 1
+      }
     ],
     experience: {
       nextLevelAt: 83,
@@ -523,11 +523,11 @@ export const defaultPlayers = [
       num: 1
     },
     roles: [
-        {
-          promoted: `8:30 PM 8-26-2023 EDT`,
-          name: `Player`,
-          level: 1
-        }
+      {
+        promoted: `8:30 PM 8-26-2023 EDT`,
+        name: `Player`,
+        level: 1
+      }
     ],
     experience: {
       nextLevelAt: 83,
