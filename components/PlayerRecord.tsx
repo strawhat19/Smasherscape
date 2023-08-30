@@ -151,7 +151,7 @@ function PlayerRecord(props) {
                         <span className={`blueText`}>Plays: <span className="whiteText">{plays?.length}</span></span>
                     </span>
                 </div>
-                {plays?.length > 0 && <div className={`playsContainer playerRecordPlaysContainer ${calcPlayerCharactersPlayed(plyr, false)?.length > 0 ? (calcPlayerCharactersPlayed(plyr, false)?.length >= 5 ? `populatedPlays moreThanFive` : `populatedPlays`) : ``}`}>
+                {plays?.length > 0 && calcPlayerCharactersPlayed(plyr, false)?.length > 3 && <div className={`playsContainer playerRecordPlaysContainer ${calcPlayerCharactersPlayed(plyr, false)?.length > 0 ? (calcPlayerCharactersPlayed(plyr, false)?.length >= 5 ? `populatedPlays moreThanFive` : `populatedPlays`) : ``}`}>
                     {calcPlayerCharactersPlayed(plyr, false)?.length > 0 ? calcPlayerCharactersPlayed(plyr, false).map((char, charIndex) => {
                         return (
                             <Badge title={`Played ${getCharacterTitle(char)} ${calcPlayerCharacterTimesPlayed(plyr, char)} Time(s)`} key={charIndex} badgeContent={calcPlayerCharacterTimesPlayed(plyr, char)} color="primary">

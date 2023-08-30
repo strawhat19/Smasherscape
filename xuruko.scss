@@ -705,14 +705,24 @@ footer {
                     }
                 }
                 &.collapsed {
-                    margin: 0;
-                    opacity: 0;
-                    height: 0px;
-                    left: -9999px;
-                    position: absolute;
-                    pointer-events: none;
-                    // @media (min-width: 768px) {
-                    // }
+                    &.updateBottomRow {
+                        @media (min-width: 768px) {
+                            margin: 0;
+                            opacity: 0;
+                            height: 0px;
+                            left: -9999px;
+                            position: absolute;
+                            pointer-events: none;
+                        }
+                    }
+                    &:not(.updateBottomRow) {
+                        margin: 0;
+                        opacity: 0;
+                        height: 0px;
+                        left: -9999px;
+                        position: absolute;
+                        pointer-events: none;
+                    }
                 }
                 &.expanded {
                     height: 100%;
@@ -723,14 +733,24 @@ footer {
                 }
             }
             &.collapsed {
-                margin: 0;
-                opacity: 0;
-                height: 0px;
-                left: -9999px;
-                position: absolute;
-                pointer-events: none;
-                // @media (min-width: 768px) {
-                // }
+                &.updateBottomRow {
+                    @media (min-width: 768px) {
+                        margin: 0;
+                        opacity: 0;
+                        height: 0px;
+                        left: -9999px;
+                        position: absolute;
+                        pointer-events: none;
+                    }
+                }
+                &:not(.updateBottomRow) {
+                    margin: 0;
+                    opacity: 0;
+                    height: 0px;
+                    left: -9999px;
+                    position: absolute;
+                    pointer-events: none;
+                }
             }
             &.expanded {
                 height: 100%;
@@ -766,7 +786,8 @@ form {
         grid-template-columns: 1fr;
     }
     &.noPlays {
-        gap: 20px;
+        gap: 20px !important;
+        display: grid !important;
         grid-template-columns: 1fr 1fr;
     }
     &.navForm {
@@ -901,6 +922,23 @@ form {
     }
     &#playerForm {
         &.hasPlays {
+            // Rearrange
+            &.hasCommandsPerm {
+                @media (max-width: 768px) {
+                    grid-template-rows: 1fr auto;
+                    grid-template-columns: 1fr 1fr;
+                    #commandsInput {
+                        grid-row: 1;
+                        grid-column: 1 / span 2;
+                        &.Update {
+                            margin: 5px 0 5px 3px;
+                        }
+                        &.Delete {
+                            margin: 5px 0 5px 3px;
+                        }
+                    }
+                }
+            }
             &.noCommandsPerm {
                 gap: 80px;
                 grid-template-columns: 1fr 1fr;
@@ -1589,6 +1627,7 @@ div[role="presentation"] {
         display: none;
     }
     .line {
+        padding-right: 2rem !important;
         align-items: flex-start !important;
     }
 }
@@ -1681,13 +1720,16 @@ div[role="presentation"] {
     }
     form {
         z-index: 0;
-        display: flex !important;
-        grid-gap: 25px !important;
         margin: 0 auto !important;
-        flex-direction: column !important;
+        &:not(#playerForm) {
+            display: flex !important;
+            grid-gap: 25px !important;
+            flex-direction: column !important;
+        }
         &.recordForm {
             display: grid !important;
             grid-gap: 10px !important;
+            // To rearrange grid
             grid-template-rows: 1fr auto;
             grid-template-columns: 1fr 1fr;
             .formSubmitButton {
@@ -1696,8 +1738,15 @@ div[role="presentation"] {
             }
         }
         .updateRow {
-            grid-template-rows: repeat(3, 1fr);
-            grid-template-columns: 1fr !important;
+            // grid-template-rows: repeat(3, 1fr);
+            // grid-template-columns: 1fr !important;
+            // To rearrange grid
+            grid-template-rows: 1fr auto;
+            grid-template-columns: 1fr 1fr !important;
+            .conditionAuto {
+                grid-row: 2;
+                grid-column: 1 / span 2;
+            }
             &.updateBottomRow {
                 width: 100% !important;
             }
@@ -1746,7 +1795,7 @@ div[role="presentation"] {
         &.commandToCopy {
             margin: -10px auto -15px;
             &.Delete {
-                margin: -10px auto 35px;
+                margin: -10px auto 0;
             }
         }
     }
@@ -2072,6 +2121,7 @@ div[role="presentation"] {
             color: black;
             font-weight: 900;
             font-size: 1.2em;
+            max-width: inherit;
             text-transform: none;
             transition: var(--transition);
             font-family: "RuneScape Chat";
@@ -2108,7 +2158,7 @@ div[role="presentation"] {
 #topButton {
     width: 100%;
     right: 70px;
-    z-index: 13;
+    z-index: 12;
     bottom: 85px;
     display: block;
     position: fixed;

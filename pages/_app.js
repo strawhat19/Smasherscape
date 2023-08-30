@@ -615,6 +615,7 @@ export default function Xuruko({ Component, pageProps, router }) {
     if (useDB() == false) {
       useEffect(() => {
         logPlayers(players, useDatabase);
+        setCommandsToShow(players);
       }, [players])
     }
 

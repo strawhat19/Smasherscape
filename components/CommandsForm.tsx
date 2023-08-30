@@ -182,7 +182,7 @@ export default function CommandsForm(props) {
                                 onInputChange={(e, val: any) => adjustPlayers(e, val, `winner`)}
                                 isOptionEqualToValue={(option, value) => option.id === value.id}
                                 options={getActivePlayers(players).filter(plyr => plyr?.id != playerTwo?.id)}
-                                renderInput={(params) => <TextField name={`players`} {...params} label="Players..." />}
+                                renderInput={(params) => <TextField name={`players`} {...params} label="Player 1..." />}
                                 noOptionsText={`No Player(s) Found for Search`}
                                 renderOption={(props: any, playerOption: any) => {
                                     return (
@@ -204,7 +204,7 @@ export default function CommandsForm(props) {
                                 onInputChange={(e, val: any) => adjustCondition(e, val)}
                                 options={[{id: 1, label: `Defeats`}, {id: 2, label: `Loses-to`}]}
                                 isOptionEqualToValue={(option, value) => option.id === value.id}
-                                renderInput={(params) => <TextField name={`condition`} {...params} label="Condition..." />}
+                                renderInput={(params) => <TextField name={`condition`} {...params} label="Victory or Defeat..." />}
                                 noOptionsText={`No Condition(s) Found for Search`}
                                 renderOption={(props: any, option: any) => {
                                     return (
@@ -228,7 +228,7 @@ export default function CommandsForm(props) {
                                 onInputChange={(e, val: any) => adjustPlayers(e, val, `loser`)}
                                 isOptionEqualToValue={(option, value) => option.id === value.id}
                                 options={getActivePlayers(players).filter(plyr => plyr.id != playerOne?.id)}
-                                renderInput={(params) => <TextField name={`players`} {...params} label="Players..." />}
+                                renderInput={(params) => <TextField name={`players`} {...params} label="Player 2..." />}
                                 noOptionsText={`No Player(s) Found for Search`}
                                 renderOption={(props: any, playerOption: any) => {
                                     return (
@@ -252,7 +252,7 @@ export default function CommandsForm(props) {
                                 onChange={(e, val: any) => adjustCharacters(e, val, 1)}
                                 onInputChange={(e, val: any) => adjustCharacters(e, val, 1)}
                                 isOptionEqualToValue={(option, value) => option.id === value.id}
-                                renderInput={(params) => <TextField name={`characters`} {...params} label="Characters..." />}
+                                renderInput={(params) => <TextField name={`characters`} {...params} label="Character 1..." />}
                                 noOptionsText={`No Character(s) Found for Search`}
                                 filterOptions={(characterOptions, state) => matchSorter(characterOptions, state.inputValue, { keys: [`label`, `shortcuts`] })}
                                 renderOption={(props: any, characterOption: any) => {
@@ -299,7 +299,7 @@ export default function CommandsForm(props) {
                                 onChange={(e, val: any) => adjustCharacters(e, val, 2)}
                                 onInputChange={(e, val: any) => adjustCharacters(e, val, 2)}
                                 isOptionEqualToValue={(option, value) => option.id === value.id}
-                                renderInput={(params) => <TextField name={`characters`} {...params} label="Characters..." />}
+                                renderInput={(params) => <TextField name={`characters`} {...params} label="Character 2..." />}
                                 noOptionsText={`No Character(s) Found for Search`}
                                 filterOptions={(characterOptions, state) => matchSorter(characterOptions, state.inputValue, { keys: [`label`, `shortcuts`] })}
                                 renderOption={(props: any, characterOption: any) => {

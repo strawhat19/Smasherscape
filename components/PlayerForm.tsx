@@ -50,7 +50,7 @@ export const searchBlur = (e: any, filteredPlayers: Player[]) => {
 
 export const showCommandsWithParameters = (parameters) => {
     let { commands, devEnv } = parameters
-    showAlert(`Here are the Smasherscape Commands so far`, <div className={`alertInner`}>
+    showAlert(`Smasherscape Commands`, <div className={`alertInner`}>
         <Commands id={`commandsList`} commands={commands} devEnv={devEnv} />
     </div>, `85%`, `auto`);
 }
@@ -620,7 +620,7 @@ export default function PlayerForm(props) {
 
     const searchInput = useRef();
     const commandsInput = useRef();
-    const { user, players, setPlayers, filteredPlayers, setFilteredPlayers, devEnv, useDatabase, commands, databasePlayers, sameNamePlayeredEnabled, deleteCompletely, setLoadingPlayers } = useContext<any>(StateContext);
+    const { user, players, setPlayers, filteredPlayers, setFilteredPlayers, mobile, useDatabase, commands, databasePlayers, sameNamePlayeredEnabled, deleteCompletely, setLoadingPlayers, command } = useContext<any>(StateContext);
 
     const handleCommands = (e?: FormEvent) => {
         e.preventDefault();
@@ -712,7 +712,7 @@ export default function PlayerForm(props) {
     }
 
     return <section className={`formsSection`}>
-    <form id={`playerForm`} onSubmit={(e) => handleCommands(e)} action="submit" className={`gridForm ${getActivePlayers(players).length > 0 ? `populated ${getActivePlayers(players).length} ${getAllPlays(getActivePlayers(players)).length > 0 ? `hasPlays` : `noPlays`}` : `empty`} ${(useDatabase == false || (user && checkUserRole(user, `Admin`))) ? `hasCommandsPerm` : `noCommandsPerm`}`}>
+    <form id={`playerForm`} onSubmit={(e) => handleCommands(e)} action="submit" className={`gridForm ${getActivePlayers(players).length > 0 ? `populated ${getActivePlayers(players).length} ${getAllPlays(getActivePlayers(players)).length > 0 ? `hasPlays` : `noPlays`}` : `empty`} ${(useDatabase == false || (user && checkUserRole(user, `Admin`))) ? `hasCommandsPerm` : `noCommandsPerm`} ${command?.name}`}>
         {getActivePlayers(players).length > 0 && <>
             <div className={`playerSearchAuto inputWrapper materialBGInputWrapper`}>
                 <div className="inputBG materialBG"></div>
@@ -726,7 +726,7 @@ export default function PlayerForm(props) {
                     onChange={(e, val: any) => searchPlayers(e, val, `playerName`)}
                     isOptionEqualToValue={(option, value) => option.id === value.id}
                     onInputChange={(e, val: any) => searchPlayers(e, val, `playerName`)}
-                    renderInput={(params) => <TextField name={`search`} onBlur={(e) => searchBlur(e, filteredPlayers)} {...params} label="Search Player(s) by Name..." />}
+                    renderInput={(params) => <TextField name={`search`} onBlur={(e) => searchBlur(e, filteredPlayers)} {...params} label={`Search Player(s)${(!mobile || window.innerWidth > 768) ? ` by Name` : ``}...`} />}
                     noOptionsText={`No Player(s) Found for Search`}
                     renderOption={(props: any, playerOption: any) => {
                         return (
@@ -738,9 +738,9 @@ export default function PlayerForm(props) {
                 />
             </div>
         </>}
-        {(useDatabase == false || (user && checkUserRole(user, `Admin`))) && <div id={`commandsInput`} className={`inputWrapper`}>
+        {(useDatabase == false || (user && checkUserRole(user, `Admin`))) && <div id={`commandsInput`} className={`inputWrapper ${command?.name}`}>
             <div className="inputBG"></div>
-            <input ref={commandsInput} type="text" className="commands" name={`commands`} placeholder={getActivePlayers(players).length > 0 ? `Enter Commands...` : `!add name to add players or sign up`} />
+            <input ref={commandsInput} type="text" className="commands" id="enterCommandsInput" name={`commands`} placeholder={getActivePlayers(players).length > 0 ? `Enter Commands...` : `!add name to add players or sign up`} />
         </div>}
         {(getActivePlayers(players).length > 0 && getAllPlays(getActivePlayers(players)).length > 0) && <>
             <div className={`characterSearchAuto inputWrapper materialBGInputWrapper`}>
@@ -754,7 +754,7 @@ export default function PlayerForm(props) {
                     onChange={(e, val: any) => searchPlayers(e, val, `searchCharacters`)}
                     onInputChange={(e, val: any) => searchPlayers(e, val, `searchCharacters`)}
                     isOptionEqualToValue={(option, value) => option.id === value.id}
-                    renderInput={(params) => <TextField name={`characters`} onBlur={(e) => searchBlur(e, filteredPlayers)} {...params} label="Search Player(s) by Character(s) Played..." />}
+                    renderInput={(params) => <TextField name={`characters`} onBlur={(e) => searchBlur(e, filteredPlayers)} {...params} label={`${(!mobile || window.innerWidth > 768) ? `Search Player(s) by Character(s) Played...` : `Search Character(s) Played...`}`} />}
                     noOptionsText={`No Character(s) Found for Search`}
                     filterOptions={(characterOptions, state) => matchSorter(characterOptions, state.inputValue, { keys: [`label`, `shortcuts`] })}
                     renderOption={(props: any, characterOption: any) => {
