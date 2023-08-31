@@ -22,6 +22,7 @@ import { doc, setDoc, deleteDoc, updateDoc } from 'firebase/firestore';
 import { checkUserRole, getActivePlayers, isInvalid, newPlayerType } from './smasherscape';
 import { calcPlayerDeaths, calcPlayerKDRatio, calcPlayerKills, removeTrailingZeroDecimal } from './PlayerRecord';
 import { StateContext, showAlert, formatDate, generateUniqueID, countPropertiesInObject, getActivePlayersJSON, useDatabaseName, getAllPlays, getAllPlaysJSON, defaultXPMultiplier, XPGainOnWin, XPGainOnLoserXPForEachStockTaken, winCons, loseCons, dev, useDB } from '../pages/_app';
+import User from '../models/User';
 
 export const testUsersDatabaseName = `testUsers`;
 export const productionUsersDatabaseName = `users`;
@@ -108,7 +109,7 @@ export const updatePlayerStats = (plyr, plays) => {
     return plyr;
 }
 
-export const createPlayer = (playerName, playerIndex, databasePlayers): Player => {
+export const createPlayer = (playerName, playerIndex, databasePlayers, user?: User | Player): Player => {
 
     let currentDateTimeStamp = formatDate(new Date());
     let uniqueIndex = databasePlayers.length + 1 + playerIndex;
@@ -129,7 +130,6 @@ export const createPlayer = (playerName, playerIndex, databasePlayers): Player =
         expanded: false,
         playerLink: false,
         name: displayName,
-        lastUpdatedBy: id,
         plays: [] as Play[],
         type: `Smasherscape`,
         username: displayName,
@@ -137,6 +137,7 @@ export const createPlayer = (playerName, playerIndex, databasePlayers): Player =
         updated: currentDateTimeStamp,
         xpModifier: defaultXPMultiplier,
         lastUpdated: currentDateTimeStamp,
+        lastUpdatedBy: user ? user.email : id,
         label: `${uniqueIndex} ${displayName}`,
         level: {
             num: 1,
@@ -180,6 +181,7 @@ export const createPlayer = (playerName, playerIndex, databasePlayers): Player =
 
 export const addPlayersWithParameters = (parameters: Parameters) => {
     let {
+        user,
         players,
         setPlayers,
         useDatabase,
@@ -192,7 +194,7 @@ export const addPlayersWithParameters = (parameters: Parameters) => {
 
     let playersToAdd = commandParams.filter((comm, commIndex) => commIndex != 0 && comm);
     [...new Set(playersToAdd)].forEach((plyr: any, plyrIndex) => {
-        let playerObj: Player = createPlayer(plyr, plyrIndex, databasePlayers);
+        let playerObj: Player = createPlayer(plyr, plyrIndex, databasePlayers, user);
         if (useDatabase == true) {
             if (sameNamePlayeredEnabled) {
                 addPlayerToDB(playerObj);
@@ -385,6 +387,7 @@ export const giveParameterWithParameters = (parameters: Parameters) => {
 export const updatePlayerPlays = (playState) => {
     let currentDateTimeStamp = formatDate(new Date());
     let {
+        user,
         plyr, 
         date,
         stocks,
@@ -442,12 +445,14 @@ export const updatePlayerPlays = (playState) => {
     plyr.updated = currentDateTimeStamp;
     plyr.lastUpdated = currentDateTimeStamp;
     plyr.properties = countPropertiesInObject(plyr);
+    plyr.lastUpdatedBy = user ? user?.email : plyr.lastUpdatedBy;
 
     return plyr;
 }
 
 export const updatePlayersWithParameters = (parameters: Parameters) => {
     let {
+        user,
         players,
         setPlayers,
         useDatabase,
@@ -555,6 +560,7 @@ export const updatePlayersWithParameters = (parameters: Parameters) => {
         let playUUID = playUIDs.length > 0 ? generateUniqueID(playUIDs) : generateUniqueID();
 
         let playState = {
+            user,
             date,
             stocks,
             players, 
@@ -637,13 +643,14 @@ export default function PlayerForm(props) {
     const commandsInput = useRef();
     const { user, players, setPlayers, filteredPlayers, setFilteredPlayers, mobile, useDatabase, commands, databasePlayers, sameNamePlayeredEnabled, deleteCompletely, setLoadingPlayers, command } = useContext<any>(StateContext);
 
-    const handleCommands = (e?: FormEvent) => {
+    const handleCommands = (e?: FormEvent, user?: User | Player) => {
         e.preventDefault();
         let field = commandsInput.current as HTMLInputElement;
         if (field.name == `commands`) {
             let command = field?.value.toLowerCase();
             let commandParams = command.split(` `);
             const parameters = new Parameters({
+                user,
                 command,
                 players, 
                 commands,
@@ -727,7 +734,7 @@ export default function PlayerForm(props) {
     }
 
     return <section className={`formsSection`}>
-    <form id={`playerForm`} onSubmit={(e) => handleCommands(e)} action="submit" className={`gridForm ${getActivePlayers(players).length > 0 ? `populated ${getActivePlayers(players).length} ${getAllPlays(getActivePlayers(players)).length > 0 ? `hasPlays` : `noPlays`}` : `empty`} ${(useDatabase == false || (user && checkUserRole(user, `Admin`))) ? `hasCommandsPerm` : `noCommandsPerm`} ${command?.name}`}>
+    <form id={`playerForm`} onSubmit={(e) => handleCommands(e, user)} action="submit" className={`gridForm ${getActivePlayers(players).length > 0 ? `populated ${getActivePlayers(players).length} ${getAllPlays(getActivePlayers(players)).length > 0 ? `hasPlays` : `noPlays`}` : `empty`} ${(useDatabase == false || (user && checkUserRole(user, `Admin`))) ? `hasCommandsPerm` : `noCommandsPerm`} ${command?.name}`}>
         {getActivePlayers(players).length > 0 && <>
             <div className={`playerSearchAuto inputWrapper materialBGInputWrapper`}>
                 <div className="inputBG materialBG"></div>

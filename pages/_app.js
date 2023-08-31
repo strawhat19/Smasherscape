@@ -629,6 +629,8 @@ export default function Xuruko({ Component, pageProps, router }) {
       }
     }
 
+
+
     // Database Updater
     useEffect(() => {
       if (useDB() == false) {
@@ -677,6 +679,7 @@ export default function Xuruko({ Component, pageProps, router }) {
       if (useDatabase == true) {
         const unsubscribeFromAuthStateListener = onAuthStateChanged(auth, userCredential => {
           if (userCredential) {
+            dev() && console.log(`Firebase Authentication`, userCredential);
             let currentUser = getCurrentUser(userCredential, players);
             // dev() && console.log(`Database User`, userCredential);
             setUser(currentUser);

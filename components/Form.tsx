@@ -124,8 +124,8 @@ export const signInWithGoogle = async (databasePlayers, setUser, setAuthState) =
 
           let usersAndPlaysState = {player: playerUserData, user: createdGoogleUserFromFirebaseData}
           
-          // if (dev()) console.log(`Add To DB`, usersAndPlaysState);
           addPlayerToDB(usersAndPlaysState?.player);
+          // if (dev()) console.log(`Add To DB`, usersAndPlaysState);
           // addUserToDB(usersAndPlaysState?.user);
           // if (dev() && userCredential.operationType != `signIn`) console.log(`Add To DB`, usersAndPlaysState);
           // if (userCredential.operationType != `signIn`) addPlayerToDB(usersAndPlaysState?.player);

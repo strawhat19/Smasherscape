@@ -1,6 +1,10 @@
+import Player from "./Player";
+import User from "./User";
+
 export default class Parameters {
     [key: string]: any;
     constructor(parameterObject: {
+        user: User | Player,
         command: any, 
         players: any, 
         commands: any, 
