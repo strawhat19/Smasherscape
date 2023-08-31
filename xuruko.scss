@@ -105,13 +105,24 @@ li {
     font-family: "RuneScape Chat Bold" !important;
 }
 
+// .userIsSignedIn {
+//     a[href="/about"] {
+//         display: none !important;
+//     }
+//     li {
+//         &:has(a[href="/about"]) {
+//             display: none !important;
+//         }
+//     }
+// }
+
 .playerGrid {
     width: 97%;
     display: grid;
     margin: 0 auto;
     align-items: center;
     padding: 15px 15px 0;
-    gap: 0px 40px !important;
+    gap: 0px 25px !important;
     grid-template-columns: 1fr;
     justify-content: space-between;
     &.populated {
@@ -1506,6 +1517,14 @@ div[role="presentation"] {
         max-height: 28px;
         right: -5px;
         top: 20%;
+        @media (min-width: 1600px) {
+            right: 0px;
+            top: 25%;
+        }
+        @media (max-width: 768px) {
+            right: 15px;
+            top: 10%;
+        }
     }
     &.userIsPlayer {
         .cardBG {
@@ -1739,9 +1758,13 @@ div[role="presentation"] {
         z-index: 0;
         margin: 0 auto !important;
         &:not(#playerForm) {
-            display: flex !important;
-            grid-gap: 25px !important;
-            flex-direction: column !important;
+            &:not(.recordForm) {
+                &:not(.authForm) {
+                    display: flex !important;
+                    grid-gap: 25px !important;
+                    flex-direction: column !important;
+                }
+            }
         }
         &.recordForm {
             display: grid !important;

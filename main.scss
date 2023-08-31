@@ -939,13 +939,17 @@ section {
         border-color: black;
     }
     @media (min-width: 768px) {
+        margin-right: 10px;
         input {
             max-height: 30px !important;
         }
     }
     @media (max-width: 768px) {
-        width: 93%;
+        width: 88%;
         margin: 25px auto -5px;
+        &::before {
+            transform: scale(1.04, 1.8);  
+        }
     }
 }
 

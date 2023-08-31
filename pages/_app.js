@@ -629,13 +629,24 @@ export default function Xuruko({ Component, pageProps, router }) {
       }
     }
 
-
+    // User Updater
+    useEffect(() => {
+      localStorage.setItem(`user`, JSON.stringify(user));
+      setBodyClasses(prevBodyClasses => {
+        if (prevBodyClasses.includes(`userIsNotSignedIn`)) {
+          prevBodyClasses = prevBodyClasses.replace(new RegExp(`userIsNotSignedIn`, `g`), ``);
+        } else if (prevBodyClasses.includes(`userIsSignedIn`)) {
+          prevBodyClasses = prevBodyClasses.replace(new RegExp(`userIsSignedIn`, `g`), ``);
+        }
+        return `${prevBodyClasses} ${user ? `userIsSignedIn` : `userIsNotSignedIn`}`
+      })
+    }, [user])
 
     // Database Updater
     useEffect(() => {
+      setCommandsToShow(players);
       if (useDB() == false) {
         logPlayers(players, useDatabase);
-        setCommandsToShow(players);
       } else {
         if (user) {
           let currentUser = getCurrentUser(user, players);
@@ -669,7 +680,7 @@ export default function Xuruko({ Component, pageProps, router }) {
       setBrowserUI();
       setSideBarUI();
 
-      setBodyClasses(`${rte = `` ? rte : `Index`} pageWrapContainer ${page != `` ? page?.toUpperCase() : `Home`} ${devEnv ? `devMode` : `prodMode`} ${onMac ? `isMac` : `isWindows`} ${mobile ? `mobile` : `desktop`} ${user ? `userIsSignedIn` : `userIsNotSignedIn`} ${useDB() == true ? `useDB` : `noDB`} ${iPhone ? `on_iPhone` : `notOn_iPhone`}`);
+      setBodyClasses(`${rte = `` ? rte : `Index`} pageWrapContainer ${page != `` ? page?.toUpperCase() : `Home`} ${devEnv ? `devMode` : `prodMode`} ${onMac ? `isMac` : `isWindows`} ${mobile ? `mobile` : `desktop`} ${useDB() == true ? `useDB` : `noDB`} ${iPhone ? `on_iPhone` : `notOn_iPhone`}`);
       
       setLoading(false);
       setSystemStatus(`${getPage()} Loaded.`);
