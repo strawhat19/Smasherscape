@@ -147,11 +147,11 @@ export const newPlayerType = (player: Player, customObject = true) => {
 }
 
 export default function Smasherscape(props) {
-    const { user, useDatabase, filteredPlayers, players, noPlayersFoundMessage, devEnv, playersLoading, command } = useContext<any>(StateContext);
+    const { user, mobile, useDatabase, filteredPlayers, players, noPlayersFoundMessage, devEnv, playersLoading, command } = useContext<any>(StateContext);
 
     return <Main className={`smasherscapeLeaderboard`} style={playersLoading ? {paddingTop: 10} : null}>
         <div className={`AdminArea ${command?.name}`}>
-            {getActivePlayers(players).length > 0 && (useDatabase == false || (user && checkUserRole(user, `Admin`))) && <>
+            {getActivePlayers(players).length > 0 && (useDatabase == false && !mobile || (user && checkUserRole(user, `Admin`))) && <>
                 <h2 className={`centerPageHeader toggleButtonsHeader`}>Commands Builder Form</h2>
                 <CommandsForm />
             </>}

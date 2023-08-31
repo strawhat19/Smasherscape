@@ -12,6 +12,8 @@ import { getActivePlayers } from "./smasherscape";
 import { getAllPlaysJSON, StateContext } from "../pages/_app";
 import { getCharacterObjects, processCommandsWithParameters } from './PlayerForm';
 import { Autocomplete, TextField, ToggleButton, ToggleButtonGroup } from "@mui/material";
+import User from '../models/User';
+import Player from '../models/Player';
 
 export const getDefaultPlayer = (number) => ({id: number, type: `Default`, name: `Player-${number}`, label: `Player-${number}`});
 
@@ -23,7 +25,7 @@ export default function CommandsForm(props) {
     let [playerOne, setPlayerOne] = useState<any>(getDefaultPlayer(1));
     let [playerTwo, setPlayerTwo] = useState<any>(getDefaultPlayer(2));
     let [stocksTaken, setStocksTaken] = useState<any>(`Stocks-Taken-From-Winner`);
-    const { players, command, setCommand, playersToSelect, commandsToNotInclude, commands, setPlayers, useDatabase, databasePlayers, updatePlayersDB, deleteCompletely, setFilteredPlayers, sameNamePlayeredEnabled, setLoadingPlayers, iPhone } = useContext<any>(StateContext);
+    const { user, players, command, setCommand, playersToSelect, commandsToNotInclude, commands, setPlayers, useDatabase, databasePlayers, updatePlayersDB, deleteCompletely, setFilteredPlayers, sameNamePlayeredEnabled, setLoadingPlayers, iPhone } = useContext<any>(StateContext);
 
     const adjustStocks = (e, val) => {
         if (val) {
@@ -108,10 +110,11 @@ export default function CommandsForm(props) {
         }
     }
 
-    const submitCommandsForm = (e) => {
+    const submitCommandsForm = (e, user: User | Player) => {
         e.preventDefault();
         let commandParams = renderCommand(command).split(` `);
         const parameters = new Parameters({
+            user,
             players, 
             commands,
             setPlayers, 
@@ -168,7 +171,7 @@ export default function CommandsForm(props) {
             </li>
         </ul>
         <section className={`formsSection`}>
-            <form onSubmit={(e) => submitCommandsForm(e)} className={`commandsForm ${command.command == `!upd` ? `updateCommandForm` : `customHookInputContainer`} gridForm ${iPhone ? `on_iPhoneCommandForm` : `notOn_iPhoneCommandForm`}`} action="submit">
+            <form onSubmit={(e) => submitCommandsForm(e, user)} className={`commandsForm ${command.command == `!upd` ? `updateCommandForm` : `customHookInputContainer`} gridForm ${iPhone ? `on_iPhoneCommandForm` : `notOn_iPhoneCommandForm`}`} action="submit">
                 <div className={`commandInputs ${command.command == `!upd` ? `expanded` : `collapsed`}`}>
                     <div className="updateRow updateTopRow">
                         <div className={`playerSearchAuto inputWrapper materialBGInputWrapper`}>

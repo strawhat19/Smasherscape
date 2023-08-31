@@ -1,7 +1,7 @@
 import Parameters from '../models/Parameters';
 import { StateContext } from '../pages/_app';
 import React, { useState, useContext } from 'react';
-import { processCommandsWithParameters, updatePlayersDB } from './PlayerForm';
+import { processCommandsWithParameters, updatePlayersLocalStorage } from './PlayerForm';
 import User from '../models/User';
 import Player from '../models/Player';
 
@@ -29,7 +29,7 @@ export default function CodeBlock(props) {
                 useDatabase, 
                 commandParams, 
                 databasePlayers, 
-                updatePlayersDB,
+                updatePlayersDB: updatePlayersLocalStorage,
                 deleteCompletely,
                 setLoadingPlayers, 
                 setFilteredPlayers,

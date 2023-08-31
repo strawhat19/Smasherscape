@@ -38,7 +38,7 @@ export const getUniqueCharactersPlayed = (players) => {
     return [...new Set(players.flatMap((p: Player) => p.plays.flatMap((play: Play) => [play.character, play.otherCharacter]) ))].sort();
 }
 
-export const updatePlayersDB = (updatedPlayers: Player[]) => {
+export const updatePlayersLocalStorage = (updatedPlayers: Player[]) => {
     console.log(`Updated Players`, getActivePlayers(updatedPlayers));
     localStorage.setItem(`players`, JSON.stringify(updatedPlayers));
 }
@@ -215,7 +215,7 @@ export const addPlayersWithParameters = (parameters: Parameters) => {
                 setPlayers(prevPlayers => {
                     let updatedPlayers: Player[] = [...prevPlayers, playerObj];
                     setFilteredPlayers(updatedPlayers);
-                    updatePlayersDB(updatedPlayers);
+                    updatePlayersLocalStorage(updatedPlayers);
                     return updatedPlayers;
                 });
             } else {
@@ -254,7 +254,7 @@ export const deletePlayersWithParameters = (parameters: Parameters) => {
         playersToDeleteFromDB.forEach((playerDB: Player) => {
             (document.querySelector(`.clearAllTagsIcon`) as any).click();
             if (useDatabase == true) {
-                if (deleteCompletely) {
+                if (deleteCompletely && playerDB?.plays?.length == 0) {
                     return deletePlayerFromDB(playerDB);
                 } else {
                     return updatePlayerInDB(playerDB, {
@@ -280,7 +280,7 @@ export const deletePlayersWithParameters = (parameters: Parameters) => {
                         }
                     });
                     setFilteredPlayers(updatedPlayers);
-                    updatePlayersDB(updatedPlayers);
+                    updatePlayersLocalStorage(updatedPlayers);
                     return updatedPlayers;
                 });
             }
@@ -300,7 +300,6 @@ export const setParametersWithParameters = (parameters: Parameters) => {
         commandParams,
         setLoadingPlayers
     } = parameters;
-
 
     let updatedPlayers: Player[] = [];
     let playerToSet = commandParams[1].toLowerCase();
@@ -332,7 +331,7 @@ export const setParametersWithParameters = (parameters: Parameters) => {
                 });
             }
 
-            updatePlayersDB(updatedPlayers);
+            updatePlayersLocalStorage(updatedPlayers);
             setPlayers(updatedPlayers);
         }
     }
@@ -345,7 +344,6 @@ export const giveParameterWithParameters = (parameters: Parameters) => {
         commandParams,
         setLoadingPlayers
     } = parameters;
-
 
     let updatedPlayers: Player[] = [];
     let playerToGive = commandParams[1].toLowerCase();
@@ -378,7 +376,7 @@ export const giveParameterWithParameters = (parameters: Parameters) => {
                 });
             }
 
-            updatePlayersDB(updatedPlayers);
+            updatePlayersLocalStorage(updatedPlayers);
             setPlayers(updatedPlayers);
         }
     }
@@ -445,7 +443,7 @@ export const updatePlayerPlays = (playState) => {
     plyr.updated = currentDateTimeStamp;
     plyr.lastUpdated = currentDateTimeStamp;
     plyr.properties = countPropertiesInObject(plyr);
-    plyr.lastUpdatedBy = user ? user?.email : plyr.lastUpdatedBy;
+    plyr.lastUpdatedBy = user ? user?.email : plyr.lastUpdatedBy || plyr?.id;
 
     return plyr;
 }
@@ -601,7 +599,7 @@ export const updatePlayersWithParameters = (parameters: Parameters) => {
                 }
             }
         } else {
-            updatePlayersDB(updatedPlayers);
+            updatePlayersLocalStorage(updatedPlayers);
             setPlayers(updatedPlayers);
             setFilteredPlayers(updatedPlayers);
         }
@@ -658,7 +656,7 @@ export default function PlayerForm(props) {
                 useDatabase, 
                 commandParams, 
                 databasePlayers, 
-                updatePlayersDB,
+                updatePlayersDB: updatePlayersLocalStorage,
                 deleteCompletely,
                 setLoadingPlayers,
                 setFilteredPlayers, 
