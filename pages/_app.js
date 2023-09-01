@@ -13,7 +13,7 @@ import { createUserFromFirebaseData } from '../components/Form';
 import { createContext, useRef, useState, useEffect } from 'react';
 import { getActivePlayers, newPlayerType } from '../components/smasherscape';
 
-export const useDB = () => false;
+export const useDB = () => true;
 export const StateContext = createContext({});
 export const signUpOrSignIn = `Sign Up or Sign In`;
 export const productionPlayersCollectionName = `players`;

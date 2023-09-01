@@ -939,6 +939,7 @@ section {
         border-color: black;
     }
     @media (min-width: 768px) {
+        padding-top: 10px;
         margin-right: 10px;
         input {
             max-height: 30px !important;
