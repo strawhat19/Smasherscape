@@ -68,14 +68,14 @@ export const createUserFromFirebaseData = (userCredential, type?, name?) => {
   return createdUser;
 }
 
-export const signInWithGoogle = async (databasePlayers, setUser, setAuthState) => {
+export const signInWithGoogle = async (databasePlayers, setUser, setAuthState, plays) => {
   try {
     let createdGoogleUserFromFirebaseData = null;
     let userCredential = await signInWithPopup(auth, googleProvider);
     if (userCredential) createdGoogleUserFromFirebaseData = createUserFromFirebaseData(userCredential, `Google`);
 
     if (createdGoogleUserFromFirebaseData != null) {
-      let dbPlayers = getActivePlayers(databasePlayers);
+      let dbPlayers = getActivePlayers(databasePlayers, true, plays);
       let nameToAdd = createdGoogleUserFromFirebaseData?.name;
       let lowerCaseName = nameToAdd.toLowerCase();
       let playerExists = dbPlayers.length > 0 && dbPlayers.find(plyr => plyr.name.toLowerCase() == lowerCaseName || plyr.name.toLowerCase().includes(lowerCaseName));
@@ -151,7 +151,7 @@ export default function Form(props?: any) {
   const loadedRef = useRef(false);
   const [loaded, setLoaded] = useState(false);
   const [alertOpen, setAlertOpen] = useState(false);
-  const { user, setUser, updates, setUpdates, authState, setAuthState, emailField, setEmailField, users, setFocus, mobile, databasePlayers, playersLoading, useDatabase } = useContext<any>(StateContext);
+  const { user, setUser, updates, setUpdates, authState, setAuthState, emailField, setEmailField, users, setFocus, mobile, databasePlayers, playersLoading, useDatabase, plays } = useContext<any>(StateContext);
 
   const authForm = (e?: any) => {
     e.preventDefault();
@@ -294,7 +294,7 @@ export default function Form(props?: any) {
         <input title={user ? `Sign Out` : authState} className={`${(user && window?.location?.href?.includes(`profile`) || (authState == `Sign In` || authState == `Sign Up`)) ? `submit half` : `submit full`} ${user ? `userSignedInSubmit` : `userSignedOutSubmit`}`} type="submit" name="authFormSubmit" value={user ? `Sign Out` : authState} />
         {/* {(authState == `Sign In` || authState == `Sign Up`) && <input id={`back`} className={`back`} type="submit" name="authFormBack" value={`Back`} />} */}
         {!user && authState == `Next` && <div title={`${signUpOrSignIn} With Google`} className={`customUserSection`}>
-          <GoogleButton onClick={(e) => signInWithGoogle(databasePlayers, setUser, setAuthState)} type="dark" />
+          <GoogleButton onClick={(e) => signInWithGoogle(databasePlayers, setUser, setAuthState, plays)} type="dark" />
         </div>}
         {user && <div title={`Welcome, ${user?.name}`} className={`customUserSection`}>
           {user?.image ? <img alt={user?.email} src={user?.image}  className={`userImage`} /> : user?.name?.split[``][0].toUpperCase()}

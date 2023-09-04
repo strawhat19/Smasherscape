@@ -22,16 +22,12 @@ import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
 import { doc, setDoc, deleteDoc, updateDoc } from 'firebase/firestore';
 import { checkUserRole, getActivePlayers, isInvalid } from './smasherscape';
 import { calcPlayerDeaths, calcPlayerKDRatio, calcPlayerKills, removeTrailingZeroDecimal } from './PlayerRecord';
-import { StateContext, showAlert, formatDate, generateUniqueID, countPropertiesInObject, getActivePlayersJSON, useDatabaseName, getAllPlays, getAllPlaysJSON, defaultXPMultiplier, XPGainOnWin, XPGainOnLoserXPForEachStockTaken, winCons, loseCons, dev, useDB } from '../pages/_app';
+import { StateContext, showAlert, formatDate, generateUniqueID, countPropertiesInObject, getActivePlayersJSON, usePlayersDatabase, getAllPlays, defaultXPMultiplier, XPGainOnWin, XPGainOnLoserXPForEachStockTaken, winCons, loseCons, dev, useDB, usePlaysDatabase } from '../pages/_app';
 
-export const testUsersDatabaseName = `testUsers`;
-export const productionUsersDatabaseName = `users`;
-export const developmentUsersDatabaseName = `devUsers`;
-export const usersDatabaseName = developmentUsersDatabaseName;
-export const addUserToDB = async (userObj: any) => await setDoc(doc(db, usersDatabaseName, userObj?.ID), userObj);
-export const deletePlayerFromDB = async (playerObj: Player) => await deleteDoc(doc(db, useDatabaseName, playerObj?.ID));
-export const addPlayerToDB = async (playerObj: Player) => await setDoc(doc(db, useDatabaseName, playerObj?.ID), playerObj);
-export const updatePlayerInDB = async (playerObj: Player, parameters) => await updateDoc(doc(db, useDatabaseName, playerObj?.ID), parameters);
+export const addPlayToDB = async (playObj: Play) => await setDoc(doc(db, usePlaysDatabase, playObj?.ID), playObj);
+export const deletePlayerFromDB = async (playerObj: Player) => await deleteDoc(doc(db, usePlayersDatabase, playerObj?.ID));
+export const addPlayerToDB = async (playerObj: Player) => await setDoc(doc(db, usePlayersDatabase, playerObj?.ID), playerObj);
+export const updatePlayerInDB = async (playerObj: Player, parameters) => await updateDoc(doc(db, usePlayersDatabase, playerObj?.ID), parameters);
 export const getAllCharacters = () => Object.entries(Characters).filter(char => char[0] === char[0].charAt(0).toUpperCase() + char[0].slice(1));
 
 export const getUniqueCharactersPlayed = (players, plays) => {
@@ -42,8 +38,8 @@ export const getUniqueCharactersPlayed = (players, plays) => {
     }
 }
 
-export const updatePlayersLocalStorage = (updatedPlayers: Player[]) => {
-    console.log(`Updated Players`, getActivePlayers(updatedPlayers));
+export const updatePlayersLocalStorage = (updatedPlayers: Player[], plays) => {
+    console.log(`Updated Players`, getActivePlayers(updatedPlayers, true, plays));
     localStorage.setItem(`players`, JSON.stringify(updatedPlayers));
 }
 
@@ -176,6 +172,7 @@ export const createPlayer = (playerName, playerIndex, databasePlayers, user?: Us
 export const addPlayersWithParameters = (parameters: Parameters) => {
     let {
         user,
+        plays,
         players,
         setPlayers,
         useDatabase,
@@ -194,7 +191,7 @@ export const addPlayersWithParameters = (parameters: Parameters) => {
                 addPlayerToDB(playerObj);
                 return playerObj;
             } else {
-                if (!getActivePlayers(players).map(playr => playr.name.toLowerCase()).some(nam => nam == plyr.toLowerCase())) {
+                if (!getActivePlayers(players, true, plays).map(playr => playr.name.toLowerCase()).some(nam => nam == plyr.toLowerCase())) {
                     addPlayerToDB(playerObj);
                     return playerObj;
                 } else {
@@ -205,11 +202,11 @@ export const addPlayersWithParameters = (parameters: Parameters) => {
                 }
             }
         } else {
-            if (!getActivePlayers(players).map(playr => playr.name.toLowerCase()).some(nam => nam == plyr.toLowerCase())) {
+            if (!getActivePlayers(players, true, plays).map(playr => playr.name.toLowerCase()).some(nam => nam == plyr.toLowerCase())) {
                 setPlayers(prevPlayers => {
                     let updatedPlayers: Player[] = [...prevPlayers, playerObj];
                     setFilteredPlayers(updatedPlayers);
-                    updatePlayersLocalStorage(updatedPlayers);
+                    updatePlayersLocalStorage(updatedPlayers, plays);
                     return updatedPlayers;
                 });
             } else {
@@ -224,6 +221,7 @@ export const addPlayersWithParameters = (parameters: Parameters) => {
 
 export const deletePlayersWithParameters = (parameters: Parameters) => {
     let {
+        plays,
         players,
         setPlayers,
         useDatabase,
@@ -237,7 +235,7 @@ export const deletePlayersWithParameters = (parameters: Parameters) => {
     let playersToDelete = commandParams.filter((comm, commIndex) => commIndex != 0 && comm);
 
     playersToDelete.forEach(player => {
-        let playerDB: Player = getActivePlayers(players).find(plyr => plyr?.name.toLowerCase() == player.toLowerCase() || plyr?.name.toLowerCase().includes(player.toLowerCase()));
+        let playerDB: Player = getActivePlayers(players, true, plays).find(plyr => plyr?.name.toLowerCase() == player.toLowerCase() || plyr?.name.toLowerCase().includes(player.toLowerCase()));
         if (playerDB) {
             playersToDeleteFromDB.push(playerDB);
         }
@@ -274,7 +272,7 @@ export const deletePlayersWithParameters = (parameters: Parameters) => {
                         }
                     });
                     setFilteredPlayers(updatedPlayers);
-                    updatePlayersLocalStorage(updatedPlayers);
+                    updatePlayersLocalStorage(updatedPlayers, plays);
                     return updatedPlayers;
                 });
             }
@@ -289,6 +287,7 @@ export const deletePlayersWithParameters = (parameters: Parameters) => {
 
 export const setParametersWithParameters = (parameters: Parameters) => {
     let {
+        plays,
         players,
         setPlayers,
         commandParams,
@@ -325,7 +324,7 @@ export const setParametersWithParameters = (parameters: Parameters) => {
                 });
             }
 
-            updatePlayersLocalStorage(updatedPlayers);
+            updatePlayersLocalStorage(updatedPlayers, plays);
             setPlayers(updatedPlayers);
         }
     }
@@ -333,6 +332,7 @@ export const setParametersWithParameters = (parameters: Parameters) => {
 
 export const giveParameterWithParameters = (parameters: Parameters) => {
     let {
+        plays,
         players,
         setPlayers,
         commandParams,
@@ -370,7 +370,7 @@ export const giveParameterWithParameters = (parameters: Parameters) => {
                 });
             }
 
-            updatePlayersLocalStorage(updatedPlayers);
+            updatePlayersLocalStorage(updatedPlayers, plays);
             setPlayers(updatedPlayers);
         }
     }
@@ -390,8 +390,9 @@ export const updatePlayerPlays = (playState) => {
         winnerDB, 
         loseChar, 
         playUUID,
-        lossStocks, 
+        lossStocks,
         stocksTaken, 
+        useDatabase, 
         winnerOrLoser, 
     } = playState;
 
@@ -406,7 +407,8 @@ export const updatePlayerPlays = (playState) => {
     let expGained = newExp - prevExp;
     plyr.experience.arenaXP = newExp;
 
-    let playToRecord = {
+    let playToRecord: Play = {
+        ID: `${plays.length + 1} Play ${winnerDB?.name} W vs ${loserDB?.name} ${stocksTaken} ${currentDateTimeStamp} ${playUUID}`,
         otherCharacter: winnerOrLoser == `winner` ? loseChar : winChar,
         character: winnerOrLoser == `winner` ? winChar : loseChar,
         id: `player-${plyr.name}-play-${playUUID}`,
@@ -416,8 +418,8 @@ export const updatePlayerPlays = (playState) => {
         winnerID: winnerDB?.id,
         loser: loserDB?.name,
         loserID: loserDB?.id,
-        uuid: playUUID,
         winnerExpGained,
+        uuid: playUUID,
         loserExpGained,
         winnerPrevExp,
         loserPrevExp,
@@ -435,9 +437,13 @@ export const updatePlayerPlays = (playState) => {
     // plyr.plays.push(playToRecord);
 
     if (winnerOrLoser == `winner`) {
-        plays.push(playToRecord);
-        setPlays(plays);
-        localStorage.setItem(`plays`, JSON.stringify(plays));
+        if (useDatabase == true) {
+            addPlayToDB(playToRecord);
+        } else {
+            plays.push(playToRecord);
+            setPlays(plays);
+            localStorage.setItem(`plays`, JSON.stringify(plays));
+        }
     };
 
     calcPlayerLevelAndExperience(plyr);
@@ -560,7 +566,8 @@ export const updatePlayersWithParameters = (parameters: Parameters) => {
             }
         ];
 
-        let playUIDs = getAllPlays(players).some(ply => ply.uuid) ? getAllPlays(players).map(ply => ply?.uuid) : players.map(plr => plr.uuid);
+        // let playUIDs = getAllPlays(players).some(ply => ply.uuid) ? getAllPlays(players).map(ply => ply?.uuid) : players.map(plr => plr.uuid);
+        let playUIDs = plays.map(ply => ply.uuid);
         let playUUID = playUIDs.length > 0 ? generateUniqueID(playUIDs) : generateUniqueID();
 
         let playState = {
@@ -576,6 +583,7 @@ export const updatePlayersWithParameters = (parameters: Parameters) => {
             loseChar,
             playUUID,
             lossStocks, 
+            useDatabase,
             stocksTaken,  
         }
 
@@ -607,7 +615,7 @@ export const updatePlayersWithParameters = (parameters: Parameters) => {
                 }
             }
         } else {
-            updatePlayersLocalStorage(updatedPlayers);
+            updatePlayersLocalStorage(updatedPlayers, plays);
             setPlayers(updatedPlayers);
             setFilteredPlayers(updatedPlayers);
         }
@@ -708,17 +716,17 @@ export default function PlayerForm(props) {
         if (itemsToSearch && itemsToSearch != ``) {
             if (type == `playerName`) {
                 if (Array.isArray(itemsToSearch) && itemsToSearch.length > 0) {
-                    setFilteredPlayers(getActivePlayers(players).filter((plyr: Player) => {
+                    setFilteredPlayers(getActivePlayers(players, true, plays).filter((plyr: Player) => {
                         return itemsToSearch.map(playr => playr.name.toLowerCase()).includes(plyr.name.toLowerCase());
                     }));
                 } else if (typeof itemsToSearch == `string`) {
-                    setFilteredPlayers(getActivePlayers(players).filter((plyr: Player) => {
+                    setFilteredPlayers(getActivePlayers(players, true, plays).filter((plyr: Player) => {
                         return Object.values(plyr).some(val =>
                             typeof val === `string` && val.toLowerCase().includes(itemsToSearch?.toLowerCase())
                         );
                     }));
                 } else {
-                    setFilteredPlayers(getActivePlayers(players).filter((plyr: Player) => {
+                    setFilteredPlayers(getActivePlayers(players, true, plays).filter((plyr: Player) => {
                         return Object.values(plyr).some(val =>
                             typeof val === `string` && val.toLowerCase().includes(itemsToSearch?.name?.toLowerCase())
                         );
@@ -726,17 +734,17 @@ export default function PlayerForm(props) {
                 }
             } else {
                 if (Array.isArray(itemsToSearch) && itemsToSearch.length > 0) {
-                    setFilteredPlayers(getActivePlayers(players).filter((plyr: Player) => {
+                    setFilteredPlayers(getActivePlayers(players, true, plays).filter((plyr: Player) => {
                         return itemsToSearch.map(playr => playr.name.toLowerCase()).includes(plyr.name.toLowerCase());
                     }));
                 } else if (typeof itemsToSearch == `string`) {
-                    setFilteredPlayers(getActivePlayers(players).filter((plyr: Player) => {
+                    setFilteredPlayers(getActivePlayers(players, true, plays).filter((plyr: Player) => {
                         return plyr.plays.map(ply => ply.character).some(char =>
                             typeof char === `string` && char.toLowerCase().includes(itemsToSearch?.toLowerCase())
                         );
                     }));
                 } else {
-                    setFilteredPlayers(getActivePlayers(players).filter((plyr: Player) => {
+                    setFilteredPlayers(getActivePlayers(players, true, plays).filter((plyr: Player) => {
                         return plyr.plays.map(ply => ply.character).some(char =>
                             typeof char === `string` && char.toLowerCase().includes(itemsToSearch?.label?.toLowerCase())
                         );
@@ -744,13 +752,13 @@ export default function PlayerForm(props) {
                 }
             }
         } else {
-            setFilteredPlayers(getActivePlayers(players));
+            setFilteredPlayers(getActivePlayers(players, true, plays));
         }
     }
 
     return <section className={`formsSection`}>
-    <form id={`playerForm`} onSubmit={(e) => handleCommands(e, user, plays, setPlays)} action="submit" className={`gridForm ${getActivePlayers(players).length > 0 ? `populated ${getActivePlayers(players).length} ${getAllPlays(getActivePlayers(players)).length > 0 ? `hasPlays` : `noPlays`}` : `empty`} ${(useDatabase == false || (user && checkUserRole(user, `Admin`))) ? `hasCommandsPerm` : `noCommandsPerm`} ${command?.name}`}>
-        {getActivePlayers(players).length > 0 && <>
+    <form id={`playerForm`} onSubmit={(e) => handleCommands(e, user, plays, setPlays)} action="submit" className={`gridForm ${getActivePlayers(players, true, plays).length > 0 ? `populated ${getActivePlayers(players, true, plays).length} ${plays && plays?.length > 0 ? `hasPlays` : `noPlays`}` : `empty`} ${(useDatabase == false || (user && checkUserRole(user, `Admin`))) ? `hasCommandsPerm` : `noCommandsPerm`} ${command?.name}`}>
+        {getActivePlayers(players, true, plays).length > 0 && <>
             <div className={`playerSearchAuto inputWrapper materialBGInputWrapper`}>
                 <div className="inputBG materialBG"></div>
                 <Autocomplete
@@ -758,7 +766,7 @@ export default function PlayerForm(props) {
                     ref={searchInput}
                     id="playerSearchAuto-1"
                     sx={{ width: `100%` }}
-                    options={getActivePlayers(players)}
+                    options={getActivePlayers(players, true, plays)}
                     getOptionLabel={(option) => option.name}
                     onChange={(e, val: any) => searchPlayers(e, val, `playerName`)}
                     isOptionEqualToValue={(option, value) => option.id === value.id}
@@ -777,9 +785,9 @@ export default function PlayerForm(props) {
         </>}
         {(useDatabase == false || (user && checkUserRole(user, `Admin`))) && <div id={`commandsInput`} className={`inputWrapper ${command?.name}`}>
             <div className="inputBG"></div>
-            <input ref={commandsInput} type="text" className="commands" id="enterCommandsInput" name={`commands`} placeholder={getActivePlayers(players).length > 0 ? `Enter Commands...` : `!add name to add players or sign up`} />
+            <input ref={commandsInput} type="text" className="commands" id="enterCommandsInput" name={`commands`} placeholder={getActivePlayers(players, true, plays).length > 0 ? `Enter Commands...` : `!add name to add players or sign up`} />
         </div>}
-        {(getActivePlayers(players).length > 0 && getAllPlays(getActivePlayers(players)).length > 0) && <>
+        {(getActivePlayers(players, true, plays).length > 0 && plays && plays?.length > 0) && <>
             <div className={`characterSearchAuto inputWrapper materialBGInputWrapper`}>
                 <div className="inputBG materialBG"></div>
                 <Autocomplete
@@ -797,7 +805,7 @@ export default function PlayerForm(props) {
                     renderOption={(props: any, characterOption: any) => {
                         return (
                             <div key={characterOption.id} {...props}>
-                                <CharacterOption plays={getAllPlaysJSON(getActivePlayers(players))} type={`All`} characterOption={characterOption} />
+                                <CharacterOption plays={plays} type={`All`} characterOption={characterOption} />
                             </div>
                         )
                     }}

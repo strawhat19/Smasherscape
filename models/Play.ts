@@ -3,6 +3,7 @@ import Stock from "./Stock";
 export default class Play {
   [key: string]: any;
   constructor(playObj: {
+    ID: any,
     date: string,
     loser: string,
     winner: string,
