@@ -7,12 +7,14 @@ import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
 import { calcPlayerCharacterTimesPlayed, calcPlayerCharactersPlayed, calcPlayerLevelImage, getCharacterTitle, publicAssetLink } from './smasherscape';
 
+export const calcPlayerWinsFromPlays = (player, plays) => plays.filter(ply => ply?.winnerUUID == player?.uuid)?.length;
+export const calcPlayerLossesFromPlays = (player, plays) => plays.filter(ply => ply?.loserUUID == player?.uuid)?.length;
 export const calcPlayerWins = (plyr: Player) => plyr.plays.filter(ply => ply.winner.toLowerCase() == plyr.name.toLowerCase()).length;
 export const calcPlayerLosses = (plyr: Player) => plyr.plays.filter(ply => ply.loser.toLowerCase() == plyr.name.toLowerCase()).length;
 
 export default function PlayerCard(props) {
     let { plyr } = props;
-    const { user, filteredPlayers, setFilteredPlayers, useLazyLoad } = useContext<any>(StateContext);
+    const { user, plays, filteredPlayers, setFilteredPlayers, useLazyLoad } = useContext<any>(StateContext);
     
     const setPlayerExpanded = (player: Player) => setFilteredPlayers(filteredPlayers.map(plyr => plyr.id == player.id ? { ...player, expanded: !player.expanded } : plyr));
 
@@ -48,14 +50,15 @@ export default function PlayerCard(props) {
                 <div className="recordPlays">
                     <div className="record">
                         <h3 className={`greenRecordText`}>Record</h3>
-                        <h4>{calcPlayerWins(plyr)} - {calcPlayerLosses(plyr)}</h4>
+                        {/* <h4>{calcPlayerWins(plyr)} - {calcPlayerLosses(plyr)}</h4> */}
+                        <h4>{calcPlayerWinsFromPlays(plyr, plays)} - {calcPlayerLossesFromPlays(plyr, plays)}</h4>
                     </div>
                     <div className="plays">
                         <h3 className={`greenRecordText`}>Plays</h3>
-                        <div className={`playsContainer ${calcPlayerCharactersPlayed(plyr)?.length > 0 ? `populatedPlays` : ``}`}>
-                            {calcPlayerCharactersPlayed(plyr)?.length > 0 ? calcPlayerCharactersPlayed(plyr).map((char, charIndex) => {
+                        <div className={`playsContainer ${calcPlayerCharactersPlayed(plyr, true, plays)?.length > 0 ? `populatedPlays` : ``}`}>
+                            {calcPlayerCharactersPlayed(plyr, true, plays)?.length > 0 ? calcPlayerCharactersPlayed(plyr, true, plays).map((char, charIndex) => {
                                 return (
-                                    <Badge title={`Played ${getCharacterTitle(char)} ${calcPlayerCharacterTimesPlayed(plyr, char)} Time(s)`} key={charIndex} badgeContent={calcPlayerCharacterTimesPlayed(plyr, char)} color="primary">
+                                    <Badge title={`Played ${getCharacterTitle(char)} ${calcPlayerCharacterTimesPlayed(plyr, char, plays)} Time(s)`} key={charIndex} badgeContent={calcPlayerCharacterTimesPlayed(plyr, char, plays)} color="primary">
                                         <img className={`charImg`} width={35} src={calcPlayerCharacterIcon(char)} alt={getCharacterTitle(char)} />
                                     </Badge>
                                 )
@@ -92,6 +95,6 @@ export default function PlayerCard(props) {
             </div>
         </div>
     </div>
-    <PlayerRecord plyr={plyr} />
+    <PlayerRecord plyr={plyr} plyrPlays={plays.filter(ply => ply?.winnerUUID == plyr?.uuid || ply?.loserUUID == plyr?.uuid)} />
 </div>
 }

@@ -1,5 +1,6 @@
 import  moment from 'moment';
 import { db } from '../firebase';
+import User from '../models/User';
 import Play from '../models/Play';
 import Role from '../models/Role';
 import Stock from '../models/Stock';
@@ -14,15 +15,14 @@ import TextField from '@mui/material/TextField';
 import CharacterOption from './CharacterOption';
 import { Characters } from '../common/Characters';
 import Autocomplete from '@mui/material/Autocomplete';
+import { FormEvent, useContext, useRef } from 'react';
 import { calcPlayerLosses, calcPlayerWins } from './PlayerCard';
 import { calcPlayerLevelAndExperience } from '../common/Levels';
-import { FormEvent, useContext, useRef } from 'react';
 import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
 import { doc, setDoc, deleteDoc, updateDoc } from 'firebase/firestore';
-import { checkUserRole, getActivePlayers, isInvalid, newPlayerType } from './smasherscape';
+import { checkUserRole, getActivePlayers, isInvalid } from './smasherscape';
 import { calcPlayerDeaths, calcPlayerKDRatio, calcPlayerKills, removeTrailingZeroDecimal } from './PlayerRecord';
 import { StateContext, showAlert, formatDate, generateUniqueID, countPropertiesInObject, getActivePlayersJSON, useDatabaseName, getAllPlays, getAllPlaysJSON, defaultXPMultiplier, XPGainOnWin, XPGainOnLoserXPForEachStockTaken, winCons, loseCons, dev, useDB } from '../pages/_app';
-import User from '../models/User';
 
 export const testUsersDatabaseName = `testUsers`;
 export const productionUsersDatabaseName = `users`;
@@ -34,8 +34,12 @@ export const addPlayerToDB = async (playerObj: Player) => await setDoc(doc(db, u
 export const updatePlayerInDB = async (playerObj: Player, parameters) => await updateDoc(doc(db, useDatabaseName, playerObj?.ID), parameters);
 export const getAllCharacters = () => Object.entries(Characters).filter(char => char[0] === char[0].charAt(0).toUpperCase() + char[0].slice(1));
 
-export const getUniqueCharactersPlayed = (players) => {
-    return [...new Set(players.flatMap((p: Player) => p.plays.flatMap((play: Play) => [play.character, play.otherCharacter]) ))].sort();
+export const getUniqueCharactersPlayed = (players, plays) => {
+    if (plays && plays?.length > 0) {
+        return [...new Set(plays.flatMap((play: Play) => [play.character, play.otherCharacter]) )].sort();
+    } else {
+        return [...new Set(players.flatMap((p: Player) => p.plays.flatMap((play: Play) => [play.character, play.otherCharacter]) ))].sort();
+    }
 }
 
 export const updatePlayersLocalStorage = (updatedPlayers: Player[]) => {
@@ -56,15 +60,15 @@ export const showCommandsWithParameters = (parameters) => {
     </div>, `85%`, `auto`);
 }
 
-export const playerConverter = {
-    toFirestore: (playr) => {
-        return newPlayerType(playr);
-    },
-    fromFirestore: (snapshot, options) => {
-        const playrData = snapshot.data(options);
-        return newPlayerType(playrData);
-    }
-};
+// export const playerConverter = {
+//     toFirestore: (playr) => {
+//         return newPlayerType(playr);
+//     },
+//     fromFirestore: (snapshot, options) => {
+//         const playrData = snapshot.data(options);
+//         return newPlayerType(playrData);
+//     }
+// };
 
 export const showPropertiesWarning = (type, winner: Player, loser: Player) => {
     showAlert(`${type == `Critical` ? `Critical! ` : ``}Player is Approaching 20,000 Properties`, <div>
@@ -154,16 +158,6 @@ export const createPlayer = (playerName, playerIndex, databasePlayers, user?: Us
                 name: `User`,
                 level: 2,
             },
-            // {
-            //     promoted: currentDateTimeStamp,
-            //     name: `Admin`,
-            //     level: 3,
-            // },
-            // {
-            //     promoted: currentDateTimeStamp,
-            //     name: `Owner`,
-            //     level: 3,
-            // },
         ] as Role[],
         experience: {
             xp: 0,
@@ -388,9 +382,11 @@ export const updatePlayerPlays = (playState) => {
         user,
         plyr, 
         date,
+        plays,
         stocks,
         winChar, 
         loserDB, 
+        setPlays,
         winnerDB, 
         loseChar, 
         playUUID,
@@ -409,8 +405,8 @@ export const updatePlayerPlays = (playState) => {
     let newExp = winnerOrLoser == `winner` ? winnerNewExp : loserNewExp;
     let expGained = newExp - prevExp;
     plyr.experience.arenaXP = newExp;
-    
-    plyr.plays.push({
+
+    let playToRecord = {
         otherCharacter: winnerOrLoser == `winner` ? loseChar : winChar,
         character: winnerOrLoser == `winner` ? winChar : loseChar,
         id: `player-${plyr.name}-play-${playUUID}`,
@@ -434,11 +430,19 @@ export const updatePlayerPlays = (playState) => {
         newExp,
         stocks,
         date
-    });
+    };
+    
+    // plyr.plays.push(playToRecord);
+
+    if (winnerOrLoser == `winner`) {
+        plays.push(playToRecord);
+        setPlays(plays);
+        localStorage.setItem(`plays`, JSON.stringify(plays));
+    };
 
     calcPlayerLevelAndExperience(plyr);
 
-    updatePlayerStats(plyr, plyr.plays);
+    updatePlayerStats(plyr, plays.filter(ply => ply?.winnerUUID == plyr?.uuid || ply?.loserUUID == plyr?.uuid));
 
     plyr.updated = currentDateTimeStamp;
     plyr.lastUpdated = currentDateTimeStamp;
@@ -451,7 +455,9 @@ export const updatePlayerPlays = (playState) => {
 export const updatePlayersWithParameters = (parameters: Parameters) => {
     let {
         user,
+        plays,
         players,
+        setPlays,
         setPlayers,
         useDatabase,
         commandParams,
@@ -560,9 +566,11 @@ export const updatePlayersWithParameters = (parameters: Parameters) => {
         let playState = {
             user,
             date,
+            plays,
             stocks,
             players, 
             winChar, 
+            setPlays,
             loserDB, 
             winnerDB, 
             loseChar,
@@ -620,6 +628,7 @@ export const processCommandsWithParameters = (parameters: Parameters) => {
     if (command != ``) {
         dev() && console.log(`Command sent to ${useDB() ? `Database` : `Leaderboard`}`, parameters);
         if (firstCommand.includes(`!upd`)) {
+            console.log(`Update Parameters`, parameters);
             updatePlayersWithParameters(parameters);
         } else if (firstCommand.includes(`!add`)) {
             addPlayersWithParameters(parameters);
@@ -639,28 +648,36 @@ export default function PlayerForm(props) {
 
     const searchInput = useRef();
     const commandsInput = useRef();
-    const { user, players, setPlayers, filteredPlayers, setFilteredPlayers, mobile, useDatabase, commands, databasePlayers, sameNamePlayeredEnabled, deleteCompletely, setLoadingPlayers, command } = useContext<any>(StateContext);
+    const { user, players, setPlayers, filteredPlayers, setFilteredPlayers, mobile, useDatabase, commands, databasePlayers, sameNamePlayeredEnabled, deleteCompletely, setLoadingPlayers, command, plays, setPlays } = useContext<any>(StateContext);
 
-    const handleCommands = (e?: FormEvent, user?: User | Player) => {
+    const handleCommands = (e?: FormEvent, user?: User | Player, plays?: any, setPlays?: any) => {
         e.preventDefault();
         let field = commandsInput.current as HTMLInputElement;
         if (field.name == `commands`) {
             let command = field?.value.toLowerCase();
             let commandParams = command.split(` `);
+
+            console.log(`handleCommands`, {
+                plays,
+                setPlays,
+            });
+
             const parameters = new Parameters({
                 user,
+                plays,
                 command,
                 players, 
+                setPlays,
                 commands,
                 setPlayers, 
                 useDatabase, 
                 commandParams, 
                 databasePlayers, 
-                updatePlayersDB: updatePlayersLocalStorage,
                 deleteCompletely,
                 setLoadingPlayers,
                 setFilteredPlayers, 
                 sameNamePlayeredEnabled,
+                updatePlayersLocalStorage,
             });
             processCommandsWithParameters(parameters);
         } else {
@@ -670,7 +687,7 @@ export default function PlayerForm(props) {
 
     const getCharacterObjs = (active) => {
         if (active == true) {
-            return getAllCharacters().filter(char => getUniqueCharactersPlayed(players).includes(char[1])).map((char, charIndex) => {
+            return getAllCharacters().filter(char => getUniqueCharactersPlayed(players, plays).includes(char[1])).map((char, charIndex) => {
                 return {
                     id: charIndex + 1,
                     key: char[0],
@@ -732,7 +749,7 @@ export default function PlayerForm(props) {
     }
 
     return <section className={`formsSection`}>
-    <form id={`playerForm`} onSubmit={(e) => handleCommands(e, user)} action="submit" className={`gridForm ${getActivePlayers(players).length > 0 ? `populated ${getActivePlayers(players).length} ${getAllPlays(getActivePlayers(players)).length > 0 ? `hasPlays` : `noPlays`}` : `empty`} ${(useDatabase == false || (user && checkUserRole(user, `Admin`))) ? `hasCommandsPerm` : `noCommandsPerm`} ${command?.name}`}>
+    <form id={`playerForm`} onSubmit={(e) => handleCommands(e, user, plays, setPlays)} action="submit" className={`gridForm ${getActivePlayers(players).length > 0 ? `populated ${getActivePlayers(players).length} ${getAllPlays(getActivePlayers(players)).length > 0 ? `hasPlays` : `noPlays`}` : `empty`} ${(useDatabase == false || (user && checkUserRole(user, `Admin`))) ? `hasCommandsPerm` : `noCommandsPerm`} ${command?.name}`}>
         {getActivePlayers(players).length > 0 && <>
             <div className={`playerSearchAuto inputWrapper materialBGInputWrapper`}>
                 <div className="inputBG materialBG"></div>

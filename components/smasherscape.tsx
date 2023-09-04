@@ -9,15 +9,25 @@ import CommandsForm from './CommandsForm';
 import LoadingSpinner from './LoadingSpinner';
 import Experience from '../models/Experience';
 import { Characters } from '../common/Characters';
-import { StateContext, defaultPlayerRoles, getActivePlayersJSON } from '../pages/_app';
 import PlayerCard, { calcPlayerLosses, calcPlayerWins } from './PlayerCard';
+import { StateContext, defaultPlayerRoles, getActivePlayersJSON } from '../pages/_app';
 import { calcPlayerDeaths, calcPlayerKDRatio, calcPlayerKills, parseDate, removeTrailingZeroDecimal } from './PlayerRecord';
 
 export const publicAssetLink = `https://github.com/strawhat19/Smasherscape/blob/main`;
-export const calcPlayerCharacterTimesPlayed = (plyr: Player, char) => plyr.plays.map(ply => ply.character).filter(charPlayed => charPlayed.toLowerCase() == char || charPlayed.toLowerCase().includes(char)).length;
+export const calcPlayerCharacterTimesPlayed = (plyr: Player, char, plays: any) => {
+    let timesCharPlayed = 0;
+    if (plays && plays?.length > 0) {
+        let playsToUpdate = plays.filter(ply => ply?.winnerUUID == plyr?.uuid || ply?.loserUUID == plyr?.uuid);
+        let charsPlayed = playsToUpdate?.map(ply => (ply?.winnerUUID == plyr?.uuid ? ply?.character : ply?.otherCharacter));
+        timesCharPlayed = charsPlayed?.filter(charPlayed => charPlayed.toLowerCase() == char || charPlayed.toLowerCase().includes(char)).length;
+    } else {
+        timesCharPlayed = plyr.plays.map(ply => ply.character).filter(charPlayed => charPlayed.toLowerCase() == char || charPlayed.toLowerCase().includes(char)).length;
+    }
+    return timesCharPlayed;
+};
 
-export const calcPlaysCharacterTimesPlayed = (plys: Play[], type, characterOption) => {
-    let playChars = type == `All` ? plys.map(ply => ply.character || ply.otherCharacter) : plys.map(ply => type == `Player` ? ply.character : ply.otherCharacter);
+export const calcPlaysCharacterTimesPlayed = (plys: Play[], type, characterOption, plyr?: any) => {
+    let playChars = type == `All` ? plys.map(ply => ply.character || ply.otherCharacter) : plys.map(ply => (ply?.winnerUUID != plyr?.uuid ? ply?.character : ply?.otherCharacter));
     return playChars.filter(charPlayed =>  characterOption.label.toLowerCase().includes(charPlayed.toLowerCase())).length;
 };
 
@@ -75,15 +85,21 @@ export const calcPlayerLevelImage = (levelName) => {
     else return `${publicAssetLink}/assets/smasherscape/OSRS_Top_Hat.png?raw=true`;
 }
 
-export const calcPlayerCharactersPlayed = (plyr: Player, cutOff = true) => {
-    let charsPlayed = plyr?.plays?.map(ply => ply?.character);
+export const calcPlayerCharactersPlayed = (plyr: Player, cutOff = true, plays) => {
+    let playsToUpdate = [];
+    if (plays && plays?.length > 0) {
+        playsToUpdate = plays.filter(ply => ply?.winnerUUID == plyr?.uuid || ply?.loserUUID == plyr?.uuid);
+    } else {
+        playsToUpdate = plyr?.plays;
+    }
+    let charsPlayed = playsToUpdate?.map(ply => (ply?.winnerUUID == plyr?.uuid ? ply?.character : ply?.otherCharacter));
     let counts = charsPlayed.reduce((acc, char) => {
         acc[char] = (acc[char] || 0) + 1;
         return acc;
     }, {});
     let sortedCharactersByMostTimesPlayed = Object.entries(counts).sort((a, b) => {
-        const aRecent = plyr.plays.find(p => p.character === a[0])?.date;
-        const bRecent = plyr.plays.find(p => p.character === b[0])?.date;
+        const aRecent = playsToUpdate?.find(p => (p?.winnerUUID == plyr?.uuid ? p?.character : p?.otherCharacter) === a[0])?.date;
+        const bRecent = playsToUpdate?.find(p => (p?.winnerUUID == plyr?.uuid ? p?.character : p?.otherCharacter) === b[0])?.date;
         // return (new Date(bRecent) as any) - (new Date(aRecent) as any); 
         return parseDate(bRecent) - parseDate(aRecent); 
     }).sort((a: any, b: any) => b[1] - a[1]).map(entry => entry[0].toLowerCase());
@@ -116,7 +132,7 @@ export const newPlayerType = (player: Player, customObject = true) => {
 
     let level: Level = new Level(player.level.name, player.level.num) as Level;
     let experience: Experience = new Experience(player.experience.nextLevelAt, player.experience.remainingXP, player.experience.arenaXP, player.experience.xp) as Experience;
-    let plays: Play[] = player.plays.map((play: Play) => {
+    let playsToConsider: Play[] = player.plays.map((play: Play) => {
         let newPlay = new Play(removeEmptyParams(play));
         return newPlay as Play;
     }) as Play[];
@@ -124,15 +140,14 @@ export const newPlayerType = (player: Player, customObject = true) => {
     let wins = calcPlayerWins(player);
     let losses = calcPlayerLosses(player);
     let ratio = (wins/(wins+losses)) * 100;
-    let kills = calcPlayerKills(player, plays);
-    let deaths = calcPlayerDeaths(player, plays);
-    let kdRatio = calcPlayerKDRatio(player, plays);
+    let kills = calcPlayerKills(player, playsToConsider);
+    let deaths = calcPlayerDeaths(player, playsToConsider);
+    let kdRatio = calcPlayerKDRatio(player, playsToConsider);
     experience = removeEmptyParams(experience) as Experience;
 
     let newPlayer: Player = new Player({
         ...player,
         level,
-        plays,
         experience,
         kills,
         deaths,
@@ -140,6 +155,7 @@ export const newPlayerType = (player: Player, customObject = true) => {
         wins,
         losses,
         ratio,
+        plays: playsToConsider,
         percentage: (ratio) > 100 ? 100 : parseFloat(removeTrailingZeroDecimal(ratio)),
     }) as Player;
 

@@ -1,17 +1,17 @@
-import Parameters from '../models/Parameters';
-import { StateContext } from '../pages/_app';
-import React, { useState, useContext } from 'react';
-import { processCommandsWithParameters, updatePlayersLocalStorage } from './PlayerForm';
 import User from '../models/User';
 import Player from '../models/Player';
+import { StateContext } from '../pages/_app';
+import Parameters from '../models/Parameters';
+import React, { useState, useContext } from 'react';
+import { processCommandsWithParameters, updatePlayersLocalStorage } from './PlayerForm';
 
 export default function CodeBlock(props) {
     let [clicked, setClicked] = useState(false);
     let [CMDClicked, setCMDClicked] = useState(false);
 
-    const { user, players, setPlayers, setFilteredPlayers, useDatabase, databasePlayers, sameNamePlayeredEnabled, deleteCompletely, commands, setLoadingPlayers } = useContext<any>(StateContext);
+    const { user, players, setPlayers, setFilteredPlayers, useDatabase, databasePlayers, sameNamePlayeredEnabled, deleteCompletely, commands, setLoadingPlayers, plays, setPlays } = useContext<any>(StateContext);
 
-    const handleCopyClick = (e, type?: string, user?: User | Player) => {
+    const handleCopyClick = (e, type?: string, user?: User | Player, plays?: any, setPlays?: any) => {
         if (type == `copy`) {
             setCMDClicked(true);
             navigator.clipboard.writeText(props.children);
@@ -22,18 +22,20 @@ export default function CodeBlock(props) {
             let commandParams = command.split(` `);
             const parameters = new Parameters({
                 user,
+                plays,
                 command,
                 players, 
                 commands,
+                setPlays,
                 setPlayers, 
                 useDatabase, 
                 commandParams, 
                 databasePlayers, 
-                updatePlayersDB: updatePlayersLocalStorage,
                 deleteCompletely,
                 setLoadingPlayers, 
                 setFilteredPlayers,
                 sameNamePlayeredEnabled,
+                updatePlayersLocalStorage,
             })
             processCommandsWithParameters(parameters);
             setTimeout(() => setClicked(false), 1500);
@@ -50,7 +52,7 @@ export default function CodeBlock(props) {
                 </code>
             </pre>
             {props.codeTitle && <div id={`copySendCommandButton`} data-custombutton={props.custombutton} className="dataCustomButton copyCustom nx-flex nx-gap-1 nx-absolute nx-m-[11px] nx-right-0 nx-top-0">
-                <button onClick={(e) => handleCopyClick(e, `default`, user)} className="nextra-button nx-transition-all active:nx-opacity-50 nx-bg-primary-700/5 nx-border nx-border-black/5 nx-text-gray-600 hover:nx-text-gray-900 nx-rounded-md nx-p-1.5 dark:nx-bg-primary-300/10 dark:nx-border-white/10 dark:nx-text-gray-400 dark:hover:nx-text-gray-50" title={`${props.codeTitle ? `Send` : `Copy`} Command`}>
+                <button onClick={(e) => handleCopyClick(e, `default`, user, plays, setPlays)} className="nextra-button nx-transition-all active:nx-opacity-50 nx-bg-primary-700/5 nx-border nx-border-black/5 nx-text-gray-600 hover:nx-text-gray-900 nx-rounded-md nx-p-1.5 dark:nx-bg-primary-300/10 dark:nx-border-white/10 dark:nx-text-gray-400 dark:hover:nx-text-gray-50" title={`${props.codeTitle ? `Send` : `Copy`} Command`}>
                     {clicked ? <>
                         <svg viewBox="0 0 20 20" width="1em" height="1em" fill="currentColor" className="checkmark nextra-copy-icon nx-pointer-events-none nx-h-4 nx-w-4">
                             <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
@@ -75,7 +77,7 @@ export default function CodeBlock(props) {
                 </button>
             </div>}
             <div id={`copyCommandButton`} data-custombutton={props.custombutton} className="dataCustomButton copySubmit nx-flex nx-gap-1 nx-absolute nx-m-[11px] nx-right-0 nx-top-0">
-                <button onClick={(e) => handleCopyClick(e, `copy`, user)} className="nextra-button nx-transition-all active:nx-opacity-50 nx-bg-primary-700/5 nx-border nx-border-black/5 nx-text-gray-600 hover:nx-text-gray-900 nx-rounded-md nx-p-1.5 dark:nx-bg-primary-300/10 dark:nx-border-white/10 dark:nx-text-gray-400 dark:hover:nx-text-gray-50" title={`${(!props.codeTitle && props.commandToCopy) ? `Send` : `Copy`} Command`}>
+                <button onClick={(e) => handleCopyClick(e, `copy`, user, plays, setPlays)} className="nextra-button nx-transition-all active:nx-opacity-50 nx-bg-primary-700/5 nx-border nx-border-black/5 nx-text-gray-600 hover:nx-text-gray-900 nx-rounded-md nx-p-1.5 dark:nx-bg-primary-300/10 dark:nx-border-white/10 dark:nx-text-gray-400 dark:hover:nx-text-gray-50" title={`${(!props.codeTitle && props.commandToCopy) ? `Send` : `Copy`} Command`}>
                     {CMDClicked ? <>
                         <svg viewBox="0 0 20 20" width="1em" height="1em" fill="currentColor" className="checkmark nextra-copy-icon nx-pointer-events-none nx-h-4 nx-w-4">
                             <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>

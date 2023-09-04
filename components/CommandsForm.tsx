@@ -1,5 +1,7 @@
 import React from 'react';
+import User from '../models/User';
 import CodeBlock from "./CodeBlock";
+import Player from '../models/Player';
 import Command from "../models/Command";
 import PlayerOption from './PlayerOption';
 import { matchSorter } from 'match-sorter';
@@ -12,8 +14,6 @@ import { getActivePlayers } from "./smasherscape";
 import { getAllPlaysJSON, StateContext } from "../pages/_app";
 import { getCharacterObjects, processCommandsWithParameters } from './PlayerForm';
 import { Autocomplete, TextField, ToggleButton, ToggleButtonGroup } from "@mui/material";
-import User from '../models/User';
-import Player from '../models/Player';
 
 export const getDefaultPlayer = (number) => ({id: number, type: `Default`, name: `Player-${number}`, label: `Player-${number}`});
 
@@ -25,7 +25,7 @@ export default function CommandsForm(props) {
     let [playerOne, setPlayerOne] = useState<any>(getDefaultPlayer(1));
     let [playerTwo, setPlayerTwo] = useState<any>(getDefaultPlayer(2));
     let [stocksTaken, setStocksTaken] = useState<any>(`Stocks-Taken-From-Winner`);
-    const { user, players, command, setCommand, playersToSelect, commandsToNotInclude, commands, setPlayers, useDatabase, databasePlayers, updatePlayersDB, deleteCompletely, setFilteredPlayers, sameNamePlayeredEnabled, setLoadingPlayers, iPhone } = useContext<any>(StateContext);
+    const { user, players, command, setCommand, playersToSelect, commandsToNotInclude, commands, setPlayers, useDatabase, databasePlayers, updatePlayersLocalStorage, deleteCompletely, setFilteredPlayers, sameNamePlayeredEnabled, setLoadingPlayers, iPhone, plays, setPlays } = useContext<any>(StateContext);
 
     const adjustStocks = (e, val) => {
         if (val) {
@@ -115,17 +115,19 @@ export default function CommandsForm(props) {
         let commandParams = renderCommand(command).split(` `);
         const parameters = new Parameters({
             user,
+            plays,
             players, 
+            setPlays,
             commands,
             setPlayers, 
             useDatabase, 
             commandParams,
             databasePlayers, 
-            updatePlayersDB,
             deleteCompletely,
             setLoadingPlayers, 
             setFilteredPlayers, 
             sameNamePlayeredEnabled,
+            updatePlayersLocalStorage,
             command: renderCommand(command),
         })
         processCommandsWithParameters(parameters);
