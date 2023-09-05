@@ -3,6 +3,7 @@ import Stock from "./Stock";
 export default class Play {
   [key: string]: any;
   constructor(playObj: {
+    ID: any,
     date: string,
     loser: string,
     winner: string,
@@ -11,6 +12,7 @@ export default class Play {
     stocksTaken: number,
     lossStocks: Stock[],
     otherCharacter: string,
+    winnerStocksTaken?: number,
     winnerExpGained?: number,
     loserExpGained?: number,
     winnerPrevExp?: number,
@@ -18,7 +20,10 @@ export default class Play {
     winnerNewExp?: number,
     loserNewExp?: number,
     winnerUUID?: string,
+    winnerUID?: string,
     loserUUID?: string,
+    loserUID?: string,
+    timeLeft?: number,
     winnerID?: string,
     loserID?: string,
     expGained?: any,

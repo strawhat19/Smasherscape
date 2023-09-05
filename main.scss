@@ -939,7 +939,7 @@ section {
         border-color: black;
     }
     @media (min-width: 768px) {
-        padding-top: 10px;
+        // padding-top: 10px;
         margin-right: 10px;
         input {
             max-height: 30px !important;
@@ -1078,6 +1078,17 @@ html[class~=dark] {
         outline: none !important;
         --tw-ring-opacity: 0 !important;
         --tw-ring-color: none !important;
+    }
+}
+
+.changeLabel {
+    padding: 0 2px;
+    border-radius: 8px;
+    transition: var(--transition);
+    &.editable {
+        &:hover {
+            background: rgba(0,194,255,.2);
+        }
     }
 }
 

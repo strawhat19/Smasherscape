@@ -16,16 +16,39 @@ import { getActivePlayers, newPlayerType } from '../components/smasherscape';
 export const useDB = () => true;
 export const StateContext = createContext({});
 export const signUpOrSignIn = `Sign Up or Sign In`;
-export const productionPlayersCollectionName = `players`;
-export const developmentPlayersCollectionName = `devPlayers`;
-export const testingPlayersCollectionName = `testPlayers`;
-export const useDatabaseName = developmentPlayersCollectionName;
+
+export const environments = {
+  dev: {
+    playsDatabase: `devPlays`,
+    playersDatabase: `devPlayers`,
+  },
+  test: {
+    playsDatabase: `testPlays`,
+    playersDatabase: `testPlayers`,
+  },
+  alpha: {
+    playsDatabase: `alphaPlays`,
+    playersDatabase: `alphaPlayers`,
+  },
+  beta: {
+    playsDatabase: `betaPlays`,
+    playersDatabase: `betaPlayers`,
+  },
+  prod: {
+    playsDatabase: `plays`,
+    playersDatabase: `players`,
+  },
+};
+
+export const environment = environments.test;
+export const usePlaysDatabase = environment.playsDatabase;
+export const usePlayersDatabase = environment.playersDatabase;
 
 export const defaultWinXP = 400;
 export const testingWinXP = 1000;
-export const defaultXPMultiplier = 5;
+export const defaultXPMultiplier = 1;
 export const XPGainOnWin = defaultWinXP;
-export const globalBonusXPMultiplier = 5;
+export const globalBonusXPMultiplier = 1;
 export const defaultLoserXPForEachStockTaken = 100;
 export const testingLoserXPForEachStockTaken = 300;
 export const XPGainOnLoserXPForEachStockTaken = defaultLoserXPForEachStockTaken;
@@ -72,12 +95,13 @@ export const getAllPlaysJSON = (players) => {
   return allPlays;
 }
 
-export const logPlayers = (plyrs, useDatabase) => {
-  if (getActivePlayers(plyrs).length > 0) {
-    let allPlays = getAllPlays(getActivePlayers(plyrs.map(pla => newPlayerType(pla))));
-    dev() && console.log(`All ${useDatabase == true ? `Database ` : ``}Players`, plyrs.map(pla => newPlayerType(pla)));
-    dev() && console.log(`Active ${useDatabase == true ? `Database ` : ``}Players`, getActivePlayers(plyrs.map(pla => newPlayerType(pla))));
-    dev() && allPlays && allPlays?.length > 0 && console.log(`All Active ${useDatabase == true ? `Database ` : ``}Plays`, allPlays);
+export const logPlayers = (plyrs, useDatabase, plays) => {
+  if (getActivePlayers(plyrs, true, plays).length > 0) {
+    // let allPlays = getAllPlays(getActivePlayers(plyrs.map(pla => newPlayerType(pla, true, plays)), true, plays));
+    dev() && console.log(`All ${useDatabase == true ? `Database ` : ``}Players`, plyrs.map(pla => newPlayerType(pla, true, plays)));
+    dev() && console.log(`Active ${useDatabase == true ? `Database ` : ``}Players`, getActivePlayers(plyrs.map(pla => newPlayerType(pla, true, plays)), true, plays));
+    // dev() && plays && plays?.length > 0 && console.log(`All Active ${useDatabase == true ? `Database ` : ``}Plays`, plays);
+    // dev() && allPlays && allPlays?.length > 0 && console.log(`All Active ${useDatabase == true ? `Database ` : ``}Plays`, allPlays);
   }
 }
 
@@ -556,6 +580,7 @@ export default function Xuruko({ Component, pageProps, router }) {
     let [width, setWidth] = useState(0);
     let [color, setColor] = useState(``);
     let [users, setUsers] = useState([]);
+    let [plays, setPlays] = useState([]);
     let [user, setUser] = useState(null);
     let [dark, setDark] = useState(false);
     let [height, setHeight] = useState(0);
@@ -629,7 +654,7 @@ export default function Xuruko({ Component, pageProps, router }) {
       }
     }
 
-    // User Updater
+    // Catch User Updates
     useEffect(() => {
       localStorage.setItem(`user`, JSON.stringify(user));
       setBodyClasses(prevBodyClasses => {
@@ -642,11 +667,11 @@ export default function Xuruko({ Component, pageProps, router }) {
       })
     }, [user])
 
-    // Database Updater
+    // Catch Player Updates
     useEffect(() => {
       setCommandsToShow(players);
       if (useDB() == false) {
-        logPlayers(players, useDatabase);
+        logPlayers(players, useDatabase, plays);
       } else {
         if (user) {
           let currentUser = getCurrentUser(user, players);
@@ -655,6 +680,13 @@ export default function Xuruko({ Component, pageProps, router }) {
         }
       }
     }, [players])
+
+    // Catch Plays Updates
+    useEffect(() => {
+      if (plays?.length > 0) {
+        localStorage.setItem(`plays`, JSON.stringify(plays));
+      };
+    }, [plays])
 
     // App and User Updater
     useEffect(() => {
@@ -695,7 +727,7 @@ export default function Xuruko({ Component, pageProps, router }) {
             // dev() && console.log(`Database User`, userCredential);
             setUser(currentUser);
             setAuthState(`Sign Out`);
-            localStorage.setItem(`userToken`, currentUser?.uid);
+            // localStorage.setItem(`userToken`, currentUser?.uid);
             // dev() && console.log(`User`, currentUser);
           } else {
             setUser(null);
@@ -710,11 +742,11 @@ export default function Xuruko({ Component, pageProps, router }) {
 
     }, [rte, user, users, authState, dark])
 
-    // Player Updates
+    // Player & Plays Updater
     useEffect(() => {
-      // Players
       if (useDatabase == true) {
-        const unsubscribeFromSmasherScapeSnapShot = onSnapshot(collection(db, useDatabaseName), (querySnapshot) => {
+        // Players
+        const unsubscribeFromDatabasePlayersListener = onSnapshot(collection(db, usePlayersDatabase), (querySnapshot) => {
           const playersFromDatabase = [];
           querySnapshot.forEach((doc) => playersFromDatabase.push(doc.data()));
           setPlayersLoading(false);
@@ -723,21 +755,31 @@ export default function Xuruko({ Component, pageProps, router }) {
           setFilteredPlayers(getActivePlayersJSON(playersFromDatabase));
           setCommandsToShow(playersFromDatabase);
           localStorage.setItem(`players`, JSON.stringify(playersFromDatabase));
-          logPlayers(playersFromDatabase, useDatabase);
+          logPlayers(playersFromDatabase, useDatabase, plays);
+        });
+        
+        // Plays
+        const unsubscribeFromDatabasePlaysListener = onSnapshot(collection(db, usePlaysDatabase), (querySnapshot) => {
+          const playsFromDatabase = [];
+          querySnapshot.forEach((doc) => playsFromDatabase.push(doc.data()));
+          setPlays(playsFromDatabase);
+          localStorage.setItem(`plays`, JSON.stringify(playsFromDatabase));
+          console.log(`Database Plays`, playsFromDatabase);
         });
   
         return () => {
-          unsubscribeFromSmasherScapeSnapShot();
+          unsubscribeFromDatabasePlayersListener();
+          unsubscribeFromDatabasePlaysListener();
         };
       } else {
+        let storedPlays = JSON.parse(localStorage.getItem(`plays`)) || [];
         let storedPlayers = JSON.parse(localStorage.getItem(`players`));
-        if (storedPlayers && useLocalStorage) {
-          if (useDatabase != true) {
-            setPlayersLoading(false); 
-            setPlayers(storedPlayers);
-            setCommandsToShow(storedPlayers);
-            setFilteredPlayers(getActivePlayersJSON(storedPlayers));
-          }
+        if (storedPlayers && storedPlays && useLocalStorage) {
+          setPlays(storedPlays);
+          setPlayersLoading(false); 
+          setPlayers(storedPlayers);
+          setCommandsToShow(storedPlayers);
+          setFilteredPlayers(getActivePlayersJSON(storedPlayers));
         } else {
           setPlayersLoading(false); 
           setPlayers(defaultPlayers);
@@ -747,7 +789,7 @@ export default function Xuruko({ Component, pageProps, router }) {
       }
     }, [])
 
-    return <StateContext.Provider value={{ router, rte, setRte, updates, setUpdates, content, setContent, width, setWidth, user, setUser, page, setPage, mobileMenu, setMobileMenu, users, setUsers, authState, setAuthState, emailField, setEmailField, devEnv, setDevEnv, mobileMenuBreakPoint, platform, setPlatform, focus, setFocus, highScore, setHighScore, color, setColor, dark, setDark, colorPref, setColorPref, qotd, setQotd, alertOpen, setAlertOpen, mobile, setMobile, systemStatus, setSystemStatus, loading, setLoading, anim, setAnimComplete, IDs, setIDs, categories, setCategories, browser, setBrowser, onMac, rearranging, setRearranging, buttonText, setButtonText, gameFormStep, setGameFormStep, players, setPlayers, filteredPlayers, setFilteredPlayers, useLocalStorage, setUseLocalStorage, command, setCommand, commands, setCommands, playersToSelect, setPlayersToSelect, databasePlayers, setDatabasePlayers, useDatabase, setUseDatabase, commandsToNotInclude, setCommandsToNotInclude, sameNamePlayeredEnabled, setSameNamePlayeredEnabled, deleteCompletely, setDeleteCompletely, noPlayersFoundMessage, setNoPlayersFoundMessage, useLazyLoad, setUseLazyLoad, playersLoading, setPlayersLoading, iPhone, set_iPhone }}>
+    return <StateContext.Provider value={{ router, rte, setRte, updates, setUpdates, content, setContent, width, setWidth, user, setUser, page, setPage, mobileMenu, setMobileMenu, users, setUsers, authState, setAuthState, emailField, setEmailField, devEnv, setDevEnv, mobileMenuBreakPoint, platform, setPlatform, focus, setFocus, highScore, setHighScore, color, setColor, dark, setDark, colorPref, setColorPref, qotd, setQotd, alertOpen, setAlertOpen, mobile, setMobile, systemStatus, setSystemStatus, loading, setLoading, anim, setAnimComplete, IDs, setIDs, categories, setCategories, browser, setBrowser, onMac, rearranging, setRearranging, buttonText, setButtonText, gameFormStep, setGameFormStep, players, setPlayers, filteredPlayers, setFilteredPlayers, useLocalStorage, setUseLocalStorage, command, setCommand, commands, setCommands, playersToSelect, setPlayersToSelect, databasePlayers, setDatabasePlayers, useDatabase, setUseDatabase, commandsToNotInclude, setCommandsToNotInclude, sameNamePlayeredEnabled, setSameNamePlayeredEnabled, deleteCompletely, setDeleteCompletely, noPlayersFoundMessage, setNoPlayersFoundMessage, useLazyLoad, setUseLazyLoad, playersLoading, setPlayersLoading, iPhone, set_iPhone, plays, setPlays }}>
       {(browser != `chrome` || onMac) ? <div className={bodyClasses}>
         <AnimatePresence mode={`wait`}>
           <motion.div className={bodyClasses} key={router.route} initial="pageInitial" animate="pageAnimate" exit="pageExit" transition={{ duration: 0.35 }} variants={{

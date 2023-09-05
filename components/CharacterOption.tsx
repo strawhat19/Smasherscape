@@ -2,8 +2,8 @@ import { useState } from "react";
 import { Badge } from "@mui/material";
 import { calcPlaysCharacterTimesPlayed } from "./smasherscape";
 export default function CharacterOption(props) {
-    let { type, plays, characterOption } = props;
-    const [timesPlayed, setTimesPlayed] = useState(calcPlaysCharacterTimesPlayed(plays, type, characterOption));
+    let { type, plays, characterOption, plyr } = props;
+    const [timesPlayed, setTimesPlayed] = useState(calcPlaysCharacterTimesPlayed(plays, type, characterOption, plyr));
     return (
         <div className="autocompleteOption characterOption">
             <div className="characterIndex">{characterOption?.id}</div>

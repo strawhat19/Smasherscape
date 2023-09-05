@@ -185,13 +185,8 @@ const Listbox = styled(`ul`)(
 );
 
 export default function CustomizedHook(props) {
-  const { players, playersToSelect, setPlayersToSelect } = useContext<any>(StateContext);
-
-  const adjustPlayersToSelect = (e: any, val: any) => {
-    // console.log(`adjustPlayersToSelect`, {e, val});
-    setPlayersToSelect(val);
-  }
-
+  const { plays, players, playersToSelect, setPlayersToSelect } = useContext<any>(StateContext);
+  const adjustPlayersToSelect = (e: any, val: any) => setPlayersToSelect(val);
   const {
     getRootProps,
     getInputProps,
@@ -207,8 +202,8 @@ export default function CustomizedHook(props) {
     multiple: true,
     defaultValue: [],
     id: `players-search-complete`,
-    options: getActivePlayers(players),
     getOptionLabel: (option) => option.label,
+    options: getActivePlayers(players, true, plays),
     onChange: (e, val: any) => adjustPlayersToSelect(e, val),
     isOptionEqualToValue: (option, value) => option.id === value.id,
   });

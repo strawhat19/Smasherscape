@@ -1,7 +1,7 @@
-import { capitalizeAllWords, StateContext, showAlert, countPropertiesInObject, formatDate, signUpOrSignIn, defaultPlayerRoles, dev } from '../pages/_app';
+import { capitalizeAllWords, StateContext, showAlert, countPropertiesInObject, formatDate, signUpOrSignIn, dev } from '../pages/_app';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
-import { addPlayerToDB, addUserToDB, createPlayer } from './PlayerForm';
 import { useContext, useEffect, useRef, useState } from 'react';
+import { addPlayerToDB, createPlayer } from './PlayerForm';
 import { auth, googleProvider } from '../firebase';
 import { getActivePlayers } from './smasherscape';
 import PasswordRequired from './PasswordRequired';
@@ -68,14 +68,14 @@ export const createUserFromFirebaseData = (userCredential, type?, name?) => {
   return createdUser;
 }
 
-export const signInWithGoogle = async (databasePlayers, setUser, setAuthState) => {
+export const signInWithGoogle = async (databasePlayers, setUser, setAuthState, plays) => {
   try {
     let createdGoogleUserFromFirebaseData = null;
     let userCredential = await signInWithPopup(auth, googleProvider);
     if (userCredential) createdGoogleUserFromFirebaseData = createUserFromFirebaseData(userCredential, `Google`);
 
     if (createdGoogleUserFromFirebaseData != null) {
-      let dbPlayers = getActivePlayers(databasePlayers);
+      let dbPlayers = getActivePlayers(databasePlayers, true, plays);
       let nameToAdd = createdGoogleUserFromFirebaseData?.name;
       let lowerCaseName = nameToAdd.toLowerCase();
       let playerExists = dbPlayers.length > 0 && dbPlayers.find(plyr => plyr.name.toLowerCase() == lowerCaseName || plyr.name.toLowerCase().includes(lowerCaseName));
@@ -151,7 +151,7 @@ export default function Form(props?: any) {
   const loadedRef = useRef(false);
   const [loaded, setLoaded] = useState(false);
   const [alertOpen, setAlertOpen] = useState(false);
-  const { user, setUser, updates, setUpdates, authState, setAuthState, emailField, setEmailField, users, setFocus, mobile, databasePlayers, playersLoading, useDatabase } = useContext<any>(StateContext);
+  const { user, setUser, updates, setUpdates, authState, setAuthState, emailField, setEmailField, users, setFocus, mobile, databasePlayers, playersLoading, useDatabase, plays } = useContext<any>(StateContext);
 
   const authForm = (e?: any) => {
     e.preventDefault();
@@ -215,7 +215,10 @@ export default function Form(props?: any) {
             }).catch((error) => {
               const errorCode = error.code;
               const errorMessage = error.message;
-              showAlert(`<div class="loadingMessage"><h3>${errorMessage}</h3></div>`, `50%`, `35%`);
+              showAlert(`Error Signing In`, <div className="alertMessage errorMessage loadingMessage">
+                <i style={{color: `var(--smasherscapeYellow)`}} className="fas fa-exclamation-triangle"></i>
+                <h3>Error Signing In</h3>
+              </div>, `50%`, `40%`);
               console.log(`Error Signing In`, {
                 error,
                 errorCode,
@@ -240,13 +243,24 @@ export default function Form(props?: any) {
             setAuthState(`Signed Up`);
             setUser(newUser);
           }).catch((error) => {
+            console.log(`Error Signing Up`, error);
             const errorMessage = error.message;
+            console.log({errorMessage});
             if (errorMessage) {
-              if (errorMessage.includes(`email-already-in-use`)) {
-                setAuthState(`Sign In`);
-              } else {
-                showAlert(`<div class="loadingMessage"><h3>${errorMessage}</h3></div>`, `50%`, `35%`);
-              }                  
+              const renderErrorMessage = (erMsg) => {
+                if (erMsg.toLowerCase().includes(`invalid-email`)) {
+                  return `Please use a valid email.`;
+                } else if (erMsg.toLowerCase().includes(`email-already-in-use`)) {
+                  return `Email is already in use.`;
+                } {
+                  return erMsg;
+                }
+              }
+
+              showAlert(`Error Signing Up`, <div className="alertMessage errorMessage loadingMessage">
+                <i style={{color: `var(--smasherscapeYellow)`}} className="fas fa-exclamation-triangle"></i>
+                <h3>{renderErrorMessage(errorMessage)}</h3>
+              </div>, `50%`, `40%`);                 
             }
             return;
           });
@@ -282,8 +296,8 @@ export default function Form(props?: any) {
         {user && window?.location?.href?.includes(`profile`) && <input id="password" className={`editPassword userData`} placeholder="Edit Password" type="password" name="editPassword" autoComplete={`current-password`} />}
         <input title={user ? `Sign Out` : authState} className={`${(user && window?.location?.href?.includes(`profile`) || (authState == `Sign In` || authState == `Sign Up`)) ? `submit half` : `submit full`} ${user ? `userSignedInSubmit` : `userSignedOutSubmit`}`} type="submit" name="authFormSubmit" value={user ? `Sign Out` : authState} />
         {/* {(authState == `Sign In` || authState == `Sign Up`) && <input id={`back`} className={`back`} type="submit" name="authFormBack" value={`Back`} />} */}
-        {!user && <div title={`${signUpOrSignIn} With Google`} className={`customUserSection`}>
-          <GoogleButton onClick={(e) => signInWithGoogle(databasePlayers, setUser, setAuthState)} type="dark" />
+        {!user && authState == `Next` && <div title={`${signUpOrSignIn} With Google`} className={`customUserSection`}>
+          <GoogleButton onClick={(e) => signInWithGoogle(databasePlayers, setUser, setAuthState, plays)} type="dark" />
         </div>}
         {user && <div title={`Welcome, ${user?.name}`} className={`customUserSection`}>
           {user?.image ? <img alt={user?.email} src={user?.image}  className={`userImage`} /> : user?.name?.split[``][0].toUpperCase()}

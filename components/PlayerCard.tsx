@@ -2,21 +2,74 @@ import { useContext } from 'react';
 import Player from '../models/Player';
 import { Badge } from '@mui/material';
 import PlayerRecord from './PlayerRecord';
-import { StateContext } from '../pages/_app';
+import { updatePlayerInDB } from './PlayerForm';
+import { StateContext, showAlert } from '../pages/_app';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
-import { calcPlayerCharacterTimesPlayed, calcPlayerCharactersPlayed, calcPlayerLevelImage, getCharacterTitle, publicAssetLink } from './smasherscape';
+import { calcPlayerCharacterTimesPlayed, calcPlayerCharactersPlayed, calcPlayerLevelImage, checkUserRole, getActivePlayers, getCharacterTitle, publicAssetLink } from './smasherscape';
 
+export const calcPlayerWinsFromPlays = (player, plays) => plays.filter(ply => ply?.winnerUUID == player?.uuid)?.length;
+export const calcPlayerLossesFromPlays = (player, plays) => plays.filter(ply => ply?.loserUUID == player?.uuid)?.length;
 export const calcPlayerWins = (plyr: Player) => plyr.plays.filter(ply => ply.winner.toLowerCase() == plyr.name.toLowerCase()).length;
 export const calcPlayerLosses = (plyr: Player) => plyr.plays.filter(ply => ply.loser.toLowerCase() == plyr.name.toLowerCase()).length;
 
 export default function PlayerCard(props) {
     let { plyr } = props;
-    const { user, filteredPlayers, setFilteredPlayers, useLazyLoad } = useContext<any>(StateContext);
-    
+    const { user, plays, useDatabase, players, filteredPlayers, setFilteredPlayers, useLazyLoad } = useContext<any>(StateContext);
     const setPlayerExpanded = (player: Player) => setFilteredPlayers(filteredPlayers.map(plyr => plyr.id == player.id ? { ...player, expanded: !player.expanded } : plyr));
 
-    return <div id={`playerCard-${plyr.id}`} className={`playerCard ${plyr?.expanded ? `expandedPlayerCard` : `collapsedPlayerCard`} ${plyr?.uid ? `playerCardUID-${plyr?.uid} ${user && user?.uid == plyr?.uid ? `playerIsUser userIsPlayer` : ``}` : ``}`}>
+    const limitInput = (event, maxLen) => {
+        const allowedKeys = [`Backspace`];
+        const disallowedKeys = [`Space`, `Enter`, `Return`];
+        const element = event.target;
+        if (element.textContent.length >= maxLen && !allowedKeys.includes(event.code) || disallowedKeys.includes(event.code)) {
+            event.preventDefault();
+            return; 
+        }
+    }
+
+    const changePlayerNameConfirm = (e, player) => {
+        let value = e.target.textContent.toLowerCase();
+        let displayName = value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+        let playerNames = getActivePlayers(players, true, plays).map(plyr => plyr.name.toLowerCase());
+
+        const changePlayerName = (e, player) => {
+            let updatedPlayer = {
+                ...player,
+                displayName,
+                name: displayName,
+            };
+            if (useDatabase == true) {
+                const jsonPlayer = JSON.parse(JSON.stringify(player));
+                const jsonUpdatedPlayer = JSON.parse(JSON.stringify(updatedPlayer));
+                updatePlayerInDB(jsonPlayer, jsonUpdatedPlayer);
+            }
+        }
+
+        if (player?.name.toLowerCase() == value) {
+            return;
+        } else if (playerNames.includes(value)) {
+            e.target.textContent = player?.name;
+            showAlert(`Player name is already taken`, <div className="alertMessage errorMessage loadingMessage">
+                <i style={{color: `var(--smasherscapeYellow)`}} className="fas fa-exclamation-triangle"></i>
+                <h3>Player name is already taken</h3>
+                <h3>Please pick a unique name</h3>
+            </div>, `50%`, `40%`);
+            return;
+        } else {
+            changePlayerName(e, player);
+            // showAlert(`Change Player Name?`, <div className="alertMessage confirmMessage loadingMessage">
+            //     <i style={{color: `var(--smasherscapeYellow)`}} className="fas fa-exclamation-triangle"></i>
+            //     <h3>Are you sure you want to change player name?</h3>
+            //     <h3>Saving will update the name</h3>
+            //     <button onClick={(e) => changePlayerName(e, player)}>Save</button>
+            // </div>, `50%`, `40%`);
+            // e.target.textContent = player?.name;
+            // return;
+        }
+    }
+
+    return <div id={`playerCard-${plyr.uuid}`} className={`playerCard ${plyr?.expanded ? `expandedPlayerCard` : `collapsedPlayerCard`} ${plyr?.uid ? `playerCardUID-${plyr?.uid} ${user && user?.uid == plyr?.uid ? `playerIsUser userIsPlayer` : ``}` : ``}`}>
     <div className="gridCard" onClick={(e) => setPlayerExpanded(plyr)}>
         {useLazyLoad ? (
             <>
@@ -36,7 +89,9 @@ export default function PlayerCard(props) {
                     <h3 className={`blackTextShadow slimmed`}>Xuruko's<br />SmasherScape</h3>
                 </div>
                 <h2 title={plyr?.name} className={`playerNameText bluePurpleTextShadow textOverflow overrideWithInlineBlock`}>
-                    {plyr?.name}
+                    <span onKeyDown={(e) => limitInput(e, 10)} onBlur={(e) => changePlayerNameConfirm(e, plyr)} className={`playerNameContainer changeLabel ${(checkUserRole(user, `Owner`) || user && user?.uid == plyr?.uid) ? `editable` : ``}`} contentEditable={checkUserRole(user, `Owner`) || user && user?.uid == plyr?.uid} suppressContentEditableWarning>
+                        {plyr?.name}
+                    </span>
                     {user && plyr?.uid && user?.uid == plyr?.uid && <img alt={user?.email} src={user?.image}  className={`userImage playerCardUserImage`} />}
                 </h2>
             </div>
@@ -48,14 +103,15 @@ export default function PlayerCard(props) {
                 <div className="recordPlays">
                     <div className="record">
                         <h3 className={`greenRecordText`}>Record</h3>
-                        <h4>{calcPlayerWins(plyr)} - {calcPlayerLosses(plyr)}</h4>
+                        {/* <h4>{calcPlayerWins(plyr)} - {calcPlayerLosses(plyr)}</h4> */}
+                        <h4>{calcPlayerWinsFromPlays(plyr, plays)} - {calcPlayerLossesFromPlays(plyr, plays)}</h4>
                     </div>
                     <div className="plays">
                         <h3 className={`greenRecordText`}>Plays</h3>
-                        <div className={`playsContainer ${calcPlayerCharactersPlayed(plyr)?.length > 0 ? `populatedPlays` : ``}`}>
-                            {calcPlayerCharactersPlayed(plyr)?.length > 0 ? calcPlayerCharactersPlayed(plyr).map((char, charIndex) => {
+                        <div className={`playsContainer ${calcPlayerCharactersPlayed(plyr, true, plays)?.length > 0 ? `populatedPlays` : ``}`}>
+                            {calcPlayerCharactersPlayed(plyr, true, plays)?.length > 0 ? calcPlayerCharactersPlayed(plyr, true, plays).map((char, charIndex) => {
                                 return (
-                                    <Badge title={`Played ${getCharacterTitle(char)} ${calcPlayerCharacterTimesPlayed(plyr, char)} Time(s)`} key={charIndex} badgeContent={calcPlayerCharacterTimesPlayed(plyr, char)} color="primary">
+                                    <Badge title={`Played ${getCharacterTitle(char)} ${calcPlayerCharacterTimesPlayed(plyr, char, plays)} Time(s)`} key={charIndex} badgeContent={calcPlayerCharacterTimesPlayed(plyr, char, plays)} color="primary">
                                         <img className={`charImg`} width={35} src={calcPlayerCharacterIcon(char)} alt={getCharacterTitle(char)} />
                                     </Badge>
                                 )
@@ -92,6 +148,6 @@ export default function PlayerCard(props) {
             </div>
         </div>
     </div>
-    <PlayerRecord plyr={plyr} />
+    <PlayerRecord plyr={plyr} plyrPlays={plays.filter(ply => ply?.winnerUUID == plyr?.uuid || ply?.loserUUID == plyr?.uuid)} />
 </div>
 }

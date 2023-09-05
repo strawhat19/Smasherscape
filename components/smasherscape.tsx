@@ -1,6 +1,5 @@
 import Main from './Main';
 import Play from '../models/Play';
-import User from '../models/User';
 import { useContext } from 'react';
 import Level from '../models/Level';
 import Player from '../models/Player';
@@ -10,14 +9,24 @@ import LoadingSpinner from './LoadingSpinner';
 import Experience from '../models/Experience';
 import { Characters } from '../common/Characters';
 import { StateContext, defaultPlayerRoles, getActivePlayersJSON } from '../pages/_app';
-import PlayerCard, { calcPlayerLosses, calcPlayerWins } from './PlayerCard';
+import PlayerCard, { calcPlayerLossesFromPlays, calcPlayerWinsFromPlays } from './PlayerCard';
 import { calcPlayerDeaths, calcPlayerKDRatio, calcPlayerKills, parseDate, removeTrailingZeroDecimal } from './PlayerRecord';
 
 export const publicAssetLink = `https://github.com/strawhat19/Smasherscape/blob/main`;
-export const calcPlayerCharacterTimesPlayed = (plyr: Player, char) => plyr.plays.map(ply => ply.character).filter(charPlayed => charPlayed.toLowerCase() == char || charPlayed.toLowerCase().includes(char)).length;
+export const calcPlayerCharacterTimesPlayed = (plyr: Player, char, plays: any) => {
+    let timesCharPlayed = 0;
+    if (plays && plays?.length > 0) {
+        let playsToUpdate = plays.filter(ply => ply?.winnerUUID == plyr?.uuid || ply?.loserUUID == plyr?.uuid);
+        let charsPlayed = playsToUpdate?.map(ply => (ply?.winnerUUID == plyr?.uuid ? ply?.character : ply?.otherCharacter));
+        timesCharPlayed = charsPlayed?.filter(charPlayed => charPlayed.toLowerCase() == char || charPlayed.toLowerCase().includes(char)).length;
+    } else {
+        timesCharPlayed = plyr.plays.map(ply => ply.character).filter(charPlayed => charPlayed.toLowerCase() == char || charPlayed.toLowerCase().includes(char)).length;
+    }
+    return timesCharPlayed;
+};
 
-export const calcPlaysCharacterTimesPlayed = (plys: Play[], type, characterOption) => {
-    let playChars = type == `All` ? plys.map(ply => ply.character || ply.otherCharacter) : plys.map(ply => type == `Player` ? ply.character : ply.otherCharacter);
+export const calcPlaysCharacterTimesPlayed = (plys: Play[], type, characterOption, plyr?: any) => {
+    let playChars = type == `All` ? plys.map(ply => ply.character).concat(plys.map(ply => ply.otherCharacter)) : plys.map(ply => (ply?.winnerUUID != plyr?.uuid ? ply?.character : ply?.otherCharacter));
     return playChars.filter(charPlayed =>  characterOption.label.toLowerCase().includes(charPlayed.toLowerCase())).length;
 };
 
@@ -50,14 +59,14 @@ export const checkUserRole = (user: any, role) => {
     }
 }
 
-export const getActivePlayers = (players: any[], customObject = true) => {
+export const getActivePlayers = (players: any[], customObject = true, plays) => {
    if (customObject == true) {
     let activePlayers: Player[] = players.filter(plyr => (plyr.active || !plyr.disabled)).sort((a, b) => {
         if (b.experience.arenaXP !== a.experience.arenaXP) {
             return b.experience.arenaXP - a.experience.arenaXP;
         }
         return b.plays.length - a.plays.length;
-    }).map(pla => newPlayerType(pla));
+    }).map(pla => newPlayerType(pla, true, plays));
     return activePlayers;
    } else {
     getActivePlayersJSON(players);
@@ -75,15 +84,21 @@ export const calcPlayerLevelImage = (levelName) => {
     else return `${publicAssetLink}/assets/smasherscape/OSRS_Top_Hat.png?raw=true`;
 }
 
-export const calcPlayerCharactersPlayed = (plyr: Player, cutOff = true) => {
-    let charsPlayed = plyr?.plays?.map(ply => ply?.character);
+export const calcPlayerCharactersPlayed = (plyr: Player, cutOff = true, plays) => {
+    let playsToUpdate = [];
+    if (plays && plays?.length > 0) {
+        playsToUpdate = plays.filter(ply => ply?.winnerUUID == plyr?.uuid || ply?.loserUUID == plyr?.uuid);
+    } else {
+        playsToUpdate = plyr?.plays;
+    }
+    let charsPlayed = playsToUpdate?.map(ply => (ply?.winnerUUID == plyr?.uuid ? ply?.character : ply?.otherCharacter));
     let counts = charsPlayed.reduce((acc, char) => {
         acc[char] = (acc[char] || 0) + 1;
         return acc;
     }, {});
     let sortedCharactersByMostTimesPlayed = Object.entries(counts).sort((a, b) => {
-        const aRecent = plyr.plays.find(p => p.character === a[0])?.date;
-        const bRecent = plyr.plays.find(p => p.character === b[0])?.date;
+        const aRecent = playsToUpdate?.find(p => (p?.winnerUUID == plyr?.uuid ? p?.character : p?.otherCharacter) === a[0])?.date;
+        const bRecent = playsToUpdate?.find(p => (p?.winnerUUID == plyr?.uuid ? p?.character : p?.otherCharacter) === b[0])?.date;
         // return (new Date(bRecent) as any) - (new Date(aRecent) as any); 
         return parseDate(bRecent) - parseDate(aRecent); 
     }).sort((a: any, b: any) => b[1] - a[1]).map(entry => entry[0].toLowerCase());
@@ -112,27 +127,32 @@ export const isInvalid = (item) => {
     }
 }
 
-export const newPlayerType = (player: Player, customObject = true) => {
+export const newPlayerType = (player: Player, customObject = true, plays) => {
 
     let level: Level = new Level(player.level.name, player.level.num) as Level;
     let experience: Experience = new Experience(player.experience.nextLevelAt, player.experience.remainingXP, player.experience.arenaXP, player.experience.xp) as Experience;
-    let plays: Play[] = player.plays.map((play: Play) => {
-        let newPlay = new Play(removeEmptyParams(play));
-        return newPlay as Play;
-    }) as Play[];
 
-    let wins = calcPlayerWins(player);
-    let losses = calcPlayerLosses(player);
-    let ratio = (wins/(wins+losses)) * 100;
-    let kills = calcPlayerKills(player, plays);
-    let deaths = calcPlayerDeaths(player, plays);
-    let kdRatio = calcPlayerKDRatio(player, plays);
+    let wins;
+    let losses;
+    let ratio = 0;
+    let kills = 0;
+    let deaths = 0;
+    let kdRatio = 0;
+
+   if (plays && plays?.length > 0) {
+        wins = calcPlayerWinsFromPlays(player, plays);
+        losses = calcPlayerLossesFromPlays(player, plays);
+        ratio = (wins/(wins+losses)) * 100;
+        kills = calcPlayerKills(player, plays);
+        deaths = calcPlayerDeaths(player, plays);
+        kdRatio = calcPlayerKDRatio(player, plays);
+    }
+    
     experience = removeEmptyParams(experience) as Experience;
 
     let newPlayer: Player = new Player({
         ...player,
         level,
-        plays,
         experience,
         kills,
         deaths,
@@ -140,6 +160,7 @@ export const newPlayerType = (player: Player, customObject = true) => {
         wins,
         losses,
         ratio,
+        // plays: playsToConsider,
         percentage: (ratio) > 100 ? 100 : parseFloat(removeTrailingZeroDecimal(ratio)),
     }) as Player;
 
@@ -147,25 +168,25 @@ export const newPlayerType = (player: Player, customObject = true) => {
 }
 
 export default function Smasherscape(props) {
-    const { user, mobile, useDatabase, filteredPlayers, players, noPlayersFoundMessage, devEnv, playersLoading, command } = useContext<any>(StateContext);
+    const { user, mobile, useDatabase, filteredPlayers, players, noPlayersFoundMessage, plays, playersLoading, command } = useContext<any>(StateContext);
 
     return <Main className={`smasherscapeLeaderboard`} style={playersLoading ? {paddingTop: 10} : null}>
         <div className={`AdminArea ${command?.name}`}>
-            {getActivePlayers(players).length > 0 && (useDatabase == false && !mobile || (user && checkUserRole(user, `Admin`))) && <>
+            {getActivePlayers(players, true, plays).length > 0 && (useDatabase == false && !mobile || (user && checkUserRole(user, `Admin`))) && <>
                 <h2 className={`centerPageHeader toggleButtonsHeader`}>Commands Builder Form</h2>
                 <CommandsForm />
             </>}
             <PlayerForm />
         </div>
-        <div id={props.id} className={`${props.className} playerGrid ${getActivePlayers(filteredPlayers)?.length == 0 ? `empty` : `populated`}`}>
-            {getActivePlayers(filteredPlayers)?.length == 0 && <>
+        <div id={props.id} className={`${props.className} playerGrid ${getActivePlayers(filteredPlayers, true, plays)?.length == 0 ? `empty` : `populated`}`}>
+            {getActivePlayers(filteredPlayers, true, plays)?.length == 0 && <>
                 <div className="gridCard">
                     <h1 className={`runescape_large noPlayersFound`}>
                         {playersLoading ? <LoadingSpinner size={42} /> : noPlayersFoundMessage}
                     </h1>
                 </div>
             </>}
-            {!playersLoading ? getActivePlayers(filteredPlayers)?.length > 0 && getActivePlayers(filteredPlayers)?.map((plyr, plyrIndex) => {
+            {!playersLoading ? getActivePlayers(filteredPlayers, true, plays)?.length > 0 && getActivePlayers(filteredPlayers, true, plays)?.map((plyr, plyrIndex) => {
                 return playersLoading ? <LoadingSpinner size={30} override={true} /> : <PlayerCard plyr={plyr} key={plyrIndex} />
             }) : <LoadingSpinner size={30} override={true} />}
         </div>

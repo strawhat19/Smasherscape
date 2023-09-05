@@ -36,16 +36,16 @@ export const removeTrailingZeroDecimal = (number) => {
 }
 
 export const calcPlayerKills = (player: Player, plays: Play[]) => {
-    let wins = plays.filter(ply => ply?.winner == player?.name)?.length;
-    let losses = plays.filter(ply => ply?.winner != player?.name);
+    let wins = plays.filter(ply => ply?.winnerUUID == player?.uuid)?.length;
+    let losses = plays.filter(ply => ply?.winnerUUID != player?.uuid);
     let lossKills = losses?.map(loss => loss?.stocksTaken)?.reduce((partialSum, a) => partialSum + a, 0);
     let winKills = wins * 3;
     return winKills + lossKills;
 }
 
 export const calcPlayerDeaths = (player: Player, plays: Play[]) => {
-    let losses = plays.filter(ply => ply?.winner != player?.name)?.length;
-    let wins = plays.filter(ply => ply?.winner == player?.name);
+    let losses = plays.filter(ply => ply?.winnerUUID != player?.uuid)?.length;
+    let wins = plays.filter(ply => ply?.winnerUUID == player?.uuid);
     let winDeaths = wins?.map(win => win?.stocksTaken)?.reduce((partialSum, a) => partialSum + a, 0);
     let lossDeaths = losses * 3;
     return lossDeaths + winDeaths;
@@ -58,12 +58,12 @@ export const calcPlayerKDRatio = (player: Player, plays: Play[]) => {
 }
 
 function PlayerRecord(props) {
-  let { plyr } = props;
+  let { plyr, plyrPlays } = props;
   const { players, filteredPlayers, devEnv, useLazyLoad } = useContext<any>(StateContext);
-  let [plays, setPlays] = useState(plyr?.plays?.sort((a: any, b: any) => parseDate(b.date) - parseDate(a.date)));
+  let [filteredPlays, setFilteredPlays] = useState(plyrPlays && plyrPlays?.length > 0 ? plyrPlays?.sort((a: any, b: any) => parseDate(b.date) - parseDate(a.date)) : plyr?.plays?.sort((a: any, b: any) => parseDate(b.date) - parseDate(a.date)));
 
   useEffect(() => {
-    setPlays(plyr?.plays?.sort((a: any, b: any) => parseDate(b.date) - parseDate(a.date)));
+    setFilteredPlays(plyrPlays && plyrPlays?.length > 0 ? plyrPlays?.sort((a: any, b: any) => parseDate(b.date) - parseDate(a.date)) : plyr?.plays?.sort((a: any, b: any) => parseDate(b.date) - parseDate(a.date)));
   }, [players])
 
   const searchRecordPlayers = (e: any, value?: any) => {
@@ -74,11 +74,11 @@ function PlayerRecord(props) {
         } else {
             searchTerm = value?.name;
         }
-        setPlays(plyr?.plays.filter(ply => ply?.winner == searchTerm || ply?.loser == searchTerm));
+        setFilteredPlays(plyrPlays.filter(ply => ply?.winner == searchTerm || ply?.loser == searchTerm));
     } else {
-        setPlays(plyr?.plays);
+        setFilteredPlays(plyrPlays);
     }
-    devEnv && console.log(`Search Record Players`, {e, value, plays});
+    devEnv && console.log(`Search Record Players`, {e, value, plays: filteredPlays});
   }
 
   const searchRecordCharacters = (e: any, value?: any) => {
@@ -89,17 +89,17 @@ function PlayerRecord(props) {
         } else {
             searchTerm = value?.label;
         }
-        setPlays(plyr?.plays.filter(ply => ply?.character == searchTerm || ply?.otherCharacter == searchTerm));
+        setFilteredPlays(plyrPlays.filter(ply => ply?.character == searchTerm || ply?.otherCharacter == searchTerm));
     } else {
-        setPlays(plyr?.plays);
+        setFilteredPlays(plyrPlays);
     }
-    devEnv && console.log(`Search Record Characters`, {e, value, plays});
+    devEnv && console.log(`Search Record Characters`, {e, value, plays: filteredPlays});
   }
 
     const getCharacterObjs = (active) => {
         if (active == true) {
-            return getAllCharacters().filter(char => getUniqueCharactersPlayed(players).includes(char[1]))
-            .filter(char => plyr?.plays.map(ply => ply.otherCharacter).includes(char[1])).map((char, charIndex) => {
+            return getAllCharacters().filter(char => getUniqueCharactersPlayed(players, filteredPlays).includes(char[1]))
+            .filter(char => filteredPlays?.map(ply => (ply?.winnerUUID != plyr?.uuid ? ply?.character : ply?.otherCharacter)).includes(char[1])).map((char, charIndex) => {
                 return {
                     id: charIndex + 1,
                     key: char[0],
@@ -113,12 +113,12 @@ function PlayerRecord(props) {
         }
     }
 
-  const calcWinLoseRatio = (playerOne, playerTwo) => {
+  const calcWinLoseRatio = (playerOne, playerTwo, plays: Play[]) => {
     let playerOneDB: Player = players?.find(plyr => plyr?.name.toLowerCase() == playerOne.toLowerCase() || plyr?.name.toLowerCase().includes(playerOne));
     let playerTwoDB: Player = players?.find(plyr => plyr?.name.toLowerCase() == playerTwo.toLowerCase() || plyr?.name.toLowerCase().includes(playerTwo));
-    let plays: Play[] = playerOneDB?.plays.filter(ply => ply?.winner == playerTwoDB?.name || ply?.loser == playerTwoDB?.name);
-    let wins = plays.filter(ply => ply?.winner == playerOneDB?.name)?.length;
-    let losses = plays.filter(ply => ply?.loser == playerOneDB?.name)?.length;
+    let playsToConsider: Play[] = plays.filter(ply => ply?.winnerUUID == playerTwoDB?.uuid || ply?.loserUUID == playerTwoDB?.uuid);
+    let wins = playsToConsider.filter(ply => ply?.winnerUUID == playerOneDB?.uuid)?.length;
+    let losses = playsToConsider.filter(ply => ply?.loserUUID == playerOneDB?.uuid)?.length;
     let winRate = (wins/(wins+losses)) * 100;
     let winPercentage = (winRate) > 100 ? 100 : removeTrailingZeroDecimal(winRate);
     return <div className={`winRateDetails`}>
@@ -144,17 +144,17 @@ function PlayerRecord(props) {
             <h3 className={`greenRecordText`}>
                 <div className={`flex playerRecordBegin`}>
                     {plyr?.name}'s Record
-                    <span className={`recordPlays ${plyr?.plays?.length > 0 ? `populated` : `empty`}`}>
-                        {plyr?.plays?.length > 0 && <span className={`goldText`}>K/D: <span className="whiteText kdRatioNum">{calcPlayerKDRatio(plyr, plays)}</span></span>}
-                        <span className={`greenText`}>Kills: <span className="whiteText">{calcPlayerKills(plyr, plays)}</span></span>
-                        <span className={`redText`}>Deaths: <span className="whiteText">{calcPlayerDeaths(plyr, plays)}</span></span>
-                        <span className={`blueText`}>Plays: <span className="whiteText">{plays?.length}</span></span>
+                    <span className={`recordPlays ${filteredPlays?.length > 0 ? `populated` : `empty`}`}>
+                        {filteredPlays?.length > 0 && <span className={`goldText`}>K/D: <span className="whiteText kdRatioNum">{calcPlayerKDRatio(plyr, filteredPlays)}</span></span>}
+                        <span className={`greenText`}>Kills: <span className="whiteText">{calcPlayerKills(plyr, filteredPlays)}</span></span>
+                        <span className={`redText`}>Deaths: <span className="whiteText">{calcPlayerDeaths(plyr, filteredPlays)}</span></span>
+                        <span className={`blueText`}>Plays: <span className="whiteText">{filteredPlays?.length}</span></span>
                     </span>
                 </div>
-                {plays?.length > 0 && calcPlayerCharactersPlayed(plyr, false)?.length > 3 && <div className={`playsContainer playerRecordPlaysContainer ${calcPlayerCharactersPlayed(plyr, false)?.length > 0 ? (calcPlayerCharactersPlayed(plyr, false)?.length >= 5 ? `populatedPlays moreThanFive` : `populatedPlays`) : ``}`}>
-                    {calcPlayerCharactersPlayed(plyr, false)?.length > 0 ? calcPlayerCharactersPlayed(plyr, false).map((char, charIndex) => {
+                {filteredPlays?.length > 0 && calcPlayerCharactersPlayed(plyr, false, filteredPlays)?.length > 3 && <div className={`playsContainer playerRecordPlaysContainer ${calcPlayerCharactersPlayed(plyr, false, filteredPlays)?.length > 0 ? (calcPlayerCharactersPlayed(plyr, false, filteredPlays)?.length >= 5 ? `populatedPlays moreThanFive` : `populatedPlays`) : ``}`}>
+                    {calcPlayerCharactersPlayed(plyr, false, filteredPlays)?.length > 0 ? calcPlayerCharactersPlayed(plyr, false, filteredPlays).map((char, charIndex) => {
                         return (
-                            <Badge title={`Played ${getCharacterTitle(char)} ${calcPlayerCharacterTimesPlayed(plyr, char)} Time(s)`} key={charIndex} badgeContent={calcPlayerCharacterTimesPlayed(plyr, char)} color="primary">
+                            <Badge title={`Played ${getCharacterTitle(char)} ${calcPlayerCharacterTimesPlayed(plyr, char, filteredPlays)} Time(s)`} key={charIndex} badgeContent={calcPlayerCharacterTimesPlayed(plyr, char, filteredPlays)} color="primary">
                                 <img className={`charImg`} width={35} src={calcPlayerCharacterIcon(char)} alt={getCharacterTitle(char)} />
                             </Badge>
                         )
@@ -162,7 +162,7 @@ function PlayerRecord(props) {
                         No Plays Yet
                     </div>}
                 </div>}
-                {plyr?.plays?.length > 0 && <div className="flex white noShadow recordForms">
+                {filteredPlays?.length > 0 && <div className="flex white noShadow recordForms">
                     <form action="submit" className="gridForm recordForm">
                         <div className={`inputWrapper materialBGInputWrapper`}>
                             <div className="inputBG materialBG"></div>
@@ -170,7 +170,7 @@ function PlayerRecord(props) {
                                 autoHighlight
                                 id={`recordPlayerSearch-${plyr.id}`}
                                 sx={{ width: `100%` }}
-                                options={players.filter(playr => playr.name != plyr.name && (plyr.plays.map(ply => ply.winner).includes(playr.name) || plyr.plays.map(ply => ply.loser).includes(playr.name))).sort((a, b) => {
+                                options={players.filter(playr => playr?.uuid != plyr?.uuid && (plyrPlays?.map(ply => ply?.winnerUUID).includes(playr?.uuid) || plyrPlays?.map(ply => ply?.loserUUID).includes(playr?.uuid))).sort((a, b) => {
                                     if (b.experience.arenaXP !== a.experience.arenaXP) {
                                         return b.experience.arenaXP - a.experience.arenaXP;
                                     }
@@ -205,7 +205,7 @@ function PlayerRecord(props) {
                                 renderOption={(props: any, characterOption: any) => {
                                     return (
                                         <div key={characterOption.id} {...props}>
-                                            <CharacterOption plays={plyr.plays} type={`Other Player`} characterOption={characterOption} />
+                                            <CharacterOption plyr={plyr} plays={plyrPlays} type={`Other Player`} characterOption={characterOption} />
                                         </div>
                                     )
                                 }}
@@ -215,7 +215,7 @@ function PlayerRecord(props) {
                     </form>
                 </div>}
             </h3>
-            {plays?.length > 0 ? plays.map((ply, plyIndex) => {
+            {filteredPlays?.length > 0 ? filteredPlays.map((ply, plyIndex) => {
                 let isWinner = ply?.winner == plyr?.name;
                 return (
                     <li className={`playerPlay`} key={plyIndex}>
@@ -258,7 +258,7 @@ function PlayerRecord(props) {
                         </div>
                         <div className="recordSubDetails">
                             <div className="charsPlayedGame">
-                                {calcWinLoseRatio(isWinner ? ply?.winner : ply?.loser, isWinner ? ply?.loser : ply?.winner)}
+                                {calcWinLoseRatio(isWinner ? ply?.winner : ply?.loser, isWinner ? ply?.loser : ply?.winner, filteredPlays)}
                             </div>
                             <div className="playDate">{ply?.date}</div>
                         </div>

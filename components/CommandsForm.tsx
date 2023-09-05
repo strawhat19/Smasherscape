@@ -1,19 +1,19 @@
 import React from 'react';
+import User from '../models/User';
 import CodeBlock from "./CodeBlock";
+import Player from '../models/Player';
 import Command from "../models/Command";
 import PlayerOption from './PlayerOption';
 import { matchSorter } from 'match-sorter';
+import { StateContext } from "../pages/_app";
 import { defaultCommands } from "./Commands";
 import { useContext, useState } from "react";
 import Parameters from '../models/Parameters';
 import CustomizedHook from './CustomizedHook';
 import CharacterOption from './CharacterOption';
 import { getActivePlayers } from "./smasherscape";
-import { getAllPlaysJSON, StateContext } from "../pages/_app";
 import { getCharacterObjects, processCommandsWithParameters } from './PlayerForm';
 import { Autocomplete, TextField, ToggleButton, ToggleButtonGroup } from "@mui/material";
-import User from '../models/User';
-import Player from '../models/Player';
 
 export const getDefaultPlayer = (number) => ({id: number, type: `Default`, name: `Player-${number}`, label: `Player-${number}`});
 
@@ -25,7 +25,7 @@ export default function CommandsForm(props) {
     let [playerOne, setPlayerOne] = useState<any>(getDefaultPlayer(1));
     let [playerTwo, setPlayerTwo] = useState<any>(getDefaultPlayer(2));
     let [stocksTaken, setStocksTaken] = useState<any>(`Stocks-Taken-From-Winner`);
-    const { user, players, command, setCommand, playersToSelect, commandsToNotInclude, commands, setPlayers, useDatabase, databasePlayers, updatePlayersDB, deleteCompletely, setFilteredPlayers, sameNamePlayeredEnabled, setLoadingPlayers, iPhone } = useContext<any>(StateContext);
+    const { user, players, command, setCommand, playersToSelect, commandsToNotInclude, commands, setPlayers, useDatabase, databasePlayers, updatePlayersLocalStorage, deleteCompletely, setFilteredPlayers, sameNamePlayeredEnabled, setLoadingPlayers, iPhone, plays, setPlays } = useContext<any>(StateContext);
 
     const adjustStocks = (e, val) => {
         if (val) {
@@ -69,13 +69,13 @@ export default function CommandsForm(props) {
         if (val) {
             if (winnerOrLoser == `winner`) {
                 if (typeof val == `string`) {
-                    setPlayerOne(getActivePlayers(players).find(plyr => plyr.label.toLowerCase() == val.toLowerCase()));   
+                    setPlayerOne(getActivePlayers(players, true, plays).find(plyr => plyr.label.toLowerCase() == val.toLowerCase()));   
                 } else {
                     setPlayerOne(val);
                 }
             } else {
                 if (typeof val == `string`) {
-                    setPlayerTwo(getActivePlayers(players).find(plyr => plyr.label.toLowerCase() == val.toLowerCase()));
+                    setPlayerTwo(getActivePlayers(players, true, plays).find(plyr => plyr.label.toLowerCase() == val.toLowerCase()));
                 } else {
                     setPlayerTwo(val);
                 }
@@ -115,17 +115,19 @@ export default function CommandsForm(props) {
         let commandParams = renderCommand(command).split(` `);
         const parameters = new Parameters({
             user,
+            plays,
             players, 
+            setPlays,
             commands,
             setPlayers, 
             useDatabase, 
             commandParams,
             databasePlayers, 
-            updatePlayersDB,
             deleteCompletely,
             setLoadingPlayers, 
             setFilteredPlayers, 
             sameNamePlayeredEnabled,
+            updatePlayersLocalStorage,
             command: renderCommand(command),
         })
         processCommandsWithParameters(parameters);
@@ -184,7 +186,7 @@ export default function CommandsForm(props) {
                                 onChange={(e, val: any) => adjustPlayers(e, val, `winner`)}
                                 onInputChange={(e, val: any) => adjustPlayers(e, val, `winner`)}
                                 isOptionEqualToValue={(option, value) => option.id === value.id}
-                                options={getActivePlayers(players).filter(plyr => plyr?.id != playerTwo?.id)}
+                                options={getActivePlayers(players, true, plays).filter(plyr => plyr?.id != playerTwo?.id)}
                                 renderInput={(params) => <TextField name={`players`} {...params} label="Player 1..." />}
                                 noOptionsText={`No Player(s) Found for Search`}
                                 renderOption={(props: any, playerOption: any) => {
@@ -230,7 +232,7 @@ export default function CommandsForm(props) {
                                 onChange={(e, val: any) => adjustPlayers(e, val, `loser`)}
                                 onInputChange={(e, val: any) => adjustPlayers(e, val, `loser`)}
                                 isOptionEqualToValue={(option, value) => option.id === value.id}
-                                options={getActivePlayers(players).filter(plyr => plyr.id != playerOne?.id)}
+                                options={getActivePlayers(players, true, plays).filter(plyr => plyr.id != playerOne?.id)}
                                 renderInput={(params) => <TextField name={`players`} {...params} label="Player 2..." />}
                                 noOptionsText={`No Player(s) Found for Search`}
                                 renderOption={(props: any, playerOption: any) => {
@@ -261,7 +263,7 @@ export default function CommandsForm(props) {
                                 renderOption={(props: any, characterOption: any) => {
                                     return (
                                         <div key={characterOption.id} {...props}>
-                                            <CharacterOption plays={playerOne.type != `Default` ? playerOne.plays : getAllPlaysJSON(getActivePlayers(players))} type={playerOne.type != `Default` ? `Player` : `All`} characterOption={characterOption} />
+                                            <CharacterOption plays={playerOne.type != `Default` ? plays.filter(ply => ply?.winnerUUID == playerOne?.uuid || ply?.loserUUID == playerOne?.uuid) : plays} type={playerOne.type != `Default` ? `Player` : `All`} plyr={playerTwo.type != `Default` ? playerTwo : `All`} characterOption={characterOption} />
                                         </div>
                                     )
                                 }}
@@ -308,7 +310,7 @@ export default function CommandsForm(props) {
                                 renderOption={(props: any, characterOption: any) => {
                                     return (
                                         <div key={characterOption.id} {...props}>
-                                            <CharacterOption  plays={playerTwo.type != `Default` ? playerTwo.plays : getAllPlaysJSON(getActivePlayers(players))} type={playerTwo.type != `Default` ? `Player` : `All`} characterOption={characterOption} />
+                                            <CharacterOption plays={playerTwo.type != `Default` ? plays.filter(ply => ply?.winnerUUID == playerTwo?.uuid || ply?.loserUUID == playerTwo?.uuid) : plays} type={playerTwo.type != `Default` ? `Player` : `All`} plyr={playerOne.type != `Default` ? playerOne : `All`} characterOption={characterOption} />                               
                                         </div>
                                     )
                                 }}
