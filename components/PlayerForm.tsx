@@ -22,7 +22,7 @@ import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
 import { doc, setDoc, deleteDoc, updateDoc } from 'firebase/firestore';
 import { checkUserRole, getActivePlayers, isInvalid } from './smasherscape';
 import { calcPlayerDeaths, calcPlayerKDRatio, calcPlayerKills, removeTrailingZeroDecimal } from './PlayerRecord';
-import { StateContext, showAlert, formatDate, generateUniqueID, countPropertiesInObject, getActivePlayersJSON, usePlayersDatabase, getAllPlays, defaultXPMultiplier, XPGainOnWin, XPGainOnLoserXPForEachStockTaken, winCons, loseCons, dev, useDB, usePlaysDatabase } from '../pages/_app';
+import { StateContext, showAlert, formatDate, generateUniqueID, countPropertiesInObject, getActivePlayersJSON, usePlayersDatabase, defaultXPMultiplier, XPGainOnWin, XPGainOnLoserXPForEachStockTaken, winCons, loseCons, dev, useDB, usePlaysDatabase } from '../pages/_app';
 
 export const addPlayToDB = async (playObj: Play) => await setDoc(doc(db, usePlaysDatabase, playObj?.ID), playObj);
 export const deletePlayerFromDB = async (playerObj: Player) => await deleteDoc(doc(db, usePlayersDatabase, playerObj?.ID));
@@ -55,16 +55,6 @@ export const showCommandsWithParameters = (parameters) => {
         <Commands id={`commandsList`} commands={commands} devEnv={devEnv} />
     </div>, `85%`, `auto`);
 }
-
-// export const playerConverter = {
-//     toFirestore: (playr) => {
-//         return newPlayerType(playr);
-//     },
-//     fromFirestore: (snapshot, options) => {
-//         const playrData = snapshot.data(options);
-//         return newPlayerType(playrData);
-//     }
-// };
 
 export const showPropertiesWarning = (type, winner: Player, loser: Player) => {
     showAlert(`${type == `Critical` ? `Critical! ` : ``}Player is Approaching 20,000 Properties`, <div>

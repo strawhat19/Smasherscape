@@ -2,10 +2,10 @@ import { useContext } from 'react';
 import Player from '../models/Player';
 import { Badge } from '@mui/material';
 import PlayerRecord from './PlayerRecord';
-import { updatePlayerInDB } from './PlayerForm';
-import { StateContext, showAlert } from '../pages/_app';
+import { updatePlayerInDB, updatePlayersLocalStorage } from './PlayerForm';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
+import { StateContext, showAlert, formatDate, countPropertiesInObject, getActivePlayersJSON } from '../pages/_app';
 import { calcPlayerCharacterTimesPlayed, calcPlayerCharactersPlayed, calcPlayerLevelImage, checkUserRole, getActivePlayers, getCharacterTitle, publicAssetLink } from './smasherscape';
 
 export const calcPlayerWinsFromPlays = (player, plays) => plays.filter(ply => ply?.winnerUUID == player?.uuid)?.length;
@@ -15,7 +15,7 @@ export const calcPlayerLosses = (plyr: Player) => plyr.plays.filter(ply => ply.l
 
 export default function PlayerCard(props) {
     let { plyr } = props;
-    const { user, plays, useDatabase, players, filteredPlayers, setFilteredPlayers, useLazyLoad } = useContext<any>(StateContext);
+    const { user, plays, useDatabase, players, filteredPlayers, setFilteredPlayers, useLazyLoad, setPlayers } = useContext<any>(StateContext);
     const setPlayerExpanded = (player: Player) => setFilteredPlayers(filteredPlayers.map(plyr => plyr.id == player.id ? { ...player, expanded: !player.expanded } : plyr));
 
     const limitInput = (event, maxLen) => {
@@ -34,16 +34,34 @@ export default function PlayerCard(props) {
         let playerNames = getActivePlayers(players, true, plays).map(plyr => plyr.name.toLowerCase());
 
         const changePlayerName = (e, player) => {
+            let currentDateTimeStamp = formatDate(new Date());
+
             let updatedPlayer = {
                 ...player,
                 displayName,
                 name: displayName,
                 username: displayName,
+                updated: currentDateTimeStamp,
+                lastUpdated: currentDateTimeStamp,
+                properties: countPropertiesInObject(player),
+                lastUpdatedBy: user ? user.name : displayName,
             };
+
             if (useDatabase == true) {
                 const jsonPlayer = JSON.parse(JSON.stringify(player));
                 const jsonUpdatedPlayer = JSON.parse(JSON.stringify(updatedPlayer));
                 updatePlayerInDB(jsonPlayer, jsonUpdatedPlayer);
+            } else {
+                let updatedPlayers = getActivePlayersJSON(players).map(plyr => {
+                    if (plyr?.uuid == player?.uuid) {
+                        return updatedPlayer;
+                    } else {
+                        return plyr;
+                    }
+                });
+                updatePlayersLocalStorage(updatedPlayers, plays);
+                setPlayers(updatedPlayers);
+                setFilteredPlayers(updatedPlayers);
             }
         }
 
