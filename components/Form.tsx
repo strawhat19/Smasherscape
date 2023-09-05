@@ -215,7 +215,10 @@ export default function Form(props?: any) {
             }).catch((error) => {
               const errorCode = error.code;
               const errorMessage = error.message;
-              showAlert(`<div class="loadingMessage"><h3>${errorMessage}</h3></div>`, `50%`, `35%`);
+              showAlert(`Error Signing In`, <div className="alertMessage errorMessage loadingMessage">
+                <i style={{color: `var(--smasherscapeYellow)`}} className="fas fa-exclamation-triangle"></i>
+                <h3>Error Signing In</h3>
+              </div>, `50%`, `40%`);
               console.log(`Error Signing In`, {
                 error,
                 errorCode,
@@ -254,10 +257,10 @@ export default function Form(props?: any) {
                 }
               }
 
-              showAlert(`Error Signing Up`, <div className="errorMessage loadingMessage">
-                <i className="fas fa-exclamation-triangle"></i>
+              showAlert(`Error Signing Up`, <div className="alertMessage errorMessage loadingMessage">
+                <i style={{color: `var(--smasherscapeYellow)`}} className="fas fa-exclamation-triangle"></i>
                 <h3>{renderErrorMessage(errorMessage)}</h3>
-              </div>, `50%`, `35%`);                 
+              </div>, `50%`, `40%`);                 
             }
             return;
           });

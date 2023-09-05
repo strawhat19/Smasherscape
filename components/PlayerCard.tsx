@@ -2,8 +2,8 @@ import { useContext } from 'react';
 import Player from '../models/Player';
 import { Badge } from '@mui/material';
 import PlayerRecord from './PlayerRecord';
-import { StateContext, showAlert } from '../pages/_app';
 import { updatePlayerInDB } from './PlayerForm';
+import { StateContext, showAlert } from '../pages/_app';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
 import { calcPlayerCharacterTimesPlayed, calcPlayerCharactersPlayed, calcPlayerLevelImage, checkUserRole, getActivePlayers, getCharacterTitle, publicAssetLink } from './smasherscape';
@@ -20,7 +20,7 @@ export default function PlayerCard(props) {
 
     const limitInput = (event, maxLen) => {
         const allowedKeys = [`Backspace`];
-        const disallowedKeys = [`Space`];
+        const disallowedKeys = [`Space`, `Enter`, `Return`];
         const element = event.target;
         if (element.textContent.length >= maxLen && !allowedKeys.includes(event.code) || disallowedKeys.includes(event.code)) {
             event.preventDefault();
@@ -28,20 +28,12 @@ export default function PlayerCard(props) {
         }
     }
 
-    const changePlayerName = (e, player) => {
+    const changePlayerNameConfirm = (e, player) => {
         let value = e.target.textContent.toLowerCase();
         let displayName = value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
         let playerNames = getActivePlayers(players, true, plays).map(plyr => plyr.name.toLowerCase());
 
-        if (playerNames.includes(value)) {
-            e.target.textContent = player?.name;
-            showAlert(`Player name is already taken`, <div className="errorMessage loadingMessage">
-                <i className="fas fa-exclamation-triangle"></i>
-                <h3>Player name is already taken</h3>
-                <h3>Please pick a unique name</h3>
-            </div>, `50%`, `35%`);
-            return;
-        } else {
+        const changePlayerName = (e, player) => {
             let updatedPlayer = {
                 ...player,
                 displayName,
@@ -52,6 +44,28 @@ export default function PlayerCard(props) {
                 const jsonUpdatedPlayer = JSON.parse(JSON.stringify(updatedPlayer));
                 updatePlayerInDB(jsonPlayer, jsonUpdatedPlayer);
             }
+        }
+
+        if (player?.name.toLowerCase() == value) {
+            return;
+        } else if (playerNames.includes(value)) {
+            e.target.textContent = player?.name;
+            showAlert(`Player name is already taken`, <div className="alertMessage errorMessage loadingMessage">
+                <i style={{color: `var(--smasherscapeYellow)`}} className="fas fa-exclamation-triangle"></i>
+                <h3>Player name is already taken</h3>
+                <h3>Please pick a unique name</h3>
+            </div>, `50%`, `40%`);
+            return;
+        } else {
+            changePlayerName(e, player);
+            // showAlert(`Change Player Name?`, <div className="alertMessage confirmMessage loadingMessage">
+            //     <i style={{color: `var(--smasherscapeYellow)`}} className="fas fa-exclamation-triangle"></i>
+            //     <h3>Are you sure you want to change player name?</h3>
+            //     <h3>Saving will update the name</h3>
+            //     <button onClick={(e) => changePlayerName(e, player)}>Save</button>
+            // </div>, `50%`, `40%`);
+            // e.target.textContent = player?.name;
+            // return;
         }
     }
 
@@ -75,7 +89,7 @@ export default function PlayerCard(props) {
                     <h3 className={`blackTextShadow slimmed`}>Xuruko's<br />SmasherScape</h3>
                 </div>
                 <h2 title={plyr?.name} className={`playerNameText bluePurpleTextShadow textOverflow overrideWithInlineBlock`}>
-                    <span onKeyDown={(e) => limitInput(e, 10)} onBlur={(e) => changePlayerName(e, plyr)} className={`playerNameContainer changeLabel`} contentEditable={checkUserRole(user, `Admin`) || user && user?.uid == plyr?.uid} suppressContentEditableWarning>{plyr?.name}</span>
+                    <span onKeyDown={(e) => limitInput(e, 10)} onBlur={(e) => changePlayerNameConfirm(e, plyr)} className={`playerNameContainer changeLabel`} contentEditable={checkUserRole(user, `Owner`) || user && user?.uid == plyr?.uid} suppressContentEditableWarning>{plyr?.name}</span>
                     {user && plyr?.uid && user?.uid == plyr?.uid && <img alt={user?.email} src={user?.image}  className={`userImage playerCardUserImage`} />}
                 </h2>
             </div>

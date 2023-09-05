@@ -1081,6 +1081,15 @@ html[class~=dark] {
     }
 }
 
+.changeLabel {
+    padding: 0 2px;
+    border-radius: 8px;
+    transition: var(--transition);
+    &:hover {
+        background: rgba(0,194,255,.2);
+    }
+}
+
 textarea {
     height: 22px;
     overflow-y: hidden;
