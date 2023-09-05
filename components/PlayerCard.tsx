@@ -89,7 +89,9 @@ export default function PlayerCard(props) {
                     <h3 className={`blackTextShadow slimmed`}>Xuruko's<br />SmasherScape</h3>
                 </div>
                 <h2 title={plyr?.name} className={`playerNameText bluePurpleTextShadow textOverflow overrideWithInlineBlock`}>
-                    <span onKeyDown={(e) => limitInput(e, 10)} onBlur={(e) => changePlayerNameConfirm(e, plyr)} className={`playerNameContainer changeLabel`} contentEditable={checkUserRole(user, `Owner`) || user && user?.uid == plyr?.uid} suppressContentEditableWarning>{plyr?.name}</span>
+                    <span onKeyDown={(e) => limitInput(e, 10)} onBlur={(e) => changePlayerNameConfirm(e, plyr)} className={`playerNameContainer changeLabel ${(checkUserRole(user, `Owner`) || user && user?.uid == plyr?.uid) ? `editable` : ``}`} contentEditable={checkUserRole(user, `Owner`) || user && user?.uid == plyr?.uid} suppressContentEditableWarning>
+                        {plyr?.name}
+                    </span>
                     {user && plyr?.uid && user?.uid == plyr?.uid && <img alt={user?.email} src={user?.image}  className={`userImage playerCardUserImage`} />}
                 </h2>
             </div>

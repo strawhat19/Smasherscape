@@ -1085,8 +1085,10 @@ html[class~=dark] {
     padding: 0 2px;
     border-radius: 8px;
     transition: var(--transition);
-    &:hover {
-        background: rgba(0,194,255,.2);
+    &.editable {
+        &:hover {
+            background: rgba(0,194,255,.2);
+        }
     }
 }
 
