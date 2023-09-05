@@ -38,6 +38,7 @@ export default function PlayerCard(props) {
                 ...player,
                 displayName,
                 name: displayName,
+                username: displayName,
             };
             if (useDatabase == true) {
                 const jsonPlayer = JSON.parse(JSON.stringify(player));
@@ -57,15 +58,15 @@ export default function PlayerCard(props) {
             </div>, `55%`, `50%`);
             return;
         } else {
-            // changePlayerName(e, player);
-            showAlert(`Change Player Name?`, <div className="alertMessage confirmMessage loadingMessage">
-                <i style={{color: `var(--smasherscapeYellow)`}} className="fas fa-exclamation-triangle"></i>
-                <h3>Are you sure you want to change player name?</h3>
-                <h3>Saving will update the name</h3>
-                <button onClick={(e) => changePlayerName(e, player)}>Save</button>
-            </div>, `55%`, `50%`);
-            e.target.textContent = player?.name;
-            return;
+            changePlayerName(e, player);
+            // showAlert(`Change Player Name?`, <div className="alertMessage confirmMessage loadingMessage">
+            //     <i style={{color: `var(--smasherscapeYellow)`}} className="fas fa-exclamation-triangle"></i>
+            //     <h3>Are you sure you want to change player name?</h3>
+            //     <h3>Saving will update the name</h3>
+            //     <button onClick={(e) => changePlayerName(e, player)}>Save</button>
+            // </div>, `55%`, `50%`);
+            // e.target.textContent = player?.name;
+            // return;
         }
     }
 
