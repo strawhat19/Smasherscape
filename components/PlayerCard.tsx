@@ -2,10 +2,11 @@ import { useContext } from 'react';
 import Player from '../models/Player';
 import { Badge } from '@mui/material';
 import PlayerRecord from './PlayerRecord';
-import { StateContext } from '../pages/_app';
+import { StateContext, showAlert } from '../pages/_app';
+import { updatePlayerInDB } from './PlayerForm';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
-import { calcPlayerCharacterTimesPlayed, calcPlayerCharactersPlayed, calcPlayerLevelImage, getCharacterTitle, publicAssetLink } from './smasherscape';
+import { calcPlayerCharacterTimesPlayed, calcPlayerCharactersPlayed, calcPlayerLevelImage, checkUserRole, getActivePlayers, getCharacterTitle, publicAssetLink } from './smasherscape';
 
 export const calcPlayerWinsFromPlays = (player, plays) => plays.filter(ply => ply?.winnerUUID == player?.uuid)?.length;
 export const calcPlayerLossesFromPlays = (player, plays) => plays.filter(ply => ply?.loserUUID == player?.uuid)?.length;
@@ -14,11 +15,47 @@ export const calcPlayerLosses = (plyr: Player) => plyr.plays.filter(ply => ply.l
 
 export default function PlayerCard(props) {
     let { plyr } = props;
-    const { user, plays, filteredPlayers, setFilteredPlayers, useLazyLoad } = useContext<any>(StateContext);
-    
+    const { user, plays, useDatabase, players, filteredPlayers, setFilteredPlayers, useLazyLoad } = useContext<any>(StateContext);
     const setPlayerExpanded = (player: Player) => setFilteredPlayers(filteredPlayers.map(plyr => plyr.id == player.id ? { ...player, expanded: !player.expanded } : plyr));
 
-    return <div id={`playerCard-${plyr.id}`} className={`playerCard ${plyr?.expanded ? `expandedPlayerCard` : `collapsedPlayerCard`} ${plyr?.uid ? `playerCardUID-${plyr?.uid} ${user && user?.uid == plyr?.uid ? `playerIsUser userIsPlayer` : ``}` : ``}`}>
+    const limitInput = (event, maxLen) => {
+        const allowedKeys = [`Backspace`];
+        const disallowedKeys = [`Space`];
+        const element = event.target;
+        if (element.textContent.length >= maxLen && !allowedKeys.includes(event.code) || disallowedKeys.includes(event.code)) {
+            event.preventDefault();
+            return; 
+        }
+    }
+
+    const changePlayerName = (e, player) => {
+        let value = e.target.textContent.toLowerCase();
+        let displayName = value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+        let playerNames = getActivePlayers(players, true, plays).map(plyr => plyr.name.toLowerCase());
+
+        if (playerNames.includes(value)) {
+            e.target.textContent = player?.name;
+            showAlert(`Player name is already taken`, <div className="errorMessage loadingMessage">
+                <i className="fas fa-exclamation-triangle"></i>
+                <h3>Player name is already taken</h3>
+                <h3>Please pick a unique name</h3>
+            </div>, `50%`, `35%`);
+            return;
+        } else {
+            let updatedPlayer = {
+                ...player,
+                displayName,
+                name: displayName,
+            };
+            if (useDatabase == true) {
+                const jsonPlayer = JSON.parse(JSON.stringify(player));
+                const jsonUpdatedPlayer = JSON.parse(JSON.stringify(updatedPlayer));
+                updatePlayerInDB(jsonPlayer, jsonUpdatedPlayer);
+            }
+        }
+    }
+
+    return <div id={`playerCard-${plyr.uuid}`} className={`playerCard ${plyr?.expanded ? `expandedPlayerCard` : `collapsedPlayerCard`} ${plyr?.uid ? `playerCardUID-${plyr?.uid} ${user && user?.uid == plyr?.uid ? `playerIsUser userIsPlayer` : ``}` : ``}`}>
     <div className="gridCard" onClick={(e) => setPlayerExpanded(plyr)}>
         {useLazyLoad ? (
             <>
@@ -38,7 +75,7 @@ export default function PlayerCard(props) {
                     <h3 className={`blackTextShadow slimmed`}>Xuruko's<br />SmasherScape</h3>
                 </div>
                 <h2 title={plyr?.name} className={`playerNameText bluePurpleTextShadow textOverflow overrideWithInlineBlock`}>
-                    {plyr?.name}
+                    <span onKeyDown={(e) => limitInput(e, 10)} onBlur={(e) => changePlayerName(e, plyr)} className={`playerNameContainer changeLabel`} contentEditable={checkUserRole(user, `Admin`) || user && user?.uid == plyr?.uid} suppressContentEditableWarning>{plyr?.name}</span>
                     {user && plyr?.uid && user?.uid == plyr?.uid && <img alt={user?.email} src={user?.image}  className={`userImage playerCardUserImage`} />}
                 </h2>
             </div>

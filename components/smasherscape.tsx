@@ -131,10 +131,6 @@ export const newPlayerType = (player: Player, customObject = true, plays) => {
 
     let level: Level = new Level(player.level.name, player.level.num) as Level;
     let experience: Experience = new Experience(player.experience.nextLevelAt, player.experience.remainingXP, player.experience.arenaXP, player.experience.xp) as Experience;
-    // let playsToConsider: Play[] = player.plays.map((play: Play) => {
-    //     let newPlay = new Play(removeEmptyParams(play));
-    //     return newPlay as Play;
-    // }) as Play[];
 
     let wins;
     let losses;

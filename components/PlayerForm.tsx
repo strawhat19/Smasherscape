@@ -27,8 +27,8 @@ import { StateContext, showAlert, formatDate, generateUniqueID, countPropertiesI
 export const addPlayToDB = async (playObj: Play) => await setDoc(doc(db, usePlaysDatabase, playObj?.ID), playObj);
 export const deletePlayerFromDB = async (playerObj: Player) => await deleteDoc(doc(db, usePlayersDatabase, playerObj?.ID));
 export const addPlayerToDB = async (playerObj: Player) => await setDoc(doc(db, usePlayersDatabase, playerObj?.ID), playerObj);
-export const updatePlayerInDB = async (playerObj: Player, parameters) => await updateDoc(doc(db, usePlayersDatabase, playerObj?.ID), parameters);
 export const getAllCharacters = () => Object.entries(Characters).filter(char => char[0] === char[0].charAt(0).toUpperCase() + char[0].slice(1));
+export const updatePlayerInDB = async (playerObj, updatedPlayerObject) => await updateDoc(doc(db, usePlayersDatabase, playerObj?.ID), updatedPlayerObject);
 
 export const getUniqueCharactersPlayed = (players, plays) => {
     if (plays && plays?.length > 0) {
@@ -738,17 +738,13 @@ export default function PlayerForm(props) {
                         return itemsToSearch.map(playr => playr.name.toLowerCase()).includes(plyr.name.toLowerCase());
                     }));
                 } else if (typeof itemsToSearch == `string`) {
-                    setFilteredPlayers(getActivePlayers(players, true, plays).filter((plyr: Player) => {
-                        return plyr.plays.map(ply => ply.character).some(char =>
-                            typeof char === `string` && char.toLowerCase().includes(itemsToSearch?.toLowerCase())
-                        );
-                    }));
+                    let playsToConsider = plays.filter(ply => ply.character?.toLowerCase().includes(itemsToSearch.toLowerCase()) || ply.otherCharacter?.toLowerCase().includes(itemsToSearch.toLowerCase()));
+                    let playIDs = playsToConsider.map(ply => ply.winnerUUID).concat(playsToConsider.map(ply => ply.loserUUID));
+                    setFilteredPlayers(getActivePlayers(players, true, plays).filter((plyr: Player) => playIDs.includes(plyr?.uuid)));
                 } else {
-                    setFilteredPlayers(getActivePlayers(players, true, plays).filter((plyr: Player) => {
-                        return plyr.plays.map(ply => ply.character).some(char =>
-                            typeof char === `string` && char.toLowerCase().includes(itemsToSearch?.label?.toLowerCase())
-                        );
-                    }));
+                    let playsToConsider = plays.filter(ply => ply.character?.toLowerCase().includes(itemsToSearch.label?.toLowerCase()) || ply.otherCharacter?.toLowerCase().includes(itemsToSearch.label?.toLowerCase()));
+                    let playIDs = playsToConsider.map(ply => ply.winnerUUID).concat(playsToConsider.map(ply => ply.loserUUID));
+                    setFilteredPlayers(getActivePlayers(players, true, plays).filter((plyr: Player) => playIDs.includes(plyr?.uuid)));
                 }
             }
         } else {
