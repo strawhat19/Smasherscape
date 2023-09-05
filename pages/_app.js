@@ -40,7 +40,7 @@ export const environments = {
   },
 };
 
-export const environment = environments.test;
+export const environment = environments.alpha;
 export const usePlaysDatabase = environment.playsDatabase;
 export const usePlayersDatabase = environment.playersDatabase;
 
@@ -144,7 +144,7 @@ export const getActivePlayersJSON = (players, customObject = false) => {
     if (b.experience.arenaXP !== a.experience.arenaXP) {
       return b.experience.arenaXP - a.experience.arenaXP;
     }
-    return b.plays.length - a.plays.length;
+    if (plays && plays.length > 0) return plays.filter(ply => ply?.winnerUUID == b?.uuid || ply?.loserUUID == b?.uuid).length - plays.filter(ply => ply?.winnerUUID == a?.uuid || ply?.loserUUID == a?.uuid).length;
   });
   return customObject == true ? activePlayers.map(plyr => newPlayerType(plyr)) : activePlayers;
 }
@@ -748,7 +748,7 @@ export default function Xuruko({ Component, pageProps, router }) {
         // Players
         const unsubscribeFromDatabasePlayersListener = onSnapshot(collection(db, usePlayersDatabase), (querySnapshot) => {
           const playersFromDatabase = [];
-          querySnapshot.forEach((doc) => playersFromDatabase.push(doc.data()));
+          querySnapshot.forEach((doc) => playersFromDatabase.push({...doc.data(), expanded: false}));
           setPlayersLoading(false);
           setPlayers(playersFromDatabase);
           setDatabasePlayers(playersFromDatabase);
@@ -764,7 +764,7 @@ export default function Xuruko({ Component, pageProps, router }) {
           querySnapshot.forEach((doc) => playsFromDatabase.push(doc.data()));
           setPlays(playsFromDatabase);
           localStorage.setItem(`plays`, JSON.stringify(playsFromDatabase));
-          console.log(`Database Plays`, playsFromDatabase);
+          dev() && console.log(`Database Plays`, playsFromDatabase);
         });
   
         return () => {

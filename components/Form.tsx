@@ -65,7 +65,7 @@ export const createUserFromFirebaseData = (userCredential, type?, name?) => {
     }),
     roles: firebaseUser?.customClaims?.roles || firebaseUser?.roles,
   }
-  return createdUser;
+  return createdUser as User;
 }
 
 export const signInWithGoogle = async (databasePlayers, setUser, setAuthState, plays) => {
@@ -78,7 +78,7 @@ export const signInWithGoogle = async (databasePlayers, setUser, setAuthState, p
       let dbPlayers = getActivePlayers(databasePlayers, true, plays);
       let nameToAdd = createdGoogleUserFromFirebaseData?.name;
       let lowerCaseName = nameToAdd.toLowerCase();
-      let playerExists = dbPlayers.length > 0 && dbPlayers.find(plyr => plyr.name.toLowerCase() == lowerCaseName || plyr.name.toLowerCase().includes(lowerCaseName));
+      let playerExists = dbPlayers.length > 0 && (dbPlayers.find(plyr => plyr.email == createdGoogleUserFromFirebaseData.email) || dbPlayers.find(plyr => plyr.name.toLowerCase() == lowerCaseName || plyr.name.toLowerCase().includes(lowerCaseName)));
 
       if (playerExists) {
         setUser(playerExists);
@@ -218,7 +218,7 @@ export default function Form(props?: any) {
               showAlert(`Error Signing In`, <div className="alertMessage errorMessage loadingMessage">
                 <i style={{color: `var(--smasherscapeYellow)`}} className="fas fa-exclamation-triangle"></i>
                 <h3>Error Signing In</h3>
-              </div>, `50%`, `40%`);
+              </div>, `55%`, `50%`);
               console.log(`Error Signing In`, {
                 error,
                 errorCode,
@@ -260,7 +260,7 @@ export default function Form(props?: any) {
               showAlert(`Error Signing Up`, <div className="alertMessage errorMessage loadingMessage">
                 <i style={{color: `var(--smasherscapeYellow)`}} className="fas fa-exclamation-triangle"></i>
                 <h3>{renderErrorMessage(errorMessage)}</h3>
-              </div>, `50%`, `40%`);                 
+              </div>, `55%`, `50%`);                 
             }
             return;
           });
@@ -300,7 +300,7 @@ export default function Form(props?: any) {
           <GoogleButton onClick={(e) => signInWithGoogle(databasePlayers, setUser, setAuthState, plays)} type="dark" />
         </div>}
         {user && <div title={`Welcome, ${user?.name}`} className={`customUserSection`}>
-          {user?.image ? <img alt={user?.email} src={user?.image}  className={`userImage`} /> : user?.name?.split[``][0].toUpperCase()}
+          {user?.image ? <img alt={user?.email} src={user?.image}  className={`userImage`} /> : user?.name?.charAt(0).toUpperCase()}
           Welcome, {user?.name}
         </div>}
         {user && window?.location?.href?.includes(`profile`) && <input id={user?.id} className={`save`} type="submit" name="authFormSave" style={{padding: 0}} value={`Save`} />}

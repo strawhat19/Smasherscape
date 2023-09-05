@@ -36,12 +36,12 @@ const config: DocsThemeConfig = {
     <meta name="description" content="Players can level up and gain experience while keeping a record of their wins, defeats, kills, deaths, characters played and level. Players can level up to gain rewards, search for their card and expand to view details, or view other player data on the leaderboard."/>
     <meta property="og:title" content="Smasherscape Leaderboard" />
     <meta property="og:description" content="Players can level up and gain experience while keeping a record of their wins, defeats, kills, deaths, characters played and level. Players can level up to gain rewards, search for their card and expand to view details, or view other player data on the leaderboard." />
-    <meta property="og:image" content="https://github.com/strawhat19/Smasherscape/blob/main/assets/smasherscape/SmasherScapeDatabasePlaysAndCommands.png?raw=true" />
-    <meta name="twitter:card" content="https://github.com/strawhat19/Smasherscape/blob/main/assets/smasherscape/SmasherScapeDatabasePlaysAndCommands.png?raw=true" />
+    <meta property="og:image" content="https://github.com/strawhat19/Smasherscape/blob/main/assets/smasherscape/SmasherScapeOGImage.png?raw=true" />
+    <meta name="twitter:card" content="https://github.com/strawhat19/Smasherscape/blob/main/assets/smasherscape/SmasherScapeOGImage.png?raw=true" />
     <meta name="twitter:site" content="@Xuruko1" />
     <meta name="twitter:title" content="Smasherscape" />
     <meta name="twitter:description" content="Players can level up and gain experience while keeping a record of their wins, defeats, kills, deaths, characters played and level. Players can level up to gain rewards, search for their card and expand to view details, or view other player data on the leaderboard." />
-    <meta name="twitter:image" content="https://github.com/strawhat19/Smasherscape/blob/main/assets/smasherscape/SmasherScapeDatabasePlaysAndCommands.png?raw=true" />
+    <meta name="twitter:image" content="https://github.com/strawhat19/Smasherscape/blob/main/assets/smasherscape/SmasherScapeOGImage.png?raw=true" />
     </>,
   logo: <>
     <img width={40} src={`https://github.com/strawhat19/Smasherscape/blob/main/assets/smasherscape/OSRS_Top_Hat.png?raw=true`} alt={`Tophat Logo`} /> <h1 style={{marginLeft: 15}}>Xuruko</h1>

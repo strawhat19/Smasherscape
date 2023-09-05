@@ -19,7 +19,7 @@ export default function PlayerCard(props) {
     const setPlayerExpanded = (player: Player) => setFilteredPlayers(filteredPlayers.map(plyr => plyr.id == player.id ? { ...player, expanded: !player.expanded } : plyr));
 
     const limitInput = (event, maxLen) => {
-        const allowedKeys = [`Backspace`];
+        const allowedKeys = [`Backspace`, `Delete`, `Shift`, `Control`, `ShiftLeft`, `ShiftRight`, `ArrowRight`, `ArrowLeft`, `ArrowUp`, `ArrowDown`, `Home`, `End`];
         const disallowedKeys = [`Space`, `Enter`, `Return`];
         const element = event.target;
         if (element.textContent.length >= maxLen && !allowedKeys.includes(event.code) || disallowedKeys.includes(event.code)) {
@@ -54,18 +54,18 @@ export default function PlayerCard(props) {
                 <i style={{color: `var(--smasherscapeYellow)`}} className="fas fa-exclamation-triangle"></i>
                 <h3>Player name is already taken</h3>
                 <h3>Please pick a unique name</h3>
-            </div>, `50%`, `40%`);
+            </div>, `55%`, `50%`);
             return;
         } else {
-            changePlayerName(e, player);
-            // showAlert(`Change Player Name?`, <div className="alertMessage confirmMessage loadingMessage">
-            //     <i style={{color: `var(--smasherscapeYellow)`}} className="fas fa-exclamation-triangle"></i>
-            //     <h3>Are you sure you want to change player name?</h3>
-            //     <h3>Saving will update the name</h3>
-            //     <button onClick={(e) => changePlayerName(e, player)}>Save</button>
-            // </div>, `50%`, `40%`);
-            // e.target.textContent = player?.name;
-            // return;
+            // changePlayerName(e, player);
+            showAlert(`Change Player Name?`, <div className="alertMessage confirmMessage loadingMessage">
+                <i style={{color: `var(--smasherscapeYellow)`}} className="fas fa-exclamation-triangle"></i>
+                <h3>Are you sure you want to change player name?</h3>
+                <h3>Saving will update the name</h3>
+                <button onClick={(e) => changePlayerName(e, player)}>Save</button>
+            </div>, `55%`, `50%`);
+            e.target.textContent = player?.name;
+            return;
         }
     }
 

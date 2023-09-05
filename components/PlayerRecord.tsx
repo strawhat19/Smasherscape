@@ -174,9 +174,9 @@ function PlayerRecord(props) {
                                     if (b.experience.arenaXP !== a.experience.arenaXP) {
                                         return b.experience.arenaXP - a.experience.arenaXP;
                                     }
-                                    return b.plays.length - a.plays.length;
+                                    if (plyrPlays && plyrPlays.length > 0) return plyrPlays.filter(ply => ply?.winnerUUID == b?.uuid || ply?.loserUUID == b?.uuid).length - plyrPlays.filter(ply => ply?.winnerUUID == a?.uuid || ply?.loserUUID == a?.uuid).length;
                                 })}
-                                getOptionLabel={(option) => option.label}
+                                getOptionLabel={(option) => option.name}
                                 onChange={(e, val: any) => searchRecordPlayers(e, val)}
                                 onInputChange={(e, val: any) => searchRecordPlayers(e, val)}
                                 isOptionEqualToValue={(option, value) => option.id === value.id}

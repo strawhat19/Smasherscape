@@ -65,7 +65,7 @@ export const getActivePlayers = (players: any[], customObject = true, plays) => 
         if (b.experience.arenaXP !== a.experience.arenaXP) {
             return b.experience.arenaXP - a.experience.arenaXP;
         }
-        return b.plays.length - a.plays.length;
+        if (plays && plays.length > 0) return plays.filter(ply => ply?.winnerUUID == b?.uuid || ply?.loserUUID == b?.uuid).length - plays.filter(ply => ply?.winnerUUID == a?.uuid || ply?.loserUUID == a?.uuid).length;
     }).map(pla => newPlayerType(pla, true, plays));
     return activePlayers;
    } else {
