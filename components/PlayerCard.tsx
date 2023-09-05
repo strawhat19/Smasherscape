@@ -2,9 +2,9 @@ import { useContext } from 'react';
 import Player from '../models/Player';
 import { Badge } from '@mui/material';
 import PlayerRecord from './PlayerRecord';
-import { updatePlayerInDB, updatePlayersLocalStorage } from './PlayerForm';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
+import { updatePlayerInDB, updatePlayersLocalStorage } from './PlayerForm';
 import { StateContext, showAlert, formatDate, countPropertiesInObject, getActivePlayersJSON } from '../pages/_app';
 import { calcPlayerCharacterTimesPlayed, calcPlayerCharactersPlayed, calcPlayerLevelImage, checkUserRole, getActivePlayers, getCharacterTitle, publicAssetLink } from './smasherscape';
 

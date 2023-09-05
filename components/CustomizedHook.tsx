@@ -10,11 +10,11 @@ import useAutocomplete, { AutocompleteGetTagProps } from '@mui/base/useAutocompl
 
 const Root = styled(`div`)(
   ({ theme }) => `
-  color: ${
-    theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.65)' : 'rgba(0,0,0,.85)'
-  };
-  font-size: 14px;
-`,
+    color: ${
+      theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.65)' : 'rgba(0,0,0,.85)'
+    };
+    font-size: 14px;
+  `,
 );
 
 const InputWrapper = styled(`div`)(
@@ -188,16 +188,16 @@ export default function CustomizedHook(props) {
   const { plays, players, playersToSelect, setPlayersToSelect } = useContext<any>(StateContext);
   const adjustPlayersToSelect = (e: any, val: any) => setPlayersToSelect(val);
   const {
-    getRootProps,
-    getInputProps,
-    getTagProps,
-    getListboxProps,
-    getOptionProps,
-    groupedOptions,
     value,
     focused,
+    getTagProps,
     setAnchorEl,
+    getRootProps,
+    getInputProps,
     getClearProps,
+    getOptionProps,
+    groupedOptions,
+    getListboxProps,
   } = useAutocomplete({
     multiple: true,
     defaultValue: [],
