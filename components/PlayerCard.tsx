@@ -52,7 +52,7 @@ export default function PlayerCard(props) {
                 const jsonUpdatedPlayer = JSON.parse(JSON.stringify(updatedPlayer));
                 updatePlayerInDB(jsonPlayer, jsonUpdatedPlayer);
             } else {
-                let updatedPlayers = getActivePlayersJSON(players).map(plyr => {
+                let updatedPlayers = getActivePlayersJSON(players, false, plays).map(plyr => {
                     if (plyr?.uuid == player?.uuid) {
                         return updatedPlayer;
                     } else {

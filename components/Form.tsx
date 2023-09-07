@@ -8,6 +8,7 @@ import PasswordRequired from './PasswordRequired';
 import GoogleButton from 'react-google-button';
 import LoadingSpinner from './LoadingSpinner';
 import { signOut } from "firebase/auth";
+import { toast } from 'react-toastify';
 import User from '../models/User';
 
 export const formatDateFromFirebase = (timestamp) => {
@@ -215,10 +216,11 @@ export default function Form(props?: any) {
             }).catch((error) => {
               const errorCode = error.code;
               const errorMessage = error.message;
-              showAlert(`Error Signing In`, <div className="alertMessage errorMessage loadingMessage">
-                <i style={{color: `var(--smasherscapeYellow)`}} className="fas fa-exclamation-triangle"></i>
-                <h3>Error Signing In</h3>
-              </div>, `55%`, `50%`);
+              toast.error(`Error Signing In`);
+              // showAlert(`Error Signing In`, <div className="alertMessage errorMessage loadingMessage">
+              //   <i style={{color: `var(--smasherscapeYellow)`}} className="fas fa-exclamation-triangle"></i>
+              //   <h3>Error Signing In</h3>
+              // </div>, `55%`, `50%`);
               console.log(`Error Signing In`, {
                 error,
                 errorCode,
@@ -236,34 +238,39 @@ export default function Form(props?: any) {
           return;
         } else {
           console.log(`Sign Up Params`, {name, email, password});
-          createUserWithEmailAndPassword(auth, email, password).then((userCredential: any) => {
-            let newUser = createUserFromFirebaseData(userCredential, `Firebase`);
-            console.log(`User Signed Up`, newUser);
-
-            setAuthState(`Signed Up`);
-            setUser(newUser);
-          }).catch((error) => {
-            console.log(`Error Signing Up`, error);
-            const errorMessage = error.message;
-            console.log({errorMessage});
-            if (errorMessage) {
-              const renderErrorMessage = (erMsg) => {
-                if (erMsg.toLowerCase().includes(`invalid-email`)) {
-                  return `Please use a valid email.`;
-                } else if (erMsg.toLowerCase().includes(`email-already-in-use`)) {
-                  return `Email is already in use.`;
-                } {
-                  return erMsg;
-                }
+          if (useDatabase == true) {
+            createUserWithEmailAndPassword(auth, email, password).then((userCredential: any) => {
+              let newUser = createUserFromFirebaseData(userCredential, `Firebase`);
+              if (newUser != null) {
+                console.log(`User Signed Up`, newUser);
+                // setAuthState(`Signed Up`);
+                // setUser(newUser);
               }
-
-              showAlert(`Error Signing Up`, <div className="alertMessage errorMessage loadingMessage">
-                <i style={{color: `var(--smasherscapeYellow)`}} className="fas fa-exclamation-triangle"></i>
-                <h3>{renderErrorMessage(errorMessage)}</h3>
-              </div>, `55%`, `50%`);                 
-            }
-            return;
-          });
+            }).catch((error) => {
+              console.log(`Error Signing Up`, error);
+              const errorMessage = error.message;
+              console.log({errorMessage});
+              if (errorMessage) {
+                const renderErrorMessage = (erMsg) => {
+                  if (erMsg.toLowerCase().includes(`invalid-email`)) {
+                    return `Please use a valid email.`;
+                  } else if (erMsg.toLowerCase().includes(`email-already-in-use`)) {
+                    return `Email is already in use.`;
+                  } else if (erMsg.toLowerCase().includes(`weak-password`)) {
+                    return `Password should be at least 6 characters`;
+                  } {
+                    return erMsg;
+                  }
+                }
+                toast.error(renderErrorMessage(errorMessage));
+                // showAlert(`Error Signing Up`, <div className="alertMessage errorMessage loadingMessage">
+                //   <i style={{color: `var(--smasherscapeYellow)`}} className="fas fa-exclamation-triangle"></i>
+                //   <h3>{renderErrorMessage(errorMessage)}</h3>
+                // </div>, `55%`, `50%`);                 
+              }
+              return;
+            });
+          }
         }
       break;
     };
