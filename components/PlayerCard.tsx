@@ -1,6 +1,7 @@
 import { useContext } from 'react';
 import Player from '../models/Player';
 import { Badge } from '@mui/material';
+import { toast } from 'react-toastify';
 import PlayerRecord from './PlayerRecord';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
@@ -66,14 +67,20 @@ export default function PlayerCard(props) {
         }
 
         if (player?.name.toLowerCase() == value) {
+            e.target.textContent = player?.name;
+            return;
+        } else if (value == ``) {
+            e.target.textContent = player?.name;
+            toast.error(`Please Enter a Valid Name!`);
             return;
         } else if (playerNames.includes(value)) {
             e.target.textContent = player?.name;
-            showAlert(`Player name is already taken`, <div className="alertMessage errorMessage loadingMessage">
-                <i style={{color: `var(--smasherscapeYellow)`}} className="fas fa-exclamation-triangle"></i>
-                <h3>Player name is already taken</h3>
-                <h3>Please pick a unique name</h3>
-            </div>, `55%`, `50%`);
+            toast.error(`Player name is already taken, Please pick a unique name.`);
+            // showAlert(`Player name is already taken`, <div className="alertMessage errorMessage loadingMessage">
+            //     <i style={{color: `var(--smasherscapeYellow)`}} className="fas fa-exclamation-triangle"></i>
+            //     <h3>Player name is already taken</h3>
+            //     <h3>Please pick a unique name</h3>
+            // </div>, `55%`, `50%`);
             return;
         } else {
             changePlayerName(e, player);
