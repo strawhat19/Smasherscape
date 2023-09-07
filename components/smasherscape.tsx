@@ -69,7 +69,7 @@ export const getActivePlayers = (players: any[], customObject = true, plays) => 
     }).map(pla => newPlayerType(pla, true, plays));
     return activePlayers;
    } else {
-    getActivePlayersJSON(players);
+    getActivePlayersJSON(players, false, plays);
    }
 }
 

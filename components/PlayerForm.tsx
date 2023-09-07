@@ -466,8 +466,8 @@ export const updatePlayersWithParameters = (parameters: Parameters) => {
     let conditionName = commandParams[2].toLowerCase();
     let playerTwoName = commandParams[3].toLowerCase();
 
-    let playerOneDB = getActivePlayersJSON(players).find(plyr => plyr?.name.toLowerCase() == playerOneName || plyr?.name.toLowerCase().includes(playerOneName));
-    let playerTwoDB = getActivePlayersJSON(players).find(plyr => plyr?.name.toLowerCase() == playerTwoName || plyr?.name.toLowerCase().includes(playerTwoName));
+    let playerOneDB = getActivePlayersJSON(players, false, plays).find(plyr => plyr?.name.toLowerCase() == playerOneName || plyr?.name.toLowerCase().includes(playerOneName));
+    let playerTwoDB = getActivePlayersJSON(players, false, plays).find(plyr => plyr?.name.toLowerCase() == playerTwoName || plyr?.name.toLowerCase().includes(playerTwoName));
 
     let characterOne;
     let characterTwo;
@@ -578,7 +578,7 @@ export const updatePlayersWithParameters = (parameters: Parameters) => {
         }
 
         dev() && console.log(`Update Players Play State`, playState);
-        let updatedPlayers: any[] = getActivePlayersJSON(players).map((plyr) => {
+        let updatedPlayers: any[] = getActivePlayersJSON(players, false, plays).map((plyr) => {
             if (plyr?.id == winnerDB?.id) {
                 updatePlayerPlays({...playState, plyr, winnerOrLoser: `winner`});
                 return plyr;

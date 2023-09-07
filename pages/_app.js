@@ -139,7 +139,7 @@ export const updateOrAdd = (obj, arr) => {
   return arr;
 };
 
-export const getActivePlayersJSON = (players, customObject = false) => {
+export const getActivePlayersJSON = (players, customObject = false, plays) => {
   let activePlayers = players.filter(plyr => (plyr.active || !plyr.disabled)).sort((a, b) => {
     if (b.experience.arenaXP !== a.experience.arenaXP) {
       return b.experience.arenaXP - a.experience.arenaXP;
@@ -645,7 +645,7 @@ export default function Xuruko({ Component, pageProps, router }) {
     }
 
     const setCommandsToShow = (players) => {
-      if (getActivePlayersJSON(players).length < 2) {
+      if (getActivePlayersJSON(players, false, plays).length < 2) {
         setCommand(defaultCommands.Delete);
         setCommandsToNotInclude([`!com`, `!add`, `!res`, `!set`, `!giv`, `!upd`]);
       } else {
@@ -752,7 +752,7 @@ export default function Xuruko({ Component, pageProps, router }) {
           setPlayersLoading(false);
           setPlayers(playersFromDatabase);
           setDatabasePlayers(playersFromDatabase);
-          setFilteredPlayers(getActivePlayersJSON(playersFromDatabase));
+          setFilteredPlayers(getActivePlayersJSON(playersFromDatabase, false, plays));
           setCommandsToShow(playersFromDatabase);
           localStorage.setItem(`players`, JSON.stringify(playersFromDatabase));
           logPlayers(playersFromDatabase, useDatabase, plays);
@@ -779,12 +779,12 @@ export default function Xuruko({ Component, pageProps, router }) {
           setPlayersLoading(false); 
           setPlayers(storedPlayers);
           setCommandsToShow(storedPlayers);
-          setFilteredPlayers(getActivePlayersJSON(storedPlayers));
+          setFilteredPlayers(getActivePlayersJSON(storedPlayers, false, plays));
         } else {
           setPlayersLoading(false); 
           setPlayers(defaultPlayers);
           setCommandsToShow(defaultPlayers);
-          setFilteredPlayers(getActivePlayersJSON(defaultPlayers));
+          setFilteredPlayers(getActivePlayersJSON(defaultPlayers, false, plays));
         }
       }
     }, [])
