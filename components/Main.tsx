@@ -9,7 +9,7 @@ export default function Main(props) {
             position={`top-right`}
             pauseOnHover={false}
             newestOnTop={false}
-            autoClose={5000}
+            autoClose={3500}
             pauseOnFocusLoss
             closeOnClick
             theme="dark"

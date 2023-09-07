@@ -1576,6 +1576,24 @@ div[role="presentation"] {
     }
 }
 
+.userCustomAvatar {
+    z-index: 1;
+    font-size: 19px;
+    font-weight: 900;
+    max-width: 5px;
+    max-height: 20px !important;
+    display: flex;
+    text-shadow: none;
+    font-family: 'RuneScape Large';
+    background: white;
+    color: black;
+    padding: 7px 10px 5px;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    border-radius: 100px;
+}
+
 // Google Button
 .customUserSection {
     max-width: fit-content;

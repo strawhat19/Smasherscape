@@ -11,6 +11,22 @@ import { signOut } from "firebase/auth";
 import { toast } from 'react-toastify';
 import User from '../models/User';
 
+export const renderErrorMessage = (erMsg) => {
+  if (erMsg.toLowerCase().includes(`invalid-email`)) {
+    return `Please use a valid email.`;
+  } else if (erMsg.toLowerCase().includes(`email-already-in-use`)) {
+    return `Email is already in use.`;
+  } else if (erMsg.toLowerCase().includes(`weak-password`)) {
+    return `Password should be at least 6 characters`;
+  } else if (erMsg.toLowerCase().includes(`wrong-password`)) {
+    return `Incorrect Password`;
+  } else if (erMsg.toLowerCase().includes(`user-not-found`)) {
+    return `User Not Found`;
+  } else {
+    return erMsg;
+  }
+}
+
 export const formatDateFromFirebase = (timestamp) => {
   let date;
   if (typeof timestamp === `number`) {
@@ -56,8 +72,8 @@ export const createUserFromFirebaseData = (userCredential, type?, name?) => {
     lastRefresh: formatDateFromFirebase(lastRefreshAt),
     lastSignIn: formatDateFromFirebase(lastSignInTime),
     ...(type == `Firebase` && {
-      name,
       password: passwordHash,
+      name: name || capitalizeAllWords(email.split(`@`)[0]),
       passwordUpdatedAt: formatDateFromFirebase(passwordUpdatedAt),
     }),
     ...(type == `Google` && {
@@ -81,9 +97,10 @@ export const signInWithGoogle = async (databasePlayers, setUser, setAuthState, p
       let lowerCaseName = nameToAdd.toLowerCase();
       let playerExists = dbPlayers.length > 0 && (dbPlayers.find(plyr => plyr.email == createdGoogleUserFromFirebaseData.email) || dbPlayers.find(plyr => plyr.name.toLowerCase() == lowerCaseName || plyr.name.toLowerCase().includes(lowerCaseName)));
 
-      if (playerExists) {
+      if (playerExists != null) {
         setUser(playerExists);
         setAuthState(`Sign Out`);
+        toast.success(`Successfully Signed In`);
       } else {
         let namesToAdd = [nameToAdd];
         namesToAdd.forEach((usr, usrIndex) => {
@@ -122,16 +139,9 @@ export const signInWithGoogle = async (databasePlayers, setUser, setAuthState, p
           }
 
           createdGoogleUserFromFirebaseData.properties = countPropertiesInObject(createdGoogleUserFromFirebaseData);
+          let usersAndPlaysState = {player: playerUserData, user: createdGoogleUserFromFirebaseData};
 
-          let usersAndPlaysState = {player: playerUserData, user: createdGoogleUserFromFirebaseData}
-          
           addPlayerToDB(usersAndPlaysState?.player);
-          // if (dev()) console.log(`Add To DB`, usersAndPlaysState);
-          // addUserToDB(usersAndPlaysState?.user);
-          // if (dev() && userCredential.operationType != `signIn`) console.log(`Add To DB`, usersAndPlaysState);
-          // if (userCredential.operationType != `signIn`) addPlayerToDB(usersAndPlaysState?.player);
-          // if (userCredential.operationType != `signIn`) addUserToDB(usersAndPlaysState?.user);
-
           dev() && console.log(`User`, usersAndPlaysState);
           setUser(usersAndPlaysState?.user);
           setAuthState(`Sign Out`);
@@ -152,7 +162,7 @@ export default function Form(props?: any) {
   const loadedRef = useRef(false);
   const [loaded, setLoaded] = useState(false);
   const [alertOpen, setAlertOpen] = useState(false);
-  const { user, setUser, updates, setUpdates, authState, setAuthState, emailField, setEmailField, users, setFocus, mobile, databasePlayers, playersLoading, useDatabase, plays } = useContext<any>(StateContext);
+  const { players, user, setUser, updates, setUpdates, authState, setAuthState, emailField, setEmailField, users, setFocus, mobile, databasePlayers, playersLoading, useDatabase, plays } = useContext<any>(StateContext);
 
   const authForm = (e?: any) => {
     e.preventDefault();
@@ -167,7 +177,12 @@ export default function Form(props?: any) {
         break;
       case `Next`:
         setEmailField(true);
-        setAuthState(`Sign Up`);
+        let userEmails = getActivePlayers(databasePlayers, true, plays).filter(usr => usr?.email).map(usr => usr?.email?.toLowerCase());
+        if (userEmails.includes(email?.toLowerCase())) {
+          setAuthState(`Sign In`);
+        } else {
+          setAuthState(`Sign Up`);
+        }
         break;
       case `Back`:
         setUpdates(updates+1);
@@ -209,23 +224,35 @@ export default function Form(props?: any) {
           if (useDatabase == true) {
             signInWithEmailAndPassword(auth, email, password).then((userCredential: any) => {
               let existingUser = createUserFromFirebaseData(userCredential, `Firebase`);
+              let dbPlayers = getActivePlayers(databasePlayers, true, plays);
+              let nameToAdd = existingUser?.name;
+              let lowerCaseName = nameToAdd.toLowerCase();
+              let playerExists = dbPlayers.length > 0 && (dbPlayers.find(plyr => plyr.email == existingUser.email) || dbPlayers.find(plyr => plyr.name.toLowerCase() == lowerCaseName || plyr.name.toLowerCase().includes(lowerCaseName)));
               console.log(`User Signed In`, existingUser);
-              setFocus(false);
-              // setAuthState(`Sign Out`);
-              // setUser(existingUser);
+              if (playerExists != null) {
+                setFocus(false);
+                setAuthState(`Sign Out`);
+                setUser(playerExists);
+                toast.success(`Successfully Signed In`);
+              } else {
+                setEmailField(true);
+                setAuthState(`Sign Up`);
+              }
             }).catch((error) => {
               const errorCode = error.code;
               const errorMessage = error.message;
-              toast.error(`Error Signing In`);
-              // showAlert(`Error Signing In`, <div className="alertMessage errorMessage loadingMessage">
-              //   <i style={{color: `var(--smasherscapeYellow)`}} className="fas fa-exclamation-triangle"></i>
-              //   <h3>Error Signing In</h3>
-              // </div>, `55%`, `50%`);
-              console.log(`Error Signing In`, {
-                error,
-                errorCode,
-                errorMessage
-              });
+              if (errorMessage) {
+                toast.error(renderErrorMessage(errorMessage));
+                // showAlert(`Error Signing In`, <div className="alertMessage errorMessage loadingMessage">
+                //   <i style={{color: `var(--smasherscapeYellow)`}} className="fas fa-exclamation-triangle"></i>
+                //   <h3>Error Signing In</h3>
+                // </div>, `55%`, `50%`);
+                console.log(`Error Signing In`, {
+                  error,
+                  errorCode,
+                  errorMessage
+                });
+              }
               return;
             });
           }
@@ -240,28 +267,59 @@ export default function Form(props?: any) {
           console.log(`Sign Up Params`, {name, email, password});
           if (useDatabase == true) {
             createUserWithEmailAndPassword(auth, email, password).then((userCredential: any) => {
-              let newUser = createUserFromFirebaseData(userCredential, `Firebase`);
-              if (newUser != null) {
-                console.log(`User Signed Up`, newUser);
-                // setAuthState(`Signed Up`);
-                // setUser(newUser);
+              let createdFirebaseUser = createUserFromFirebaseData(userCredential, `Firebase`);
+              if (createdFirebaseUser != null) {
+                console.log(`User Signed Up`, createdFirebaseUser);
+                let nameToAdd = createdFirebaseUser?.name;
+                let namesToAdd = [nameToAdd];
+                namesToAdd.forEach((usr, usrIndex) => {
+                  let currentDateTimeStamp = formatDate(new Date());
+                  let userPlayerData = createPlayer(usr, usrIndex, databasePlayers);
+                  let { uid, email, playerLink, emailVerified, source, type, validSince, lastRefresh, lastSignIn, providerId, operationType } = createdFirebaseUser;
+
+                  let playerUserData: any = {
+                    ...userPlayerData,
+                    uid,
+                    type,
+                    email,
+                    source,
+                    providerId,
+                    validSince,
+                    playerLink,
+                    lastSignIn,
+                    lastRefresh,
+                    operationType,
+                    emailVerified,
+                    roles: userPlayerData?.roles,
+                  };
+
+                  playerUserData.properties = countPropertiesInObject(playerUserData);
+
+                  createdFirebaseUser = {
+                    ...createdFirebaseUser,
+                    updated: currentDateTimeStamp,
+                    lastUpdated: currentDateTimeStamp,
+                    uniqueIndex: playerUserData?.uniqueIndex,
+                    roles: playerUserData?.roles,
+                    uuid: playerUserData?.uuid,
+                    ID: playerUserData?.ID,
+                    id: playerUserData?.id,
+                  }
+
+                  createdFirebaseUser.properties = countPropertiesInObject(createdFirebaseUser);
+                  let usersAndPlaysState = {player: playerUserData, user: createdFirebaseUser};
+
+                  addPlayerToDB(usersAndPlaysState?.player);
+                  dev() && console.log(`User`, usersAndPlaysState);
+                  setUser(usersAndPlaysState?.user);
+                  setAuthState(`Sign Out`);
+                })
               }
             }).catch((error) => {
               console.log(`Error Signing Up`, error);
               const errorMessage = error.message;
               console.log({errorMessage});
               if (errorMessage) {
-                const renderErrorMessage = (erMsg) => {
-                  if (erMsg.toLowerCase().includes(`invalid-email`)) {
-                    return `Please use a valid email.`;
-                  } else if (erMsg.toLowerCase().includes(`email-already-in-use`)) {
-                    return `Email is already in use.`;
-                  } else if (erMsg.toLowerCase().includes(`weak-password`)) {
-                    return `Password should be at least 6 characters`;
-                  } {
-                    return erMsg;
-                  }
-                }
                 toast.error(renderErrorMessage(errorMessage));
                 // showAlert(`Error Signing Up`, <div className="alertMessage errorMessage loadingMessage">
                 //   <i style={{color: `var(--smasherscapeYellow)`}} className="fas fa-exclamation-triangle"></i>
@@ -307,7 +365,7 @@ export default function Form(props?: any) {
           <GoogleButton onClick={(e) => signInWithGoogle(databasePlayers, setUser, setAuthState, plays)} type="dark" />
         </div>}
         {user && <div title={`Welcome, ${user?.name}`} className={`customUserSection`}>
-          {user?.image ? <img alt={user?.email} src={user?.image}  className={`userImage`} /> : user?.name?.charAt(0).toUpperCase()}
+          {user?.image ? <img alt={user?.email} src={user?.image}  className={`userImage`} /> : <div className={`userCustomAvatar`}>{user?.name?.charAt(0).toUpperCase()}</div>}
           Welcome, {user?.name}
         </div>}
         {user && window?.location?.href?.includes(`profile`) && <input id={user?.id} className={`save`} type="submit" name="authFormSave" style={{padding: 0}} value={`Save`} />}

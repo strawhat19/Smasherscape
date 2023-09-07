@@ -118,7 +118,8 @@ export default function PlayerCard(props) {
                     <span onKeyDown={(e) => limitInput(e, 10)} onBlur={(e) => changePlayerNameConfirm(e, plyr)} className={`playerNameContainer changeLabel ${(checkUserRole(user, `Owner`) || user && user?.uid == plyr?.uid) ? `editable` : ``}`} contentEditable={checkUserRole(user, `Owner`) || user && user?.uid == plyr?.uid} suppressContentEditableWarning>
                         {plyr?.name}
                     </span>
-                    {user && plyr?.uid && user?.uid == plyr?.uid && <img alt={user?.email} src={user?.image}  className={`userImage playerCardUserImage`} />}
+                    {user && plyr?.uid && user?.uid == plyr?.uid && user?.image && <img alt={user?.email} src={user?.image}  className={`userImage playerCardUserImage`} />}
+                    {user && plyr?.uid && user?.uid == plyr?.uid && !user?.image && <div className={`userCustomAvatar playerCardUserImage`}>{user?.name?.charAt(0).toUpperCase()}</div>}
                 </h2>
             </div>
             <div className="cardMiddleRow">
