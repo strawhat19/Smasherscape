@@ -813,9 +813,13 @@ form {
     &.navForm {
         gap: 5px;
         width: 100%;
-        margin: -10px 0 0;
+        margin: -5px 0 0;
+        padding-left: 2px;
         position: relative;
         flex-wrap: wrap !important;
+        &.hasPasswordField {
+            gap: 2px;
+        }
         max-height: var(--authFormHeight) !important;
         &.threeInputs {
             input {
@@ -870,6 +874,23 @@ form {
             font-size: 12px;
             max-height: 0px;
             position: relative;
+            transition: var(--transition);
+            &.authStateFormRight {
+                cursor: pointer;
+                left: 56% !important;
+                @media (min-width: 768px) {
+                    top: -9px !important;
+                }
+                @media (max-width: 768px) {
+                    left: 50% !important;
+                }
+                &:hover {
+                    .authFormLabel {
+                        color: white;
+                        background: black !important;
+                    }
+                }
+            }
             .authFormLabel {
                 padding: 0 4px;
                 max-height: 17px;

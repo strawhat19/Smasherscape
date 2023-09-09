@@ -1,5 +1,5 @@
 import { capitalizeAllWords, StateContext, showAlert, countPropertiesInObject, formatDate, signUpOrSignIn, dev } from '../pages/_app';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
+import { createUserWithEmailAndPassword, sendPasswordResetEmail, signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
 import { useContext, useEffect, useRef, useState } from 'react';
 import { addPlayerToDB, createPlayer } from './PlayerForm';
 import { auth, googleProvider } from '../firebase';
@@ -163,6 +163,17 @@ export default function Form(props?: any) {
   const [loaded, setLoaded] = useState(false);
   const [alertOpen, setAlertOpen] = useState(false);
   const { players, user, setUser, updates, setUpdates, authState, setAuthState, emailField, setEmailField, users, setFocus, mobile, databasePlayers, playersLoading, useDatabase, plays } = useContext<any>(StateContext);
+
+  const resetPassword = (e) => {
+    let email = (document.querySelector(`.emailAddressField`) as any)?.value;
+    sendPasswordResetEmail(auth, email)
+    .then(() => {
+      toast.success(`Email Sent to ${email}, for resetting your password.`);
+    })
+    .catch(error => {
+      toast.error(`Error snding reset password instructions to ${email}.`);
+    });
+  }
 
   const authForm = (e?: any) => {
     e.preventDefault();
@@ -344,13 +355,20 @@ export default function Form(props?: any) {
     {playersLoading ? (
       <LoadingSpinner override={true} size={18} />
     ) : (
-      <form id={props.id} onSubmit={authForm} className={`flex authForm ${props.className} ${authState == `Sign Up` || authState == `Sign In` ? `threeInputs` : ``} ${user ? `userSignedIn` : `userSignedOut`}`} style={style}>
-        {!user && <div className={`authStateForm`}>
-          <span className={`authFormLabel`}>
-            <span className={`authFormPhrase`}>{authState == `Next` ? signUpOrSignIn : authState}</span>
-          </span>
-        </div>}
-        {!user && <input placeholder="Email Address" type="email" name="email" autoComplete={`email`} required />}
+      <form id={props.id} onSubmit={authForm} className={`flex authForm ${authState == `Next` ? `Next` : ``} ${emailField == true ? `hasPasswordField` : `noPasswordYet`} ${props.className} ${authState == `Sign Up` || authState == `Sign In` ? `threeInputs` : ``} ${user ? `userSignedIn` : `userSignedOut`}`} style={style}>
+        {!user && <>
+          <div className={`authStateForm`}>
+            <span className={`authFormLabel`}>
+              <span className={`authFormPhrase`}>{authState == `Next` ? signUpOrSignIn : authState}</span>
+            </span>
+          </div>
+          {authState == `Sign In` && <div onClick={(e) => resetPassword(e)} className={`authStateForm authStateFormRight`}>
+            <span className={`authFormLabel`}>
+              <span className={`authFormPhrase`}>Reset Password</span>
+            </span>
+          </div>}
+        </>}
+        {!user && <input placeholder="Email Address" className={`emailAddressField`} type="email" name="email" autoComplete={`email`} required />}
         {!user && emailField && (
           <input placeholder="Password" type="password" name="password" autoComplete={`current-password`} />
         )}
