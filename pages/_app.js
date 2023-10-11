@@ -9,10 +9,10 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { parseDate } from '../components/PlayerRecord';
 import { AnimatePresence, motion } from 'framer-motion';
 import { defaultCommands } from '../components/Commands';
-import { collection, onSnapshot } from 'firebase/firestore';
 import { createUserFromFirebaseData } from '../components/Form';
 import { createContext, useRef, useState, useEffect } from 'react';
 import { getActivePlayers, newPlayerType } from '../components/smasherscape';
+import { collection, onSnapshot, query, limit, orderBy } from 'firebase/firestore';
 
 export const useDB = () => true;
 export const StateContext = createContext({});
@@ -620,7 +620,9 @@ export default function Xuruko({ Component, pageProps, router }) {
         });
         
         // Plays
-        const unsubscribeFromDatabasePlaysListener = onSnapshot(collection(db, usePlaysDatabase), (querySnapshot) => {
+        const playsCollection = collection(db, usePlaysDatabase);
+        const playsQuery = query(playsCollection, orderBy(`date`), limit(35));
+        const unsubscribeFromDatabasePlaysListener = onSnapshot(playsQuery, (querySnapshot) => {
           const playsFromDatabase = [];
           querySnapshot.forEach((doc) => playsFromDatabase.push(doc.data()));
           setPlays(playsFromDatabase);

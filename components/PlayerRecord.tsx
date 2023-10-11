@@ -59,6 +59,7 @@ export const calcPlayerKDRatio = (player: Player, plays: Play[]) => {
 
 function PlayerRecord(props) {
   let { plyr, plyrPlays } = props;
+//   let [playsToGet, setPlaysToGet] = useState(5);
   const { players, filteredPlayers, devEnv, useLazyLoad } = useContext<any>(StateContext);
   let [filteredPlays, setFilteredPlays] = useState(plyrPlays && plyrPlays?.length > 0 ? plyrPlays?.sort((a: any, b: any) => parseDate(b.date) - parseDate(a.date)) : plyr?.plays?.sort((a: any, b: any) => parseDate(b.date) - parseDate(a.date)));
 
@@ -145,9 +146,9 @@ function PlayerRecord(props) {
                 <div className={`flex playerRecordBegin`}>
                     {plyr?.name}'s Record
                     <span className={`recordPlays ${filteredPlays?.length > 0 ? `populated` : `empty`}`}>
-                        {filteredPlays?.length > 0 && <span className={`goldText`}>K/D: <span className="whiteText kdRatioNum">{calcPlayerKDRatio(plyr, filteredPlays)}</span></span>}
-                        <span className={`greenText`}>Kills: <span className="whiteText">{calcPlayerKills(plyr, filteredPlays)}</span></span>
-                        <span className={`redText`}>Deaths: <span className="whiteText">{calcPlayerDeaths(plyr, filteredPlays)}</span></span>
+                        {filteredPlays?.length > 0 && <span className={`goldText`}>K/D: <span className="whiteText kdRatioNum">{plyr?.kdRatio ? plyr?.kdRatio : calcPlayerKDRatio(plyr, filteredPlays)}</span></span>}
+                        <span className={`greenText`}>Kills: <span className="whiteText">{plyr?.kills ? plyr?.kills : calcPlayerKills(plyr, filteredPlays)}</span></span>
+                        <span className={`redText`}>Deaths: <span className="whiteText">{plyr?.deaths ? plyr?.deaths : calcPlayerDeaths(plyr, filteredPlays)}</span></span>
                         <span className={`blueText`}>Plays: <span className="whiteText">{filteredPlays?.length}</span></span>
                     </span>
                 </div>

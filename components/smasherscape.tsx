@@ -74,14 +74,22 @@ export const getActivePlayers = (players: any[], customObject = true, plays) => 
 }
 
 export const calcPlayerLevelImage = (levelName) => {
-    if (levelName == `Bronze Scimitar`) return `${publicAssetLink}/assets/smasherscape/Bronze_Scimmy.png?raw=true`; 
-    else if (levelName == `Iron Scimitar`) return `${publicAssetLink}/assets/smasherscape/Iron_Scimmy.png?raw=true`; 
-    else if (levelName == `Steel Scimitar`) return `${publicAssetLink}/assets/smasherscape/Steel_Scimmy.png?raw=true`; 
-    else if (levelName == `Mithril Scimitar`) return `${publicAssetLink}/assets/smasherscape/Mithril_Scimmy.png?raw=true`; 
-    else if (levelName == `Adamantite Scimitar`) return `${publicAssetLink}/assets/smasherscape/Adamant_Scimmy.png?raw=true`; 
-    else if (levelName == `Rune Scimitar`) return `${publicAssetLink}/assets/smasherscape/Rune_Scimmy.png?raw=true`; 
-    else if (levelName == `Gilded Scimitar`) return `${publicAssetLink}/assets/smasherscape/Gilded_Scimmy.png?raw=true`; 
-    else return `${publicAssetLink}/assets/smasherscape/OSRS_Top_Hat.png?raw=true`;
+    let smasherscapeImagesURL = `${publicAssetLink}/assets/smasherscape`;
+    if (levelName == `Bronze Scimitar`) return `${smasherscapeImagesURL}/Bronze_Scimmy.png?raw=true`; 
+    else if (levelName == `Iron Scimitar`) return `${smasherscapeImagesURL}/Iron_Scimmy.png?raw=true`; 
+    else if (levelName == `Steel Scimitar`) return `${smasherscapeImagesURL}/Steel_Scimmy.png?raw=true`; 
+    else if (levelName == `Mithril Scimitar`) return `${smasherscapeImagesURL}/Mithril_Scimmy.png?raw=true`; 
+    else if (levelName == `Adamantite Scimitar`) return `${smasherscapeImagesURL}/Adamant_Scimmy.png?raw=true`; 
+    else if (levelName == `Rune Scimitar`) return `${smasherscapeImagesURL}/Rune_Scimmy.png?raw=true`; 
+    else if (levelName == `Gilded Scimitar`) return `${smasherscapeImagesURL}/Gilded_Scimmy.png?raw=true`;
+    else if (levelName == `Gomu Gomu`) return `${smasherscapeImagesURL}/Gomu_Gomu.png?raw=true`;
+    else if (levelName == `Dragon Scimitar`) return `${smasherscapeImagesURL}/Dragon_Scimmy.png?raw=true`;
+    else if (levelName == `Abyssal Whip`) return `${smasherscapeImagesURL}/Abyssal_Whip.png?raw=true`;
+    // else if (levelName == `Dragon Hunter Crossbow`) return `${smasherscapeImagesURL}/Abyssal_Whip.png?raw=true`;
+    // else if (levelName == `Twisted Bow`) return `${smasherscapeImagesURL}/Abyssal_Whip.png?raw=true`;
+    else if (levelName == `Fish Sack`) return `${smasherscapeImagesURL}/Fish_Sack.png?raw=true`;
+    else if (levelName == `Golden Tench`) return `${smasherscapeImagesURL}/Golden_Tench.png?raw=true`;
+    else return `${smasherscapeImagesURL}/OSRS_Top_Hat.png?raw=true`;
 }
 
 export const calcPlayerCharactersPlayed = (plyr: Player, cutOff = true, plays) => {
@@ -132,21 +140,21 @@ export const newPlayerType = (player: Player, customObject = true, plays) => {
     let level: Level = new Level(player.level.name, player.level.num) as Level;
     let experience: Experience = new Experience(player.experience.nextLevelAt, player.experience.remainingXP, player.experience.arenaXP, player.experience.xp) as Experience;
 
-    let wins;
-    let losses;
-    let ratio = 0;
-    let kills = 0;
-    let deaths = 0;
-    let kdRatio = 0;
+    // let wins;
+    // let losses;
+    // let ratio = 0;
+    // let kills = 0;
+    // let deaths = 0;
+    // let kdRatio = 0;
 
-   if (plays && plays?.length > 0) {
-        wins = calcPlayerWinsFromPlays(player, plays);
-        losses = calcPlayerLossesFromPlays(player, plays);
-        ratio = (wins/(wins+losses)) * 100;
-        kills = calcPlayerKills(player, plays);
-        deaths = calcPlayerDeaths(player, plays);
-        kdRatio = calcPlayerKDRatio(player, plays);
-    }
+//    if (plays && plays?.length > 0) {
+//         wins = calcPlayerWinsFromPlays(player, plays);
+//         losses = calcPlayerLossesFromPlays(player, plays);
+//         ratio = (wins/(wins+losses)) * 100;
+//         kills = calcPlayerKills(player, plays);
+//         deaths = calcPlayerDeaths(player, plays);
+//         kdRatio = calcPlayerKDRatio(player, plays);
+//     }
     
     experience = removeEmptyParams(experience) as Experience;
 
@@ -154,14 +162,14 @@ export const newPlayerType = (player: Player, customObject = true, plays) => {
         ...player,
         level,
         experience,
-        kills,
-        deaths,
-        kdRatio,
-        wins,
-        losses,
-        ratio,
+        // kills,
+        // deaths,
+        // kdRatio,
+        // wins,
+        // losses,
+        // ratio,
         // plays: playsToConsider,
-        percentage: (ratio) > 100 ? 100 : parseFloat(removeTrailingZeroDecimal(ratio)),
+        // percentage: (ratio) > 100 ? 100 : parseFloat(removeTrailingZeroDecimal(ratio)),
     }) as Player;
 
     return new Player(removeEmptyParams(newPlayer)) as Player;

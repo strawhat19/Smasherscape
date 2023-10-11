@@ -326,7 +326,7 @@ export const calcPlayerLevelAndExperience = (plyr: Player) => {
     } else if (xp >= 184040 && xp < 203254) {
         plyr.level.num = 56;
         plyr.experience.xp = 184040;
-        plyr.level.name = `Gilded Scimitar`;
+        plyr.level.name = `Gomu Gomu`;
         plyr.experience.nextLevelAt = 203254;
         plyr.experience.remainingXP = (203254 - xp);
     } else if (xp >= 203254 && xp < 224466) {

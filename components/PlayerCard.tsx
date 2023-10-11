@@ -1,3 +1,4 @@
+// import { db } from '../firebase';
 import { useContext } from 'react';
 import Player from '../models/Player';
 import { Badge } from '@mui/material';
@@ -5,8 +6,9 @@ import { toast } from 'react-toastify';
 import PlayerRecord from './PlayerRecord';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
+// import { collection, query, limit, orderBy } from 'firebase/firestore';
 import { updatePlayerInDB, updatePlayersLocalStorage } from './PlayerForm';
-import { StateContext, showAlert, formatDate, countPropertiesInObject, getActivePlayersJSON } from '../pages/_app';
+import { StateContext, formatDate, countPropertiesInObject, getActivePlayersJSON, usePlaysDatabase } from '../pages/_app';
 import { calcPlayerCharacterTimesPlayed, calcPlayerCharactersPlayed, calcPlayerLevelImage, checkUserRole, getActivePlayers, getCharacterTitle, publicAssetLink } from './smasherscape';
 
 export const calcPlayerWinsFromPlays = (player, plays) => plays.filter(ply => ply?.winnerUUID == player?.uuid)?.length;
