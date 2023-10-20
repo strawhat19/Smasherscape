@@ -316,10 +316,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
       })
       res.status(200).json(locationsWithWeatherAndTime);
-    } catch (error) {
-      res.status(500).json({location, error});
+    } catch (APIError) {
+      res.status(500).json({ APIError, error: `Error getting GeoData` });
     }
   } else {
-    res.status(405).json({location, error});
+    res.status(405).json({ error: `Error getting GeoData from Server` });
   }
 }
