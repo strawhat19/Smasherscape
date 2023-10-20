@@ -309,12 +309,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method === `GET`) {
     try {
       let locations = await getLocations(location);
-      let locationsWithWeatherAndTime = await locations.map((locat, locatIndex) => {
-        return {
-          ...locat,
-          index: locatIndex + 1,
-        }
-      })
+      let locationsWithWeatherAndTime = `hello`;
+    //   let locationsWithWeatherAndTime = await locations.map((locat, locatIndex) => {
+    //     return {
+    //       ...locat,
+    //       index: locatIndex + 1,
+    //     }
+    //   })
       res.status(200).json(locationsWithWeatherAndTime);
     } catch (error) {
       res.status(500).json({location, error});
