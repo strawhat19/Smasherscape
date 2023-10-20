@@ -1,4 +1,5 @@
 import moment from 'moment-timezone';
+import { openWeatherAPIKey } from '../../../firebase';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -197,7 +198,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
       let { latitude, longitude } = coordinates;
       let openWeatherAPIURL = `https://api.openweathermap.org/data/2.5`;
-      let openWeatherAPIKey = process.env.NEXT_PUBLIC_OPENWEATHER_APIKEY;
       let openWeatherOneCallForLatLonURL = `${openWeatherAPIURL}/onecall?lat=${latitude}&lon=${longitude}&appid=${openWeatherAPIKey}`;
       let openWeatherOneCallForLatLonResponse = await fetch(openWeatherOneCallForLatLonURL);
 
