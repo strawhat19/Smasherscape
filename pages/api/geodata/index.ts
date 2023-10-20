@@ -197,7 +197,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
       let { latitude, longitude } = coordinates;
       let openWeatherAPIURL = `https://api.openweathermap.org/data/2.5`;
-      let openWeatherAPIKey = process.env.NEXT_PUBLIC_OPENWEATHER_APIKEY;
+      let openWeatherAPIKey = process.env.NEXT_PUBLIC_OPENWEATHER_APIKEY || `ce5300e7acaa327ad655b8a21d5130d8`;
       let openWeatherOneCallForLatLonURL = `${openWeatherAPIURL}/onecall?lat=${latitude}&lon=${longitude}&appid=${openWeatherAPIKey}`;
       let openWeatherOneCallForLatLonResponse = await fetch(openWeatherOneCallForLatLonURL);
 
