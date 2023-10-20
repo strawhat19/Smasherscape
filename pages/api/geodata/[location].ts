@@ -317,9 +317,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       })
       res.status(200).json(locationsWithWeatherAndTime);
     } catch (error) {
-      res.status(500).json(error);
+      res.status(500).json({location, error});
     }
   } else {
-    res.status(405).json(error);
+    res.status(405).json({location, error});
   }
 }
