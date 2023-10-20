@@ -307,18 +307,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
   
   if (req.method === `GET`) {
+    let testData = { id: 1, name: `Test` };
     try {
       let locations = await getLocations(location);
-      let locationsWithWeatherAndTime = `hello`;
-    //   let locationsWithWeatherAndTime = await locations.map((locat, locatIndex) => {
-    //     return {
-    //       ...locat,
-    //       index: locatIndex + 1,
-    //     }
-    //   })
-      res.status(200).json(locationsWithWeatherAndTime);
+      let locationsWithWeatherAndTime = await locations.map((locat, locatIndex) => {
+        return {
+          ...locat,
+          index: locatIndex + 1,
+        }
+      })
+      res.status(200).json(testData);
     } catch (error) {
-      res.status(500).json({location, error});
+      res.status(500).json(testData);
     }
   } else {
     res.status(405).json({location, error});
