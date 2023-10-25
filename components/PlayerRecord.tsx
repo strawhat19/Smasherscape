@@ -3,6 +3,7 @@ import { Badge } from '@mui/material';
 import Player from '../models/Player';
 import PlayerOption from './PlayerOption';
 import { StateContext } from '../pages/_app';
+import LoadingSpinner from './LoadingSpinner';
 import TextField from '@mui/material/TextField';
 import CharacterOption from './CharacterOption';
 import { Characters } from '../common/Characters';
@@ -12,7 +13,6 @@ import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
 import { getAllCharacters, getCharacterObjects, getUniqueCharactersPlayed, searchBlur } from './PlayerForm';
 import { calcPlayerCharacterTimesPlayed, calcPlayerCharactersPlayed, getCharacterTitle, publicAssetLink } from './smasherscape';
-import LoadingSpinner from './LoadingSpinner';
 
 export const parseDate = (dateStr: any) => {
     const parts = dateStr.split(`, `);
@@ -66,7 +66,7 @@ function PlayerRecord(props) {
   let [filteredPlays, setFilteredPlays] = useState(plyrPlays && plyrPlays?.length > 0 ? plyrPlays?.sort((a: any, b: any) => parseDate(b.date) - parseDate(a.date)) : plyr?.plays?.sort((a: any, b: any) => parseDate(b.date) - parseDate(a.date)));
 
   let [initialInterval, setInitialInterval] = useState(5);
-  let [loadedInterval, setLoadedInterval] = useState(35);
+  let [loadedInterval, setLoadedInterval] = useState(20);
   let [paginationAmount, setPaginationAmount] = useState(initialInterval);
   let [paginationEnd, setPaginationEnd] = useState(paginationAmount);
 
