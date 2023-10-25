@@ -66,7 +66,7 @@ function PlayerRecord(props) {
   let [filteredPlays, setFilteredPlays] = useState(plyrPlays && plyrPlays?.length > 0 ? plyrPlays?.sort((a: any, b: any) => parseDate(b.date) - parseDate(a.date)) : plyr?.plays?.sort((a: any, b: any) => parseDate(b.date) - parseDate(a.date)));
 
   let [initialInterval, setInitialInterval] = useState(5);
-  let [loadedInterval, setLoadedInterval] = useState(500);
+  let [loadedInterval, setLoadedInterval] = useState(35);
   let [paginationAmount, setPaginationAmount] = useState(initialInterval);
   let [paginationEnd, setPaginationEnd] = useState(paginationAmount);
 
