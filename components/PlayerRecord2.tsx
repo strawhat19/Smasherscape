@@ -1,8 +1,8 @@
+import { collection, query, orderBy, limit } from 'firebase/firestore';
 import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
 import React, { useEffect, useState, useContext } from 'react';
 import { StateContext, usePlaysDatabase } from '../pages/_app';
 import { removeTrailingZeroDecimal } from './PlayerRecord';
-import { collection, query } from 'firebase/firestore';
 import { getCharacterTitle } from './smasherscape';
 import Player from '../models/Player';
 import Play from '../models/Play';
@@ -15,15 +15,16 @@ const PlayerRecord = (props) => {
   const { players, filteredPlayers, devEnv, useLazyLoad } = useContext<any>(StateContext);
   
   const getPlays = async () => {
-      let queryToGet = plyrPlays;
-      // let queryToGet = query(collection(db, usePlaysDatabase)).orderBy(`date`).limit(35);
-    if (lastPlay) {
+    //   let queryToGet = plyrPlays;
+    let playsCollection = collection(db, usePlaysDatabase);
+    let queryToGet = query(playsCollection, orderBy(`date`), limit(35));
+    if (lastPlay != null) {
       queryToGet = queryToGet.startAfter(lastPlay);
     }
-    const snapshot = await queryToGet.get();
-    const newPlays = snapshot.docs.map(doc => doc.data());
+    const snapshot = await queryToGet;
+    const newPlays = snapshot.docs && Array.isArray(snapshot.docs) && snapshot.docs.length > 0 ? snapshot.docs.map(doc => doc.data()) : [];
     setPlays(prevPlays => [...prevPlays, ...newPlays]);
-    setLastPlay(snapshot.docs[snapshot.docs.length - 1]);
+    setLastPlay(newPlays[newPlays.length - 1]);
   };
   
   useEffect(() => {
@@ -55,7 +56,7 @@ const PlayerRecord = (props) => {
   }
   
   return (
-    <div>
+    <div className={`recordOfPlayer ${plyr?.expanded ? `expanded` : `collapsed`}`}>
         {plays?.length > 0 ? plays.map((ply, plyIndex) => {
             let isWinner = ply?.winner == plyr?.name;
             return (

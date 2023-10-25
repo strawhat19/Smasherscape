@@ -621,7 +621,7 @@ export default function Xuruko({ Component, pageProps, router }) {
         
         // Plays
         const playsCollection = collection(db, usePlaysDatabase);
-        const playsQuery = query(playsCollection, orderBy(`date`), limit(35));
+        const playsQuery = query(playsCollection, orderBy(`date`));
         const unsubscribeFromDatabasePlaysListener = onSnapshot(playsQuery, (querySnapshot) => {
           const playsFromDatabase = [];
           querySnapshot.forEach((doc) => playsFromDatabase.push(doc.data()));

@@ -7,11 +7,12 @@ import TextField from '@mui/material/TextField';
 import CharacterOption from './CharacterOption';
 import { Characters } from '../common/Characters';
 import Autocomplete from '@mui/material/Autocomplete';
-import { useContext, useState, useEffect } from 'react';
+import { useContext, useState, useEffect, useRef } from 'react';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
 import { getAllCharacters, getCharacterObjects, getUniqueCharactersPlayed, searchBlur } from './PlayerForm';
 import { calcPlayerCharacterTimesPlayed, calcPlayerCharactersPlayed, getCharacterTitle, publicAssetLink } from './smasherscape';
+import LoadingSpinner from './LoadingSpinner';
 
 export const parseDate = (dateStr: any) => {
     const parts = dateStr.split(`, `);
@@ -59,13 +60,52 @@ export const calcPlayerKDRatio = (player: Player, plays: Play[]) => {
 
 function PlayerRecord(props) {
   let { plyr, plyrPlays } = props;
-//   let [playsToGet, setPlaysToGet] = useState(5);
+  const plyrRecord = useRef<any>();
+  let [loading, setLoading] = useState(false);
   const { players, filteredPlayers, devEnv, useLazyLoad } = useContext<any>(StateContext);
   let [filteredPlays, setFilteredPlays] = useState(plyrPlays && plyrPlays?.length > 0 ? plyrPlays?.sort((a: any, b: any) => parseDate(b.date) - parseDate(a.date)) : plyr?.plays?.sort((a: any, b: any) => parseDate(b.date) - parseDate(a.date)));
+
+  let [initialInterval, setInitialInterval] = useState(5);
+  let [loadedInterval, setLoadedInterval] = useState(500);
+  let [paginationAmount, setPaginationAmount] = useState(initialInterval);
+  let [paginationEnd, setPaginationEnd] = useState(paginationAmount);
+
+  const paginate = () => {
+    // let newAmount = paginationAmount + interval;
+    // setPaginationAmount(prevAmount => prevAmount + newAmount);
+    // console.log({paginationEnd, paginationAmount, newAmount});
+    // if (plyr?.expanded == true) {
+        setPaginationEnd(prevEnd => prevEnd + loadedInterval);
+    // } else {
+        // setPaginationEnd(initialInterval);
+    // }
+    // plyr?.expanded == true ? setPaginationEnd(prevEnd => prevEnd + loadedInterval) : setPaginationEnd(initialInterval);
+    setLoading(false);
+  };
 
   useEffect(() => {
     setFilteredPlays(plyrPlays && plyrPlays?.length > 0 ? plyrPlays?.sort((a: any, b: any) => parseDate(b.date) - parseDate(a.date)) : plyr?.plays?.sort((a: any, b: any) => parseDate(b.date) - parseDate(a.date)));
   }, [players])
+
+  useEffect(() => {
+    const handleScroll = (e) => {
+      const element = e.target;
+      if (element.scrollHeight - element.scrollTop === element.clientHeight) {
+        setLoading(true);
+        paginate();
+      }
+    };
+
+    if (plyrRecord.current) {
+      plyrRecord.current.addEventListener(`scroll`, handleScroll);
+    }
+
+    return () => {
+      if (plyrRecord.current) {
+        plyrRecord.current.removeEventListener(`scroll`, handleScroll);
+      }
+    };
+  }, []);
 
   const searchRecordPlayers = (e: any, value?: any) => {
     if (value) {
@@ -141,7 +181,7 @@ function PlayerRecord(props) {
                 <img src={`${publicAssetLink}/assets/smasherscape/OSRS_Card_Template_Border_Only.png?raw=true`} className={`cardBG border`} alt={`Smasherscape Player Card`} />
             </>
         )}
-        <ul className="recordList">
+        <ul className="recordList" ref={plyrRecord}>
             <h3 className={`greenRecordText`}>
                 <div className={`flex playerRecordBegin`}>
                     {plyr?.name}'s Record
@@ -216,7 +256,7 @@ function PlayerRecord(props) {
                     </form>
                 </div>}
             </h3>
-            {filteredPlays?.length > 0 ? filteredPlays.map((ply, plyIndex) => {
+            {filteredPlays?.length > 0 ? filteredPlays.slice(0, paginationEnd).map((ply, plyIndex) => {
                 let isWinner = ply?.winner == plyr?.name;
                 return (
                     <li className={`playerPlay`} key={plyIndex}>
@@ -268,7 +308,10 @@ function PlayerRecord(props) {
                 )
             }) : <div className={`noPlaysYet`}>
             No Plays Yet
-        </div>}
+            </div>}
+            {loading == true || filteredPlays.slice(0, paginationEnd).length < filteredPlays.length && <div className="noPlaysYet">
+                <LoadingSpinner override={true} size={18} />
+            </div>}
         </ul>
     </div>
   )
