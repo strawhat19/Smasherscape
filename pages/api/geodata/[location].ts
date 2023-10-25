@@ -1,15 +1,15 @@
 import moment from 'moment-timezone';
-import { openWeatherAPIKey } from '../../../firebase';
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { devEnv, openWeatherAPIKey } from '../../../firebase';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   
   let { location } = req.query;
-  // let browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  let browserTimezone = devEnv ? Intl.DateTimeFormat().resolvedOptions().timeZone : moment.tz.guess();
   let error = { error: `Error getting GeoData`, message: `Error getting GeoData` };
-  // let browserTimezoneCityOrRegion = browserTimezone.split(`/`)[1].replace(/_/g, ` `);
+  let browserTimezoneCityOrRegion = browserTimezone.split(`/`)[1].replace(/_/g, ` `);
   
-  // if (!location && req.url) location = browserTimezoneCityOrRegion;
+  if (!location && req.url) location = browserTimezoneCityOrRegion;
 
   const convertWindSpeedFromMetersPerSecondToMilesPerHour = (speedInMS) => Math.floor(speedInMS * 2.237);
   const convertTemperatureFromKelvinToCelsius = (tempInKelvin) => parseFloat(removeTrailingZeroDecimal(5, (tempInKelvin - 273.15)));
@@ -36,27 +36,29 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const isValid = (item) => {
     if (typeof item == `string`) {
       if (!item || item == `` || item.trim() == `` || item == undefined || item == null) {
-          return false;
+        return false;
       } else {
-          return true;
+        return true;
       }
     } else if (typeof item == `number`) {
       if (isNaN(item) || item == undefined || item == null) {
-          return false;
+        return false;
       } else {
-          return true;
+        return true;
       }
     } else if (typeof item == `object` && item != undefined && item != null) {
       if (Object.keys(item).length == 0 || item == undefined || item == null) {
-          return false;
+        return false;
       } else {
-          return true;
+        return true;
       }
+    } else if (Array.isArray(item) && item != undefined && item != null) {
+      return item.length > 0;
     } else {
       if (item == undefined || item == null) {
-          return false;
+        return false;
       } else {
-          return true;
+        return true;
       }
     }
   }
@@ -294,7 +296,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       let locations = openStreetMapsNominatimLocationData;
 
       if (Array.isArray(locations) && locations.length > 0) {
-        locations = generateNewLocations(locations);
+        locations = await generateNewLocations(locations);
       }
 
       return locations;
@@ -309,13 +311,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method === `GET`) {
     try {
       let locations = await getLocations(location);
-      let locationsWithWeatherAndTime = await locations.map((locat, locatIndex) => {
-        return {
-          ...locat,
-          index: locatIndex + 1,
-        }
-      })
-      res.status(200).json(locationsWithWeatherAndTime);
+      res.status(200).json(locations);
     } catch (APIError) {
       res.status(500).json({ APIError, error: `Error getting GeoData` });
     }
