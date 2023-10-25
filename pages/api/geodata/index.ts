@@ -5,9 +5,10 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   
   let { location } = req.query;
-  let browserTimezone = moment.tz.guess() || Intl.DateTimeFormat().resolvedOptions().timeZone;
+  let browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  let defaultTimezone = moment.tz.guess() || browserTimezone;
   let error = { error: `Error getting GeoData`, message: `Error getting GeoData` };
-  let browserTimezoneCityOrRegion = browserTimezone.split(`/`)[1].replace(/_/g, ` `);
+  let browserTimezoneCityOrRegion = defaultTimezone.split(`/`)[1].replace(/_/g, ` `);
   
   if (!location && req.url) location = browserTimezoneCityOrRegion;
 
@@ -315,6 +316,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return {
           ...locat,
           index: locatIndex + 1,
+          locationTimezone: defaultTimezone,
         }
       })
       res.status(200).json(locations);
