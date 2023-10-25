@@ -3,7 +3,7 @@ import { getFirestore } from "firebase/firestore";
 import { GoogleAuthProvider, getAuth } from "firebase/auth";
 
 export const openWeatherAPIKey = process.env.NEXT_PUBLIC_OPENWEATHER_APIKEY;
-export const devEnv = window.location.host.includes(`dev`) || window.location.host.includes(`local`) || window.location.host.includes(`:3000`);
+// export const devEnv = window && window.location.host.includes(`dev`) || window.location.host.includes(`local`) || window.location.host.includes(`:3000`);
 
 const provider = new GoogleAuthProvider();
 provider.setCustomParameters({ prompt: 'select_account' });

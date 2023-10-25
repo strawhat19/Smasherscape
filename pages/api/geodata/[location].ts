@@ -1,11 +1,11 @@
 import moment from 'moment-timezone';
+import { openWeatherAPIKey } from '../../../firebase';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { devEnv, openWeatherAPIKey } from '../../../firebase';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   
   let { location } = req.query;
-  let browserTimezone = devEnv ? Intl.DateTimeFormat().resolvedOptions().timeZone : moment.tz.guess();
+  let browserTimezone = moment.tz.guess() || Intl.DateTimeFormat().resolvedOptions().timeZone;
   let error = { error: `Error getting GeoData`, message: `Error getting GeoData` };
   let browserTimezoneCityOrRegion = browserTimezone.split(`/`)[1].replace(/_/g, ` `);
   
