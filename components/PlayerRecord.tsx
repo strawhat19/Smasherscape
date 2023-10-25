@@ -51,8 +51,10 @@ export const calcPlayerDeaths = (player: Player, plays: Play[]) => {
     return lossDeaths + winDeaths;
 }
 
-export const calcPlayerKDRatio = (player: Player, plays: Play[]) => {
-    let kd = calcPlayerKills(player, plays) / calcPlayerDeaths(player, plays);
+export const calcPlayerKDRatio = (player: Player, plays?: Play[]) => {
+    let { kills, deaths } = player;
+    // let kd = calcPlayerKills(player, plays) / calcPlayerDeaths(player, plays);
+    let kd = kills > 0 || deaths > 0 ? kills / deaths : 0;
     let kdRatio = removeTrailingZeroDecimal(kd);
     return parseFloat(kdRatio);
 }
@@ -61,10 +63,10 @@ function PlayerRecord(props) {
   let { plyr, plyrPlays } = props;
 //   let [playsToGet, setPlaysToGet] = useState(5);
   const { players, filteredPlayers, devEnv, useLazyLoad } = useContext<any>(StateContext);
-  let [filteredPlays, setFilteredPlays] = useState(plyrPlays && plyrPlays?.length > 0 ? plyrPlays?.sort((a: any, b: any) => parseDate(b.date) - parseDate(a.date)) : plyr?.plays?.sort((a: any, b: any) => parseDate(b.date) - parseDate(a.date)));
+  let [filteredPlays, setFilteredPlays] = useState(plyrPlays && plyrPlays?.length > 0 ? plyrPlays?.sort((a: any, b: any) => parseDate(b.date) - parseDate(a.date)) : Array.isArray(plyr?.plays) ? plyr?.plays?.sort((a: any, b: any) => parseDate(b.date) - parseDate(a.date)) : []);
 
   useEffect(() => {
-    setFilteredPlays(plyrPlays && plyrPlays?.length > 0 ? plyrPlays?.sort((a: any, b: any) => parseDate(b.date) - parseDate(a.date)) : plyr?.plays?.sort((a: any, b: any) => parseDate(b.date) - parseDate(a.date)));
+    setFilteredPlays(plyrPlays && plyrPlays?.length > 0 ? plyrPlays?.sort((a: any, b: any) => parseDate(b.date) - parseDate(a.date)) : Array.isArray(plyr?.plays) ? plyr?.plays?.sort((a: any, b: any) => parseDate(b.date) - parseDate(a.date)) : []);
   }, [players])
 
   const searchRecordPlayers = (e: any, value?: any) => {
@@ -149,7 +151,7 @@ function PlayerRecord(props) {
                         {filteredPlays?.length > 0 && <span className={`goldText`}>K/D: <span className="whiteText kdRatioNum">{plyr?.kdRatio ? plyr?.kdRatio : calcPlayerKDRatio(plyr, filteredPlays)}</span></span>}
                         <span className={`greenText`}>Kills: <span className="whiteText">{plyr?.kills ? plyr?.kills : calcPlayerKills(plyr, filteredPlays)}</span></span>
                         <span className={`redText`}>Deaths: <span className="whiteText">{plyr?.deaths ? plyr?.deaths : calcPlayerDeaths(plyr, filteredPlays)}</span></span>
-                        <span className={`blueText`}>Plays: <span className="whiteText">{filteredPlays?.length}</span></span>
+                        <span className={`blueText`}>Plays: <span className="whiteText">{plyr?.plays ? plyr?.plays : filteredPlays?.length}</span></span>
                     </span>
                 </div>
                 {filteredPlays?.length > 0 && calcPlayerCharactersPlayed(plyr, false, filteredPlays)?.length > 3 && <div className={`playsContainer playerRecordPlaysContainer ${calcPlayerCharactersPlayed(plyr, false, filteredPlays)?.length > 0 ? (calcPlayerCharactersPlayed(plyr, false, filteredPlays)?.length >= 5 ? `populatedPlays moreThanFive` : `populatedPlays`) : ``}`}>

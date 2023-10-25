@@ -132,8 +132,9 @@ export default function PlayerCard(props) {
                 <div className="recordPlays">
                     <div className="record">
                         <h3 className={`greenRecordText`}>Record</h3>
+                        <h4>{plyr.wins} - {plyr.losses}</h4>
                         {/* <h4>{calcPlayerWins(plyr)} - {calcPlayerLosses(plyr)}</h4> */}
-                        <h4>{calcPlayerWinsFromPlays(plyr, plays)} - {calcPlayerLossesFromPlays(plyr, plays)}</h4>
+                        {/* <h4>{calcPlayerWinsFromPlays(plyr, plays)} - {calcPlayerLossesFromPlays(plyr, plays)}</h4> */}
                     </div>
                     <div className="plays">
                         <h3 className={`greenRecordText`}>Plays</h3>

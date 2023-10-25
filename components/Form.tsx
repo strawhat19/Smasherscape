@@ -97,7 +97,7 @@ export const signInWithGoogle = async (databasePlayers, setUser, setAuthState, p
       let lowerCaseName = nameToAdd.toLowerCase();
       let playerExists = dbPlayers.length > 0 && (dbPlayers.find(plyr => plyr.email == createdGoogleUserFromFirebaseData.email) || dbPlayers.find(plyr => plyr.name.toLowerCase() == lowerCaseName || plyr.name.toLowerCase().includes(lowerCaseName)));
 
-      if (playerExists != null) {
+      if (playerExists) {
         setUser(playerExists);
         setAuthState(`Sign Out`);
         toast.success(`Successfully Signed In`);

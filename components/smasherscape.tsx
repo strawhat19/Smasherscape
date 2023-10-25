@@ -96,7 +96,7 @@ export const calcPlayerCharactersPlayed = (plyr: Player, cutOff = true, plays) =
     let playsToUpdate = [];
     if (plays && plays?.length > 0) {
         playsToUpdate = plays.filter(ply => ply?.winnerUUID == plyr?.uuid || ply?.loserUUID == plyr?.uuid);
-    } else {
+    } else if (Array.isArray(plyr?.plays)) {
         playsToUpdate = plyr?.plays;
     }
     let charsPlayed = playsToUpdate?.map(ply => (ply?.winnerUUID == plyr?.uuid ? ply?.character : ply?.otherCharacter));

@@ -33,8 +33,10 @@ export const updatePlayerInDB = async (playerObj, updatedPlayerObject) => await 
 export const getUniqueCharactersPlayed = (players, plays) => {
     if (plays && plays?.length > 0) {
         return [...new Set(plays.flatMap((play: Play) => [play.character, play.otherCharacter]) )].sort();
-    } else {
+    } else if (Array.isArray(players[0].plays)) {
         return [...new Set(players.flatMap((p: Player) => p.plays.flatMap((play: Play) => [play.character, play.otherCharacter]) ))].sort();
+    } else {
+        return [];
     }
 }
 
@@ -85,17 +87,17 @@ export const getCharacterObjects = () => {
     // }
 }
 
-export const updatePlayerStats = (plyr, plays) => {
-    let wins = calcPlayerWins(plyr);
-    let losses = calcPlayerLosses(plyr);
-    let ratio = (wins/(wins+losses)) * 100;
-    plyr.wins = wins;
-    plyr.losses = losses;
+export const updatePlayerStats = (plyr, plays?: any) => {
+    let { wins, losses } = plyr;
+    // let wins = calcPlayerWins(plyr);
+    // let losses = calcPlayerLosses(plyr);
+    let ratio = (wins > 0 || losses > 0) ? (wins / (wins + losses)) * 100 : 0;
     plyr.ratio = ratio;
     plyr.percentage = (ratio) > 100 ? 100 : parseFloat(removeTrailingZeroDecimal(ratio));
-    plyr.kills = calcPlayerKills(plyr, plays);
-    plyr.deaths = calcPlayerDeaths(plyr, plays);
-    plyr.kdRatio = calcPlayerKDRatio(plyr, plays);
+    plyr.kdRatio = calcPlayerKDRatio(plyr);
+    // plyr.kills = calcPlayerKills(plyr, plays);
+    // plyr.deaths = calcPlayerDeaths(plyr, plays);
+    // plyr.kdRatio = calcPlayerKDRatio(plyr, plays);
     return plyr;
 }
 
@@ -113,14 +115,18 @@ export const createPlayer = (playerName, playerIndex, databasePlayers, user?: Us
         id,
         ID,
         uuid,
+        wins: 0,
+        kills: 0,
+        plays: 0,
+        losses: 0,
+        deaths: 0,
         uniqueIndex,
         displayName,
         active: true,
         disabled: false,
         expanded: false,
-        playerLink: false,
         name: displayName,
-        plays: [] as Play[],
+        playerLink: false,
         type: `Smasherscape`,
         username: displayName,
         created: currentDateTimeStamp,
@@ -153,7 +159,7 @@ export const createPlayer = (playerName, playerIndex, databasePlayers, user?: Us
         } as Experience,
     };
 
-    updatePlayerStats(plyr, []);
+    updatePlayerStats(plyr);
     plyr.properties = countPropertiesInObject(plyr);
 
     return plyr;
@@ -424,6 +430,7 @@ export const updatePlayerPlays = (playState) => {
         date
     };
     
+    plyr.plays = plyr.plays + 1;
     // plyr.plays.push(playToRecord);
 
     if (winnerOrLoser == `winner`) {
