@@ -4,7 +4,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   
-  // let { location } = req.query;
+  let { location } = req.query;
   // let browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   let error = { error: `Error getting GeoData`, message: `Error getting GeoData` };
   // let browserTimezoneCityOrRegion = browserTimezone.split(`/`)[1].replace(/_/g, ` `);
@@ -33,33 +33,33 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   //   }
   // }
 
-  // const isValid = (item) => {
-  //   if (typeof item == `string`) {
-  //     if (!item || item == `` || item.trim() == `` || item == undefined || item == null) {
-  //         return false;
-  //     } else {
-  //         return true;
-  //     }
-  //   } else if (typeof item == `number`) {
-  //     if (isNaN(item) || item == undefined || item == null) {
-  //         return false;
-  //     } else {
-  //         return true;
-  //     }
-  //   } else if (typeof item == `object` && item != undefined && item != null) {
-  //     if (Object.keys(item).length == 0 || item == undefined || item == null) {
-  //         return false;
-  //     } else {
-  //         return true;
-  //     }
-  //   } else {
-  //     if (item == undefined || item == null) {
-  //         return false;
-  //     } else {
-  //         return true;
-  //     }
-  //   }
-  // }
+  const isValid = (item) => {
+    if (typeof item == `string`) {
+      if (!item || item == `` || item.trim() == `` || item == undefined || item == null) {
+          return false;
+      } else {
+          return true;
+      }
+    } else if (typeof item == `number`) {
+      if (isNaN(item) || item == undefined || item == null) {
+          return false;
+      } else {
+          return true;
+      }
+    } else if (typeof item == `object` && item != undefined && item != null) {
+      if (Object.keys(item).length == 0 || item == undefined || item == null) {
+          return false;
+      } else {
+          return true;
+      }
+    } else {
+      if (item == undefined || item == null) {
+          return false;
+      } else {
+          return true;
+      }
+    }
+  }
 
   // const getMapData = (coordinates) => {
   //   let { latitude, longitude } = coordinates;
@@ -290,7 +290,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   
   if (req.method === `GET`) {
     try {
-      let locations = await [error, req, res];
+      let locations = await isValid(location) ? [location] : [1, 2, 3];
       // let locationsWithWeatherAndTime = await locations.map((locat, locatIndex) => {
       //   return {
       //     ...locat,
