@@ -281,7 +281,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
 
     } catch (getWeatherAndTimeDataError) {
-      return { location, error, getWeatherAndTimeDataError };
+      return { error: `Couldn't get Weather for ${location}`, messsage: `Couldn't get Weather for ${location}` };
     }
   }
 
@@ -314,9 +314,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       let locations = await getLocations(location);
       locations = await locations.map((locat, locatIndex) => {
         return {
-          ...locat,
           index: locatIndex + 1,
-          locationTimezone: defaultTimezone,
+          timezone: defaultTimezone,
+          ...locat,
         }
       })
       res.status(200).json(locations);
