@@ -431,6 +431,10 @@ export const updatePlayerPlays = (playState) => {
     };
     
     plyr.plays = plyr.plays + 1;
+    plyr.wins = winnerOrLoser == `winner` ? plyr.wins + 1 : plyr.wins;
+    plyr.losses = winnerOrLoser == `winner` ? plyr.losses : plyr.losses + 1;
+    plyr.kills = winnerOrLoser == `winner` ? plyr.kills + 3 : plyr.kills + stocksTaken;
+    plyr.deaths = winnerOrLoser == `winner` ? plyr.deaths + stocksTaken : plyr.deaths + 3;
     // plyr.plays.push(playToRecord);
 
     if (winnerOrLoser == `winner`) {
@@ -444,8 +448,8 @@ export const updatePlayerPlays = (playState) => {
     };
 
     calcPlayerLevelAndExperience(plyr);
-
-    updatePlayerStats(plyr, plays.filter(ply => ply?.winnerUUID == plyr?.uuid || ply?.loserUUID == plyr?.uuid));
+    updatePlayerStats(plyr);
+    // updatePlayerStats(plyr, plays.filter(ply => ply?.winnerUUID == plyr?.uuid || ply?.loserUUID == plyr?.uuid));
 
     plyr.updated = currentDateTimeStamp;
     plyr.lastUpdated = currentDateTimeStamp;
