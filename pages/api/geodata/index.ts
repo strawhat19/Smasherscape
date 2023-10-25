@@ -5,9 +5,9 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   
   let { location } = req.query;
-  // let browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  let browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   let error = { error: `Error getting GeoData`, message: `Error getting GeoData` };
-  // let browserTimezoneCityOrRegion = browserTimezone.split(`/`)[1].replace(/_/g, ` `);
+  let browserTimezoneCityOrRegion = browserTimezone.split(`/`)[1].replace(/_/g, ` `);
   
   // if (!location && req.url) location = browserTimezoneCityOrRegion;
 
@@ -290,7 +290,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   
   if (req.method === `GET`) {
     try {
-      let locations = await isValid(location) ? [location] : [1, 2, 3];
+      let locations = await isValid(location) ? [location, browserTimezone, browserTimezoneCityOrRegion] : [browserTimezone, browserTimezoneCityOrRegion];
       // let locationsWithWeatherAndTime = await locations.map((locat, locatIndex) => {
       //   return {
       //     ...locat,
