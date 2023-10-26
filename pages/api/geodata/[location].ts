@@ -191,7 +191,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     let totalPopulation = locations.reduce((sum, locn) => sum + locn.population, 0);
     locationWithHighestPopulation.population = totalPopulation;
     locationWithHighestPopulation.people = totalPopulation.toLocaleString();
-    locationWithHighestPopulation.weatherAndTime = await getWeatherAndTimeData(coordinates);
+    let weatherAndTime: any = await getWeatherAndTimeData(coordinates);
+    locationWithHighestPopulation.weatherAndTime = weatherAndTime;
+    locationWithHighestPopulation.timezone = weatherAndTime.timezone;
 
     return locations;
   }
@@ -315,7 +317,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       locations = await locations.map((locat, locatIndex) => {
         return {
           index: locatIndex + 1,
-          timezone: defaultTimezone,
           ...locat,
         }
       })
