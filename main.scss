@@ -213,11 +213,11 @@ html[class~="dark"] {
 
     article {
         // background: var(--smasherscapeBrown);
-        // background: url(./assets/smasherscape/CobbleStoneTexture.png);
+        // background: url(./public/assets/CobbleStoneTexture.png);
 
         background-size: 50% !important;
         background-attachment: fixed !important;
-        background: url("./assets/runescapeBG.jpg") repeat-y center;
+        background: url("./public/assets/runescapeBG.jpg") repeat-y center;
     }
 
     .nextra-toc {

@@ -46,22 +46,22 @@ html, body {
 
 @font-face {
     font-family: 'RuneScape Large';
-    src: url('./assets/smasherscape/fonts/RuneScapeFonts/RuneScape-Large.woff2') format('woff2'),
-         url('./assets/smasherscape/fonts/RuneScapeFonts/RuneScape-Large.woff') format('woff');
+    src: url('./public/assets/fonts/RuneScapeFonts/RuneScape-Large.woff2') format('woff2'),
+         url('./public/assets/fonts/RuneScapeFonts/RuneScape-Large.woff') format('woff');
     font-style: normal;
 }
 
 @font-face {
     font-family: 'RuneScape Chat';
-    src: url('./assets/smasherscape/fonts/RuneScapeFonts/runescape-chat-07-webfont.woff2') format('woff2'),
-         url('./assets/smasherscape/fonts/RuneScapeFonts/runescape-chat-07-webfont.woff') format('woff');
+    src: url('./public/assets/fonts/RuneScapeFonts/runescape-chat-07-webfont.woff2') format('woff2'),
+         url('./public/assets/fonts/RuneScapeFonts/runescape-chat-07-webfont.woff') format('woff');
     font-style: normal;
 }
 
 @font-face {
     font-family: 'RuneScape Chat Bold';
-    src: url('./assets/smasherscape/fonts/RuneScapeFonts/runescape-chat-bold-07-webfont.woff2') format('woff2'),
-         url('./assets/smasherscape/fonts/RuneScapeFonts/runescape-chat-bold-07-webfont.woff') format('woff');
+    src: url('./public/assets/fonts/RuneScapeFonts/runescape-chat-bold-07-webfont.woff2') format('woff2'),
+         url('./public/assets/fonts/RuneScapeFonts/runescape-chat-bold-07-webfont.woff') format('woff');
     font-style: normal;
 }
 
@@ -161,7 +161,7 @@ li {
         // background-size: contain !important;
         // background-repeat: no-repeat !important;
         // background-position: 50% 50% !important;
-        // background: url(https://github.com/strawhat19/Smasherscape/blob/main/assets/smasherscape/OSRS_Card_Empty.png?raw=true);
+        // background: url(/assets/OSRS_Card_Empty.png?raw=true);
         .playerCardContent {
             z-index: 1;
             width: 87%;

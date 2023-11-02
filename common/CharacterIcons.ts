@@ -1,6 +1,6 @@
 import { Characters } from "./Characters";
 export const calcPlayerCharacterIcon = (char) => {
-    let publicAssetImageLink = `https://raw.githubusercontent.com/strawhat19/Smasherscape/main/assets/smasherscape/characters`;
+    let publicAssetImageLink = `/assets/characters`;
     if (char == `aegis` || char == `pyra` || char == `mythra` || Characters[char] == Characters.Aegis || char == Characters.Aegis || char == Characters.Aegis.toLowerCase()) {
         return `${publicAssetImageLink}/PyraMythraAegis.webp`;
     } else if (char == `banjoandkazooie` || char == `banjo&kazooie` || char == `banjo` || char == `bk` || char == `bandk` || char == `b&k` || Characters[char] == Characters.BanjoAndKazooie || char == Characters.BanjoAndKazooie || char == Characters.BanjoAndKazooie.toLowerCase()) {

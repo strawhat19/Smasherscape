@@ -32,19 +32,19 @@ const config: DocsThemeConfig = {
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" />
-    <link rel="icon" href="https://github.com/strawhat19/Smasherscape/blob/main/assets/smasherscape/OSRS_Top_Hat.png?raw=true" type="image/x-icon"></link>
+    <link rel="icon" href="/assets/OSRS_Top_Hat.png" type="image/x-icon"></link>
     <meta name="description" content="Players can level up and gain experience while keeping a record of their wins, defeats, kills, deaths, characters played and level. Players can level up to gain rewards, search for their card and expand to view details, or view other player data on the leaderboard."/>
     <meta property="og:title" content="Smasherscape Leaderboard" />
     <meta property="og:description" content="Players can level up and gain experience while keeping a record of their wins, defeats, kills, deaths, characters played and level. Players can level up to gain rewards, search for their card and expand to view details, or view other player data on the leaderboard." />
-    <meta property="og:image" content="https://github.com/strawhat19/Smasherscape/blob/main/assets/smasherscape/SmasherScapeOGImage.png?raw=true" />
-    <meta name="twitter:card" content="https://github.com/strawhat19/Smasherscape/blob/main/assets/smasherscape/SmasherScapeOGImage.png?raw=true" />
+    <meta property="og:image" content="/assets/SmasherScapeOGImage.png" />
+    <meta name="twitter:card" content="/assets/SmasherScapeOGImage.png" />
     <meta name="twitter:site" content="@Xuruko1" />
     <meta name="twitter:title" content="Smasherscape" />
     <meta name="twitter:description" content="Players can level up and gain experience while keeping a record of their wins, defeats, kills, deaths, characters played and level. Players can level up to gain rewards, search for their card and expand to view details, or view other player data on the leaderboard." />
-    <meta name="twitter:image" content="https://github.com/strawhat19/Smasherscape/blob/main/assets/smasherscape/SmasherScapeOGImage.png?raw=true" />
+    <meta name="twitter:image" content="/assets/SmasherScapeOGImage.png" />
     </>,
   logo: <>
-    <img width={40} src={`https://github.com/strawhat19/Smasherscape/blob/main/assets/smasherscape/OSRS_Top_Hat.png?raw=true`} alt={`Tophat Logo`} /> <h1 style={{marginLeft: 15}}>Xuruko</h1>
+    <img width={40} src={`/assets/OSRS_Top_Hat.png`} alt={`Tophat Logo`} /> <h1 style={{marginLeft: 15}}>Xuruko</h1>
   </>,
   // navbar: {
     // extraContent: <NextraSearch />
