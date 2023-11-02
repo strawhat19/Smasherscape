@@ -164,7 +164,7 @@ function PlayerRecord(props) {
     let winPercentage = (winRate) > 100 ? 100 : removeTrailingZeroDecimal(winRate);
     return <div className={`winRateDetails`}>
         <div className={`winPercentage ${winPercentage > 50 ? winPercentage == 100 ? `perfect` : `positive` : winPercentage > 24 ? `challenger` : `negative`}`}>({winPercentage}%)</div>
-        <div className="winsToLossses">{wins} Wins - {losses} Losses</div>
+        <div className="winsToLossses">{wins.toLocaleString()} Wins - {losses.toLocaleString()} Losses</div>
     </div>
   }
 
@@ -178,9 +178,9 @@ function PlayerRecord(props) {
                     {plyr?.name}'s Record
                     <span className={`recordPlays ${filteredPlays?.length > 0 ? `populated` : `empty`}`}>
                         {filteredPlays?.length > 0 && <span className={`goldText`}>K/D: <span className="whiteText kdRatioNum">{plyr?.kdRatio ? plyr?.kdRatio : calcPlayerKDRatio(plyr, filteredPlays)}</span></span>}
-                        <span className={`greenText`}>Kills: <span className="whiteText">{plyr?.kills ? plyr?.kills : calcPlayerKills(plyr, filteredPlays)}</span></span>
-                        <span className={`redText`}>Deaths: <span className="whiteText">{plyr?.deaths ? plyr?.deaths : calcPlayerDeaths(plyr, filteredPlays)}</span></span>
-                        <span className={`blueText`}>Plays: <span className="whiteText">{filteredPlays?.length}</span></span>
+                        <span className={`greenText`}>Kills: <span className="whiteText">{plyr?.kills ? plyr?.kills?.toLocaleString() : calcPlayerKills(plyr, filteredPlays)?.toLocaleString()}</span></span>
+                        <span className={`redText`}>Deaths: <span className="whiteText">{plyr?.deaths ? plyr?.deaths?.toLocaleString() : calcPlayerDeaths(plyr, filteredPlays)?.toLocaleString()}</span></span>
+                        <span className={`blueText`}>Plays: <span className="whiteText">{filteredPlays?.length?.toLocaleString()}</span></span>
                     </span>
                 </div>
                 {filteredPlays?.length > 0 && calcPlayerCharactersPlayed(plyr, false, filteredPlays)?.length > 3 && <div className={`playsContainer playerRecordPlaysContainer ${calcPlayerCharactersPlayed(plyr, false, filteredPlays)?.length > 0 ? (calcPlayerCharactersPlayed(plyr, false, filteredPlays)?.length >= 5 ? `populatedPlays moreThanFive` : `populatedPlays`) : ``}`}>

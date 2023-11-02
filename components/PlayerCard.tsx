@@ -110,7 +110,7 @@ export default function PlayerCard(props) {
     }
 
     return <div id={`playerCard-${plyr.uuid}`} className={`playerCard ${plyr?.expanded ? `expandedPlayerCard` : `collapsedPlayerCard`} ${plyr?.uid ? `playerCardUID-${plyr?.uid} ${user && user?.uid == plyr?.uid ? `playerIsUser userIsPlayer` : ``}` : ``}`}>
-    <BadgesContainer />
+    <BadgesContainer player={plyr} />
     <div className="gridCard" onClick={(e) => setPlayerExpanded(plyr)}>
         <Image className={`cardBG`} alt={`Smasherscape Player Card`} src={`/assets/OSRS_Card_Empty.png?raw=true`} />
         <Image className={`cardBG border`} alt={`Smasherscape Player Card`} src={`/assets/OSRS_Card_Template_Border_Only.png?raw=true`} />
@@ -137,7 +137,7 @@ export default function PlayerCard(props) {
                     <div className="record">
                         <h3 className={`greenRecordText`}>Record</h3>
                         {/* <h4>{calcPlayerWins(plyr)} - {calcPlayerLosses(plyr)}</h4> */}
-                        <h4>{calcPlayerWinsFromPlays(plyr, plays)} - {calcPlayerLossesFromPlays(plyr, plays)}</h4>
+                        <h4>{calcPlayerWinsFromPlays(plyr, plays).toLocaleString()} - {calcPlayerLossesFromPlays(plyr, plays).toLocaleString()}</h4>
                     </div>
                     <div className="plays">
                         <h3 className={`greenRecordText`}>Plays</h3>
