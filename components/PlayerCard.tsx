@@ -1,9 +1,9 @@
 // import { db } from '../firebase';
-import { useContext } from 'react';
 import Player from '../models/Player';
 import { Badge } from '@mui/material';
 import { toast } from 'react-toastify';
 import PlayerRecord from './PlayerRecord';
+import { useContext, useState, useRef } from 'react';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
 // import { collection, query, limit, orderBy } from 'firebase/firestore';
@@ -18,8 +18,21 @@ export const calcPlayerLosses = (plyr: Player) => plyr.plays.filter(ply => ply.l
 
 export default function PlayerCard(props) {
     let { plyr } = props;
+
+    let [initialInterval, setInitialInterval] = useState(5);
+    let [loadedInterval, setLoadedInterval] = useState(20);
+    let [paginationAmount, setPaginationAmount] = useState(initialInterval);
+    let [paginationEnd, setPaginationEnd] = useState(paginationAmount);
+
     const { user, plays, useDatabase, players, filteredPlayers, setFilteredPlayers, useLazyLoad, setPlayers } = useContext<any>(StateContext);
-    const setPlayerExpanded = (player: Player) => setFilteredPlayers(filteredPlayers.map(plyr => plyr.id == player.id ? { ...player, expanded: !player.expanded } : plyr));
+
+    const setPlayerExpanded = (player: Player) => {
+        setPaginationEnd(initialInterval);
+        let recordOf = document.querySelector(`.recordOf-${plyr?.uuid}`);
+        recordOf.scrollTop = 0;
+        let playersWithExpandedOrCollapsedPlayer = setFilteredPlayers(filteredPlayers.map(plyr => plyr.id == player.id ? { ...player, expanded: !player.expanded } : plyr));
+        return playersWithExpandedOrCollapsedPlayer;
+    };
 
     const limitInput = (event, maxLen) => {
         const allowedKeys = [`Backspace`, `Delete`, `Shift`, `Control`, `ShiftLeft`, `ShiftRight`, `ArrowRight`, `ArrowLeft`, `ArrowUp`, `ArrowDown`, `Home`, `End`];
@@ -177,6 +190,6 @@ export default function PlayerCard(props) {
             </div>
         </div>
     </div>
-    <PlayerRecord plyr={plyr} plyrPlays={plays.filter(ply => ply?.winnerUUID == plyr?.uuid || ply?.loserUUID == plyr?.uuid)} />
+    <PlayerRecord plyr={plyr} paginationEnd={paginationEnd} setPaginationEnd={setPaginationEnd} loadedInterval={loadedInterval} plyrPlays={plays.filter(ply => ply?.winnerUUID == plyr?.uuid || ply?.loserUUID == plyr?.uuid)} />
 </div>
 }

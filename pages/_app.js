@@ -63,10 +63,10 @@ export const getCurrentPageName = () => window.location.hash.slice(window.locati
 export const detectIfMobile = () => (typeof window.orientation !== `undefined`) || (navigator.userAgent.indexOf(`IEMobile`) !== -1);
 
 export const capWords = (str) => {
-  return str.replace(/\b\w/g, (match) => {
+  return str.replace(/(?:^|\s)\w/g, (match) => {
     return match.toUpperCase();
   });
-}
+};
 
 export const getNumberFromString = (string) => {
   let result = string.match(/\d+/);

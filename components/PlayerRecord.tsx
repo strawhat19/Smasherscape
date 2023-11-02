@@ -59,16 +59,16 @@ export const calcPlayerKDRatio = (player: Player, plays: Play[]) => {
 }
 
 function PlayerRecord(props) {
-  let { plyr, plyrPlays } = props;
   const plyrRecord = useRef<any>();
   let [loading, setLoading] = useState(false);
+  let { plyr, plyrPlays, paginationEnd, setPaginationEnd, loadedInterval } = props;
   const { players, filteredPlayers, devEnv, useLazyLoad } = useContext<any>(StateContext);
   let [filteredPlays, setFilteredPlays] = useState(plyrPlays && plyrPlays?.length > 0 ? plyrPlays?.sort((a: any, b: any) => parseDate(b.date) - parseDate(a.date)) : plyr?.plays?.sort((a: any, b: any) => parseDate(b.date) - parseDate(a.date)));
 
-  let [initialInterval, setInitialInterval] = useState(5);
-  let [loadedInterval, setLoadedInterval] = useState(20);
-  let [paginationAmount, setPaginationAmount] = useState(initialInterval);
-  let [paginationEnd, setPaginationEnd] = useState(paginationAmount);
+//   let [initialInterval, setInitialInterval] = useState(5);
+//   let [loadedInterval, setLoadedInterval] = useState(20);
+//   let [paginationAmount, setPaginationAmount] = useState(initialInterval);
+//   let [paginationEnd, setPaginationEnd] = useState(paginationAmount);
 
   const paginate = () => {
     // let newAmount = paginationAmount + interval;
@@ -181,7 +181,7 @@ function PlayerRecord(props) {
                 <img src={`${publicAssetLink}/assets/smasherscape/OSRS_Card_Template_Border_Only.png?raw=true`} className={`cardBG border`} alt={`Smasherscape Player Card`} />
             </>
         )}
-        <ul className="recordList" ref={plyrRecord}>
+        <ul id={`recordOf-${plyr?.uuid}`} className={`recordOf-${plyr?.uuid} recordList`} ref={plyrRecord}>
             <h3 className={`greenRecordText`}>
                 <div className={`flex playerRecordBegin`}>
                     {plyr?.name}'s Record
@@ -310,7 +310,7 @@ function PlayerRecord(props) {
             No Plays Yet
             </div>}
             {loading == true || filteredPlays.slice(0, paginationEnd).length < filteredPlays.length && <div className="noPlaysYet">
-                <LoadingSpinner override={true} size={18} />
+                <LoadingSpinner loadingLabel={`Play(s)`} override={true} size={18} />
             </div>}
         </ul>
     </div>
