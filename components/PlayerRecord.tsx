@@ -1,3 +1,4 @@
+import Image from './Image';
 import Play from '../models/Play';
 import { Badge } from '@mui/material';
 import Player from '../models/Player';
@@ -9,10 +10,9 @@ import CharacterOption from './CharacterOption';
 import { Characters } from '../common/Characters';
 import Autocomplete from '@mui/material/Autocomplete';
 import { useContext, useState, useEffect, useRef } from 'react';
-import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
 import { getAllCharacters, getCharacterObjects, getUniqueCharactersPlayed, searchBlur } from './PlayerForm';
-import { calcPlayerCharacterTimesPlayed, calcPlayerCharactersPlayed, getCharacterTitle, publicAssetLink } from './smasherscape';
+import { calcPlayerCharacterTimesPlayed, calcPlayerCharactersPlayed, getCharacterTitle } from './smasherscape';
 
 export const parseDate = (dateStr: any) => {
     const parts = dateStr.split(`, `);
@@ -170,17 +170,8 @@ function PlayerRecord(props) {
 
   return (
     <div className={`recordOfPlayer ${plyr?.expanded ? `expanded` : `collapsed`}`}>
-        {useLazyLoad ? (
-            <>
-                <LazyLoadImage effect="blur" src={`${publicAssetLink}/assets/smasherscape/OSRS_Card_Empty.png?raw=true`} className={`cardBG`} alt={`Smasherscape Player Card`} />
-                <LazyLoadImage effect="blur" src={`${publicAssetLink}/assets/smasherscape/OSRS_Card_Template_Border_Only.png?raw=true`} className={`cardBG border`} alt={`Smasherscape Player Card`} />
-            </>
-        ) : (
-            <>
-                <img src={`${publicAssetLink}/assets/smasherscape/OSRS_Card_Empty.png?raw=true`} className={`cardBG`} alt={`Smasherscape Player Card`} />
-                <img src={`${publicAssetLink}/assets/smasherscape/OSRS_Card_Template_Border_Only.png?raw=true`} className={`cardBG border`} alt={`Smasherscape Player Card`} />
-            </>
-        )}
+        <Image className={`cardBG`} alt={`Smasherscape Player Card`} src={`/assets/OSRS_Card_Empty.png?raw=true`} />
+        <Image className={`cardBG border`} alt={`Smasherscape Player Card`} src={`/assets/OSRS_Card_Template_Border_Only.png?raw=true`} />
         <ul id={`recordOf-${plyr?.uuid}`} className={`recordOf-${plyr?.uuid} recordList`} ref={plyrRecord}>
             <h3 className={`greenRecordText`}>
                 <div className={`flex playerRecordBegin`}>

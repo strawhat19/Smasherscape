@@ -8,11 +8,11 @@ import CommandsForm from './CommandsForm';
 import LoadingSpinner from './LoadingSpinner';
 import Experience from '../models/Experience';
 import { Characters } from '../common/Characters';
-import { StateContext, defaultPlayerRoles, getActivePlayersJSON } from '../pages/_app';
+import { StateContext, defaultPlayerRoles, dev, getActivePlayersJSON } from '../pages/_app';
 import PlayerCard, { calcPlayerLossesFromPlays, calcPlayerWinsFromPlays } from './PlayerCard';
 import { calcPlayerDeaths, calcPlayerKDRatio, calcPlayerKills, parseDate, removeTrailingZeroDecimal } from './PlayerRecord';
 
-export const publicAssetLink = `https://github.com/strawhat19/Smasherscape/blob/main`;
+// export const publicAssetLink = true ? `` : `https://github.com/strawhat19/Smasherscape/blob/main`;
 export const calcPlayerCharacterTimesPlayed = (plyr: Player, char, plays: any) => {
     let timesCharPlayed = 0;
     if (plays && plays?.length > 0) {
@@ -74,7 +74,7 @@ export const getActivePlayers = (players: any[], customObject = true, plays) => 
 }
 
 export const calcPlayerLevelImage = (levelName) => {
-    let smasherscapeImagesURL = `${publicAssetLink}/assets/smasherscape`;
+    let smasherscapeImagesURL = `/assets`;
     if (levelName == `Bronze Scimitar`) return `${smasherscapeImagesURL}/Bronze_Scimmy.png?raw=true`; 
     else if (levelName == `Iron Scimitar`) return `${smasherscapeImagesURL}/Iron_Scimmy.png?raw=true`; 
     else if (levelName == `Steel Scimitar`) return `${smasherscapeImagesURL}/Steel_Scimmy.png?raw=true`; 

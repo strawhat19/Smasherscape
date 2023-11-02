@@ -1,15 +1,14 @@
-// import { db } from '../firebase';
+import Image from './Image';
 import Player from '../models/Player';
 import { Badge } from '@mui/material';
 import { toast } from 'react-toastify';
 import PlayerRecord from './PlayerRecord';
-import { useContext, useState, useRef } from 'react';
-import { LazyLoadImage } from 'react-lazy-load-image-component';
+import { useContext, useState } from 'react';
+import BadgesContainer from './BadgesContainer';
 import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
-// import { collection, query, limit, orderBy } from 'firebase/firestore';
 import { updatePlayerInDB, updatePlayersLocalStorage } from './PlayerForm';
-import { StateContext, formatDate, countPropertiesInObject, getActivePlayersJSON, usePlaysDatabase } from '../pages/_app';
-import { calcPlayerCharacterTimesPlayed, calcPlayerCharactersPlayed, calcPlayerLevelImage, checkUserRole, getActivePlayers, getCharacterTitle, publicAssetLink } from './smasherscape';
+import { StateContext, formatDate, countPropertiesInObject, getActivePlayersJSON } from '../pages/_app';
+import { calcPlayerCharacterTimesPlayed, calcPlayerCharactersPlayed, calcPlayerLevelImage, checkUserRole, getActivePlayers, getCharacterTitle } from './smasherscape';
 
 export const calcPlayerWinsFromPlays = (player, plays) => plays.filter(ply => ply?.winnerUUID == player?.uuid)?.length;
 export const calcPlayerLossesFromPlays = (player, plays) => plays.filter(ply => ply?.loserUUID == player?.uuid)?.length;
@@ -111,22 +110,14 @@ export default function PlayerCard(props) {
     }
 
     return <div id={`playerCard-${plyr.uuid}`} className={`playerCard ${plyr?.expanded ? `expandedPlayerCard` : `collapsedPlayerCard`} ${plyr?.uid ? `playerCardUID-${plyr?.uid} ${user && user?.uid == plyr?.uid ? `playerIsUser userIsPlayer` : ``}` : ``}`}>
+    <BadgesContainer />
     <div className="gridCard" onClick={(e) => setPlayerExpanded(plyr)}>
-        {useLazyLoad ? (
-            <>
-                <LazyLoadImage effect="blur" src={`${publicAssetLink}/assets/smasherscape/OSRS_Card_Empty.png?raw=true`} className={`cardBG`} alt={`Smasherscape Player Card`} />
-                <LazyLoadImage effect="blur" src={`${publicAssetLink}/assets/smasherscape/OSRS_Card_Template_Border_Only.png?raw=true`} className={`cardBG border`} alt={`Smasherscape Player Card`} />
-            </>
-        ) : (
-            <>
-                <img src={`${publicAssetLink}/assets/smasherscape/OSRS_Card_Empty.png?raw=true`} className={`cardBG`} alt={`Smasherscape Player Card`} />
-                <img src={`${publicAssetLink}/assets/smasherscape/OSRS_Card_Template_Border_Only.png?raw=true`} className={`cardBG border`} alt={`Smasherscape Player Card`} />
-            </>
-        )}
+        <Image className={`cardBG`} alt={`Smasherscape Player Card`} src={`/assets/OSRS_Card_Empty.png?raw=true`} />
+        <Image className={`cardBG border`} alt={`Smasherscape Player Card`} src={`/assets/OSRS_Card_Template_Border_Only.png?raw=true`} />
         <div className="playerCardContent">
             <div className="cardTopRow">
                 <div className="logoWithWords">
-                    <img width={70} src={`${publicAssetLink}/assets/smasherscape/OSRS_Top_Hat.png?raw=true`} alt={`Tophat Logo`} />
+                    <img width={70} src={`/assets/OSRS_Top_Hat.png?raw=true`} alt={`Tophat Logo`} />
                     <h3 className={`blackTextShadow slimmed`}>Xuruko's<br />SmasherScape</h3>
                 </div>
                 <h2 title={plyr?.name} className={`playerNameText bluePurpleTextShadow textOverflow overrideWithInlineBlock`}>
