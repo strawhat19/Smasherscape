@@ -2,6 +2,7 @@ import { useContext } from "react";
 import { Badge } from "@mui/material";
 import { StateContext } from "../pages/_app";
 import { calcPlayerCharacterIcon } from "../common/CharacterIcons";
+import { calcPlayerWinsFromPlays, calcPlayerLossesFromPlays } from "./PlayerCard";
 import { calcPlayerCharactersPlayed, calcPlayerCharacterTimesPlayed, calcPlayerLevelImage, getCharacterTitle } from "./smasherscape";
 
 export default function PlayerOption(props) {
@@ -25,8 +26,8 @@ export default function PlayerOption(props) {
                     <div className="playerStats">
                         <span>Exp: {playerOption?.experience?.arenaXP?.toLocaleString(`en`)}</span>
                         <div className="playerStatDetails subtleTextInLabel">
-                            <div className={`statDetailLabelSmall`}><span className={`subtleTextInLabel`}>Wins:</span> {playerOption?.wins}</div>
-                            <div className={`statDetailLabelSmall`}><span className={`subtleTextInLabel`}>Losses:</span> {playerOption?.losses}</div>
+                            <div className={`statDetailLabelSmall`}><span className={`subtleTextInLabel`}>Wins:</span> {calcPlayerWinsFromPlays(playerOption, plays.filter(ply => ply?.winnerUUID == playerOption?.uuid || ply?.loserUUID == playerOption?.uuid)) || playerOption?.wins}</div>
+                            <div className={`statDetailLabelSmall`}><span className={`subtleTextInLabel`}>Losses:</span> {calcPlayerLossesFromPlays(playerOption, plays.filter(ply => ply?.winnerUUID == playerOption?.uuid || ply?.loserUUID == playerOption?.uuid)) || playerOption?.losses}</div>
                         </div>
                     </div>
                 </div>
