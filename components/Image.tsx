@@ -4,16 +4,7 @@ import { LazyLoadImage } from 'react-lazy-load-image-component';
 
 export default function Image(props) {
     let { src, alt, className } = props;
+    className = `customImage ${className}`;
     const { useLazyLoad } = useContext<any>(StateContext);
-    return <div className="playerBadgesContainer">
-        {useLazyLoad ? (
-            <>
-                <LazyLoadImage effect="blur" src={src} className={className} alt={alt} />
-            </>
-        ) : (
-            <>
-                <img src={src} className={className} alt={alt} />
-            </>
-        )}
-    </div>
+    return useLazyLoad ? <LazyLoadImage effect="blur" src={src} className={className} alt={alt} /> : <img src={src} className={className} alt={alt} />;
 }

@@ -4,15 +4,14 @@ import { useContext } from 'react';
 import Level from '../models/Level';
 import Player from '../models/Player';
 import PlayerForm from './PlayerForm';
+import PlayerCard from './PlayerCard';
 import CommandsForm from './CommandsForm';
+import { parseDate } from './PlayerRecord';
 import LoadingSpinner from './LoadingSpinner';
 import Experience from '../models/Experience';
 import { Characters } from '../common/Characters';
-import { StateContext, defaultPlayerRoles, dev, getActivePlayersJSON } from '../pages/_app';
-import PlayerCard, { calcPlayerLossesFromPlays, calcPlayerWinsFromPlays } from './PlayerCard';
-import { calcPlayerDeaths, calcPlayerKDRatio, calcPlayerKills, parseDate, removeTrailingZeroDecimal } from './PlayerRecord';
+import { StateContext, defaultPlayerRoles, getActivePlayersJSON } from '../pages/_app';
 
-// export const publicAssetLink = true ? `` : `https://github.com/strawhat19/Smasherscape/blob/main`;
 export const calcPlayerCharacterTimesPlayed = (plyr: Player, char, plays: any) => {
     let timesCharPlayed = 0;
     if (plays && plays?.length > 0) {

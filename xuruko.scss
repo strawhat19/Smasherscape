@@ -46,22 +46,22 @@ html, body {
 
 @font-face {
     font-family: 'RuneScape Large';
-    src: url('./public/assets/fonts/RuneScapeFonts/RuneScape-Large.woff2') format('woff2'),
-         url('./public/assets/fonts/RuneScapeFonts/RuneScape-Large.woff') format('woff');
+    src: url('./public/fonts/RuneScapeFonts/RuneScape-Large.woff2') format('woff2'),
+         url('./public/fonts/RuneScapeFonts/RuneScape-Large.woff') format('woff');
     font-style: normal;
 }
 
 @font-face {
     font-family: 'RuneScape Chat';
-    src: url('./public/assets/fonts/RuneScapeFonts/runescape-chat-07-webfont.woff2') format('woff2'),
-         url('./public/assets/fonts/RuneScapeFonts/runescape-chat-07-webfont.woff') format('woff');
+    src: url('./public/fonts/RuneScapeFonts/runescape-chat-07-webfont.woff2') format('woff2'),
+         url('./public/fonts/RuneScapeFonts/runescape-chat-07-webfont.woff') format('woff');
     font-style: normal;
 }
 
 @font-face {
     font-family: 'RuneScape Chat Bold';
-    src: url('./public/assets/fonts/RuneScapeFonts/runescape-chat-bold-07-webfont.woff2') format('woff2'),
-         url('./public/assets/fonts/RuneScapeFonts/runescape-chat-bold-07-webfont.woff') format('woff');
+    src: url('./public/fonts/RuneScapeFonts/runescape-chat-bold-07-webfont.woff2') format('woff2'),
+         url('./public/fonts/RuneScapeFonts/runescape-chat-bold-07-webfont.woff') format('woff');
     font-style: normal;
 }
 
@@ -1558,6 +1558,19 @@ div[role="presentation"] {
 }
 
 .playerCard {
+    position: relative;
+    margin-bottom: 40px;
+    .playerBadgesContainer {
+        top: -5px;
+        z-index: 2;
+        right: 20px;
+        display: flex;
+        grid-gap: 10px;
+        position: absolute;
+        .customImage {
+            max-width: 60px;
+        }
+    }
     .playerCardUserImage {
         transform: translateY(-50%);
         position: absolute;
@@ -1583,7 +1596,6 @@ div[role="presentation"] {
             }
         }
     }
-    margin-bottom: 40px;
     &.expandedPlayerCard {
         .logoWithWords {
             width: 245px !important;
