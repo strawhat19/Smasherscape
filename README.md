@@ -12,7 +12,7 @@
 ![SASS](https://img.shields.io/badge/SASS-hotpink.svg?style=for-the-badge&logo=SASS&logoColor=white)
 ![Firebase](https://img.shields.io/badge/Firebase-039BE5?style=for-the-badge&logo=Firebase&logoColor=white)
 
-![Screenshot of SmasherScape](./assets/smasherscape/SmasherScapeDatabasePlaysAndCommands.png)
+![Screenshot of SmasherScape](./public/assets/SmasherScapeDatabasePlaysAndCommands.png)
 
 ## About
 Smasherscape is a leaderboard system designed for tracking player statistics. This component provides an interactive leaderboard system, where admins can add, delete, update, and search for players, along with their respective statistics.
