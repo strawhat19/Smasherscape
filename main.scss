@@ -957,8 +957,10 @@ section {
 .navFormSection {
     min-width: 260px;
     padding: 0 !important;
-    &:has(.Next) {
-        max-width: 260px;
+    @media (min-width: 768px) {
+        &:has(.Next) {
+            max-width: 260px;
+        }
     }
     .submit {
         max-width: fit-content !important;

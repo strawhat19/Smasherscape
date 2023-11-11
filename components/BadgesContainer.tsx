@@ -21,15 +21,15 @@ export default function BadgesContainer(props) {
         }
     }
 
-    console.log({playerPlays, recentRecord: streakType, streak});
-
     return <div className={`playerBadgesContainer`}>
-        {streak > 2 && <div className={`badgeElement strkBadge ${streakType} ${streak > 999 ? `largeStreak` : ``}`}>
-            <span className="badgeContent">{streak?.toLocaleString()} <span className="innerBadgeContext">{streakType} Strk</span></span>
+        {player?.xpModifier > 1 && <div className={`badgeElement xpModifierBadge`}>
+            <span className="badgeContent">{player?.xpModifier?.toLocaleString()}x <span className="innerBadgeContext">Pts</span></span>
             <Image src={`/assets/RS_Empty_Blue_Ring_Badge.png`} alt={`Empty Badge`} className={`emptyBadge recordBadge`} />
         </div>}
-        {player?.xpModifier > 1 && <div className={`badgeElement xpModifierBadge`}>
-            <span className="badgeContent">x{player?.xpModifier?.toLocaleString()} <span className="innerBadgeContext">Pts</span></span>
+        {streak > 2 && <div className={`badgeElement strkBadge ${streakType} ${streak > 999 ? `largeStreak` : ``}`}>
+            {streakType == `Win` && <Image src={`/assets/flames/flame3.gif`} alt={`Win Streak Badge`} className={`flameBadge badgeIcon ${streakType}`} />}
+            {streakType == `Loss` && <Image src={`/assets/flames/flame3.gif`} alt={`Loss Streak Badge`} className={`flameBadge badgeIcon ${streakType}`} />}
+            <span className="badgeContent">{streak?.toLocaleString()} <span className="innerBadgeContext">{streakType} Strk</span></span>
             <Image src={`/assets/RS_Empty_Blue_Ring_Badge.png`} alt={`Empty Badge`} className={`emptyBadge recordBadge`} />
         </div>}
         {/* <Image src={`/assets/RS_Warrior_Badge.webp`} alt={`Warrior Badge`} className={`warriorBadge recordBadge`} /> */}

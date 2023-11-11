@@ -1573,6 +1573,15 @@ div[role="presentation"] {
             align-items: center;
             justify-content: center;
             &.strkBadge {
+                .badgeIcon {
+                    top: 8px;
+                    opacity: 0.4;
+                    position: absolute;
+                    max-width: 50px !important;
+                    &.Loss {
+                        filter: hue-rotate(180deg);
+                    }
+                }
                 &.largeStreak {
                     .badgeContent {
                         font-size: 19px;
