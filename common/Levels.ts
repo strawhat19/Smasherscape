@@ -1,4 +1,171 @@
+import Level from "../models/Level";
 import Player from "../models/Player";
+
+export const Levels: Level = {
+    Bronze: {
+        startAt: 1,
+        levelUpAfter: 9,
+        class: `Bronze`,
+        color: `#d9be1a`,
+        name: `Bronze Scimitar`,
+        altImage: `/assets/Bronze_Scimmy.png`,
+        image: `/images/Level_1_Bronze_Scimmy.png`,
+        gradient: `linear-gradient(90deg, #f3ae41, #92621d)`,
+    },
+    Iron: {
+        startAt: 10,
+        levelUpAfter: 14,
+        class: `Iron`,
+        name: `Iron Scimitar`,
+        image: `/images/Level_10_Iron_Scimmy.png`,
+        gradient: `linear-gradient(90deg, #b1acab , #4c5153)`,
+    },
+    Steel: {
+        startAt: 15,
+        levelUpAfter: 19,
+        class: `Steel`,
+        name: `Steel Scimitar`,
+        image: `/images/Level_15_Steel_Scimmy.png`,
+        gradient: `linear-gradient(90deg, #d3dde3, #6f7e86)`,
+    },
+    Mithril: {
+        startAt: 20,
+        levelUpAfter: 29,
+        class: `Mithril`,
+        name: `Mithril Scimitar`,
+        image: `/images/Level_20_Mithril_Scimmy.png`,
+        gradient: `linear-gradient(90deg, #aeb0da, #4a4aca)`,
+    },
+    Adamantite: {
+        startAt: 30,
+        levelUpAfter: 39,
+        class: `Adamantite`,
+        name: `Adamantite Scimitar`,
+        image: `/images/Level_30_Adamant_Scimmy.png`,
+        gradient: `linear-gradient(90deg, #75e775, #055505)`,
+    },
+    Rune: {
+        startAt: 40,
+        levelUpAfter: 49,
+        class: `Rune`,
+        name: `Rune Scimitar`,
+        image: `/images/Level_40_Rune_Scimmy.png`,
+        gradient: `linear-gradient(90deg, #4acbff, #105479)`,
+    },
+    Gilded: {
+        startAt: 50,
+        levelUpAfter: 55,
+        class: `Gilded`,
+        name: `Gilded Scimitar`,
+        image: `/images/Level_50_Gilded_Scimmy.png`,
+        gradient: `linear-gradient(90deg, #8b8bff, #31a8e5, #1edc78)`,
+    },
+    GomuGomu: {
+        startAt: 56,
+        levelUpAfter: 59,
+        class: `GomuGomu`,
+        name: `Gomu Gomu`,
+        image: `/images/Level_56_Gomu_Gomu.png`,
+        gradient: `linear-gradient(90deg, #f83474, #59e035)`,
+    },
+    DragonScimmy: {
+        startAt: 60,
+        levelUpAfter: 69,
+        class: `DragonScimmy`,
+        name: `Dragon Scimitar`,
+        image: `/images/Level_60_Dragon_Scimmy.png`,
+        gradient: `linear-gradient(90deg, #f22fe7, #f63460)`,
+    },
+    Abyssal: {
+        startAt: 70,
+        levelUpAfter: 74,
+        class: `Abyssal`,
+        name: `Abyssal Whip`,
+        image: `/images/Level_70_Abyssal_Whip.png`,
+        gradient: `linear-gradient(90deg, #2c4aff, #e72af8)`,
+    },
+    Blowpipe: {
+        startAt: 75,
+        levelUpAfter: 79,
+        class: `Blowpipe`,
+        name: `Blowpipe`,
+        image: `/images/Level_75_Blowpipe.png`,
+        gradient: `linear-gradient(90deg, #3462f8, #59e035)`,
+    },
+    DragonHunterCrossbow: {
+        startAt: 80,
+        levelUpAfter: 84,
+        class: `DHC`,
+        name: `DHC`,
+        image: `/images/Level_80_DHC.png`,
+        gradient: `linear-gradient(90deg, #aee7ef, #cde242)`,
+    },
+    Kingdom: {
+        startAt: 85,
+        levelUpAfter: 89,
+        class: `Kingdom`,
+        name: `Kingdom Key`,
+        image: `/images/Level_85_Kingdom_Key.png`,
+        gradient: `linear-gradient(90deg, #303d92, #48f8a3)`,
+    },
+    Twisted: {
+        startAt: 90,
+        levelUpAfter: 91,
+        class: `Twisted`,
+        name: `Twisted Bow`,
+        image: `/images/Level_90_Twisted_Bow.png`,
+        gradient: `linear-gradient(90deg, #a9d73a, #60f7b9)`,
+    },
+    DragonSlayer: {
+        startAt: 92,
+        levelUpAfter: 93,
+        class: `DragonSlayer`,
+        name: `Dragon Slayer`,
+        image: `/images/Level_92_Dragon_Slayer.png`,
+        gradient: `linear-gradient(90deg, #e44646, #4e2699)`,
+    },
+    Oblivion: {
+        startAt: 94,
+        levelUpAfter: 96,
+        class: `Oblivion`,
+        name: `Oblivion Key`,
+        image: `/images/Level_94_Oblivion_Key.png`,
+        gradient: `linear-gradient(90deg, #0749f3, #4f209e, #9d1ffb)`,
+    },
+    Fish: {
+        startAt: 97,
+        levelUpAfter: 97,
+        class: `Fish`,
+        name: `Fish Sack`,
+        image: `/images/Level_97_Fish_Sack.png`,
+        gradient: `linear-gradient(90deg, #36c2ea, #4fe78f)`,
+    },
+    Golden: {
+        startAt: 98,
+        levelUpAfter: 98,
+        class: `Golden`,
+        name: `Golden Tench`,
+        image: `/images/Level_98_Golden_Tench.png`,
+        // gradient: `linear-gradient(90deg, #36c2ea, #4fe78f)`,
+    },
+    Top: {
+        startAt: 99,
+        levelUpAfter: 99,
+        class: `Top`,
+        name: `Top Hat`,
+        image: `/assets/OSRS_Top_Hat.png`,
+        gradient: `linear-gradient(90deg, #1edc78, #31a8e5)`,
+    },
+}
+
+export const convertToCustomClasses = (customClassModelObject, CustomClassModel) => {
+    let customClassModelInstances = {};
+    for (const key in customClassModelObject) if (customClassModelObject.hasOwnProperty(key)) customClassModelInstances[key] = new CustomClassModel(customClassModelObject[key]);
+    return customClassModelInstances;
+}
+
+export const levels = convertToCustomClasses(Levels, Level);
+export const levelsArray = Object.values(levels).sort((firstLevel: Level, nextLevel: Level) => firstLevel.startAt - nextLevel.startAt);
 
 export const calcPlayerLevelAndExperience = (plyr: Player) => {
     let xp = plyr.experience.arenaXP;

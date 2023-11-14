@@ -1,14 +1,23 @@
 export default class Level {
   [key: string]: any;
-  constructor(
-      public name: string,
-      public num: number,
-      public uuid?: any,
-      public id?: any,
-  ) {
-    this.name = name;
-    this.uuid = uuid;
-    this.num = num;
-    this.id = id;
+  constructor(levelObj: {
+    id?: any,
+    uuid?: any,
+    color?: any,
+    name: string,
+    num?: number,
+    unlocks?: any,
+    bonuses?: any,
+    features?: any,
+    gradient?: any,
+    image?: string,
+    class?: string,
+    experience?: any,
+    background?: any,
+    startAt?: number,
+    altImage?: string,
+    levelUpAfter?: number,
+  }) {
+    Object.assign(this, levelObj);
   }
 }

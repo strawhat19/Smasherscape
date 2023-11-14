@@ -1581,6 +1581,10 @@ div[role="presentation"] {
                     &.Loss {
                         filter: hue-rotate(180deg);
                     }
+                    @media (max-width: 677px) {
+                        top: 22px;
+                        max-width: 95px !important;
+                    }
                 }
                 &.largeStreak {
                     .badgeContent {
@@ -1595,6 +1599,12 @@ div[role="presentation"] {
                 .badgeContent {
                     .innerBadgeContext {
                         font-size: 10px;
+                    }
+                    @media (max-width: 677px) {
+                        font-size: 30px !important;
+                        .innerBadgeContext {
+                            font-size: 15px;
+                        }
                     }
                 }
             }
@@ -1617,6 +1627,9 @@ div[role="presentation"] {
         }
         .customImage {
             max-width: 69px;
+            @media (max-width: 677px) {
+                max-width: 135px;
+            }
         }
     }
     .playerCardUserImage {

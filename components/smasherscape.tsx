@@ -11,6 +11,7 @@ import LoadingSpinner from './LoadingSpinner';
 import Experience from '../models/Experience';
 import { Characters } from '../common/Characters';
 import { StateContext, defaultPlayerRoles, getActivePlayersJSON } from '../pages/_app';
+import { Levels } from '../common/Levels';
 
 export const calcPlayerCharacterTimesPlayed = (plyr: Player, char, plays: any) => {
     let timesCharPlayed = 0;
@@ -73,22 +74,25 @@ export const getActivePlayers = (players: any[], customObject = true, plays) => 
 }
 
 export const calcPlayerLevelImage = (levelName) => {
-    let smasherscapeImagesURL = `/assets`;
-    if (levelName == `Bronze Scimitar`) return `${smasherscapeImagesURL}/Bronze_Scimmy.png?raw=true`; 
-    else if (levelName == `Iron Scimitar`) return `${smasherscapeImagesURL}/Iron_Scimmy.png?raw=true`; 
-    else if (levelName == `Steel Scimitar`) return `${smasherscapeImagesURL}/Steel_Scimmy.png?raw=true`; 
-    else if (levelName == `Mithril Scimitar`) return `${smasherscapeImagesURL}/Mithril_Scimmy.png?raw=true`; 
-    else if (levelName == `Adamantite Scimitar`) return `${smasherscapeImagesURL}/Adamant_Scimmy.png?raw=true`; 
-    else if (levelName == `Rune Scimitar`) return `${smasherscapeImagesURL}/Rune_Scimmy.png?raw=true`; 
-    else if (levelName == `Gilded Scimitar`) return `${smasherscapeImagesURL}/Gilded_Scimmy.png?raw=true`;
-    else if (levelName == `Gomu Gomu`) return `${smasherscapeImagesURL}/Gomu_Gomu.png?raw=true`;
-    else if (levelName == `Dragon Scimitar`) return `${smasherscapeImagesURL}/Dragon_Scimmy.png?raw=true`;
-    else if (levelName == `Abyssal Whip`) return `${smasherscapeImagesURL}/Abyssal_Whip.png?raw=true`;
-    // else if (levelName == `Dragon Hunter Crossbow`) return `${smasherscapeImagesURL}/Abyssal_Whip.png?raw=true`;
-    // else if (levelName == `Twisted Bow`) return `${smasherscapeImagesURL}/Abyssal_Whip.png?raw=true`;
-    else if (levelName == `Fish Sack`) return `${smasherscapeImagesURL}/Fish_Sack.png?raw=true`;
-    else if (levelName == `Golden Tench`) return `${smasherscapeImagesURL}/Golden_Tench.png?raw=true`;
-    else return `${smasherscapeImagesURL}/OSRS_Top_Hat.png?raw=true`;
+    let levels = Object.values(Levels);
+    let playerLevel: any = levels.find(lvl => lvl?.name == levelName);
+    return playerLevel?.altImage || playerLevel?.image;
+    // let smasherscapeImagesURL = `/assets`;
+    // if (levelName == `Bronze Scimitar`) return `${smasherscapeImagesURL}/Bronze_Scimmy.png?raw=true`; 
+    // else if (levelName == `Iron Scimitar`) return `${smasherscapeImagesURL}/Iron_Scimmy.png?raw=true`; 
+    // else if (levelName == `Steel Scimitar`) return `${smasherscapeImagesURL}/Steel_Scimmy.png?raw=true`; 
+    // else if (levelName == `Mithril Scimitar`) return `${smasherscapeImagesURL}/Mithril_Scimmy.png?raw=true`; 
+    // else if (levelName == `Adamantite Scimitar`) return `${smasherscapeImagesURL}/Adamant_Scimmy.png?raw=true`; 
+    // else if (levelName == `Rune Scimitar`) return `${smasherscapeImagesURL}/Rune_Scimmy.png?raw=true`; 
+    // else if (levelName == `Gilded Scimitar`) return `${smasherscapeImagesURL}/Gilded_Scimmy.png?raw=true`;
+    // else if (levelName == `Gomu Gomu`) return `${smasherscapeImagesURL}/Gomu_Gomu.png?raw=true`;
+    // else if (levelName == `Dragon Scimitar`) return `${smasherscapeImagesURL}/Dragon_Scimmy.png?raw=true`;
+    // else if (levelName == `Abyssal Whip`) return `${smasherscapeImagesURL}/Abyssal_Whip.png?raw=true`;
+    // // else if (levelName == `Dragon Hunter Crossbow`) return `${smasherscapeImagesURL}/Abyssal_Whip.png?raw=true`;
+    // // else if (levelName == `Twisted Bow`) return `${smasherscapeImagesURL}/Abyssal_Whip.png?raw=true`;
+    // else if (levelName == `Fish Sack`) return `${smasherscapeImagesURL}/Fish_Sack.png?raw=true`;
+    // else if (levelName == `Golden Tench`) return `${smasherscapeImagesURL}/Golden_Tench.png?raw=true`;
+    // else return `${smasherscapeImagesURL}/OSRS_Top_Hat.png?raw=true`;
 }
 
 export const calcPlayerCharactersPlayed = (plyr: Player, cutOff = true, plays) => {
@@ -135,8 +139,9 @@ export const isInvalid = (item) => {
 }
 
 export const newPlayerType = (player: Player, customObject = true, plays) => {
-
-    let level: Level = new Level(player.level.name, player.level.num) as Level;
+    let { name, num } = player.level;
+    let levelObj = { name, num };
+    let level: Level = new Level(levelObj) as Level;
     let experience: Experience = new Experience(player.experience.nextLevelAt, player.experience.remainingXP, player.experience.arenaXP, player.experience.xp) as Experience;
 
     // let wins;
@@ -146,14 +151,14 @@ export const newPlayerType = (player: Player, customObject = true, plays) => {
     // let deaths = 0;
     // let kdRatio = 0;
 
-//    if (plays && plays?.length > 0) {
-//         wins = calcPlayerWinsFromPlays(player, plays);
-//         losses = calcPlayerLossesFromPlays(player, plays);
-//         ratio = (wins/(wins+losses)) * 100;
-//         kills = calcPlayerKills(player, plays);
-//         deaths = calcPlayerDeaths(player, plays);
-//         kdRatio = calcPlayerKDRatio(player, plays);
-//     }
+    // if (plays && plays?.length > 0) {
+    //     wins = calcPlayerWinsFromPlays(player, plays);
+    //     losses = calcPlayerLossesFromPlays(player, plays);
+    //     ratio = (wins/(wins+losses)) * 100;
+    //     kills = calcPlayerKills(player, plays);
+    //     deaths = calcPlayerDeaths(player, plays);
+    //     kdRatio = calcPlayerKDRatio(player, plays);
+    // }
     
     experience = removeEmptyParams(experience) as Experience;
 
