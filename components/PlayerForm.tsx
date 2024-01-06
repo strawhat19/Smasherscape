@@ -16,14 +16,15 @@ import CharacterOption from './CharacterOption';
 import { Characters } from '../common/Characters';
 import Autocomplete from '@mui/material/Autocomplete';
 import { FormEvent, useContext, useRef } from 'react';
-import { calcPlayerLosses, calcPlayerWins } from './PlayerCard';
+import { calcPlayerLosses, calcPlayerLossesFromPlays, calcPlayerWins, calcPlayerWinsFromPlays } from './PlayerCard';
 import { calcPlayerLevelAndExperience } from '../common/Levels';
 import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
 import { doc, setDoc, deleteDoc, updateDoc } from 'firebase/firestore';
 import { checkUserRole, getActivePlayers, isInvalid } from './smasherscape';
-import { calcPlayerDeaths, calcPlayerKDRatio, calcPlayerKills, removeTrailingZeroDecimal } from './PlayerRecord';
+import { calcPlayerDeaths, calcPlayerKDRatio, calcPlayerKills, parseDate, removeTrailingZeroDecimal } from './PlayerRecord';
 import { StateContext, showAlert, formatDate, generateUniqueID, countPropertiesInObject, getActivePlayersJSON, usePlayersDatabase, defaultXPMultiplier, XPGainOnWin, XPGainOnLoserXPForEachStockTaken, winCons, loseCons, dev, useDB, usePlaysDatabase } from '../pages/_app';
 
+export const deletePlayFromDB = async (playID) => await deleteDoc(doc(db, usePlaysDatabase, playID));
 export const addPlayToDB = async (playObj: Play) => await setDoc(doc(db, usePlaysDatabase, playObj?.ID), playObj);
 export const deletePlayerFromDB = async (playerObj: Player) => await deleteDoc(doc(db, usePlayersDatabase, playerObj?.ID));
 export const addPlayerToDB = async (playerObj: Player) => await setDoc(doc(db, usePlayersDatabase, playerObj?.ID), playerObj);
@@ -86,8 +87,8 @@ export const getCharacterObjects = () => {
 }
 
 export const updatePlayerStats = (plyr, plays) => {
-    let wins = calcPlayerWins(plyr);
-    let losses = calcPlayerLosses(plyr);
+    let wins = calcPlayerWinsFromPlays(plyr, plays);
+    let losses = calcPlayerLossesFromPlays(plyr, plays);
     let ratio = (wins/(wins+losses)) * 100;
     plyr.wins = wins;
     plyr.losses = losses;
@@ -448,6 +449,12 @@ export const updatePlayerPlays = (playState) => {
     return plyr;
 }
 
+export const undoCommand = (parameters: Parameters) => {
+    let playsToConsider = parameters.plays.sort((a: any, b: any) => parseDate(b.date) - parseDate(a.date));
+    console.log(`Undo Command`, {parameters, playsToConsider});
+    // if (playsToConsider.length > 0) deletePlayFromDB(playsToConsider[0].ID);
+}
+
 export const updatePlayersWithParameters = (parameters: Parameters) => {
     let {
         user,
@@ -632,6 +639,8 @@ export const processCommandsWithParameters = (parameters: Parameters) => {
             addPlayersWithParameters(parameters);
         } else if (firstCommand.includes(`!del`)) {
             deletePlayersWithParameters(parameters);
+        } else if (firstCommand.includes(`!undo`)) {
+            undoCommand(parameters);
         } else if (firstCommand.includes(`!giv`)) {
             giveParameterWithParameters(parameters);
         } else if (firstCommand.includes(`!set`)) {
@@ -705,22 +714,30 @@ export default function PlayerForm(props) {
         if (!itemsToSearch) itemsToSearch = field.value;
         if (itemsToSearch && itemsToSearch != ``) {
             if (type == `playerName`) {
+                let keysToIgnore = [`lastUpdatedBy`];
                 if (Array.isArray(itemsToSearch) && itemsToSearch.length > 0) {
-                    setFilteredPlayers(getActivePlayers(players, true, plays).filter((plyr: Player) => {
+                    let playersToShow = getActivePlayers(players, true, plays).filter((plyr: Player) => {
                         return itemsToSearch.map(playr => playr.name.toLowerCase()).includes(plyr.name.toLowerCase());
-                    }));
+                    });
+                    setFilteredPlayers(playersToShow);
                 } else if (typeof itemsToSearch == `string`) {
-                    setFilteredPlayers(getActivePlayers(players, true, plays).filter((plyr: Player) => {
-                        return Object.values(plyr).some(val =>
-                            typeof val === `string` && val.toLowerCase().includes(itemsToSearch?.toLowerCase())
-                        );
-                    }));
+                    let playersToShow = getActivePlayers(players, true, plays).filter((plyr: Player) => {
+                        return Object.entries(plyr).some(ent => {
+                            let [key, val] = ent;
+                            let showPlayer = !keysToIgnore.includes(key) && typeof val === `string` && val.toLowerCase().includes(itemsToSearch?.toLowerCase());
+                            return showPlayer;
+                        });
+                    });
+                    setFilteredPlayers(playersToShow);
                 } else {
-                    setFilteredPlayers(getActivePlayers(players, true, plays).filter((plyr: Player) => {
-                        return Object.values(plyr).some(val =>
-                            typeof val === `string` && val.toLowerCase().includes(itemsToSearch?.name?.toLowerCase())
-                        );
-                    }));
+                    let playersToShow = getActivePlayers(players, true, plays).filter((plyr: Player) => {
+                        return Object.entries(plyr).some(ent => {
+                            let [key, val] = ent;
+                            let showPlayer = !keysToIgnore.includes(key) && typeof val === `string` && val.toLowerCase().includes(itemsToSearch?.name?.toLowerCase());
+                            return showPlayer;
+                        });
+                    });
+                    setFilteredPlayers(playersToShow);
                 }
             } else {
                 if (Array.isArray(itemsToSearch) && itemsToSearch.length > 0) {

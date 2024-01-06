@@ -178,8 +178,8 @@ function PlayerRecord(props) {
                     {plyr?.name}'s Record
                     <span className={`recordPlays ${filteredPlays?.length > 0 ? `populated` : `empty`}`}>
                         {filteredPlays?.length > 0 && <span className={`goldText`}>K/D: <span className="whiteText kdRatioNum">{plyr?.kdRatio ? plyr?.kdRatio : calcPlayerKDRatio(plyr, filteredPlays)}</span></span>}
-                        <span className={`greenText`}>Kills: <span className="whiteText">{plyr?.kills ? plyr?.kills?.toLocaleString() : calcPlayerKills(plyr, filteredPlays)?.toLocaleString()}</span></span>
-                        <span className={`redText`}>Deaths: <span className="whiteText">{plyr?.deaths ? plyr?.deaths?.toLocaleString() : calcPlayerDeaths(plyr, filteredPlays)?.toLocaleString()}</span></span>
+                        <span className={`greenText`}>Kills: <span className="whiteText">{calcPlayerKills(plyr, filteredPlays)?.toLocaleString()}</span></span>
+                        <span className={`redText`}>Deaths: <span className="whiteText">{calcPlayerDeaths(plyr, filteredPlays)?.toLocaleString()}</span></span>
                         <span className={`blueText`}>Plays: <span className="whiteText">{filteredPlays?.length?.toLocaleString()}</span></span>
                     </span>
                 </div>

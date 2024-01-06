@@ -9,11 +9,19 @@ import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
 import { updatePlayerInDB, updatePlayersLocalStorage } from './PlayerForm';
 import { StateContext, formatDate, countPropertiesInObject, getActivePlayersJSON } from '../pages/_app';
 import { calcPlayerCharacterTimesPlayed, calcPlayerCharactersPlayed, calcPlayerLevelImage, checkUserRole, getActivePlayers, getCharacterTitle } from './smasherscape';
+import { Levels } from '../common/Levels';
 
 export const calcPlayerWinsFromPlays = (player, plays) => plays.filter(ply => ply?.winnerUUID == player?.uuid)?.length;
 export const calcPlayerLossesFromPlays = (player, plays) => plays.filter(ply => ply?.loserUUID == player?.uuid)?.length;
 export const calcPlayerWins = (plyr: Player) => plyr.plays.filter(ply => ply.winner.toLowerCase() == plyr.name.toLowerCase()).length;
 export const calcPlayerLosses = (plyr: Player) => plyr.plays.filter(ply => ply.loser.toLowerCase() == plyr.name.toLowerCase()).length;
+
+export const isBigImage = (plyr: Player) => {
+    let classesToAdd = `bigImage`;
+    let levelOfPlayer = Object.values(Levels).find(lvl => lvl?.name == plyr?.level?.name);
+    if (levelOfPlayer?.altImage != undefined) classesToAdd = ``;
+    return classesToAdd;
+}
 
 export default function PlayerCard(props) {
     let { plyr } = props;
@@ -130,14 +138,13 @@ export default function PlayerCard(props) {
             </div>
             <div className="cardMiddleRow">
                 <div className={`imgLeftCol ${plyr.level.name.split(` `)[0]}`}>
-                    <img className={`cardLevelImage`} width={150} src={calcPlayerLevelImage(plyr?.level?.name)} alt={plyr?.level?.name} />
+                    <img className={`cardLevelImage ${isBigImage(plyr)}`} width={150} src={calcPlayerLevelImage(plyr?.level?.name)} alt={plyr?.level?.name} />
                     <h4 className={`levelName blackTextShadow slimmed ${plyr?.level?.name.split(` `)[0]}`}>{plyr?.level?.name}</h4>
                 </div>
                 <div className="recordPlays">
                     <div className="record">
                         <h3 className={`greenRecordText`}>Record</h3>
-                        {/* <h4>{calcPlayerWins(plyr)} - {calcPlayerLosses(plyr)}</h4> */}
-                        <h4>{calcPlayerWinsFromPlays(plyr, plays).toLocaleString()} - {calcPlayerLossesFromPlays(plyr, plays).toLocaleString()}</h4>
+                        <h4 className={`${(calcPlayerWinsFromPlays(plyr, plays) > 1000 || calcPlayerLossesFromPlays(plyr, plays) > 1000) ? `highNumbers` : ``}`}>{calcPlayerWinsFromPlays(plyr, plays).toLocaleString()} - {calcPlayerLossesFromPlays(plyr, plays).toLocaleString()}</h4>
                     </div>
                     <div className="plays">
                         <h3 className={`greenRecordText`}>Plays</h3>
