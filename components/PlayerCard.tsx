@@ -3,13 +3,13 @@ import Player from '../models/Player';
 import { Badge } from '@mui/material';
 import { toast } from 'react-toastify';
 import PlayerRecord from './PlayerRecord';
+import { Levels } from '../common/Levels';
 import { useContext, useState } from 'react';
 import BadgesContainer from './BadgesContainer';
 import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
 import { updatePlayerInDB, updatePlayersLocalStorage } from './PlayerForm';
 import { StateContext, formatDate, countPropertiesInObject, getActivePlayersJSON } from '../pages/_app';
 import { calcPlayerCharacterTimesPlayed, calcPlayerCharactersPlayed, calcPlayerLevelImage, checkUserRole, getActivePlayers, getCharacterTitle } from './smasherscape';
-import { Levels } from '../common/Levels';
 
 export const calcPlayerWinsFromPlays = (player, plays) => plays.filter(ply => ply?.winnerUUID == player?.uuid)?.length;
 export const calcPlayerLossesFromPlays = (player, plays) => plays.filter(ply => ply?.loserUUID == player?.uuid)?.length;

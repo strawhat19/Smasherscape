@@ -8,6 +8,9 @@ html, body {
     &:has(.desktop) {
         scroll-behavior: smooth;
     }
+    &:has(.overlay) {
+        overflow: hidden;
+    }
 }
 
 :root {
@@ -22,6 +25,7 @@ html, body {
     --smasherscapeBrown: #473d32;
     --smasherscapeBlue: #45bde9;
     --smasherscapeBlue2: #31a8e5;
+    --smasherscapeBlue3: #00c8ff;
     --smasherscapeBronze: #d9bf1a;
     --smasherscapeIron: #b1acab;
     --smasherscapeBronze2: #f6cc00;
@@ -124,6 +128,10 @@ li {
 //         }
 //     }
 // }
+
+.commandDate {
+    color: var(--smasherscapeBlue3);
+}
 
 .playerGrid {
     width: 97%;
@@ -440,11 +448,6 @@ li {
 }
 
 .recordOfPlayer {
-    height: 0;
-    top: -55px;
-    opacity: 0;
-    z-index: 0;
-    width: 90%;
     display: flex;
     margin: 0 auto;
     position: relative;
@@ -453,6 +456,25 @@ li {
     transform-origin: top;
     justify-content: center;
     transition: var(--transition);
+    &.commandsToUndo {
+        width: 100%;
+        ul {
+            width: 100%;
+            height: 100%;
+            margin: 0 auto 0;
+            overflow: visible;
+            &::-webkit-scrollbar {
+                background: pink;
+            }
+        }
+    }
+    &:not(.commandsToUndo) {
+        height: 0;
+        width: 90%;
+        top: -55px;
+        opacity: 0;
+        z-index: 0;
+    }
     @media (max-width: 677px) {
         top: -105px;
     }
@@ -523,6 +545,9 @@ li {
             text-shadow: 2px 2px 0px black;
             &:not(:last-child) {
                 border-bottom: 2px solid black;
+                &.commandToUndo {
+                    border-bottom: 2px solid white;
+                }
             }
             .recordDetails {
                 width: 100%;

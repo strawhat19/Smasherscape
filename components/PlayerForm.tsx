@@ -20,7 +20,7 @@ import { calcPlayerLosses, calcPlayerLossesFromPlays, calcPlayerWins, calcPlayer
 import { calcPlayerLevelAndExperience } from '../common/Levels';
 import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
 import { doc, setDoc, deleteDoc, updateDoc } from 'firebase/firestore';
-import { checkUserRole, getActivePlayers, isInvalid } from './smasherscape';
+import { checkUserRole, getActivePlayers, getCharacterTitle, isInvalid } from './smasherscape';
 import { calcPlayerDeaths, calcPlayerKDRatio, calcPlayerKills, parseDate, removeTrailingZeroDecimal } from './PlayerRecord';
 import { StateContext, showAlert, formatDate, generateUniqueID, countPropertiesInObject, getActivePlayersJSON, usePlayersDatabase, defaultXPMultiplier, XPGainOnWin, XPGainOnLoserXPForEachStockTaken, winCons, loseCons, dev, useDB, usePlaysDatabase } from '../pages/_app';
 
@@ -451,8 +451,71 @@ export const updatePlayerPlays = (playState) => {
 
 export const undoCommand = (parameters: Parameters) => {
     let playsToConsider = parameters.plays.sort((a: any, b: any) => parseDate(b.date) - parseDate(a.date));
-    console.log(`Undo Command`, {parameters, playsToConsider});
-    // if (playsToConsider.length > 0) deletePlayFromDB(playsToConsider[0].ID);
+
+    if (playsToConsider.length > 0) {
+
+        const undoPlay = (ply) => {
+            console.log(`Undo Command`, {play: playsToConsider.find(pl => ply?.uuid == pl?.uuid), parameters, playsToConsider});
+            // if (playsToConsider.length > 0) deletePlayFromDB(playsToConsider[0].ID);
+        }
+
+        showAlert(`Commands to Undo`, <div className={`alertInner`}>
+            <div className={`commandsToUndo recordOfPlayer`}>
+               <ul className="recordList">
+                    {playsToConsider?.length > 0 ? playsToConsider.slice(0, 7).map((ply, plyIndex) => {
+                        let isWinner = true;
+                        return (
+                            <li className={`playerPlay commandToUndo`} key={plyIndex}>
+                                <div className="plyIndex">{plyIndex + 1}.</div>
+                                <div className="recordDetails">
+                                <div className={`playMessage`}>{isWinner ? <div>{ply?.winner} <span className={`${isWinner ? `winner` : `loser`}`}>Win</span> over <span className={`loser`}>{ply?.loser}</span></div> : <div><span className={`${isWinner ? `winner` : `loser`}`}>Loss</span> to {ply?.winner}</div>}
+                                    <div className="stocksRow">
+                                        <div className="stocks">
+                                            {isWinner ? ply?.stocks?.length > 0 && ply?.stocks?.map((stok, stkIndex) => {
+                                                return (
+                                                    <span key={stkIndex} className={stok?.dead ? `dead` : `living`}>
+                                                        <img className={`charImg`} width={35} src={calcPlayerCharacterIcon(stok?.character)} alt={getCharacterTitle(stok?.character)} />
+                                                    </span>
+                                                )
+                                            }) : ply?.lossStocks?.map((stok, stkIndex) => {
+                                                return (
+                                                    <span key={stkIndex} className={stok?.dead ? `dead` : `living`}>
+                                                        <img className={`charImg`} width={35} src={calcPlayerCharacterIcon(stok?.character)} alt={getCharacterTitle(stok?.character)} />
+                                                    </span>
+                                                )
+                                            })}
+                                        </div>
+                                    vs 
+                                        <div className="otherStocks">
+                                            {!isWinner ? ply?.stocks?.length > 0 && ply?.stocks?.map((stok, stkIndex) => {
+                                                return (
+                                                    <span key={stkIndex} className={stok?.dead ? `dead` : `living`}>
+                                                        <img className={`charImg`} width={35} src={calcPlayerCharacterIcon(stok?.character)} alt={getCharacterTitle(stok?.character)} />
+                                                    </span>
+                                                )
+                                            }) : ply?.lossStocks?.map((stok, stkIndex) => {
+                                                return (
+                                                    <span key={stkIndex} className={stok?.dead ? `dead` : `living`}>
+                                                        <img className={`charImg`} width={35} src={calcPlayerCharacterIcon(stok?.character)} alt={getCharacterTitle(stok?.character)} />
+                                                    </span>
+                                                )
+                                            })}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="recordSubDetails">
+                                    <div className="playDate commandDate">{ply?.date}</div>
+                                    <button onClick={() => undoPlay(ply)} className="commandUndoSubmit">Undo this Play</button>
+                                </div>
+                                </div>
+                            </li>
+                        )}) : <div className={`noPlaysYet`}>
+                            No Plays Yet
+                    </div>}
+                </ul>
+            </div>
+        </div>, `85%`, `500px`);
+    }
 }
 
 export const updatePlayersWithParameters = (parameters: Parameters) => {
