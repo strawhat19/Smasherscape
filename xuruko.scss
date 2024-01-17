@@ -2505,3 +2505,14 @@ div[role="presentation"] {
         opacity: 1;
     }
 }
+
+
+@media (max-width: 1580px) {
+    .expLevelCompare {
+        &.largeXP {
+            .expChanges {
+                font-size: 18px !important;
+            }
+        }
+    }
+}

@@ -1,12 +1,15 @@
+import { dev } from "../pages/_app";
 import { getCharacterTitle } from "./smasherscape";
 import { calcLevelFromExperience } from "../common/Levels";
 import { deletePlayFromDB, updatePlayerInDB } from "./PlayerForm";
 import { calcPlayerCharacterIcon } from "../common/CharacterIcons";
+import Play from "../models/Play";
 
 export default function CommandsUndo(props) {
     let { playsToConsider, parameters } = props;
 
     const undoPlay = (e, playToUndo, params) => {
+        let { winner, loser} = params;
         if (e.target.innerHTML == `Confirm Undo`) {
             let overlay: any = document.querySelector(`.overlay`);
             let alert: any = document.querySelector(`.alert`);
@@ -20,8 +23,8 @@ export default function CommandsUndo(props) {
                   document.body.removeChild(overlay);
                   localStorage.setItem(`alertOpen`, `false`);
 
-                  updatePlayerInDB(params.winner.player, params.winner.newPlayer);
-                  updatePlayerInDB(params.loser.player, params.loser.newPlayer);
+                  updatePlayerInDB(winner.player, winner.newPlayer);
+                  updatePlayerInDB(loser.player, loser.newPlayer);
                   deletePlayFromDB(playToUndo?.ID);
 
                   let playerForm = document.querySelector(`#playerForm`);
@@ -31,13 +34,14 @@ export default function CommandsUndo(props) {
             }
         } else {
             e.target.innerHTML = `Confirm Undo`;
+            dev() && console.log(`playToUndo`, {playToUndo, winner, loser});
         }
     }
 
     return (
         <div className={`commandsToUndo recordOfPlayer`}>
             <ul className="recordList">
-                {playsToConsider?.length > 0 ? playsToConsider.slice(0, 7).map((ply, plyIndex) => {
+                {playsToConsider?.length > 0 ? playsToConsider.slice(0, 7).map((ply: Play, plyIndex) => {
 
                     let isWinner = true;
                     let winnerPlayer = parameters.players.find(plyr => plyr?.uuid == ply?.winnerUUID);
@@ -47,7 +51,8 @@ export default function CommandsUndo(props) {
                     let winnerLevel = calcLevelFromExperience(winnerXP)?.level?.num;
                     let loserLevel = calcLevelFromExperience(loserXP)?.level?.num;
                     let winnerNewExperience = winnerXP - ply?.winnerExpGained;
-                    let loserNewExperience = loserXP - ply?.loserExpGained;
+                    if (ply?.loserExpGained >= ply?.winnerExpGained) ply.loserExpGained = 100 * ply?.stocksTaken;
+                    let loserNewExperience = loserXP - ply.loserExpGained;
 
                     winnerNewExperience = winnerNewExperience < 0 ? 0 : winnerNewExperience;
                     loserNewExperience = loserNewExperience < 0 ? 0 : loserNewExperience;
@@ -113,14 +118,14 @@ export default function CommandsUndo(props) {
                                         </div>
                                     </div>
                                 </div>
-                                <div className="recordSubDetails">
+                                <div className={`expLevelCompare recordSubDetails ${winnerXP >= 99999 || loserXP >= 99999 ? `largeXP` : ``}`}>
                                     <div className="playDate expChanges preChanges">
-                                        <span className={`winner`}>{ply.winner}</span> Lvl: <span className={`preChange`}>{winnerLevel}</span> & XP: <span className={`preChange`}>{winnerXP}</span>, <span>{ply.loser}</span> Lvl: <span className={`preChange`}>{loserLevel}</span> & XP: <span className={`preChange`}>{loserXP}</span>
+                                        <span className={`winner`}>{ply.winner}</span> Lvl: <span className={`preChange`}>{winnerLevel}</span> & XP: <span className={`preChange`}>{winnerXP.toLocaleString()}</span>, <span>{ply.loser}</span> Lvl: <span className={`preChange`}>{loserLevel}</span> & XP: <span className={`preChange`}>{loserXP.toLocaleString()}</span>
                                     </div>
                                     <div className="playDate expChanges">{`>>>`}</div>
                                     <div className="playDate expChanges postChanges">
-                                        New <span className={`winner`}>{ply.winner}</span> Lvl: <span className={`postChange`}>{winnerNewLevel}</span> & XP: <span className={`postChange`}>{winnerNewExperience}</span>, 
-                                        New <span>{ply.loser}</span> Lvl: <span className={`postChange`}>{loserNewLevel}</span> & XP: <span className={`postChange`}>{loserNewExperience}</span>
+                                        New <span className={`winner`}>{ply.winner}</span> Lvl: <span className={`postChange`}>{winnerNewLevel}</span> & XP: <span className={`postChange`}>{winnerNewExperience.toLocaleString()}</span>, 
+                                        New <span>{ply.loser}</span> Lvl: <span className={`postChange`}>{loserNewLevel}</span> & XP: <span className={`postChange`}>{loserNewExperience.toLocaleString()}</span>
                                     </div>
                                 </div>
                                 <div className="bottomButtonRow recordSubDetails">
