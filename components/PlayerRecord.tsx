@@ -63,7 +63,7 @@ function PlayerRecord(props) {
   let [loading, setLoading] = useState(false);
   let { plyr, plyrPlays, paginationEnd, setPaginationEnd, loadedInterval } = props;
   const { players, filteredPlayers, devEnv, useLazyLoad } = useContext<any>(StateContext);
-  let [filteredPlays, setFilteredPlays] = useState(plyrPlays && plyrPlays?.length > 0 ? plyrPlays?.sort((a: any, b: any) => parseDate(b.date) - parseDate(a.date)) : plyr?.plays?.sort((a: any, b: any) => parseDate(b.date) - parseDate(a.date)));
+  let [filteredPlays, setFilteredPlays] = useState(plyrPlays && plyrPlays?.length > 0 ? plyrPlays?.sort((a: any, b: any) => parseDate(b.date) - parseDate(a.date)) : plyr?.plays?.length > 0 ? plyr?.plays?.sort((a: any, b: any) => parseDate(b.date) - parseDate(a.date)) : []);
 
 //   let [initialInterval, setInitialInterval] = useState(5);
 //   let [loadedInterval, setLoadedInterval] = useState(20);
@@ -84,7 +84,7 @@ function PlayerRecord(props) {
   };
 
   useEffect(() => {
-    setFilteredPlays(plyrPlays && plyrPlays?.length > 0 ? plyrPlays?.sort((a: any, b: any) => parseDate(b.date) - parseDate(a.date)) : plyr?.plays?.sort((a: any, b: any) => parseDate(b.date) - parseDate(a.date)));
+    setFilteredPlays(plyrPlays && plyrPlays?.length > 0 ? plyrPlays?.sort((a: any, b: any) => parseDate(b.date) - parseDate(a.date)) : plyr?.plays?.length > 0 ? plyr?.plays?.sort((a: any, b: any) => parseDate(b.date) - parseDate(a.date)) : []);
   }, [players])
 
   useEffect(() => {

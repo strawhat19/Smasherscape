@@ -129,8 +129,41 @@ li {
 //     }
 // }
 
+.expChanges {
+    color: white;
+    font-size: 20px !important;
+}
+
+.preChange {
+    color: var(--red);
+    text-decoration: line-through;
+    text-decoration-thickness: 1px;
+    text-decoration-color: white;
+}
+
+.postChange {
+    color: var(--smasherscapeGreen2);
+}
+
 .commandDate {
     color: var(--smasherscapeBlue3);
+}
+
+.textShadowThis {
+    text-shadow: 2px 2px 0px black;
+}
+
+.buttonLike {
+    padding: 0px 15px;
+    cursor: pointer !important;
+    transition: var(--transition);
+    box-shadow: 2px 2px 0px black;
+    border-radius: var(--borderRadius);
+    background: var(--smasherscapeBlue2) !important;
+    
+    &:hover {
+        background: var(--smasherscapeGreen) !important;
+    }
 }
 
 .playerGrid {
@@ -451,13 +484,17 @@ li {
     display: flex;
     margin: 0 auto;
     position: relative;
-    pointer-events: none;
+    &:not(.commandsToUndo) {
+        pointer-events: none;
+    }
     align-items: flex-end;
     transform-origin: top;
     justify-content: center;
     transition: var(--transition);
     &.commandsToUndo {
         width: 100%;
+        height: 100%;
+        align-items: flex-start;
         ul {
             width: 100%;
             height: 100%;
@@ -2362,6 +2399,10 @@ div[role="presentation"] {
             }
         }
     }
+}
+
+.bottomButtonRow {
+    margin-bottom: 10px;
 }
 
 #topButton {

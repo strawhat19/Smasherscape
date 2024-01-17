@@ -17,10 +17,10 @@ export const calcPlayerCharacterTimesPlayed = (plyr: Player, char, plays: any) =
     let timesCharPlayed = 0;
     if (plays && plays?.length > 0) {
         let playsToUpdate = plays.filter(ply => ply?.winnerUUID == plyr?.uuid || ply?.loserUUID == plyr?.uuid);
-        let charsPlayed = playsToUpdate?.map(ply => (ply?.winnerUUID == plyr?.uuid ? ply?.character : ply?.otherCharacter));
-        timesCharPlayed = charsPlayed?.filter(charPlayed => charPlayed.toLowerCase() == char || charPlayed.toLowerCase().includes(char)).length;
+        let charsPlayed = playsToUpdate?.length > 0 ? playsToUpdate?.map(ply => (ply?.winnerUUID == plyr?.uuid ? ply?.character : ply?.otherCharacter)) : [];
+        timesCharPlayed = charsPlayed?.length > 0 ? charsPlayed?.filter(charPlayed => charPlayed.toLowerCase() == char || charPlayed.toLowerCase().includes(char)).length : [].length;
     } else {
-        timesCharPlayed = plyr.plays.map(ply => ply.character).filter(charPlayed => charPlayed.toLowerCase() == char || charPlayed.toLowerCase().includes(char)).length;
+        timesCharPlayed = plyr.plays.length > 0 ? plyr.plays.map(ply => ply.character).filter(charPlayed => charPlayed.toLowerCase() == char || charPlayed.toLowerCase().includes(char)).length : [].length;
     }
     return timesCharPlayed;
 };
@@ -102,7 +102,7 @@ export const calcPlayerCharactersPlayed = (plyr: Player, cutOff = true, plays) =
     } else {
         playsToUpdate = plyr?.plays;
     }
-    let charsPlayed = playsToUpdate?.map(ply => (ply?.winnerUUID == plyr?.uuid ? ply?.character : ply?.otherCharacter));
+    let charsPlayed = playsToUpdate?.length > 0 ? playsToUpdate?.map(ply => (ply?.winnerUUID == plyr?.uuid ? ply?.character : ply?.otherCharacter)) : [];
     let counts = charsPlayed.reduce((acc, char) => {
         acc[char] = (acc[char] || 0) + 1;
         return acc;
