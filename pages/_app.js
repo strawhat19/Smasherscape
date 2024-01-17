@@ -41,7 +41,7 @@ export const environments = {
   },
 };
 
-export const environment = environments.alpha;
+export const environment = environments.dev;
 export const usePlaysDatabase = environment.playsDatabase;
 export const usePlayersDatabase = environment.playersDatabase;
 

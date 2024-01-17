@@ -26,8 +26,8 @@ export default function PlayerOption(props) {
                     <div className="playerStats">
                         <span>Exp: {playerOption?.experience?.arenaXP?.toLocaleString(`en`)}</span>
                         <div className="playerStatDetails subtleTextInLabel">
-                            <div className={`statDetailLabelSmall`}><span className={`subtleTextInLabel`}>Wins:</span> {calcPlayerWinsFromPlays(playerOption, plays.filter(ply => ply?.winnerUUID == playerOption?.uuid || ply?.loserUUID == playerOption?.uuid)) || playerOption?.wins}</div>
-                            <div className={`statDetailLabelSmall`}><span className={`subtleTextInLabel`}>Losses:</span> {calcPlayerLossesFromPlays(playerOption, plays.filter(ply => ply?.winnerUUID == playerOption?.uuid || ply?.loserUUID == playerOption?.uuid)) || playerOption?.losses}</div>
+                            <div className={`statDetailLabelSmall`}><span className={`subtleTextInLabel`}>Wins:</span> {plays?.length > 0 ? calcPlayerWinsFromPlays(playerOption, plays.filter(ply => ply?.winnerUUID == playerOption?.uuid || ply?.loserUUID == playerOption?.uuid)) : 0 || plays?.length > 0 ? playerOption?.wins : 0}</div>
+                            <div className={`statDetailLabelSmall`}><span className={`subtleTextInLabel`}>Losses:</span> {plays?.length > 0 ? calcPlayerLossesFromPlays(playerOption, plays.filter(ply => ply?.winnerUUID == playerOption?.uuid || ply?.loserUUID == playerOption?.uuid)) : 0 || plays?.length > 0 ? playerOption?.losses : 0}</div>
                         </div>
                     </div>
                 </div>

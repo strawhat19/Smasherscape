@@ -61,6 +61,8 @@ export const calcPlayerKDRatio = (player: Player, plays: Play[]) => {
 function PlayerRecord(props) {
   const plyrRecord = useRef<any>();
   let [loading, setLoading] = useState(false);
+  let [playerSearchActive, setPlayerSearchActive] = useState(false);
+  let [characterSearchActive, setCharacterSearchActive] = useState(false);
   let { plyr, plyrPlays, paginationEnd, setPaginationEnd, loadedInterval } = props;
   const { players, filteredPlayers, devEnv, useLazyLoad } = useContext<any>(StateContext);
   let [filteredPlays, setFilteredPlays] = useState(plyrPlays && plyrPlays?.length > 0 ? plyrPlays?.sort((a: any, b: any) => parseDate(b.date) - parseDate(a.date)) : plyr?.plays?.length > 0 ? plyr?.plays?.sort((a: any, b: any) => parseDate(b.date) - parseDate(a.date)) : []);
@@ -111,27 +113,31 @@ function PlayerRecord(props) {
     if (value) {
         let searchTerm;
         if (typeof value == `string`) {
-            searchTerm = value;
+            searchTerm = value.toLowerCase();
         } else {
-            searchTerm = value?.name;
+            searchTerm = value?.name.toLowerCase();
         }
-        setFilteredPlays(plyrPlays.filter(ply => ply?.winner == searchTerm || ply?.loser == searchTerm));
+        setFilteredPlays(plyrPlays.filter(ply => ply?.winner.toLowerCase()?.includes(searchTerm) || ply?.loser.toLowerCase()?.includes(searchTerm)));
+        setPlayerSearchActive(true);
     } else {
+        setPlayerSearchActive(false);
         setFilteredPlays(plyrPlays);
     }
     devEnv && console.log(`Search Record Players`, {e, value, plays: filteredPlays});
   }
 
-  const searchRecordCharacters = (e: any, value?: any) => {
+  const searchRecordCharacters = (e: any, value?: any) => { 
     if (value) {
         let searchTerm;
         if (typeof value == `string`) {
-            searchTerm = value;
+            searchTerm = value.toLowerCase();
         } else {
-            searchTerm = value?.label;
+            searchTerm = value?.label.toLowerCase();
         }
-        setFilteredPlays(plyrPlays.filter(ply => ply?.character == searchTerm || ply?.otherCharacter == searchTerm));
+        setFilteredPlays(plyrPlays.filter(ply => ply?.character.toLowerCase()?.includes(searchTerm) || ply?.otherCharacter.toLowerCase()?.includes(searchTerm)));
+        setCharacterSearchActive(true);
     } else {
+        setCharacterSearchActive(false);
         setFilteredPlays(plyrPlays);
     }
     devEnv && console.log(`Search Record Characters`, {e, value, plays: filteredPlays});
@@ -177,7 +183,7 @@ function PlayerRecord(props) {
                 <div className={`flex playerRecordBegin`}>
                     {plyr?.name}'s Record
                     <span className={`recordPlays ${filteredPlays?.length > 0 ? `populated` : `empty`}`}>
-                        {filteredPlays?.length > 0 && <span className={`goldText`}>K/D: <span className="whiteText kdRatioNum">{plyr?.kdRatio ? plyr?.kdRatio : calcPlayerKDRatio(plyr, filteredPlays)}</span></span>}
+                        {filteredPlays?.length > 0 && <span className={`goldText`}>K/D: <span className="whiteText kdRatioNum">{calcPlayerKDRatio(plyr, filteredPlays)}</span></span>}
                         <span className={`greenText`}>Kills: <span className="whiteText">{calcPlayerKills(plyr, filteredPlays)?.toLocaleString()}</span></span>
                         <span className={`redText`}>Deaths: <span className="whiteText">{calcPlayerDeaths(plyr, filteredPlays)?.toLocaleString()}</span></span>
                         <span className={`blueText`}>Plays: <span className="whiteText">{filteredPlays?.length?.toLocaleString()}</span></span>
@@ -196,10 +202,11 @@ function PlayerRecord(props) {
                 </div>}
                 {filteredPlays?.length > 0 && <div className="flex white noShadow recordForms">
                     <form action="submit" className="gridForm recordForm">
-                        <div className={`inputWrapper materialBGInputWrapper`}>
+                        <div className={`playerSearchAuto inputWrapper materialBGInputWrapper`}>
                             <div className="inputBG materialBG"></div>
                             <Autocomplete
                                 autoHighlight
+                                disabled={characterSearchActive == true}
                                 id={`recordPlayerSearch-${plyr.id}`}
                                 sx={{ width: `100%` }}
                                 options={players.filter(playr => playr?.uuid != plyr?.uuid && (plyrPlays?.map(ply => ply?.winnerUUID).includes(playr?.uuid) || plyrPlays?.map(ply => ply?.loserUUID).includes(playr?.uuid))).sort((a, b) => {
@@ -226,6 +233,7 @@ function PlayerRecord(props) {
                             <div className="inputBG materialBG"></div>
                             <Autocomplete
                                 autoHighlight
+                                disabled={playerSearchActive == true}
                                 id={`recordPlayerCharacterSearch-${plyr.id}`}
                                 sx={{ width: `100%` }}
                                 options={getCharacterObjs(true)}

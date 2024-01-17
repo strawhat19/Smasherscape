@@ -4,7 +4,7 @@ import { useContext } from 'react';
 import Level from '../models/Level';
 import Player from '../models/Player';
 import PlayerForm from './PlayerForm';
-import PlayerCard from './PlayerCard';
+import PlayerCard, { calcPlayerLossesFromPlays, calcPlayerWinsFromPlays } from './PlayerCard';
 import CommandsForm from './CommandsForm';
 import { parseDate } from './PlayerRecord';
 import LoadingSpinner from './LoadingSpinner';
@@ -61,11 +61,52 @@ export const checkUserRole = (user: any, role) => {
 
 export const getActivePlayers = (players: any[], customObject = true, plays) => {
    if (customObject == true) {
-    let activePlayers: Player[] = players.filter(plyr => (plyr.active || !plyr.disabled)).sort((a, b) => {
-        if (b.experience.arenaXP !== a.experience.arenaXP) {
-            return b.experience.arenaXP - a.experience.arenaXP;
+    let activePlayers: Player[] = players.filter(plyr => (plyr.active || !plyr.disabled)).sort((a: Player, b: Player) => {
+
+        let aWins = 0;
+        let bWins = 0;
+
+        let aLosses = 0;
+        let bLosses = 0;
+
+        let aPlays = [];
+        let bPlays = [];
+
+        let hasPlays = plays && Array.isArray(plays) && plays?.length > 0;
+
+        if (hasPlays) aPlays = plays.filter(ply => ply?.winnerUUID == a?.uuid || ply?.loserUUID == a?.uuid);
+        if (hasPlays) bPlays = plays.filter(ply => ply?.winnerUUID == b?.uuid || ply?.loserUUID == b?.uuid);
+
+        if (hasPlays) aWins = calcPlayerWinsFromPlays(a, plays);
+        if (hasPlays) bWins = calcPlayerWinsFromPlays(b, plays);
+        
+        if (hasPlays) aLosses = calcPlayerLossesFromPlays(a, plays);
+        if (hasPlays) bLosses = calcPlayerLossesFromPlays(b, plays);
+
+        let compareByExperience = b.experience.arenaXP !== a.experience.arenaXP;
+        if (compareByExperience) {
+            let sortByHighestExperience = b.experience.arenaXP - a.experience.arenaXP;
+            return sortByHighestExperience;
         }
-        if (plays && plays.length > 0) return plays.filter(ply => ply?.winnerUUID == b?.uuid || ply?.loserUUID == b?.uuid).length - plays.filter(ply => ply?.winnerUUID == a?.uuid || ply?.loserUUID == a?.uuid).length;
+
+        let compareByWins = aWins !== bWins;
+        if (compareByWins) {
+            let sortByHighestWins = bWins - aWins;
+            return sortByHighestWins;
+        }
+
+        let compareByLowestLosses = aLosses !== bLosses;
+        if (compareByLowestLosses) {
+            let sortByLowestLosses = aLosses - bLosses;
+            return sortByLowestLosses;
+        }
+
+        let sortByHighestGamesPlayedAfterHighestExp = bPlays?.length - aPlays?.length;
+        
+        if (hasPlays) {
+            return sortByHighestGamesPlayedAfterHighestExp;
+        };
+
     }).map(pla => newPlayerType(pla, true, plays));
     return activePlayers;
    } else {

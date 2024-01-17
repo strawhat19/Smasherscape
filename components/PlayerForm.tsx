@@ -23,6 +23,7 @@ import { doc, setDoc, deleteDoc, updateDoc } from 'firebase/firestore';
 import { checkUserRole, getActivePlayers, getCharacterTitle, isInvalid } from './smasherscape';
 import { calcPlayerDeaths, calcPlayerKDRatio, calcPlayerKills, parseDate, removeTrailingZeroDecimal } from './PlayerRecord';
 import { StateContext, showAlert, formatDate, generateUniqueID, countPropertiesInObject, getActivePlayersJSON, usePlayersDatabase, defaultXPMultiplier, XPGainOnWin, XPGainOnLoserXPForEachStockTaken, winCons, loseCons, dev, useDB, usePlaysDatabase } from '../pages/_app';
+import CommandsUndo from './CommandsUndo';
 
 export const deletePlayFromDB = async (playID) => await deleteDoc(doc(db, usePlaysDatabase, playID));
 export const addPlayToDB = async (playObj: Play) => await setDoc(doc(db, usePlaysDatabase, playObj?.ID), playObj);
@@ -90,6 +91,7 @@ export const updatePlayerStats = (plyr, plays) => {
     let wins = calcPlayerWinsFromPlays(plyr, plays);
     let losses = calcPlayerLossesFromPlays(plyr, plays);
     let ratio = (wins/(wins+losses)) * 100;
+    plyr.plays = plays?.length;
     plyr.wins = wins;
     plyr.losses = losses;
     plyr.ratio = ratio;
@@ -390,12 +392,13 @@ export const updatePlayerPlays = (playState) => {
     let prevExp = plyr?.experience?.arenaXP;
     let loserPrevExp = loserDB?.experience?.arenaXP;
     let winnerPrevExp = winnerDB?.experience?.arenaXP;
-    let winnerNewExp = prevExp + (XPGainOnWin * plyr?.xpModifier);
-    let loserNewExp = prevExp + ((XPGainOnLoserXPForEachStockTaken * plyr?.xpModifier) * stocksTaken);
-    let winnerExpGained = Math.abs(winnerNewExp - winnerPrevExp);
-    let loserExpGained = Math.abs(loserNewExp - loserPrevExp);
+    let winnerNewExp = winnerPrevExp + (XPGainOnWin * plyr?.xpModifier);
+    let loserNewExp = loserPrevExp + ((XPGainOnLoserXPForEachStockTaken * plyr?.xpModifier) * stocksTaken);
+    let winnerExpGained = winnerNewExp - winnerPrevExp;
+    let loserExpGained = loserNewExp - loserPrevExp;
     let newExp = winnerOrLoser == `winner` ? winnerNewExp : loserNewExp;
-    let expGained = Math.abs(newExp - prevExp);
+    let expGained = newExp - prevExp;
+
     plyr.experience.arenaXP = newExp;
 
     let playToRecord: Play = {
@@ -427,7 +430,10 @@ export const updatePlayerPlays = (playState) => {
     
     // plyr.plays.push(playToRecord);
 
+    let playsToConsiderInCalculation = plays.filter(ply => ply?.winnerUUID == plyr?.uuid || ply?.loserUUID == plyr?.uuid);
+
     if (winnerOrLoser == `winner`) {
+        playsToConsiderInCalculation.push(playToRecord);
         if (useDatabase == true) {
             addPlayToDB(playToRecord);
         } else {
@@ -439,7 +445,7 @@ export const updatePlayerPlays = (playState) => {
 
     calcPlayerLevelAndExperience(plyr);
 
-    updatePlayerStats(plyr, plays.filter(ply => ply?.winnerUUID == plyr?.uuid || ply?.loserUUID == plyr?.uuid));
+    updatePlayerStats(plyr, playsToConsiderInCalculation);
 
     plyr.updated = currentDateTimeStamp;
     plyr.lastUpdated = currentDateTimeStamp;
@@ -449,137 +455,11 @@ export const updatePlayerPlays = (playState) => {
     return plyr;
 }
 
-export const undoCommand = (parameters: Parameters) => {
+export const showCommandsUndo = (parameters: Parameters) => {
     let playsToConsider = parameters.plays.sort((a: any, b: any) => parseDate(b.date) - parseDate(a.date));
-
     if (playsToConsider.length > 0) {
-
-        const undoPlay = (e, playToUndo, params) => {
-            if (e.target.innerHTML == `Confirm Undo`) {
-                let overlay: any = document.querySelector(`.overlay`);
-                let alert: any = document.querySelector(`.alert`);
-
-                if (overlay && alert) {
-                    alert.style.opacity = 0;
-                    alert.style.transform = `translateY(-50px)`;
-                    overlay.style.opacity = 0;
-              
-                    setTimeout(() => {
-                      document.body.removeChild(overlay);
-                      localStorage.setItem(`alertOpen`, `false`);
-
-                      updatePlayerInDB(params.winner.player, params.winner.newPlayer);
-                      updatePlayerInDB(params.loser.player, params.loser.newPlayer);
-                      deletePlayFromDB(playToUndo?.ID);
-
-                      let playerForm = document.querySelector(`#playerForm`);
-
-                      if (playerForm) (playerForm as any).reset();
-                    }, 240);
-                }
-            } else {
-                e.target.innerHTML = `Confirm Undo`;
-            }
-        }
-
         showAlert(`Commands to Undo`, <div className={`alertInner`}>
-            <div className={`commandsToUndo recordOfPlayer`}>
-               <ul className="recordList">
-                    {playsToConsider?.length > 0 ? playsToConsider.slice(0, 7).map((ply, plyIndex) => {
-
-                        let isWinner = true;
-                        let winnerPlayer = parameters.players.find(plyr => plyr?.uuid == ply?.winnerUUID);
-                        let loserPlayer = parameters.players.find(plyr => plyr?.uuid == ply?.loserUUID);
-                        let winnerXP = winnerPlayer?.experience?.arenaXP;
-                        let loserXP = loserPlayer?.experience?.arenaXP;
-                        let winnerLevel = calcLevelFromExperience(winnerXP)?.level?.num;
-                        let loserLevel = calcLevelFromExperience(loserXP)?.level?.num;
-                        let winnerNewExperience = winnerXP - Math.abs(ply?.winnerExpGained);
-                        let loserNewExperience = loserXP - Math.abs(ply?.loserExpGained);
-
-                        winnerNewExperience = winnerNewExperience < 0 ? 0 : winnerNewExperience;
-                        loserNewExperience = loserNewExperience < 0 ? 0 : loserNewExperience;
-
-                        let winnerNewLevel = calcLevelFromExperience(winnerNewExperience)?.level?.num;
-                        let loserNewLevel = calcLevelFromExperience(loserNewExperience)?.level?.num;
-
-                        let updateParams = {
-                            winner: {
-                                player: winnerPlayer,
-                                newPlayer: {
-                                    experience: calcLevelFromExperience(winnerNewExperience).experience,
-                                    level: calcLevelFromExperience(winnerNewExperience).level,
-                                }
-                            },
-                            loser: {
-                                player: loserPlayer,
-                                newPlayer: {
-                                    experience: calcLevelFromExperience(loserNewExperience).experience,
-                                    level: calcLevelFromExperience(loserNewExperience).level,
-                                }
-                            },
-                        };
-
-                        return (
-                            <li className={`playerPlay commandToUndo`} key={plyIndex}>
-                                <div className="plyIndex">{plyIndex + 1}.</div>
-                                <div className="recordDetails">
-                                    <div className={`playMessage`}>{isWinner ? <div>{ply?.winner} <span className={`${isWinner ? `winner` : `loser`}`}>Win</span> over <span className={`loser`}>{ply?.loser}</span></div> : <div><span className={`${isWinner ? `winner` : `loser`}`}>Loss</span> to {ply?.winner}</div>}
-                                        <div className="stocksRow">
-                                            <div className="stocks">
-                                                {isWinner ? ply?.stocks?.length > 0 && ply?.stocks?.map((stok, stkIndex) => {
-                                                    return (
-                                                        <span key={stkIndex} className={stok?.dead ? `dead` : `living`}>
-                                                            <img className={`charImg`} width={35} src={calcPlayerCharacterIcon(stok?.character)} alt={getCharacterTitle(stok?.character)} />
-                                                        </span>
-                                                    )
-                                                }) : ply?.lossStocks?.map((stok, stkIndex) => {
-                                                    return (
-                                                        <span key={stkIndex} className={stok?.dead ? `dead` : `living`}>
-                                                            <img className={`charImg`} width={35} src={calcPlayerCharacterIcon(stok?.character)} alt={getCharacterTitle(stok?.character)} />
-                                                        </span>
-                                                    )
-                                                })}
-                                            </div>
-                                        vs 
-                                            <div className="otherStocks">
-                                                {!isWinner ? ply?.stocks?.length > 0 && ply?.stocks?.map((stok, stkIndex) => {
-                                                    return (
-                                                        <span key={stkIndex} className={stok?.dead ? `dead` : `living`}>
-                                                            <img className={`charImg`} width={35} src={calcPlayerCharacterIcon(stok?.character)} alt={getCharacterTitle(stok?.character)} />
-                                                        </span>
-                                                    )
-                                                }) : ply?.lossStocks?.map((stok, stkIndex) => {
-                                                    return (
-                                                        <span key={stkIndex} className={stok?.dead ? `dead` : `living`}>
-                                                            <img className={`charImg`} width={35} src={calcPlayerCharacterIcon(stok?.character)} alt={getCharacterTitle(stok?.character)} />
-                                                        </span>
-                                                    )
-                                                })}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="recordSubDetails">
-                                        <div className="playDate expChanges preChanges">
-                                            <span className={`winner`}>{ply.winner}</span> Lvl: <span className={`preChange`}>{winnerLevel}</span> & XP: <span className={`preChange`}>{winnerXP}</span>, <span>{ply.loser}</span> Lvl: <span className={`preChange`}>{loserLevel}</span> & XP: <span className={`preChange`}>{loserXP}</span>
-                                        </div>
-                                        <div className="playDate expChanges">{`>>>`}</div>
-                                        <div className="playDate expChanges postChanges">
-                                            New <span className={`winner`}>{ply.winner}</span> Lvl: <span className={`postChange`}>{winnerNewLevel}</span> & XP: <span className={`postChange`}>{winnerNewExperience}</span>, 
-                                            New <span>{ply.loser}</span> Lvl: <span className={`postChange`}>{loserNewLevel}</span> & XP: <span className={`postChange`}>{loserNewExperience}</span>
-                                        </div>
-                                    </div>
-                                    <div className="bottomButtonRow recordSubDetails">
-                                        <div className="playDate commandDate">{ply?.date}</div>
-                                        <button disabled={false} type={`button`} onClick={(e) => undoPlay(e, ply, updateParams)} className={`buttonLike commandUndoSubmit textShadowThis`}>Undo this Play</button>
-                                    </div>
-                                </div>
-                            </li>
-                        )}) : <div className={`noPlaysYet`}>
-                            No Plays Yet
-                    </div>}
-                </ul>
-            </div>
+            <CommandsUndo playsToConsider={playsToConsider} parameters={parameters} />
         </div>, `85%`, `500px`);
     }
 }
@@ -760,7 +640,7 @@ export const processCommandsWithParameters = (parameters: Parameters) => {
     let firstCommand = commandParams[0];
     
     if (command != ``) {
-        dev() && console.log(`Command sent to ${useDB() ? `Database` : `Leaderboard`}`, parameters);
+        // dev() && console.log(`Command sent to ${useDB() ? `Database` : `Leaderboard`}`, parameters);
         if (firstCommand.includes(`!upd`)) {
             console.log(`Update Parameters`, parameters);
             updatePlayersWithParameters(parameters);
@@ -769,7 +649,7 @@ export const processCommandsWithParameters = (parameters: Parameters) => {
         } else if (firstCommand.includes(`!del`)) {
             deletePlayersWithParameters(parameters);
         } else if (firstCommand.includes(`!undo`)) {
-            undoCommand(parameters);
+            showCommandsUndo(parameters);
         } else if (firstCommand.includes(`!giv`)) {
             giveParameterWithParameters(parameters);
         } else if (firstCommand.includes(`!set`)) {
@@ -792,11 +672,6 @@ export default function PlayerForm(props) {
         if (field.name == `commands`) {
             let command = field?.value.toLowerCase();
             let commandParams = command.split(` `);
-
-            console.log(`handleCommands`, {
-                plays,
-                setPlays,
-            });
 
             const parameters = new Parameters({
                 user,
