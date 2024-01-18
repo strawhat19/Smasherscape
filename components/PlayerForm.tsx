@@ -102,7 +102,7 @@ export const updatePlayerStats = (plyr, plays) => {
     return plyr;
 }
 
-export const createPlayer = (playerName, playerIndex, databasePlayers, user?: User | Player): Player => {
+export const createPlayer = (playerName, playerIndex, databasePlayers, user?: User | Player, lowercaseUsernames?): Player => {
 
     let currentDateTimeStamp = formatDate(new Date());
     let uniqueIndex = databasePlayers.length + 1 + playerIndex;
@@ -111,6 +111,13 @@ export const createPlayer = (playerName, playerIndex, databasePlayers, user?: Us
     let displayName = playerName.charAt(0).toUpperCase() + playerName.slice(1).toLowerCase();
     let id = `${uniqueIndex}_Player_${displayName}_${currentDateTimeStampNoSpaces}_${uuid}`;
     let ID = `${uniqueIndex} ${displayName} ${currentDateTimeStamp} ${uuid}`;
+
+    if (lowercaseUsernames && Array.isArray(lowercaseUsernames)) {
+        let nameMatches = lowercaseUsernames.filter(nam => nam.includes(displayName.toLowerCase()));
+        if (nameMatches.length > 0) {
+            displayName = `${displayName}-${nameMatches.length}`;
+        }
+    }
 
     let plyr: Player = {
         id,

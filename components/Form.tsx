@@ -161,6 +161,7 @@ export default function Form(props?: any) {
   const { style } = props;
   const loadedRef = useRef(false);
   const [loaded, setLoaded] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
   const [alertOpen, setAlertOpen] = useState(false);
   const { players, user, setUser, updates, setUpdates, authState, setAuthState, emailField, setEmailField, users, setFocus, mobile, databasePlayers, playersLoading, useDatabase, plays } = useContext<any>(StateContext);
 
@@ -276,86 +277,122 @@ export default function Form(props?: any) {
           return;
         } else {
           console.log(`Sign Up Params`, {name, email, password});
-          if (useDatabase == true) {
-            createUserWithEmailAndPassword(auth, email, password).then((userCredential: any) => {
-              let createdFirebaseUser = createUserFromFirebaseData(userCredential, `Firebase`);
-              if (createdFirebaseUser != null) {
-                console.log(`User Signed Up`, createdFirebaseUser);
-                let nameToAdd = createdFirebaseUser?.name;
-                let namesToAdd = [nameToAdd];
-                namesToAdd.forEach((usr, usrIndex) => {
-                  let currentDateTimeStamp = formatDate(new Date());
-                  let userPlayerData = createPlayer(usr, usrIndex, databasePlayers);
-                  let { uid, email, playerLink, emailVerified, source, type, validSince, lastRefresh, lastSignIn, providerId, operationType } = createdFirebaseUser;
-
-                  let playerUserData: any = {
-                    ...userPlayerData,
-                    uid,
-                    type,
-                    email,
-                    source,
-                    providerId,
-                    validSince,
-                    playerLink,
-                    lastSignIn,
-                    lastRefresh,
-                    operationType,
-                    emailVerified,
-                    roles: userPlayerData?.roles,
-                  };
-
-                  playerUserData.properties = countPropertiesInObject(playerUserData);
-
-                  createdFirebaseUser = {
-                    ...createdFirebaseUser,
-                    updated: currentDateTimeStamp,
-                    lastUpdated: currentDateTimeStamp,
-                    uniqueIndex: playerUserData?.uniqueIndex,
-                    roles: playerUserData?.roles,
-                    uuid: playerUserData?.uuid,
-                    ID: playerUserData?.ID,
-                    id: playerUserData?.id,
-                  }
-
-                  createdFirebaseUser.properties = countPropertiesInObject(createdFirebaseUser);
-                  let usersAndPlaysState = {player: playerUserData, user: createdFirebaseUser};
-
-                  addPlayerToDB(usersAndPlaysState?.player);
-                  dev() && console.log(`User`, usersAndPlaysState);
-                  setUser(usersAndPlaysState?.user);
-                  setAuthState(`Sign Out`);
-                })
-              }
-            }).catch((error) => {
-              console.log(`Error Signing Up`, error);
-              const errorMessage = error.message;
-              console.log({errorMessage});
-              if (errorMessage) {
-                toast.error(renderErrorMessage(errorMessage));
-                // showAlert(`Error Signing Up`, <div className="alertMessage errorMessage loadingMessage">
-                //   <i style={{color: `var(--smasherscapeYellow)`}} className="fas fa-exclamation-triangle"></i>
-                //   <h3>{renderErrorMessage(errorMessage)}</h3>
-                // </div>, `55%`, `50%`);                 
-              }
-              return;
-            });
-          }
+          let filteredActiveUsers = getActivePlayers(databasePlayers, true, plays);
+          let usernames = filteredActiveUsers.map(usr => usr?.name || usr?.username);
+          let lowerCaseUsernames = usernames.map(usr => usr.toLowerCase());
+          // if (lowerCaseUsernames.includes(name.toLowerCase())) {
+            // toast.error(`Player name is already taken, Please pick a unique name.`);
+            // return;
+          // } else {
+            if (useDatabase == true) {
+              createUserWithEmailAndPassword(auth, email, password).then((userCredential: any) => {
+                let createdFirebaseUser = createUserFromFirebaseData(userCredential, `Firebase`);
+                if (createdFirebaseUser != null) {
+                  console.log(`User Signed Up`, createdFirebaseUser);
+                  let nameToAdd = createdFirebaseUser?.name;
+                  let namesToAdd = [nameToAdd];
+                  namesToAdd.forEach((usr, usrIndex) => {
+                    let currentDateTimeStamp = formatDate(new Date());
+                    let userPlayerData = createPlayer(usr, usrIndex, databasePlayers, null, lowerCaseUsernames);
+                    let { uid, email, playerLink, emailVerified, source, type, validSince, lastRefresh, lastSignIn, providerId, operationType } = createdFirebaseUser;
+  
+                    let playerUserData: any = {
+                      ...userPlayerData,
+                      uid,
+                      type,
+                      email,
+                      source,
+                      providerId,
+                      validSince,
+                      playerLink,
+                      lastSignIn,
+                      lastRefresh,
+                      operationType,
+                      emailVerified,
+                      roles: userPlayerData?.roles,
+                    };
+  
+                    playerUserData.properties = countPropertiesInObject(playerUserData);
+  
+                    createdFirebaseUser = {
+                      ...createdFirebaseUser,
+                      updated: currentDateTimeStamp,
+                      lastUpdated: currentDateTimeStamp,
+                      uniqueIndex: playerUserData?.uniqueIndex,
+                      roles: playerUserData?.roles,
+                      uuid: playerUserData?.uuid,
+                      ID: playerUserData?.ID,
+                      id: playerUserData?.id,
+                    }
+  
+                    createdFirebaseUser.properties = countPropertiesInObject(createdFirebaseUser);
+                    let usersAndPlaysState = {player: playerUserData, user: createdFirebaseUser};
+  
+                    addPlayerToDB(usersAndPlaysState?.player);
+                    dev() && console.log(`User`, usersAndPlaysState);
+                    setUser(usersAndPlaysState?.user);
+                    setAuthState(`Sign Out`);
+                  })
+                }
+              }).catch((error) => {
+                console.log(`Error Signing Up`, error);
+                const errorMessage = error.message;
+                console.log({errorMessage});
+                if (errorMessage) {
+                  toast.error(renderErrorMessage(errorMessage));
+                  // showAlert(`Error Signing Up`, <div className="alertMessage errorMessage loadingMessage">
+                  //   <i style={{color: `var(--smasherscapeYellow)`}} className="fas fa-exclamation-triangle"></i>
+                  //   <h3>{renderErrorMessage(errorMessage)}</h3>
+                  // </div>, `55%`, `50%`);                 
+                }
+                return;
+              });
+            }
+          // }
         }
       break;
     };
   }
 
+  const trackKeyDown = () => {
+    if (isFocused) {
+      const scrollY = window.scrollY; // Capture the current scroll position
+      window.onscroll = function () { window.scrollTo(window.scrollX, scrollY); };
+    }
+  }
+
   useEffect(() => {
     if (loadedRef.current) return;
-    loadedRef.current = true;
-    setLoaded(true);
+      loadedRef.current = true;
+      setLoaded(true);
   }, [user, users, authState]);
+
+  useEffect(() => {
+    // Restore normal scrolling when focus is lost
+    const resetScroll = () => {
+      window.onscroll = null;
+    };
+
+    if (!isFocused) {
+      resetScroll();
+    }
+
+    // Event listeners for restoring scroll on window resize or orientation change
+    window.addEventListener(`resize`, resetScroll);
+    window.addEventListener(`orientationchange`, resetScroll);
+
+    return () => {
+      // Clean up event listeners
+      window.removeEventListener(`resize`, resetScroll);
+      window.removeEventListener(`orientationchange`, resetScroll);
+    };
+  }, [isFocused]);
 
   return <>
     {playersLoading ? (
       <LoadingSpinner override={true} size={18} />
     ) : (
-      <form id={props.id} onSubmit={authForm} className={`flex authForm ${authState == `Next` ? `Next` : ``} ${emailField == true ? `hasPasswordField` : `noPasswordYet`} ${props.className} ${authState == `Sign Up` || authState == `Sign In` ? `threeInputs` : ``} ${user ? `userSignedIn` : `userSignedOut`}`} style={style}>
+      <form onFocus={() => setIsFocused(true)} onBlur={() => setIsFocused(false)} onKeyDown={() => trackKeyDown()} id={props.id} onSubmit={authForm} className={`flex authForm ${authState == `Next` ? `Next` : ``} ${emailField == true ? `hasPasswordField` : `noPasswordYet`} ${props.className} ${authState == `Sign Up` || authState == `Sign In` ? `threeInputs` : ``} ${user ? `userSignedIn` : `userSignedOut`}`} style={style}>
         {!user && <>
           <div className={`authStateForm`}>
             <span className={`authFormLabel`}>

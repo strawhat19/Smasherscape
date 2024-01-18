@@ -41,13 +41,17 @@ export default function PlayerCard(props) {
         return playersWithExpandedOrCollapsedPlayer;
     };
 
-    const limitInput = (event, maxLen) => {
+    const limitInput = (event, maxLen, plyr?) => {
         const allowedKeys = [`Backspace`, `Delete`, `Shift`, `Control`, `ShiftLeft`, `ShiftRight`, `ArrowRight`, `ArrowLeft`, `ArrowUp`, `ArrowDown`, `Home`, `End`];
         const disallowedKeys = [`Space`, `Enter`, `Return`];
         const element = event.target;
-        if (element.textContent.length >= maxLen && !allowedKeys.includes(event.code) || disallowedKeys.includes(event.code)) {
+        if (event.code != `Enter` && (element.textContent.length >= maxLen && !allowedKeys.includes(event.code) || disallowedKeys.includes(event.code))) {
             event.preventDefault();
             return; 
+        } else if (event.code == `Enter`) {
+            event.preventDefault();
+            changePlayerNameConfirm(event, plyr);
+            event.target.blur();
         }
     }
 
@@ -73,6 +77,7 @@ export default function PlayerCard(props) {
             if (useDatabase == true) {
                 const jsonPlayer = JSON.parse(JSON.stringify(player));
                 const jsonUpdatedPlayer = JSON.parse(JSON.stringify(updatedPlayer));
+                console.log(`Updating Player in DB`, jsonPlayer?.username, `To`, jsonUpdatedPlayer?.username);
                 updatePlayerInDB(jsonPlayer, jsonUpdatedPlayer);
             } else {
                 let updatedPlayers = getActivePlayersJSON(players, false, plays).map(plyr => {
@@ -129,7 +134,7 @@ export default function PlayerCard(props) {
                     <h3 className={`blackTextShadow slimmed`}>Xuruko's<br />SmasherScape</h3>
                 </div>
                 <h2 title={plyr?.name} className={`playerNameText bluePurpleTextShadow textOverflow overrideWithInlineBlock`}>
-                    <span onKeyDown={(e) => limitInput(e, 10)} onBlur={(e) => changePlayerNameConfirm(e, plyr)} className={`playerNameContainer changeLabel ${(checkUserRole(user, `Owner`) || user && user?.uid == plyr?.uid) ? `editable` : ``}`} contentEditable={checkUserRole(user, `Owner`) || user && user?.uid == plyr?.uid} suppressContentEditableWarning>
+                    <span onKeyDown={(e) => limitInput(e, 10, plyr)} onBlur={(e) => changePlayerNameConfirm(e, plyr)} className={`playerNameContainer changeLabel ${(checkUserRole(user, `Owner`) || user && user?.uid == plyr?.uid) ? `editable` : ``}`} contentEditable={checkUserRole(user, `Owner`) || user && user?.uid == plyr?.uid} suppressContentEditableWarning>
                         {plyr?.name}
                     </span>
                     {user && plyr?.uid && user?.uid == plyr?.uid && user?.image && <img alt={user?.email} src={user?.image}  className={`userImage playerCardUserImage`} />}
