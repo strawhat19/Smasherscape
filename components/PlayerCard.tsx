@@ -33,7 +33,8 @@ export default function PlayerCard(props) {
 
     const { user, plays, useDatabase, players, filteredPlayers, setFilteredPlayers, useLazyLoad, setPlayers } = useContext<any>(StateContext);
 
-    const setPlayerExpanded = (player: Player) => {
+    const setPlayerExpanded = (player: Player, e?) => {
+        if (e?.target?.classList?.contains(`playerNameContainer`)) return;
         setPaginationEnd(initialInterval);
         let recordOf = document.querySelector(`.recordOf-${plyr?.uuid}`);
         recordOf.scrollTop = 0;
@@ -43,12 +44,12 @@ export default function PlayerCard(props) {
 
     const limitInput = (event, maxLen, plyr?) => {
         const allowedKeys = [`Backspace`, `Delete`, `Shift`, `Control`, `ShiftLeft`, `ShiftRight`, `ArrowRight`, `ArrowLeft`, `ArrowUp`, `ArrowDown`, `Home`, `End`];
-        const disallowedKeys = [`Space`, `Enter`, `Return`];
+        const disallowedKeys = [`Space`, `Enter`, `NumpadEnter`, `Return`];
         const element = event.target;
-        if (event.code != `Enter` && (element.textContent.length >= maxLen && !allowedKeys.includes(event.code) || disallowedKeys.includes(event.code))) {
+        if ((event.code != `Enter` && event.code != `NumpadEnter`) && (element.textContent.length >= maxLen && !allowedKeys.includes(event.code) || disallowedKeys.includes(event.code))) {
             event.preventDefault();
             return; 
-        } else if (event.code == `Enter`) {
+        } else if (event.code == `Enter` || event.code == `NumpadEnter`) {
             event.preventDefault();
             changePlayerNameConfirm(event, plyr);
             event.target.blur();
@@ -70,6 +71,7 @@ export default function PlayerCard(props) {
                 username: displayName,
                 updated: currentDateTimeStamp,
                 lastUpdated: currentDateTimeStamp,
+                expanded: player.expanded || false,
                 properties: countPropertiesInObject(player),
                 lastUpdatedBy: user ? user.name : displayName,
             };
@@ -77,7 +79,6 @@ export default function PlayerCard(props) {
             if (useDatabase == true) {
                 const jsonPlayer = JSON.parse(JSON.stringify(player));
                 const jsonUpdatedPlayer = JSON.parse(JSON.stringify(updatedPlayer));
-                console.log(`Updating Player in DB`, jsonPlayer?.username, `To`, jsonUpdatedPlayer?.username);
                 updatePlayerInDB(jsonPlayer, jsonUpdatedPlayer);
             } else {
                 let updatedPlayers = getActivePlayersJSON(players, false, plays).map(plyr => {
@@ -124,7 +125,7 @@ export default function PlayerCard(props) {
 
     return <div id={`playerCard-${plyr.uuid}`} className={`playerCard ${plyr?.expanded ? `expandedPlayerCard` : `collapsedPlayerCard`} ${plyr?.uid ? `playerCardUID-${plyr?.uid} ${user && user?.uid == plyr?.uid ? `playerIsUser userIsPlayer` : ``}` : ``}`}>
     <BadgesContainer player={plyr} />
-    <div className="gridCard" onClick={(e) => setPlayerExpanded(plyr)}>
+    <div className="gridCard" onClick={(e) => setPlayerExpanded(plyr, e)}>
         <Image className={`cardBG`} alt={`Smasherscape Player Card`} src={`/assets/OSRS_Card_Empty.png?raw=true`} />
         <Image className={`cardBG border`} alt={`Smasherscape Player Card`} src={`/assets/OSRS_Card_Template_Border_Only.png?raw=true`} />
         <div className="playerCardContent">
