@@ -51,7 +51,7 @@ export default function CommandsUndo(props) {
                     let winnerLevel = calcLevelFromExperience(winnerXP)?.level?.num;
                     let loserLevel = calcLevelFromExperience(loserXP)?.level?.num;
                     let winnerNewExperience = winnerXP - ply?.winnerExpGained;
-                    if (ply?.loserExpGained >= ply?.winnerExpGained) ply.loserExpGained = 100 * ply?.stocksTaken;
+                    if (ply?.loserExpGained < 0 || ply?.loserExpGained >= ply?.winnerExpGained) ply.loserExpGained = 100 * ply?.stocksTaken;
                     let loserNewExperience = loserXP - ply.loserExpGained;
 
                     winnerNewExperience = winnerNewExperience < 0 ? 0 : winnerNewExperience;
