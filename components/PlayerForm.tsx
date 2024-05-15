@@ -7,7 +7,9 @@ import Stock from '../models/Stock';
 import Level from '../models/Level';
 import Player from '../models/Player';
 import { Commands } from './Commands';
+import { toast } from 'react-toastify';
 import PlayerOption from './PlayerOption';
+import CommandsUndo from './CommandsUndo';
 import { matchSorter } from 'match-sorter';
 import Experience from '../models/Experience';
 import Parameters from '../models/Parameters';
@@ -16,14 +18,13 @@ import CharacterOption from './CharacterOption';
 import { Characters } from '../common/Characters';
 import Autocomplete from '@mui/material/Autocomplete';
 import { FormEvent, useContext, useRef } from 'react';
-import { calcPlayerLosses, calcPlayerLossesFromPlays, calcPlayerWins, calcPlayerWinsFromPlays } from './PlayerCard';
-import { calcLevelFromExperience, calcPlayerLevelAndExperience } from '../common/Levels';
 import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
 import { doc, setDoc, deleteDoc, updateDoc } from 'firebase/firestore';
 import { checkUserRole, getActivePlayers, getCharacterTitle, isInvalid } from './smasherscape';
+import { calcPlayerLosses, calcPlayerLossesFromPlays, calcPlayerWins, calcPlayerWinsFromPlays } from './PlayerCard';
+import { Levels, calcLevelFromExperience, calcLevelFromNumber, calcPlayerLevelAndExperience, getLevelFromNumber, levelsArray } from '../common/Levels';
 import { calcPlayerDeaths, calcPlayerKDRatio, calcPlayerKills, parseDate, removeTrailingZeroDecimal } from './PlayerRecord';
 import { StateContext, showAlert, formatDate, generateUniqueID, countPropertiesInObject, getActivePlayersJSON, usePlayersDatabase, defaultXPMultiplier, XPGainOnWin, XPGainOnLoserXPForEachStockTaken, winCons, loseCons, dev, useDB, usePlaysDatabase } from '../pages/_app';
-import CommandsUndo from './CommandsUndo';
 
 export const deletePlayFromDB = async (playID) => await deleteDoc(doc(db, usePlaysDatabase, playID));
 export const addPlayToDB = async (playObj: Play) => await setDoc(doc(db, usePlaysDatabase, playObj?.ID), playObj);
@@ -189,10 +190,12 @@ export const addPlayersWithParameters = (parameters: Parameters) => {
         if (useDatabase == true) {
             if (sameNamePlayeredEnabled) {
                 addPlayerToDB(playerObj);
+                toast.success(`Added New Player ${playerObj?.name}`);
                 return playerObj;
             } else {
                 if (!getActivePlayers(players, true, plays).map(playr => playr.name.toLowerCase()).some(nam => nam == plyr.toLowerCase())) {
                     addPlayerToDB(playerObj);
+                    toast.success(`Added New Player ${playerObj?.name}`);
                     return playerObj;
                 } else {
                     showAlert(`Player(s) Added Already`, <h1>
@@ -207,6 +210,7 @@ export const addPlayersWithParameters = (parameters: Parameters) => {
                     let updatedPlayers: Player[] = [...prevPlayers, playerObj];
                     setFilteredPlayers(updatedPlayers);
                     updatePlayersLocalStorage(updatedPlayers, plays);
+                    toast.success(`Added New Player ${playerObj?.name}`);
                     return updatedPlayers;
                 });
             } else {
@@ -247,8 +251,10 @@ export const deletePlayersWithParameters = (parameters: Parameters) => {
             (document.querySelector(`.clearAllTagsIcon`) as any).click();
             if (useDatabase == true) {
                 if (deleteCompletely && playerDB?.plays?.length == 0) {
+                    toast.success(`Deleted Player ${playerDB?.name}`);
                     return deletePlayerFromDB(playerDB);
                 } else {
+                    toast.success(`Deleted Player ${playerDB?.name}`);
                     return updatePlayerInDB(playerDB, {
                         active: false, 
                         disabled: true, 
@@ -273,6 +279,7 @@ export const deletePlayersWithParameters = (parameters: Parameters) => {
                     });
                     setFilteredPlayers(updatedPlayers);
                     updatePlayersLocalStorage(updatedPlayers, plays);
+                    toast.success(`Deleted Player ${playerDB?.name}`);
                     return updatedPlayers;
                 });
             }
@@ -308,12 +315,13 @@ export const setParametersWithParameters = (parameters: Parameters) => {
     } else {
         if (isInvalid(parameter) || isInvalid(amount)) {
             showAlert(`Please Enter Parameter & Valid Amount`, <h1>
-                Please Enter Parameter such as `xp`.
-                Please Enter Valid Amount such as `100` or `-500`.
+                Please Enter Parameter such as `xp` or `lvl`.
+                For XP: Please Enter Valid Amount such as `100` or `-500`.
+                For LVL: Please Enter Valid Amount between `1` or `99`.
             </h1>, `65%`, `35%`);
             return;
         } else {
-            if (parameter == `xp`) {
+            if (parameter == `xpmod`) {
                 updatedPlayers = players.map(plyr => {
                     if (plyr?.name.toLowerCase() == playerToSetDB?.name?.toLowerCase() || plyr?.name.toLowerCase().includes(playerToSetDB?.name?.toLowerCase())) {
                         plyr.xpModifier = amount;
@@ -322,10 +330,20 @@ export const setParametersWithParameters = (parameters: Parameters) => {
                         return plyr as Player;
                     }
                 });
-            }
+                updatePlayersLocalStorage(updatedPlayers, plays);
+                setPlayers(updatedPlayers);
+            } else if (parameter == `lv` || parameter == `lvl` || parameter == `level`) {
+                let { experience, level } = calcLevelFromNumber(amount);
+                let playerToUpdateTo = {
+                    ...playerToSetDB,
+                    experience,
+                    level,
+                }
 
-            updatePlayersLocalStorage(updatedPlayers, plays);
-            setPlayers(updatedPlayers);
+                updatePlayerInDB(playerToSetDB, playerToUpdateTo);
+
+                toast.success(`Update Player ${playerToSetDB?.name} Level from ${playerToSetDB?.level?.num} to ${amount}`);
+            }
         }
     }
 }

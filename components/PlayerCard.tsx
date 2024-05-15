@@ -145,7 +145,9 @@ export default function PlayerCard(props) {
             <div className="cardMiddleRow">
                 <div className={`imgLeftCol ${plyr.level.name.split(` `)[0]}`}>
                     <img className={`cardLevelImage ${isBigImage(plyr)}`} width={150} src={calcPlayerLevelImage(plyr?.level?.name)} alt={plyr?.level?.name} />
-                    <h4 className={`levelName blackTextShadow slimmed ${plyr?.level?.name.split(` `)[0]}`}>{plyr?.level?.name}</h4>
+                    <h4 className={`levelName blackTextShadow slimmed ${plyr?.level?.name.split(` `)[0]}`}>
+                        {plyr?.level?.name.length >= 20 ? plyr?.level?.name.split(` `)[0] : plyr?.level?.name}
+                    </h4>
                 </div>
                 <div className="recordPlays">
                     <div className="record">
@@ -167,7 +169,7 @@ export default function PlayerCard(props) {
                         </div>
                     </div>
                 </div>
-                <div className="rightCol">
+                <div className={`rightCol levelAndExperienceColumn ${plyr.level.num >= 30 ? plyr.level.num >= 50 ? plyr.level.num >= 99 ? `maxExp` : `largestExp` : `largerExp` : `smallerExp`}`}>
                     <div className="level">
                         <h4 className={`levelNum levelTop`}>{plyr?.level?.num}</h4>
                         <div className="borderSep"></div>

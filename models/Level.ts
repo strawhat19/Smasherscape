@@ -9,6 +9,7 @@ export default class Level {
     unlocks?: any,
     bonuses?: any,
     features?: any,
+    minXP?: number,
     gradient?: any,
     image?: string,
     class?: string,

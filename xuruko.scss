@@ -333,6 +333,27 @@ li {
                 }
                 .rightCol {
                     width: 100%;
+                    &.largerExp {
+                        min-width: 180px;
+                        .level {
+                            position: relative;
+                            right: -15px;
+                        }
+                    }
+                    &.largestExp {
+                        min-width: 200px;
+                        .level {
+                            position: relative;
+                            right: -15px;
+                        }
+                    }
+                    &.maxExp {
+                        min-width: 225px;
+                        .level {
+                            position: relative;
+                            right: -15px;
+                        }
+                    }
                     .level {
                         width: 100%;
                         height: 100%;

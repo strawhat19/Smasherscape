@@ -420,7 +420,7 @@ export default function Form(props?: any) {
           <GoogleButton onClick={(e) => signInWithGoogle(databasePlayers, setUser, setAuthState, plays)} type="dark" />
         </div>}
         {user && <div title={`Welcome, ${user?.name}`} className={`customUserSection`}>
-          {user?.image ? <img alt={user?.email} src={user?.image}  className={`userImage`} /> : <div className={`userCustomAvatar`}>{user?.name?.charAt(0).toUpperCase()}</div>}
+          {user?.image ? <img alt={user?.email} src={user?.image} className={`userImage`} /> : <div className={`userCustomAvatar`}>{user?.name?.charAt(0).toUpperCase()}</div>}
           Welcome, {user?.name}
         </div>}
         {user && window?.location?.href?.includes(`profile`) && <input id={user?.id} className={`save`} type="submit" name="authFormSave" style={{padding: 0}} value={`Save`} />}

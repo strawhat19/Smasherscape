@@ -46,14 +46,14 @@ export const defaultCommands = {
     shortDescription: `Update Player(s) in Leaderboard`,
     example: `!upd winner vs loser with winChar vs loseChar stocksTakenFromWinner`,
   },
-  // Set: {
-  //   id: 6,
-  //   name: `Set`,
-  //   command: `!set`,
-  //   triggers: [`!set`, `!change`],
-  //   example: `!set playerName (xp) amount`,
-  //   description: `Set Parameter for Player`,
-  // },
+  Set: {
+    id: 6,
+    name: `Set`,
+    command: `!set`,
+    triggers: [`!set`, `!change`],
+    description: `Set Parameter for Player`,
+    example: `!set playerName ([xpmod, lvl]) amount (xp coming soon)`,
+  },
   // Give: {
   //   id: 7,
   //   name: `Give`,
