@@ -816,6 +816,11 @@ footer {
                 transition: var(--transition);
                 grid-template-columns: 1fr 350px 1fr;
                 &:has(.Mui-focused), &:has(.MuiAutocomplete-hasClearIcon) {
+                    .conditionToggle {
+                        div[role="group"] {
+                            height: 88px;
+                        }
+                    }
                     .MuiTextField-root {
                         padding-top: 1em;
                         .MuiFormLabel-root {
@@ -2392,6 +2397,26 @@ div[role="presentation"] {
     padding: 0;
     width: 100%;
     text-align: center;
+    &.conditionToggle {
+        div[role="group"] {
+            height: 75px;
+            flex-direction: row;
+            .buttonInnerText {
+                grid-gap: 15px;
+                align-items: center;
+                flex-direction: row;
+                justify-content: center;
+                i {
+                    // opacity: 0.55;
+                    max-width: fit-content;
+                }
+                .buttonRowText {
+                    // opacity: 0.55;
+                    max-width: fit-content;
+                }
+            }
+        }
+    }
     div[role="group"] {
         width: 100%;
         height: 65px;
@@ -2400,6 +2425,7 @@ div[role="presentation"] {
         margin: 0 auto;
         align-items: center;
         justify-content: center;
+        transition: var(--transition);
         button {
             width: 100%;
             height: 100%;

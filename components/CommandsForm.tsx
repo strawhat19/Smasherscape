@@ -25,6 +25,20 @@ export default function CommandsForm(props) {
     let [playerOne, setPlayerOne] = useState<any>(getDefaultPlayer(1));
     let [playerTwo, setPlayerTwo] = useState<any>(getDefaultPlayer(2));
     let [stocksTaken, setStocksTaken] = useState<any>(`Stocks-Taken-From-Winner`);
+
+    let [conditions, setConditions] = useState<any>([
+        {
+            id: 1, 
+            label: `Defeats`, 
+            icon: <i className={`fas fa-trophy`}></i>,
+        },
+        {
+            id: 2, 
+            label: `Loses-to`, 
+            icon: <i className={`fas fa-flag`}></i>,
+        },
+    ]);
+
     const { user, players, command, setCommand, playersToSelect, commandsToNotInclude, commands, setPlayers, useDatabase, databasePlayers, updatePlayersLocalStorage, deleteCompletely, setFilteredPlayers, sameNamePlayeredEnabled, setLoadingPlayers, iPhone, plays, setPlays } = useContext<any>(StateContext);
 
     const adjustStocks = (e, val) => {
@@ -39,6 +53,7 @@ export default function CommandsForm(props) {
 
     const adjustCondition = (e, val) => {
         if (val) {
+            console.log(`Condition Val`, {e, val});
             if (typeof val == `string`) {
                 setCondition(val);
             } else {
@@ -138,9 +153,9 @@ export default function CommandsForm(props) {
         <div className={`toggleButtonsContainer`}>
             <ToggleButtonGroup
                 exclusive
-                color="primary"
                 value={command}
-                aria-label="Platform"
+                color={`primary`}
+                aria-label={`Platform`}
                 onChange={(e, val) => val && setCommand(val)}
             >
                 {Object.values(defaultCommands).filter(cmd => !commandsToNotInclude.includes(cmd.command)).map((comm: Command, commIndex) => {
@@ -198,29 +213,27 @@ export default function CommandsForm(props) {
                                 }}
                             />
                         </div>
-                        <div className={`conditionAuto smallAuto inputWrapper materialBGInputWrapper ${iPhone ? `on_iPhoneConditionAuto` : `notOn_iPhoneConditionAuto`}`}>
-                            <div className="inputBG materialBG"></div>
-                            <Autocomplete
-                                autoHighlight
-                                id="conditionAuto-1"
-                                sx={{ width: `100%` }}
-                                getOptionLabel={(option) => option.label}
-                                onChange={(e, val: any) => adjustCondition(e, val)}
-                                onInputChange={(e, val: any) => adjustCondition(e, val)}
-                                options={[{id: 1, label: `Defeats`}, {id: 2, label: `Loses-to`}]}
-                                isOptionEqualToValue={(option, value) => option.id === value.id}
-                                renderInput={(params) => <TextField name={`condition`} {...params} label="Victory or Defeat..." />}
-                                noOptionsText={`No Condition(s) Found for Search`}
-                                renderOption={(props: any, option: any) => {
+                        <div className={`toggleButtonsContainer conditionToggle`}>
+                            <ToggleButtonGroup
+                                exclusive
+                                color={`primary`}
+                                value={condition}
+                                aria-label={`Platform`}
+                                onChange={(e, val) => val && adjustCondition(e, val)}
+                            >
+                                {conditions.map((con, conIndex) => {
                                     return (
-                                        <div key={option.id} {...props}>
-                                            <div className="autocompleteOption singularLabel">
-                                                {option.label}
-                                            </div>
-                                        </div>
+                                        <ToggleButton key={conIndex} size={`small`} value={con.label}>
+                                            <span id={`${con.id}-${con.label}`} className={`buttonInnerText`}>
+                                                {con?.icon}
+                                                <div className={`buttonRowText`}>
+                                                    <div className={`buttonRowTextInner`}>{con.label}</div>
+                                                </div>
+                                            </span>
+                                        </ToggleButton>
                                     )
-                                }}
-                            />
+                                })}
+                            </ToggleButtonGroup>
                         </div>
                         <div className={`playerSearchAuto inputWrapper materialBGInputWrapper`}>
                             <div className="inputBG materialBG"></div>

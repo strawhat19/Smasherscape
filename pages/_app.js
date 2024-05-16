@@ -485,7 +485,7 @@ export default function Xuruko({ Component, pageProps, router }) {
     let [deleteCompletely, setDeleteCompletely] = useState(false);
     let [sameNamePlayeredEnabled, setSameNamePlayeredEnabled] = useState(false);
     let [noPlayersFoundMessage, setNoPlayersFoundMessage] = useState(`No Players Found`);
-    let [commandsToNotInclude, setCommandsToNotInclude] = useState([`!com`, `!add`, `!res`, `!set`, `!giv`]);
+    let [commandsToNotInclude, setCommandsToNotInclude] = useState([`!com`, `!add`, `!res`]);
 
     let [useLazyLoad, setUseLazyLoad] = useState(false);
     let [useDatabase, setUseDatabase] = useState(useDB());
