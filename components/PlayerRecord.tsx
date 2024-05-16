@@ -3,10 +3,10 @@ import Play from '../models/Play';
 import { Badge } from '@mui/material';
 import Player from '../models/Player';
 import PlayerOption from './PlayerOption';
-import { StateContext } from '../pages/_app';
 import LoadingSpinner from './LoadingSpinner';
 import TextField from '@mui/material/TextField';
 import CharacterOption from './CharacterOption';
+import { StateContext, dev } from '../pages/_app';
 import { Characters } from '../common/Characters';
 import Autocomplete from '@mui/material/Autocomplete';
 import { useContext, useState, useEffect, useRef } from 'react';
@@ -67,21 +67,8 @@ function PlayerRecord(props) {
   const { players, filteredPlayers, devEnv, useLazyLoad } = useContext<any>(StateContext);
   let [filteredPlays, setFilteredPlays] = useState(plyrPlays && plyrPlays?.length > 0 ? plyrPlays?.sort((a: any, b: any) => parseDate(b.date) - parseDate(a.date)) : plyr?.plays?.length > 0 ? plyr?.plays?.sort((a: any, b: any) => parseDate(b.date) - parseDate(a.date)) : []);
 
-//   let [initialInterval, setInitialInterval] = useState(5);
-//   let [loadedInterval, setLoadedInterval] = useState(20);
-//   let [paginationAmount, setPaginationAmount] = useState(initialInterval);
-//   let [paginationEnd, setPaginationEnd] = useState(paginationAmount);
-
   const paginate = () => {
-    // let newAmount = paginationAmount + interval;
-    // setPaginationAmount(prevAmount => prevAmount + newAmount);
-    // console.log({paginationEnd, paginationAmount, newAmount});
-    // if (plyr?.expanded == true) {
-        setPaginationEnd(prevEnd => prevEnd + loadedInterval);
-    // } else {
-        // setPaginationEnd(initialInterval);
-    // }
-    // plyr?.expanded == true ? setPaginationEnd(prevEnd => prevEnd + loadedInterval) : setPaginationEnd(initialInterval);
+    setPaginationEnd(prevEnd => prevEnd + loadedInterval);
     setLoading(false);
   };
 
@@ -92,18 +79,26 @@ function PlayerRecord(props) {
   useEffect(() => {
     const handleScroll = (e) => {
       const element = e.target;
-      if (element.scrollHeight - element.scrollTop === element.clientHeight) {
+      let scrollDetectionThreshold = 5;
+      let { scrollHeight, scrollTop, clientHeight } = element;
+      let totalScroll = scrollHeight - scrollTop;
+      let minScrollDetectionRange = clientHeight - scrollDetectionThreshold;
+      let maxScrollDetectionRange = clientHeight + scrollDetectionThreshold;
+      let inRangeOfScrollBottom = (totalScroll >= minScrollDetectionRange) && (totalScroll <= maxScrollDetectionRange);
+      if (inRangeOfScrollBottom) {
         setLoading(true);
         paginate();
       }
     };
 
     if (plyrRecord.current) {
+      dev() && console.log(`addEventListener plyrRecord.current`, plyrRecord.current);
       plyrRecord.current.addEventListener(`scroll`, handleScroll);
     }
 
     return () => {
       if (plyrRecord.current) {
+        dev() && console.log(`removeEventListener plyrRecord.current`, plyrRecord.current);
         plyrRecord.current.removeEventListener(`scroll`, handleScroll);
       }
     };
