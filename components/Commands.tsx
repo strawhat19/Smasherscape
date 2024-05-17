@@ -3,6 +3,8 @@ import CodeBlock from './CodeBlock';
 import Command from '../models/Command';
 import { isInvalid } from './smasherscape';
 
+export const defaultSetParameter = `([Level_Experience_XP-Modifier])`;
+
 export const defaultCommands = {
   List: {
     id: 1,
@@ -60,7 +62,7 @@ export const defaultCommands = {
     description: `Set Parameter for Player(s)`,
     triggers: [`!st`, `!set`, `!change`],
     shortDescription: `Set Parameter for Player(s)`,
-    example: `!set name(s) of player(s) ([Level, Experience, XP Modifier]) amount`,
+    example: `!set name(s) of player(s) ${defaultSetParameter} amount`,
   },
   Give: {
     id: 7,

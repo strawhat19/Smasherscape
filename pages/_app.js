@@ -1,6 +1,7 @@
 import '../main.scss';
 import '../xuruko.scss';
 import '../concentration.scss';
+import '../customImports.scss';
 import User from '../models/User';
 import Play from '../models/Play';
 import { auth, db } from '../firebase';
@@ -8,11 +9,11 @@ import ReactDOM from 'react-dom/client';
 import { onAuthStateChanged } from 'firebase/auth';
 import { parseDate } from '../components/PlayerRecord';
 import { AnimatePresence, motion } from 'framer-motion';
-import { defaultCommands } from '../components/Commands';
 import { createUserFromFirebaseData } from '../components/Form';
 import { createContext, useRef, useState, useEffect } from 'react';
+import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { getActivePlayers, newPlayerType } from '../components/smasherscape';
-import { collection, onSnapshot, query, limit, orderBy } from 'firebase/firestore';
+import { defaultCommands, defaultSetParameter } from '../components/Commands';
 
 export const useDB = () => true;
 export const StateContext = createContext({});
@@ -462,6 +463,7 @@ export default function Xuruko({ Component, pageProps, router }) {
     let [loading, setLoading] = useState(true);
     let [iPhone, set_iPhone] = useState(false);
     let [highScore, setHighScore] = useState(0);
+    let [amount, setAmount] = useState(`Amount`);
     let [platform, setPlatform] = useState(null);
     let [anim, setAnimComplete] = useState(false);
     let [categories, setCategories] = useState([]);
@@ -484,6 +486,7 @@ export default function Xuruko({ Component, pageProps, router }) {
     let [command, setCommand] = useState(defaultCommands.Update);
     let [filteredPlayers, setFilteredPlayers] = useState(players);
     let [deleteCompletely, setDeleteCompletely] = useState(false);
+    let [setParameter, setSetParameter] = useState(defaultSetParameter);
     let [sameNamePlayeredEnabled, setSameNamePlayeredEnabled] = useState(false);
     let [noPlayersFoundMessage, setNoPlayersFoundMessage] = useState(`No Players Found`);
     let [commandsToNotInclude, setCommandsToNotInclude] = useState([`!com`, `!add`, `!res`].concat(useSetGive ? [] : [`!set`, `!giv`]));
@@ -653,7 +656,7 @@ export default function Xuruko({ Component, pageProps, router }) {
       }
     }, [])
 
-    return <StateContext.Provider value={{ router, rte, setRte, updates, setUpdates, content, setContent, width, setWidth, user, setUser, page, setPage, mobileMenu, setMobileMenu, users, setUsers, authState, setAuthState, emailField, setEmailField, devEnv, setDevEnv, mobileMenuBreakPoint, platform, setPlatform, focus, setFocus, highScore, setHighScore, color, setColor, dark, setDark, colorPref, setColorPref, qotd, setQotd, alertOpen, setAlertOpen, mobile, setMobile, systemStatus, setSystemStatus, loading, setLoading, anim, setAnimComplete, IDs, setIDs, categories, setCategories, browser, setBrowser, onMac, rearranging, setRearranging, buttonText, setButtonText, gameFormStep, setGameFormStep, players, setPlayers, filteredPlayers, setFilteredPlayers, useLocalStorage, setUseLocalStorage, command, setCommand, commands, setCommands, playersToSelect, setPlayersToSelect, databasePlayers, setDatabasePlayers, useDatabase, setUseDatabase, commandsToNotInclude, setCommandsToNotInclude, sameNamePlayeredEnabled, setSameNamePlayeredEnabled, deleteCompletely, setDeleteCompletely, noPlayersFoundMessage, setNoPlayersFoundMessage, useLazyLoad, setUseLazyLoad, playersLoading, setPlayersLoading, iPhone, set_iPhone, plays, setPlays }}>
+    return <StateContext.Provider value={{ router, rte, setRte, updates, setUpdates, content, setContent, width, setWidth, user, setUser, page, setPage, mobileMenu, setMobileMenu, users, setUsers, authState, setAuthState, emailField, setEmailField, devEnv, setDevEnv, mobileMenuBreakPoint, platform, setPlatform, focus, setFocus, highScore, setHighScore, color, setColor, dark, setDark, colorPref, setColorPref, qotd, setQotd, alertOpen, setAlertOpen, mobile, setMobile, systemStatus, setSystemStatus, loading, setLoading, anim, setAnimComplete, IDs, setIDs, categories, setCategories, browser, setBrowser, onMac, rearranging, setRearranging, buttonText, setButtonText, gameFormStep, setGameFormStep, players, setPlayers, filteredPlayers, setFilteredPlayers, useLocalStorage, setUseLocalStorage, command, setCommand, commands, setCommands, playersToSelect, setPlayersToSelect, databasePlayers, setDatabasePlayers, useDatabase, setUseDatabase, commandsToNotInclude, setCommandsToNotInclude, sameNamePlayeredEnabled, setSameNamePlayeredEnabled, deleteCompletely, setDeleteCompletely, noPlayersFoundMessage, setNoPlayersFoundMessage, useLazyLoad, setUseLazyLoad, playersLoading, setPlayersLoading, iPhone, set_iPhone, plays, setPlays, amount, setAmount, setParameter, setSetParameter }}>
       {(browser != `chrome` || onMac && browser != `chrome`) ? <div className={bodyClasses}>
         <AnimatePresence mode={`wait`}>
           <motion.div className={bodyClasses} key={router.route} initial="pageInitial" animate="pageAnimate" exit="pageExit" transition={{ duration: 0.35 }} variants={{

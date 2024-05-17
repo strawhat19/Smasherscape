@@ -6,7 +6,6 @@ import Role from '../models/Role';
 import Stock from '../models/Stock';
 import Level from '../models/Level';
 import Player from '../models/Player';
-import { Commands } from './Commands';
 import { toast } from 'react-toastify';
 import PlayerOption from './PlayerOption';
 import CommandsUndo from './CommandsUndo';
@@ -18,13 +17,14 @@ import CharacterOption from './CharacterOption';
 import { Characters } from '../common/Characters';
 import Autocomplete from '@mui/material/Autocomplete';
 import { FormEvent, useContext, useRef } from 'react';
+import { Commands, defaultSetParameter } from './Commands';
 import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
 import { doc, setDoc, deleteDoc, updateDoc } from 'firebase/firestore';
-import { checkUserRole, getActivePlayers, getCharacterTitle, isInvalid } from './smasherscape';
-import { calcPlayerLosses, calcPlayerLossesFromPlays, calcPlayerWins, calcPlayerWinsFromPlays } from './PlayerCard';
-import { Levels, calcLevelFromExperience, calcLevelFromNumber, calcPlayerLevelAndExperience, getLevelFromNumber, levelsArray } from '../common/Levels';
+import { checkUserRole, getActivePlayers, isInvalid } from './smasherscape';
+import { calcPlayerLossesFromPlays, calcPlayerWinsFromPlays } from './PlayerCard';
+import { calcLevelFromNumber, calcPlayerLevelAndExperience } from '../common/Levels';
 import { calcPlayerDeaths, calcPlayerKDRatio, calcPlayerKills, parseDate, removeTrailingZeroDecimal } from './PlayerRecord';
-import { StateContext, showAlert, formatDate, generateUniqueID, countPropertiesInObject, getActivePlayersJSON, usePlayersDatabase, defaultXPMultiplier, XPGainOnWin, XPGainOnLoserXPForEachStockTaken, winCons, loseCons, dev, useDB, usePlaysDatabase } from '../pages/_app';
+import { StateContext, showAlert, formatDate, generateUniqueID, countPropertiesInObject, getActivePlayersJSON, usePlayersDatabase, defaultXPMultiplier, XPGainOnWin, XPGainOnLoserXPForEachStockTaken, winCons, loseCons, dev, usePlaysDatabase } from '../pages/_app';
 
 export const deletePlayFromDB = async (playID) => await deleteDoc(doc(db, usePlaysDatabase, playID));
 export const addPlayToDB = async (playObj: Play) => await setDoc(doc(db, usePlaysDatabase, playObj?.ID), playObj);
@@ -298,7 +298,6 @@ export const setParametersWithParameters = (parameters: Parameters) => {
         players,
         setPlayers,
         commandParams,
-        setLoadingPlayers
     } = parameters;
 
     let updatedPlayers: Player[] = [];
@@ -314,10 +313,12 @@ export const setParametersWithParameters = (parameters: Parameters) => {
         return;
     } else {
         if (isInvalid(parameter) || isInvalid(amount)) {
+            let validParam = parameter != defaultSetParameter.toLowerCase();
             showAlert(`Please Enter Parameter & Valid Amount`, <h1>
-                Please Enter Parameter such as `xp` or `lvl`.
-                For XP: Please Enter Valid Amount such as `100` or `-500`.
-                For LVL: Please Enter Valid Amount between `1` or `99`.
+                {validParam ? <>Please Enter Valid Value.<br /></> : <>Please Enter Parameter such as `xp` or `level` or `xpmod`.<br /></>}
+                For XP: Please Enter Valid Amount such as `100` or `-500`.<br />
+                For Level: Please Enter Valid Amount between `1` and `99`.<br />
+                For XP Mod: Please Enter Valid Amount between `1` and `9`.
             </h1>, `65%`, `35%`);
             return;
         } else {
@@ -354,7 +355,6 @@ export const giveParameterWithParameters = (parameters: Parameters) => {
         players,
         setPlayers,
         commandParams,
-        setLoadingPlayers
     } = parameters;
 
     let updatedPlayers: Player[] = [];
@@ -656,7 +656,7 @@ export const updatePlayersWithParameters = (parameters: Parameters) => {
 export const processCommandsWithParameters = (parameters: Parameters) => {
     let {
         command,
-        setLoadingPlayers
+        // setLoadingPlayers
     } = parameters as Parameters;
 
     // setLoadingPlayers(true);

@@ -2,31 +2,32 @@ import React from 'react';
 import User from '../models/User';
 import CodeBlock from "./CodeBlock";
 import Player from '../models/Player';
+import RangeSlider from './RangeSlider';
 import Command from "../models/Command";
 import PlayerOption from './PlayerOption';
 import { matchSorter } from 'match-sorter';
-import { defaultCommands } from "./Commands";
 import { useContext, useState } from "react";
 import { StateContext } from "../pages/_app";
 import Parameters from '../models/Parameters';
 import PlayerSelector from './PlayerSelector';
 import CharacterOption from './CharacterOption';
 import { getActivePlayers } from "./smasherscape";
+import { defaultCommands, defaultSetParameter } from "./Commands";
 import { getCharacterObjects, processCommandsWithParameters } from './PlayerForm';
 import { Autocomplete, TextField, ToggleButton, ToggleButtonGroup } from "@mui/material";
 
 export const getDefaultPlayer = (number) => ({id: number, type: `Default`, name: `Player-${number}`, label: `Player-${number}`});
 
 export default function CommandsForm(props) {
-    let [characters, setCharacters] = useState([]);
+    const { user, players, command, setCommand, playersToSelect, setPlayersToSelect, commandsToNotInclude, commands, setPlayers, useDatabase, databasePlayers, updatePlayersLocalStorage, deleteCompletely, setFilteredPlayers, sameNamePlayeredEnabled, setLoadingPlayers, iPhone, plays, setPlays, amount, setAmount, setParameter, setSetParameter } = useContext<any>(StateContext);
+
     let [condition, setCondition] = useState(`vs`);
-    let [amount, setAmount] = useState<any>(`Amount`);
+    let [characters, setCharacters] = useState([]);
     let [charOne, setCharOne] = useState(`Character-One`);
     let [charTwo, setCharTwo] = useState(`Character-Two`);
     let [playerOne, setPlayerOne] = useState<any>(getDefaultPlayer(1));
     let [playerTwo, setPlayerTwo] = useState<any>(getDefaultPlayer(2));
     let [stocksTaken, setStocksTaken] = useState<any>(`Stocks-Taken-From-Winner`);
-    let [setParameter, setSetParameter] = useState<any>(`([Level, Experience, XP Modifier])`);
     let dynamicFormCommands = [defaultCommands.Update.command, defaultCommands.Set.command, defaultCommands.Give.command];
 
     let [conditions, setConditions] = useState<any>([
@@ -46,7 +47,7 @@ export default function CommandsForm(props) {
         {
             id: 1, 
             label: `Level`, 
-            icon: <i className={`fas fa-signal`}></i>,
+            icon: <i className={`fas fa-sort-amount-up`}></i>,
         },
         {
             id: 2, 
@@ -56,16 +57,16 @@ export default function CommandsForm(props) {
         {
             id: 2, 
             label: `XP Modifier`, 
-            icon: <i className={`fas fa-signal`}></i>,
+            icon: <i className={`fas fa-sort-numeric-up-alt`}></i>,
         },
     ]);
-
-    const { user, players, command, setCommand, playersToSelect, setPlayersToSelect, commandsToNotInclude, commands, setPlayers, useDatabase, databasePlayers, updatePlayersLocalStorage, deleteCompletely, setFilteredPlayers, sameNamePlayeredEnabled, setLoadingPlayers, iPhone, plays, setPlays } = useContext<any>(StateContext);
 
     const adjustCommand = (e, val) => {
         if (val) {
             setCommand(val);
+            setAmount(`Amount`);
             setPlayersToSelect([]);
+            setSetParameter(defaultSetParameter);
             document.querySelectorAll(`.clearAllTagsIcon`).forEach((clearButton: any) => clearButton.click());
         }
     }
@@ -153,7 +154,7 @@ export default function CommandsForm(props) {
         if (command) {
             if (command.command == `!del`) {
                 commandToReturn = `!del ${playersSelected}`;
-            } else if (command.command == `!set`) {
+            } else if (command.command == defaultCommands.Set.command) {
                 commandToReturn = `!set ${playersSelected} ${setParameter} ${amount}`;
             } else if (command.command == `!giv`) {
                 commandToReturn = `!giv ${playersSelected} ([xp, bonus]) ${amount}`;
@@ -173,6 +174,7 @@ export default function CommandsForm(props) {
             players, 
             setPlays,
             commands,
+            setAmount,
             setPlayers, 
             useDatabase, 
             commandParams,
@@ -297,7 +299,7 @@ export default function CommandsForm(props) {
                             />
                         </div>
                     </div>
-                    <div className={`updateRow updateBottomRow ${playerOne && playerTwo && ((typeof playerOne == `string` ? playerOne != `Player-1` : playerOne.type != `Default`) && (typeof playerTwo == `string` ? playerTwo != `Player-2` : playerTwo.type != `Default`) && condition != `vs`) ? `expanded` : `collapsed`}`}>
+                    <div className={`updateRow updateNextRow ${playerOne && playerTwo && ((typeof playerOne == `string` ? playerOne != `Player-1` : playerOne.type != `Default`) && (typeof playerTwo == `string` ? playerTwo != `Player-2` : playerTwo.type != `Default`) && condition != `vs`) ? `expanded` : `collapsed`}`}>
                         <div className={`characterSearchAuto inputWrapper materialBGInputWrapper`}>
                             <div className={`inputBG materialBG`}></div>
                             <Autocomplete
@@ -375,7 +377,7 @@ export default function CommandsForm(props) {
                 </div>
                 <div className={`setCommandsForm multiSelectCommandsForm commandInputs ${command.command == `!set` ? `expanded` : `collapsed`}`}>
                     <PlayerSelector />
-                    <div className={`updateRow nextParameterRow updateBottomRow ${playersToSelect.length > 0 ? `expanded` : `collapsed`}`}>
+                    <div className={`updateRow nextParameterRow updateNextRow ${playersToSelect.length > 0 ? `expanded` : `collapsed`}`}>
                         <div className={`toggleButtonsContainer conditionToggle`}>
                             <ToggleButtonGroup
                                 exclusive
@@ -398,6 +400,9 @@ export default function CommandsForm(props) {
                                 })}
                             </ToggleButtonGroup>
                         </div>
+                    </div>
+                    <div className={`updateRow nextParameterRow updateNextRow ${(playersToSelect.length > 0) && (setParameter != defaultSetParameter) ? `expanded` : `collapsed`}`}>
+                        <RangeSlider name={`Set to Level`} min={0} defaultValue={50} max={99} marks={false} showMinMax={true} setAmount={setAmount} />
                     </div>
                 </div>
                 <div className={`giveCommandsForm multiSelectCommandsForm commandInputs ${command.command == `!giv` ? `expanded` : `collapsed`}`}>

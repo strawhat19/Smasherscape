@@ -858,7 +858,7 @@ footer {
                     }
                 }
                 &.collapsed {
-                    &.updateBottomRow {
+                    &.updateNextRow {
                         @media (min-width: 768px) {
                             margin: 0;
                             opacity: 0;
@@ -868,7 +868,7 @@ footer {
                             pointer-events: none;
                         }
                     }
-                    &:not(.updateBottomRow) {
+                    &:not(.updateNextRow) {
                         margin: 0;
                         opacity: 0;
                         height: 0px;
@@ -880,13 +880,13 @@ footer {
                 &.expanded {
                     height: 100%;
                 }
-                &.updateBottomRow {
+                &.updateNextRow {
                     width: 85%;
                     margin: 0 auto;
                 }
             }
             &.collapsed {
-                &.updateBottomRow {
+                &.updateNextRow {
                     @media (min-width: 768px) {
                         margin: 0;
                         opacity: 0;
@@ -896,7 +896,7 @@ footer {
                         pointer-events: none;
                     }
                 }
-                &:not(.updateBottomRow) {
+                &:not(.updateNextRow) {
                     margin: 0;
                     opacity: 0;
                     height: 0px;
@@ -2068,7 +2068,7 @@ div[role="presentation"] {
             &.updateTopRow {
                 display: flex !important;
             }
-            &.updateBottomRow {
+            &.updateNextRow {
                 width: 100% !important;
             }
         }
@@ -2149,6 +2149,9 @@ div[role="presentation"] {
 @media (min-width: 677px) and (max-width: 1366px) {
     .cardLevelImage {
         transform: scale(1.55) !important;
+        &.bigImage {
+            transform: scale(1.35) !important;
+        }
     }
     .xpDetail {
         width: 95%;
