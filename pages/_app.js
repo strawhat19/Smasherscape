@@ -437,6 +437,7 @@ export const defaultPlayers = [];
 
 export default function Xuruko({ Component, pageProps, router }) {
     let brwser = ``;
+    let useSetGive = false;
     let loaded = useRef(false);
     let mobileMenuBreakPoint = 697;
     let [IDs, setIDs] = useState([]);
@@ -474,7 +475,7 @@ export default function Xuruko({ Component, pageProps, router }) {
     let [systemStatus, setSystemStatus] = useState(``);
     let [buttonText, setButtonText] = useState(`Next`);
     let [rearranging, setRearranging] = useState(false);
-    let [content, setContent] = useState(`defaultContent`)
+    let [content, setContent] = useState(`defaultContent`);
     let [commands, setCommands] = useState(defaultCommands);
     let [year, setYear] = useState(new Date().getFullYear());
     let [playersToSelect, setPlayersToSelect] = useState([]);
@@ -485,7 +486,7 @@ export default function Xuruko({ Component, pageProps, router }) {
     let [deleteCompletely, setDeleteCompletely] = useState(false);
     let [sameNamePlayeredEnabled, setSameNamePlayeredEnabled] = useState(false);
     let [noPlayersFoundMessage, setNoPlayersFoundMessage] = useState(`No Players Found`);
-    let [commandsToNotInclude, setCommandsToNotInclude] = useState([`!com`, `!add`, `!res`, `!set`, `!giv`]);
+    let [commandsToNotInclude, setCommandsToNotInclude] = useState([`!com`, `!add`, `!res`].concat(useSetGive ? [] : [`!set`, `!giv`]));
 
     let [useLazyLoad, setUseLazyLoad] = useState(false);
     let [useDatabase, setUseDatabase] = useState(useDB());
@@ -513,10 +514,10 @@ export default function Xuruko({ Component, pageProps, router }) {
     const setCommandsToShow = (players) => {
       if (getActivePlayersJSON(players, false, plays).length < 2) {
         setCommand(defaultCommands.Delete);
-        setCommandsToNotInclude([`!com`, `!add`, `!res`, `!upd`, `!set`, `!giv`]);
+        setCommandsToNotInclude([`!com`, `!add`, `!res`, `!upd`].concat(useSetGive ? [] : [`!set`, `!giv`]));
       } else {
         setCommand(defaultCommands.Update);
-        setCommandsToNotInclude([`!com`, `!add`, `!res`, `!set`, `!giv`]);
+        setCommandsToNotInclude([`!com`, `!add`, `!res`].concat(useSetGive ? [] : [`!set`, `!giv`]));
       }
     }
 

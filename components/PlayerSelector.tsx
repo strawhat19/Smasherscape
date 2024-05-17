@@ -209,16 +209,18 @@ export default function PlayerSelector(props) {
   });
 
   return (
-    <Root className={`customHookRoot rootOfCustomHook`}>
+    <Root className={`customHookRoot dynamicHeightHookRoot rootOfCustomHook`}>
       <div {...getRootProps()} className={`customHookRootProps getRootProps`}>
         <div className={`playerHookInputWrapper`}>
-          <div className="playerHookInputBG"></div>
-          <InputWrapper className={`customHookRoot customHookRootInputWrapper ${focused ? `focused` : ``}`} ref={setAnchorEl}>
+          <div className={`playerHookInputBG`}></div>
+          <InputWrapper className={`multiSelectOptionContainer customHookRoot selectedOptions${playersToSelect.length}Container customHookRootInputWrapper ${focused ? `focused` : ``}`} ref={setAnchorEl}>
             {value.filter(v => playersToSelect.map(plyr => plyr.name).includes(v.name)).map((option: any, index: number) => (
-              <div key={index} className={`styledTagWithProps`}><StyledTag {...getTagProps({ index })} label={option.label} player={option} option={option} /></div>
+              <div key={index} className={`multiSelectOption styledTagWithProps selectedOptions${playersToSelect.length}`}>
+                <StyledTag {...getTagProps({ index })} label={option.label} player={option} option={option} />
+              </div>
             ))}
-            <input className={`playerHookInput`} placeholder={`Start Typing or Click Here to Enter Player(s) to ${command.name}`} {...getInputProps()} />
-            <i style={{width: 20, cursor: `pointer`}} className={`fas fa-times clearAllTagsIcon`} {...getClearProps()}></i>
+            <input className={`multiSelectOptionInput playerHookInput ${playersToSelect.length < 3 ? `` : `hiddenClickable`}`} placeholder={`Start Typing or Click Here to Enter Player(s) to ${command.name}`} {...getInputProps()} />
+            <i style={{width: 20, cursor: `pointer`}} className={`fas fa-times clearAllTagsIcon ${playersToSelect.length < 3 ? `` : `hiddenClickable`}`} {...getClearProps()}></i>
           </InputWrapper>
         </div>
       </div>

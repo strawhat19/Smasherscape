@@ -33,8 +33,9 @@ html, body {
     --smasherscapePurple: #7b4e9b;
     --smasherscapeNavyBlue: #1C2432;
     --win: var(--smasherscapeGreen2);
-    --customHookInputContainerHeight: 55px;
+    --customHookInputContainerHeight: auto;
     --playerDetailsColumnGaps: 1fr 110px 85px;
+    --customHookInputContainerOldHeight: 55px;
     --smasherscapeBlue2Transparent: rgba(49, 168, 229, 0.35);
     --smasherscapeBlue2Transparent2: rgba(49, 168, 229, 0.55);
     --smasherscapeGreen2Transparent: rgba(30, 220, 120, 0.35);
@@ -459,9 +460,9 @@ li {
         }
         h4 {
             font-size: 3.1em;
-            &.highNumbers {
-                font-size: 2.6em;
-            }
+            // &.highNumbers {
+            //     font-size: 2.6em;
+            // }
             font-family: 'RuneScape Chat';
             color: var(--smasherscapeYellow);
             text-shadow: 2px 2px 0px black;
@@ -677,6 +678,16 @@ button[title="Change theme"] {
     font-size: 16px !important;
 }
 
+.hiddenClickable {
+    opacity: 0;
+    display: none;
+    width: 0 !important;
+    pointer-events: none;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
 .nextra-nav-container-blur {
     position: relative;
     &::after {
@@ -722,7 +733,7 @@ footer {
             @media (max-width: 768px) {
                 margin: 0 auto 0 !important;
             }
-            &:not(:has(.Mui-focused)) {
+            &:not(:has(.Mui-focused)):not(.dynamicHeight) {
                 height: var(--customHookInputContainerHeight);
                 min-height: var(--customHookInputContainerHeight);
                 max-height: var(--customHookInputContainerHeight);
@@ -740,27 +751,40 @@ footer {
             .customHookRootInputWrapper {
                 width: 99.6%;
                 padding: 7px 10px;
-                max-height: var(--customHookInputContainerHeight);
+                &.multiSelectOptionContainer {
+                    justify-content: space-between;
+                    align-items: center;
+                    padding: 6px 10px;
+                    column-gap: 8px;
+                    row-gap: 7px;
+                }
+                &:not(.multiSelectOptionContainer) {
+                    max-height: var(--customHookInputContainerHeight);
+                }
                 .styledTagWithProps {
                     justify-content: center;
                     width: -moz-fit-content;
                     align-items: center;
                     width: fit-content;
+                    max-height: 41px;
+                    max-width: 32.7%;
                     display: flex;
-                    height: 100%;
                     div {
                         &:first-child {
                             .playerDetailsColumn {
-                                // grid-template-columns: 1fr 95px 99px;
                                 grid-template-columns: var(--playerDetailsColumnGaps);
                             }
                         }
                     }
+                    .playerStats {
+                        &.playerStatName {
+                            max-width: 35px !important;
+                        }
+                    }
                 }
                 .playerHookInput {
-                    // height: var(--customHookRootHeight);
+                    max-height: 35px !important;
                     height: var(--customHookInputContainerHeight);
-                    max-height: var(--customHookInputContainerHeight);
                 }
             }
         }
@@ -805,14 +829,19 @@ footer {
             display: grid;
             grid-template-columns: 1fr;
             transition: var(--transition);
+            &.multiSelectCommandsForm {
+                margin-bottom: -3px;
+            }
             .updateRow {
                 gap: 15px;
                 display: grid;
                 padding: 5px 0 0;
                 transition: var(--transition);
                 grid-template-columns: 1fr 350px 1fr;
-                &.setParamRow {
+                &.nextParameterRow {
+                    width: 100% !important;
                     grid-template-columns: 1fr;
+                    margin: 12px auto -12px !important;
                 }
                 &:has(.Mui-focused), &:has(.MuiAutocomplete-hasClearIcon) {
                     .conditionToggle {
@@ -2409,7 +2438,6 @@ div[role="presentation"] {
     }
     &.conditionToggle {
         div[role="group"] {
-            height: 75px;
             flex-direction: row;
             .buttonInnerText {
                 grid-gap: 15px;

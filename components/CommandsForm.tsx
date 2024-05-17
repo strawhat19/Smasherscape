@@ -5,9 +5,9 @@ import Player from '../models/Player';
 import Command from "../models/Command";
 import PlayerOption from './PlayerOption';
 import { matchSorter } from 'match-sorter';
-import { StateContext, dev } from "../pages/_app";
 import { defaultCommands } from "./Commands";
 import { useContext, useState } from "react";
+import { StateContext } from "../pages/_app";
 import Parameters from '../models/Parameters';
 import PlayerSelector from './PlayerSelector';
 import CharacterOption from './CharacterOption';
@@ -18,15 +18,16 @@ import { Autocomplete, TextField, ToggleButton, ToggleButtonGroup } from "@mui/m
 export const getDefaultPlayer = (number) => ({id: number, type: `Default`, name: `Player-${number}`, label: `Player-${number}`});
 
 export default function CommandsForm(props) {
-    let [expand, setExpand] = useState<any>(false);
     let [characters, setCharacters] = useState([]);
     let [condition, setCondition] = useState(`vs`);
+    let [amount, setAmount] = useState<any>(`Amount`);
     let [charOne, setCharOne] = useState(`Character-One`);
     let [charTwo, setCharTwo] = useState(`Character-Two`);
-    let [set, setSet] = useState<any>(`([XP Modifier, Level])`);
     let [playerOne, setPlayerOne] = useState<any>(getDefaultPlayer(1));
     let [playerTwo, setPlayerTwo] = useState<any>(getDefaultPlayer(2));
     let [stocksTaken, setStocksTaken] = useState<any>(`Stocks-Taken-From-Winner`);
+    let [setParameter, setSetParameter] = useState<any>(`([Level, Experience, XP Modifier])`);
+    let dynamicFormCommands = [defaultCommands.Update.command, defaultCommands.Set.command, defaultCommands.Give.command];
 
     let [conditions, setConditions] = useState<any>([
         {
@@ -38,6 +39,24 @@ export default function CommandsForm(props) {
             id: 2, 
             label: `Loses-to`, 
             icon: <i className={`fas fa-flag`}></i>,
+        },
+    ]);
+ 
+    let [setParameters, setSetParameters] = useState<any>([
+        {
+            id: 1, 
+            label: `Level`, 
+            icon: <i className={`fas fa-signal`}></i>,
+        },
+        {
+            id: 2, 
+            label: `Experience`, 
+            icon: <i className={`fas fa-signal`}></i>,
+        },
+        {
+            id: 2, 
+            label: `XP Modifier`, 
+            icon: <i className={`fas fa-signal`}></i>,
         },
     ]);
 
@@ -63,11 +82,20 @@ export default function CommandsForm(props) {
 
     const adjustCondition = (e, val) => {
         if (val) {
-            console.log(`Condition Val`, {e, val});
             if (typeof val == `string`) {
                 setCondition(val);
             } else {
                 setCondition(val.label);
+            }
+        }
+    }
+    
+    const adjustSetParameter = (e, val) => {
+        if (val) {
+            if (typeof val == `string`) {
+                setSetParameter(val);
+            } else {
+                setSetParameter(val.label);
             }
         }
     }
@@ -126,9 +154,9 @@ export default function CommandsForm(props) {
             if (command.command == `!del`) {
                 commandToReturn = `!del ${playersSelected}`;
             } else if (command.command == `!set`) {
-                commandToReturn = `!set ${playersSelected} ([lvl, xpmod]) amount`;
+                commandToReturn = `!set ${playersSelected} ${setParameter} ${amount}`;
             } else if (command.command == `!giv`) {
-                commandToReturn = `!giv ${playersSelected} ([xp, bonus]) amount`;
+                commandToReturn = `!giv ${playersSelected} ([xp, bonus]) ${amount}`;
             } else {
                 commandToReturn = `!upd ${playerOne?.name || `Player-1`} ${condition} ${playerTwo?.name || `Player-2`} with ${charOne} vs ${charTwo} ${stocksTaken}`;
             }
@@ -199,11 +227,11 @@ export default function CommandsForm(props) {
             </li>
         </ul>
         <section className={`formsSection`}>
-            <form onSubmit={(e) => submitCommandsForm(e, user)} className={`commandsForm ${command.class} ${command.command == `!upd` ? `updateCommandForm` : `customHookInputContainer`} gridForm ${iPhone ? `on_iPhoneCommandForm` : `notOn_iPhoneCommandForm`}`} action="submit">
+            <form onSubmit={(e) => submitCommandsForm(e, user)} className={`commandsForm ${command.class} ${defaultCommands.Update.command == command.command ? `updateCommandForm` : `customHookInputContainer`} ${dynamicFormCommands.includes(command.command) ? `dynamicHeight` : `staticHeight`} gridForm ${iPhone ? `on_iPhoneCommandForm` : `notOn_iPhoneCommandForm`}`} action={`submit`}>
                 <div className={`updateCommandsForm commandInputs ${command.command == `!upd` ? `expanded` : `collapsed`}`}>
                     <div className={`updateRow updateTopRow`}>
                         <div className={`playerSearchAuto inputWrapper materialBGInputWrapper`}>
-                            <div className="inputBG materialBG"></div>
+                            <div className={`inputBG materialBG`}></div>
                             <Autocomplete
                                 autoHighlight
                                 sx={{ width: `100%` }}
@@ -247,7 +275,7 @@ export default function CommandsForm(props) {
                             </ToggleButtonGroup>
                         </div>
                         <div className={`playerSearchAuto inputWrapper materialBGInputWrapper`}>
-                            <div className="inputBG materialBG"></div>
+                            <div className={`inputBG materialBG`}></div>
                             <Autocomplete
                                 autoHighlight
                                 sx={{ width: `100%` }}
@@ -271,7 +299,7 @@ export default function CommandsForm(props) {
                     </div>
                     <div className={`updateRow updateBottomRow ${playerOne && playerTwo && ((typeof playerOne == `string` ? playerOne != `Player-1` : playerOne.type != `Default`) && (typeof playerTwo == `string` ? playerTwo != `Player-2` : playerTwo.type != `Default`) && condition != `vs`) ? `expanded` : `collapsed`}`}>
                         <div className={`characterSearchAuto inputWrapper materialBGInputWrapper`}>
-                            <div className="inputBG materialBG"></div>
+                            <div className={`inputBG materialBG`}></div>
                             <Autocomplete
                                 autoHighlight
                                 sx={{ width: `100%` }}
@@ -294,7 +322,7 @@ export default function CommandsForm(props) {
                             />
                         </div>
                         <div className={`conditionAuto stocksAuto smallAuto inputWrapper materialBGInputWrapper ${iPhone ? `on_iPhoneStocksAuto` : `notOn_iPhoneStocksAuto`}`}>
-                            <div className="inputBG materialBG"></div>
+                            <div className={`inputBG materialBG`}></div>
                             <Autocomplete
                                 autoHighlight
                                 id="stocksAuto-1"
@@ -318,7 +346,7 @@ export default function CommandsForm(props) {
                             />
                         </div>
                         <div className={`characterSearchAuto inputWrapper materialBGInputWrapper`}>
-                            <div className="inputBG materialBG"></div>
+                            <div className={`inputBG materialBG`}></div>
                             <Autocomplete
                                 autoHighlight
                                 sx={{ width: `100%` }}
@@ -342,27 +370,27 @@ export default function CommandsForm(props) {
                         </div>
                     </div>
                 </div>
-                <div className={`deleteCommandsForm commandInputs ${command.command == `!del` ? `expanded` : `collapsed`}`}>
+                <div className={`deleteCommandsForm multiSelectCommandsForm commandInputs ${command.command == `!del` ? `expanded` : `collapsed`}`}>
                     <PlayerSelector />
                 </div>
-                <div className={`setCommandsForm commandInputs ${command.command == `!set` ? `expanded` : `collapsed`}`}>
+                <div className={`setCommandsForm multiSelectCommandsForm commandInputs ${command.command == `!set` ? `expanded` : `collapsed`}`}>
                     <PlayerSelector />
-                    <div className={`updateRow setParamRow updateBottomRow ${playersToSelect.length > 0 ? `expanded` : `collapsed`}`}>
+                    <div className={`updateRow nextParameterRow updateBottomRow ${playersToSelect.length > 0 ? `expanded` : `collapsed`}`}>
                         <div className={`toggleButtonsContainer conditionToggle`}>
                             <ToggleButtonGroup
                                 exclusive
-                                value={set}
                                 color={`primary`}
+                                value={setParameter}
                                 aria-label={`Platform`}
-                                onChange={(e, val) => val && setSet(val)}
+                                onChange={(e, val) => val && adjustSetParameter(e, val)}
                             >
-                                {[`XPModifier`, `Level`].map((setParam, setParamsIndex) => {
+                                {setParameters.map((setParam, setParamsIndex) => {
                                     return (
-                                        <ToggleButton key={setParamsIndex} size={`small`} value={setParam}>
-                                            <span id={`setParam-${setParam}`} className={`buttonInnerText`}>
-                                                {/* {setParam?.icon} */}
+                                        <ToggleButton key={setParamsIndex} size={`small`} value={setParam.label}>
+                                            <span id={`setParam-${setParam.id}-${setParam.label}`} className={`buttonInnerText`}>
+                                                {setParam?.icon}
                                                 <div className={`buttonRowText`}>
-                                                    <div className={`buttonRowTextInner`}>{setParam}</div>
+                                                    <div className={`buttonRowTextInner`}>{setParam.label}</div>
                                                 </div>
                                             </span>
                                         </ToggleButton>
@@ -372,147 +400,8 @@ export default function CommandsForm(props) {
                         </div>
                     </div>
                 </div>
-                <div className={`commandInputs giveCommandsForm ${command.command == `!giv` ? `expanded` : `collapsed`}`}>
-                    <div className={`updateRow updateTopRow`}>
-                        <div className={`playerSearchAuto inputWrapper materialBGInputWrapper`}>
-                            <div className="inputBG materialBG"></div>
-                            <Autocomplete
-                                autoHighlight
-                                sx={{ width: `100%` }}
-                                id={`playerSearchAutoPlayer1`}
-                                getOptionLabel={(option) => option.name}
-                                onChange={(e, val: any) => adjustPlayers(e, val, `winner`)}
-                                onInputChange={(e, val: any) => adjustPlayers(e, val, `winner`)}
-                                isOptionEqualToValue={(option, value) => option.id === value.id}
-                                options={getActivePlayers(players, true, plays).filter(plyr => plyr?.id != playerTwo?.id)}
-                                renderInput={(params) => <TextField name={`players`} {...params} label="Player 1..." />}
-                                noOptionsText={`No Player(s) Found for Search`}
-                                renderOption={(props: any, playerOption: any) => {
-                                    return (
-                                        <div key={playerOption.id} {...props}>
-                                            <PlayerOption playerOption={playerOption} />
-                                        </div>
-                                    )
-                                }}
-                            />
-                        </div>
-                        <div className={`toggleButtonsContainer conditionToggle`}>
-                            <ToggleButtonGroup
-                                exclusive
-                                color={`primary`}
-                                value={condition}
-                                aria-label={`Platform`}
-                                onChange={(e, val) => val && adjustCondition(e, val)}
-                            >
-                                {conditions.map((con, conIndex) => {
-                                    return (
-                                        <ToggleButton key={conIndex} size={`small`} value={con.label}>
-                                            <span id={`${con.id}-${con.label}`} className={`buttonInnerText`}>
-                                                {con?.icon}
-                                                <div className={`buttonRowText`}>
-                                                    <div className={`buttonRowTextInner`}>{con.label}</div>
-                                                </div>
-                                            </span>
-                                        </ToggleButton>
-                                    )
-                                })}
-                            </ToggleButtonGroup>
-                        </div>
-                        <div className={`playerSearchAuto inputWrapper materialBGInputWrapper`}>
-                            <div className="inputBG materialBG"></div>
-                            <Autocomplete
-                                autoHighlight
-                                sx={{ width: `100%` }}
-                                id={`playerSearchAutoPlayer2`}
-                                getOptionLabel={(option) => option.name}
-                                onChange={(e, val: any) => adjustPlayers(e, val, `loser`)}
-                                onInputChange={(e, val: any) => adjustPlayers(e, val, `loser`)}
-                                isOptionEqualToValue={(option, value) => option.id === value.id}
-                                options={getActivePlayers(players, true, plays).filter(plyr => plyr.id != playerOne?.id)}
-                                renderInput={(params) => <TextField name={`players`} {...params} label="Player 2..." />}
-                                noOptionsText={`No Player(s) Found for Search`}
-                                renderOption={(props: any, playerOption: any) => {
-                                    return (
-                                        <div key={playerOption.id} {...props}>
-                                            <PlayerOption playerOption={playerOption} />
-                                        </div>
-                                    )
-                                }}
-                            />
-                        </div>
-                    </div>
-                    <div className={`updateRow updateBottomRow ${playerOne && playerTwo && ((typeof playerOne == `string` ? playerOne != `Player-1` : playerOne.type != `Default`) && (typeof playerTwo == `string` ? playerTwo != `Player-2` : playerTwo.type != `Default`) && condition != `vs`) ? `expanded` : `collapsed`}`}>
-                        <div className={`characterSearchAuto inputWrapper materialBGInputWrapper`}>
-                            <div className="inputBG materialBG"></div>
-                            <Autocomplete
-                                autoHighlight
-                                sx={{ width: `100%` }}
-                                options={getCharacterObjects()}
-                                id={`characterSearchAutoCommandsForm-1`}
-                                getOptionLabel={(option) => option.label}
-                                onChange={(e, val: any) => adjustCharacters(e, val, 1)}
-                                onInputChange={(e, val: any) => adjustCharacters(e, val, 1)}
-                                isOptionEqualToValue={(option, value) => option.id === value.id}
-                                renderInput={(params) => <TextField name={`characters`} {...params} label="Character 1..." />}
-                                noOptionsText={`No Character(s) Found for Search`}
-                                filterOptions={(characterOptions, state) => matchSorter(characterOptions, state.inputValue, { keys: [`label`, `shortcuts`] })}
-                                renderOption={(props: any, characterOption: any) => {
-                                    return (
-                                        <div key={characterOption.id} {...props}>
-                                            <CharacterOption plays={playerOne.type != `Default` ? plays.filter(ply => ply?.winnerUUID == playerOne?.uuid || ply?.loserUUID == playerOne?.uuid) : plays} type={playerOne.type != `Default` ? `Player` : `All`} plyr={playerTwo.type != `Default` ? playerTwo : `All`} characterOption={characterOption} />
-                                        </div>
-                                    )
-                                }}
-                            />
-                        </div>
-                        <div className={`conditionAuto stocksAuto smallAuto inputWrapper materialBGInputWrapper ${iPhone ? `on_iPhoneStocksAuto` : `notOn_iPhoneStocksAuto`}`}>
-                            <div className="inputBG materialBG"></div>
-                            <Autocomplete
-                                autoHighlight
-                                id="stocksAuto-1"
-                                sx={{ width: `100%` }}
-                                options={[{id: 0, label: `0 Stock(s)`}, {id: 1, label: `1 Stock(s)`}, {id: 2, label: `2 Stock(s)`}]}
-                                getOptionLabel={(option) => option.label}
-                                onChange={(e, val: any) => adjustStocks(e, val)}
-                                onInputChange={(e, val: any) => adjustStocks(e, val)}
-                                isOptionEqualToValue={(option, value) => option.id === value.id}
-                                renderInput={(params) => <TextField name={`stocks`} {...params} label="Stocks Taken from Winner..." />}
-                                noOptionsText={`No Stock(s) Found for Search`}
-                                renderOption={(props: any, option: any) => {
-                                    return (
-                                        <div key={option?.id} {...props}>
-                                            <div className="autocompleteOption singularLabel">
-                                                {option.label}
-                                            </div>
-                                        </div>
-                                    )
-                                }}
-                            />
-                        </div>
-                        <div className={`characterSearchAuto inputWrapper materialBGInputWrapper`}>
-                            <div className="inputBG materialBG"></div>
-                            <Autocomplete
-                                autoHighlight
-                                sx={{ width: `100%` }}
-                                options={getCharacterObjects()}
-                                id={`characterSearchAutoCommandsForm-2`}
-                                getOptionLabel={(option) => option.label}
-                                noOptionsText={`No Character(s) Found for Search`}
-                                onChange={(e, val: any) => adjustCharacters(e, val, 2)}
-                                onInputChange={(e, val: any) => adjustCharacters(e, val, 2)}
-                                isOptionEqualToValue={(option, value) => option.id === value.id}
-                                renderInput={(params) => <TextField name={`characters`} {...params} label="Character 2..." />}
-                                filterOptions={(characterOptions, state) => matchSorter(characterOptions, state.inputValue, { keys: [`label`, `shortcuts`] })}
-                                renderOption={(props: any, characterOption: any) => {
-                                    return (
-                                        <div key={characterOption.id} {...props}>
-                                            <CharacterOption plays={playerTwo.type != `Default` ? plays.filter(ply => ply?.winnerUUID == playerTwo?.uuid || ply?.loserUUID == playerTwo?.uuid) : plays} type={playerTwo.type != `Default` ? `Player` : `All`} plyr={playerOne.type != `Default` ? playerOne : `All`} characterOption={characterOption} />                               
-                                        </div>
-                                    )
-                                }}
-                            />
-                        </div>
-                    </div>
+                <div className={`giveCommandsForm multiSelectCommandsForm commandInputs ${command.command == `!giv` ? `expanded` : `collapsed`}`}>
+                    <PlayerSelector />
                 </div>
                 <button className={`formSubmitButton commandsFormSubmit`} type={`submit`}>Submit</button>
             </form>

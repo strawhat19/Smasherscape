@@ -15,8 +15,8 @@ export default function PlayerOption(props) {
                 <img width={30} src={calcPlayerLevelImage(playerOption?.level?.name)} alt={playerOption?.level?.name} />
             </div>
             <div className="playerDetailsColumn">
-                <div className="playerStats justifyContentCenter">
-                    <span>{playerOption?.name}</span>
+                <div title={playerOption?.name} className="playerStats playerStatName justifyContentCenter">
+                    <span className={`textOverflow extended`}>{playerOption?.name}</span>
                     {/* <div className="playerStatDetails subtleTextInLabel">
                         <div className={`statDetailLabelSmall`}><span className={`subtleTextInLabel`}>K:</span> {playerOption?.kills}</div>
                         <div className={`statDetailLabelSmall`}><span className={`subtleTextInLabel`}>D:</span> {playerOption?.deaths}</div>

@@ -196,7 +196,7 @@ function PlayerRecord(props) {
                 {filteredPlays?.length > 0 && <div className="flex white noShadow recordForms">
                     <form action="submit" className="gridForm recordForm">
                         <div className={`playerSearchAuto inputWrapper materialBGInputWrapper`}>
-                            <div className="inputBG materialBG"></div>
+                            <div className={`inputBG materialBG`}></div>
                             <Autocomplete
                                 autoHighlight
                                 disabled={characterSearchActive == true}
@@ -223,7 +223,7 @@ function PlayerRecord(props) {
                             />
                         </div>
                         <div className={`characterSearchAuto inputWrapper materialBGInputWrapper`}>
-                            <div className="inputBG materialBG"></div>
+                            <div className={`inputBG materialBG`}></div>
                             <Autocomplete
                                 autoHighlight
                                 disabled={playerSearchActive == true}

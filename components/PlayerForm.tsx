@@ -792,7 +792,7 @@ export default function PlayerForm(props) {
     <form id={`playerForm`} onSubmit={(e) => handleCommands(e, user, plays, setPlays)} action="submit" className={`gridForm ${getActivePlayers(players, true, plays).length > 0 ? `populated ${getActivePlayers(players, true, plays).length} ${plays && plays?.length > 0 ? `hasPlays` : `noPlays`}` : `empty`} ${(useDatabase == false || (user && checkUserRole(user, `Admin`))) ? `hasCommandsPerm` : `noCommandsPerm`} ${command?.name}`}>
         {getActivePlayers(players, true, plays).length > 0 && <>
             <div className={`playerSearchAuto inputWrapper materialBGInputWrapper`}>
-                <div className="inputBG materialBG"></div>
+                <div className={`inputBG materialBG`}></div>
                 <Autocomplete
                     autoHighlight
                     ref={searchInput}
@@ -821,7 +821,7 @@ export default function PlayerForm(props) {
         </div>}
         {(getActivePlayers(players, true, plays).length > 0 && plays && plays?.length > 0) && <>
             <div className={`characterSearchAuto inputWrapper materialBGInputWrapper`}>
-                <div className="inputBG materialBG"></div>
+                <div className={`inputBG materialBG`}></div>
                 <Autocomplete
                     autoHighlight
                     id="characterSearchAuto-1"

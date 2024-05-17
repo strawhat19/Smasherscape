@@ -60,7 +60,7 @@ export const defaultCommands = {
     description: `Set Parameter for Player(s)`,
     triggers: [`!st`, `!set`, `!change`],
     shortDescription: `Set Parameter for Player(s)`,
-    example: `!set playerName ([XP Modifier, Level]) amount (xp coming soon)`,
+    example: `!set name(s) of player(s) ([Level, Experience, XP Modifier]) amount`,
   },
   Give: {
     id: 7,
@@ -71,7 +71,7 @@ export const defaultCommands = {
     description: `Give Parameter to Player(s)`,
     triggers: [`!giv`, `!give`],
     shortDescription: `Give Parameter to Player(s)`,
-    example: `!giv playerName (xp) amount`,
+    example: `!giv name(s) of player(s) (xp) amount`,
   },
 };
 
