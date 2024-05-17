@@ -190,7 +190,7 @@ li {
         width: 100%;
     }
     .gridCard {
-        z-index: 1;
+        z-index: 2;
         width: 100%;
         height: 100%;
         display: flex;
@@ -199,10 +199,6 @@ li {
         align-items: center;
         flex-direction: column;
         justify-content: center;
-        // background-size: contain !important;
-        // background-repeat: no-repeat !important;
-        // background-position: 50% 50% !important;
-        // background: url(/assets/OSRS_Card_Empty.png?raw=true);
         .playerCardContent {
             z-index: 1;
             width: 87%;
@@ -717,8 +713,8 @@ footer {
     flex-direction: column;
     .commandsForm {
         gap: 15px;
-        z-index: 2;
         margin: 0 auto 0;
+        z-index: 9 !important;
         grid-template-columns: 1fr;
         transition: var(--transition);
         &.customHookInputContainer {
@@ -815,6 +811,9 @@ footer {
                 padding: 5px 0 0;
                 transition: var(--transition);
                 grid-template-columns: 1fr 350px 1fr;
+                &.setParamRow {
+                    grid-template-columns: 1fr;
+                }
                 &:has(.Mui-focused), &:has(.MuiAutocomplete-hasClearIcon) {
                     .conditionToggle {
                         div[role="group"] {
@@ -1671,7 +1670,7 @@ div[role="presentation"] {
     margin-bottom: 40px;
     .playerBadgesContainer {
         top: -10px;
-        z-index: 2;
+        z-index: 3;
         right: 20px;
         display: flex;
         grid-gap: 10px;
@@ -2037,6 +2036,9 @@ div[role="presentation"] {
                 grid-row: 2;
                 grid-column: 1 / span 2;
             }
+            &.updateTopRow {
+                display: flex !important;
+            }
             &.updateBottomRow {
                 width: 100% !important;
             }
@@ -2397,6 +2399,14 @@ div[role="presentation"] {
     padding: 0;
     width: 100%;
     text-align: center;
+    @media (max-width: 600px) {
+        &.commandsToggle {
+            div[role="group"] {
+                height: unset;
+                flex-direction: column;
+            }
+        }
+    }
     &.conditionToggle {
         div[role="group"] {
             height: 75px;

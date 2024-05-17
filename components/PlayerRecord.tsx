@@ -92,13 +92,11 @@ function PlayerRecord(props) {
     };
 
     if (plyrRecord.current) {
-      dev() && console.log(`addEventListener plyrRecord.current`, plyrRecord.current);
       plyrRecord.current.addEventListener(`scroll`, handleScroll);
     }
 
     return () => {
       if (plyrRecord.current) {
-        dev() && console.log(`removeEventListener plyrRecord.current`, plyrRecord.current);
         plyrRecord.current.removeEventListener(`scroll`, handleScroll);
       }
     };

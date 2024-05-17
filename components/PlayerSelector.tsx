@@ -184,8 +184,8 @@ const Listbox = styled(`ul`)(
 `,
 );
 
-export default function CustomizedHook(props) {
-  const { plays, players, playersToSelect, setPlayersToSelect } = useContext<any>(StateContext);
+export default function PlayerSelector(props) {
+  const { plays, command, players, playersToSelect, setPlayersToSelect } = useContext<any>(StateContext);
   const adjustPlayersToSelect = (e: any, val: any) => setPlayersToSelect(val);
   const {
     value,
@@ -217,8 +217,8 @@ export default function CustomizedHook(props) {
             {value.filter(v => playersToSelect.map(plyr => plyr.name).includes(v.name)).map((option: any, index: number) => (
               <div key={index} className={`styledTagWithProps`}><StyledTag {...getTagProps({ index })} label={option.label} player={option} option={option} /></div>
             ))}
-            <input className={`playerHookInput`} placeholder={`Start Typing or Click Here to Enter Player(s) to Delete`} {...getInputProps()} />
-            <i style={{width: 20, cursor: `pointer`}} className="fas fa-times clearAllTagsIcon" {...getClearProps()}></i>
+            <input className={`playerHookInput`} placeholder={`Start Typing or Click Here to Enter Player(s) to ${command.name}`} {...getInputProps()} />
+            <i style={{width: 20, cursor: `pointer`}} className={`fas fa-times clearAllTagsIcon`} {...getClearProps()}></i>
           </InputWrapper>
         </div>
       </div>
