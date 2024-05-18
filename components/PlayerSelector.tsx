@@ -166,6 +166,7 @@ const Listbox = styled(`ul`)(
 
     &:hover {
       filter: brightness(1.15);
+      
     }
 
     & svg {

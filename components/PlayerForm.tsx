@@ -358,6 +358,12 @@ export const setParametersWithParameters = (parameters: Parameters) => {
                     </h1>, `65%`, `35%`);
                     return;
                 } else {
+                    playersToSetFromDB.forEach(plyr => {
+                        let playerToUpdateTo = { ...plyr, xpModifier: amount };
+                        let jsonUpdatedPlayer = JSON.parse(JSON.stringify(playerToUpdateTo));
+                        updatePlayerInDB(plyr, jsonUpdatedPlayer);
+                        toast.success(`Updated Player ${plyr?.name} XP Modifier from ${plyr?.xpModifier}x Multiplier to ${amount}x Multiplier`);
+                    })
                     // updatedPlayers = players.map(plyr => {
                     //     if (plyr?.name.toLowerCase() == playerToSetDB?.name?.toLowerCase() || plyr?.name.toLowerCase().includes(playerToSetDB?.name?.toLowerCase())) {
                     //         plyr.xpModifier = amount;
@@ -368,14 +374,15 @@ export const setParametersWithParameters = (parameters: Parameters) => {
                     // });
                     // updatePlayersLocalStorage(updatedPlayers, plays);
                     // setPlayers(updatedPlayers);
-                    console.log(`Set XP Modifier`, {
-                        amount,
-                        parameter,
-                        commandParams,
-                        playersToSetFromDB,
-                    });
-                    toast.info(`XP Set Modifier Is In Development!`, autoCloseToastOptions);
-                    return;
+                    
+                    // console.log(`Set XP Modifier`, {
+                    //     amount,
+                    //     parameter,
+                    //     commandParams,
+                    //     playersToSetFromDB,
+                    // });
+                    // toast.info(`XP Set Modifier Is In Development!`, autoCloseToastOptions);
+                    // return;
                 }
             } else if (setLevel) {
                 let { experience, level } = calcLevelFromNumber(amount);
@@ -384,7 +391,7 @@ export const setParametersWithParameters = (parameters: Parameters) => {
                     playersToSetFromDB.forEach(plyr => {
                         let playerToUpdateTo = { ...plyr, experience, level };
                         updatePlayerInDB(plyr, playerToUpdateTo);
-                        toast.success(`Update Player ${plyr?.name} Level from ${plyr?.level?.num} to ${amount}`);
+                        toast.success(`Updated Player ${plyr?.name} Level from ${plyr?.level?.num} to ${amount}`, autoCloseToastOptions);
                     })
                 } else {
                     showAlert(`Please Only Update 1 - 3 Player(s) at a time`, <h1>
@@ -696,7 +703,9 @@ export const updatePlayersWithParameters = (parameters: Parameters) => {
                 showPropertiesWarning(`Critical`, winnerDB, loserDB);
                 return;
             } else {
+                toast.success(`Updating Winner ${updatedWinner?.name} Experience from ${winnerDB?.experience?.arenaXP} to ${updatedWinner?.experience?.arenaXP}`, autoCloseToastOptions);
                 updatePlayerInDB(winnerDB, updatedWinner);
+                toast.error(`Updating Loser ${updatedloser?.name} Experience from ${loserDB?.experience?.arenaXP} to ${updatedloser?.experience?.arenaXP}`, autoCloseToastOptions);
                 updatePlayerInDB(loserDB, updatedloser);
                 if (winnerDB.properties >= 19000 || loserDB.properties >= 19000) {
                     showPropertiesWarning(`Warning`, winnerDB, loserDB);

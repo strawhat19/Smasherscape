@@ -4,28 +4,31 @@ import { StateContext } from "../pages/_app";
 import { calcPlayerCharacterIcon } from "../common/CharacterIcons";
 import { calcPlayerWinsFromPlays, calcPlayerLossesFromPlays } from "./PlayerCard";
 import { calcPlayerCharactersPlayed, calcPlayerCharacterTimesPlayed, calcPlayerLevelImage, getCharacterTitle } from "./smasherscape";
+import BadgesContainer from "./BadgesContainer";
 
 export default function PlayerOption(props) {
     let { playerOption, className } = props;
     const { plays } = useContext<any>(StateContext);
     return (
         <div className={`autocompleteOption ${className ? className : ``}`}>
-            <div className="levelNumColumn">Lv {playerOption?.level?.num}</div>
-            <div className="levelImageColumn">
+            {/* <BadgesContainer player={playerOption} className={`inOption`} /> */}
+            <div className={`levelNumColumn`}>Lv {playerOption?.level?.num}</div>
+            <div className={`levelImageColumn`}>
                 <img width={30} src={calcPlayerLevelImage(playerOption?.level?.name)} alt={playerOption?.level?.name} />
             </div>
-            <div className="playerDetailsColumn">
-                <div title={playerOption?.name} className="playerStats playerStatName justifyContentCenter">
+            <div className={`playerDetailsColumn`}>
+                <div title={playerOption?.name} className={`playerStats playerStatName justifyContentCenter`}>
                     <span className={`textOverflow extended`}>{playerOption?.name}</span>
-                    {/* <div className="playerStatDetails subtleTextInLabel">
+                    {/* <BadgesContainer player={playerOption} className={`inOption`} /> */}
+                    {/* <div className={`playerStatDetails subtleTextInLabel`}>
                         <div className={`statDetailLabelSmall`}><span className={`subtleTextInLabel`}>K:</span> {playerOption?.kills}</div>
                         <div className={`statDetailLabelSmall`}><span className={`subtleTextInLabel`}>D:</span> {playerOption?.deaths}</div>
                     </div> */}
                 </div>
-                <div className="playerEXP subtleTextInLabel">
-                    <div className="playerStats">
+                <div className={`playerEXP subtleTextInLabel`}>
+                    <div className={`playerStats`}>
                         <span>Exp: {playerOption?.experience?.arenaXP?.toLocaleString(`en`)}</span>
-                        <div className="playerStatDetails subtleTextInLabel">
+                        <div className={`playerStatDetails subtleTextInLabel`}>
                             <div className={`statDetailLabelSmall`}><span className={`subtleTextInLabel`}>Wins:</span> {plays?.length > 0 ? calcPlayerWinsFromPlays(playerOption, plays.filter(ply => ply?.winnerUUID == playerOption?.uuid || ply?.loserUUID == playerOption?.uuid)) : 0 || plays?.length > 0 ? playerOption?.wins : 0}</div>
                             <div className={`statDetailLabelSmall`}><span className={`subtleTextInLabel`}>Losses:</span> {plays?.length > 0 ? calcPlayerLossesFromPlays(playerOption, plays.filter(ply => ply?.winnerUUID == playerOption?.uuid || ply?.loserUUID == playerOption?.uuid)) : 0 || plays?.length > 0 ? playerOption?.losses : 0}</div>
                         </div>
