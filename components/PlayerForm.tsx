@@ -302,27 +302,43 @@ export const setParametersWithParameters = (parameters: Parameters) => {
 
     let updatedPlayers: Player[] = [];
     let playerToSet = commandParams[1].toLowerCase();
-    let parameter = commandParams[2].toLowerCase();
-    let amount = parseFloat(commandParams[3]);
+    let parameter = commandParams[commandParams.length - 2].toLowerCase();
+    let amount = parseFloat(commandParams[commandParams.length - 1]);
     let playerToSetDB: Player = players.find(plyr => plyr?.name.toLowerCase() == playerToSet || plyr?.name.toLowerCase().includes(playerToSet));
 
-    if (!playerToSetDB) {
-        showAlert(`Can't Find Players`, <h1>
-            Can't find players with that name.
-        </h1>, `65%`, `35%`);
-        return;
-    } else {
-        if (isInvalid(parameter) || isInvalid(amount)) {
-            let validParam = parameter != defaultSetParameter.toLowerCase();
-            showAlert(`Please Enter Parameter & Valid Amount`, <h1>
-                {validParam ? <>Please Enter Valid Value.<br /></> : <>Please Enter Parameter such as `xp` or `level` or `xpmod`.<br /></>}
+    let playersToSetFromDB: Player[] = [];
+    let playersToSet = commandParams.filter((comm, commIndex) => commIndex != 0 && comm && commIndex < commandParams.length - 2);
+
+    playersToSet.forEach(player => {
+        let playerDB: Player = getActivePlayers(players, true, plays).find(plyr => plyr?.name.toLowerCase() == player.toLowerCase() || plyr?.name.toLowerCase().includes(player.toLowerCase()));
+        if (playerDB) {
+            playersToSetFromDB.push(playerDB);
+        }
+    });
+
+    if (isInvalid(parameter) || isInvalid(amount)) {
+        let validParam = parameter != defaultSetParameter.toLowerCase();
+        showAlert(`Please Enter Parameter & Valid Amount`, <h1>
+            {(!playerToSetDB || playersToSetFromDB.length == 0) ? <>Please Select 1 - 3 Player(s)<br /></> : <></>}
+            {validParam ? <>Please Enter Valid Value.<br /></> : <>Please Enter Parameter such as `xp` or `level` or `xpmod`.<br /></>}
+            {isNaN(amount) ? <>
                 For XP: Please Enter Valid Amount such as `100` or `-500`.<br />
                 For Level: Please Enter Valid Amount between `1` and `99`.<br />
                 For XP Mod: Please Enter Valid Amount between `1` and `9`.
+            </> : <></>}
+        </h1>, `65%`, `auto`);
+        return;
+    } else {
+        if (!playerToSetDB || playersToSetFromDB.length == 0) {
+            showAlert(`Can't Find Players`, <h1>
+                Can't find players with that name.
             </h1>, `65%`, `35%`);
             return;
         } else {
-            if (parameter == `xpmod`) {
+            let setXPMod = parameter == `xpmod`;
+            let setLevel = parameter == `lv` || parameter == `lvl` || parameter == `level`;
+            let setExperience = parameter == `xp` || parameter == `exp` || parameter == `experience`;
+            if (setXPMod) {
                 updatedPlayers = players.map(plyr => {
                     if (plyr?.name.toLowerCase() == playerToSetDB?.name?.toLowerCase() || plyr?.name.toLowerCase().includes(playerToSetDB?.name?.toLowerCase())) {
                         plyr.xpModifier = amount;
@@ -333,17 +349,22 @@ export const setParametersWithParameters = (parameters: Parameters) => {
                 });
                 updatePlayersLocalStorage(updatedPlayers, plays);
                 setPlayers(updatedPlayers);
-            } else if (parameter == `lv` || parameter == `lvl` || parameter == `level`) {
+            } else if (setLevel) {
                 let { experience, level } = calcLevelFromNumber(amount);
-                let playerToUpdateTo = {
-                    ...playerToSetDB,
-                    experience,
-                    level,
+                if (playersToSetFromDB && (playersToSetFromDB.length > 0 && playersToSetFromDB.length <= 3)) {
+                    playersToSetFromDB.forEach(plyr => {
+                        let playerToUpdateTo = { ...plyr, experience, level };
+                        updatePlayerInDB(plyr, playerToUpdateTo);
+                        toast.success(`Update Player ${plyr?.name} Level from ${plyr?.level?.num} to ${amount}`);
+                    })
+                } else {
+                    showAlert(`Please Only Update 1 - 3 Player(s) at a time`, <h1>
+                        Please Only Update 1 - 3 Player(s) at a time.<br />
+                    </h1>, `65%`, `35%`);
+                    return;
                 }
-
-                updatePlayerInDB(playerToSetDB, playerToUpdateTo);
-
-                toast.success(`Update Player ${playerToSetDB?.name} Level from ${playerToSetDB?.level?.num} to ${amount}`);
+            } else if (setExperience) {
+                console.log(`Set Experience`);
             }
         }
     }

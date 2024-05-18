@@ -842,6 +842,15 @@ footer {
                     width: 100% !important;
                     grid-template-columns: 1fr;
                     margin: 12px auto -12px !important;
+                    &.setParameterBottomRow {
+                        &.expanded {
+                            padding-bottom: 5px;
+                        }
+                    }
+                    &.fixedPositioning {
+                        padding-bottom: 5px;
+                        margin: 12px auto -5px !important;
+                    }
                 }
                 &:has(.Mui-focused), &:has(.MuiAutocomplete-hasClearIcon) {
                     .conditionToggle {
@@ -2431,6 +2440,9 @@ div[role="presentation"] {
     padding: 0;
     width: 100%;
     text-align: center;
+    &.notActivated {
+        margin-bottom: -5px;
+    }
     @media (max-width: 600px) {
         &.commandsToggle {
             div[role="group"] {

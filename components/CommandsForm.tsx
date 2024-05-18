@@ -376,32 +376,32 @@ export default function CommandsForm(props) {
                     <PlayerSelector />
                 </div>
                 <div className={`setCommandsForm multiSelectCommandsForm commandInputs ${command.command == `!set` ? `expanded` : `collapsed`}`}>
-                    <PlayerSelector />
-                    <div className={`updateRow nextParameterRow updateNextRow ${playersToSelect.length > 0 ? `expanded` : `collapsed`}`}>
-                        <div className={`toggleButtonsContainer conditionToggle`}>
-                            <ToggleButtonGroup
-                                exclusive
-                                color={`primary`}
-                                value={setParameter}
-                                aria-label={`Platform`}
-                                onChange={(e, val) => val && adjustSetParameter(e, val)}
-                            >
-                                {setParameters.map((setParam, setParamsIndex) => {
-                                    return (
-                                        <ToggleButton key={setParamsIndex} size={`small`} value={setParam.label}>
-                                            <span id={`setParam-${setParam.id}-${setParam.label}`} className={`buttonInnerText`}>
-                                                {setParam?.icon}
-                                                <div className={`buttonRowText`}>
-                                                    <div className={`buttonRowTextInner`}>{setParam.label}</div>
-                                                </div>
-                                            </span>
-                                        </ToggleButton>
-                                    )
-                                })}
-                            </ToggleButtonGroup>
-                        </div>
+                    <div className={`toggleButtonsContainer conditionToggle ${setParameter.toLowerCase() != defaultSetParameter.toLowerCase() ? `activated` : `notActivated`}`}>
+                        <ToggleButtonGroup
+                            exclusive
+                            color={`primary`}
+                            value={setParameter}
+                            aria-label={`Platform`}
+                            onChange={(e, val) => val && adjustSetParameter(e, val)}
+                        >
+                            {setParameters.map((setParam, setParamsIndex) => {
+                                return (
+                                    <ToggleButton key={setParamsIndex} size={`small`} value={setParam.label}>
+                                        <span id={`setParam-${setParam.id}-${setParam.label}`} className={`buttonInnerText`}>
+                                            {setParam?.icon}
+                                            <div className={`buttonRowText`}>
+                                                <div className={`buttonRowTextInner`}>{setParam.label}</div>
+                                            </div>
+                                        </span>
+                                    </ToggleButton>
+                                )
+                            })}
+                        </ToggleButtonGroup>
                     </div>
-                    <div className={`updateRow nextParameterRow updateNextRow ${(playersToSelect.length > 0) && (setParameter != defaultSetParameter) ? `expanded` : `collapsed`}`}>
+                    <div className={`updateRow nextParameterRow fixedPositioning updateNextRow ${setParameter.toLowerCase() != defaultSetParameter.toLowerCase() ? `expanded` : `collapsed`}`}>
+                        <PlayerSelector />
+                    </div>
+                    <div className={`updateRow nextParameterRow updateNextRow setParameterBottomRow ${(playersToSelect.length > 0) && (setParameter.toLowerCase() != defaultSetParameter.toLowerCase()) ? `expanded` : `collapsed`}`}>
                         <RangeSlider name={`Set to Level`} min={0} defaultValue={50} max={99} marks={false} showMinMax={true} setAmount={setAmount} />
                     </div>
                 </div>

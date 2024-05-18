@@ -16,6 +16,7 @@ import { getActivePlayers, newPlayerType } from '../components/smasherscape';
 import { defaultCommands, defaultSetParameter } from '../components/Commands';
 
 export const useDB = () => true;
+export const defaultPlayers = [];
 export const StateContext = createContext({});
 export const signUpOrSignIn = `Sign Up or Sign In`;
 
@@ -434,8 +435,6 @@ export const showAlert = async (title, component, width, height) => {
   });
 }
 
-export const defaultPlayers = [];
-
 export default function Xuruko({ Component, pageProps, router }) {
     let brwser = ``;
     let useSetGive = false;
@@ -451,8 +450,6 @@ export default function Xuruko({ Component, pageProps, router }) {
     let [plays, setPlays] = useState([]);
     let [user, setUser] = useState(null);
     let [dark, setDark] = useState(false);
-    let [height, setHeight] = useState(0);
-    let [boards, setBoards] = useState([]);
     let [updates, setUpdates] = useState(0);
     let [onMac, setOnMac] = useState(false);
     let [focus, setFocus] = useState(false);
