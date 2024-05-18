@@ -841,10 +841,15 @@ footer {
                 &.nextParameterRow {
                     width: 100% !important;
                     grid-template-columns: 1fr;
-                    margin: 12px auto -12px !important;
-                    &.setParameterBottomRow {
-                        &.expanded {
+                    margin: 3px auto -12px !important;
+                    &.setParameterRangeRow {
+                        &.nextNotSet {
                             padding-bottom: 5px;
+                        }
+                        &.nextInitialized {
+                            &.expanded {
+                                padding-bottom: 10px;
+                            }
                         }
                     }
                     &.fixedPositioning {

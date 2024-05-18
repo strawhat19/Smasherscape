@@ -14,6 +14,7 @@ import { createContext, useRef, useState, useEffect } from 'react';
 import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { getActivePlayers, newPlayerType } from '../components/smasherscape';
 import { defaultCommands, defaultSetParameter } from '../components/Commands';
+import { defaultAmount } from '../common/Constants';
 
 export const useDB = () => true;
 export const defaultPlayers = [];
@@ -437,7 +438,7 @@ export const showAlert = async (title, component, width, height) => {
 
 export default function Xuruko({ Component, pageProps, router }) {
     let brwser = ``;
-    let useSetGive = false;
+    let useGive = false;
     let loaded = useRef(false);
     let mobileMenuBreakPoint = 697;
     let [IDs, setIDs] = useState([]);
@@ -460,7 +461,6 @@ export default function Xuruko({ Component, pageProps, router }) {
     let [loading, setLoading] = useState(true);
     let [iPhone, set_iPhone] = useState(false);
     let [highScore, setHighScore] = useState(0);
-    let [amount, setAmount] = useState(`Amount`);
     let [platform, setPlatform] = useState(null);
     let [anim, setAnimComplete] = useState(false);
     let [categories, setCategories] = useState([]);
@@ -469,6 +469,7 @@ export default function Xuruko({ Component, pageProps, router }) {
     let [authState, setAuthState] = useState(`Next`);
     let [bodyClasses, setBodyClasses] = useState(``);
     let [mobileMenu, setMobileMenu] = useState(false);
+    let [amount, setAmount] = useState(defaultAmount);
     let [gameFormStep, setGameFormStep] = useState(1);
     let [emailField, setEmailField] = useState(false);
     let [systemStatus, setSystemStatus] = useState(``);
@@ -486,11 +487,41 @@ export default function Xuruko({ Component, pageProps, router }) {
     let [setParameter, setSetParameter] = useState(defaultSetParameter);
     let [sameNamePlayeredEnabled, setSameNamePlayeredEnabled] = useState(false);
     let [noPlayersFoundMessage, setNoPlayersFoundMessage] = useState(`No Players Found`);
-    let [commandsToNotInclude, setCommandsToNotInclude] = useState([`!com`, `!add`, `!res`].concat(useSetGive ? [] : [`!set`, `!giv`]));
 
     let [useLazyLoad, setUseLazyLoad] = useState(false);
     let [useDatabase, setUseDatabase] = useState(useDB());
     let [useLocalStorage, setUseLocalStorage] = useState(true);
+
+    let [commandsToNotInclude, setCommandsToNotInclude] = useState([
+      defaultCommands.List.command, 
+      defaultCommands.Add.command, 
+      defaultCommands.Undo.command,
+    ].concat(useGive ? [] : [
+      defaultCommands.Give.command,
+    ]));
+
+    const setCommandsToShow = (players) => {
+      if (getActivePlayersJSON(players, false, plays).length < 2) {
+        setCommand(defaultCommands.Delete);
+        setCommandsToNotInclude([
+          defaultCommands.List.command, 
+          defaultCommands.Add.command, 
+          defaultCommands.Update.command, 
+          defaultCommands.Undo.command,
+        ].concat(useGive ? [] : [
+          defaultCommands.Give.command,
+        ]));
+      } else {
+        setCommand(defaultCommands.Update);
+        setCommandsToNotInclude([
+          defaultCommands.List.command, 
+          defaultCommands.Add.command, 
+          defaultCommands.Undo.command,
+        ].concat(useGive ? [] : [
+          defaultCommands.Give.command,
+        ]));
+      }
+    }
 
     const setBrowserUI = () => {
       if (brwser == `` && (navigator.userAgent.match(/edg/i) || navigator.userAgent.includes(`edg`) || navigator.userAgent.includes(`Edg`))) {
@@ -508,16 +539,6 @@ export default function Xuruko({ Component, pageProps, router }) {
       } else if (brwser == `` && navigator.userAgent.match(/opr\//i)) {
         brwser = `opera`;
         setBrowser(`opera`);
-      }
-    }
-
-    const setCommandsToShow = (players) => {
-      if (getActivePlayersJSON(players, false, plays).length < 2) {
-        setCommand(defaultCommands.Delete);
-        setCommandsToNotInclude([`!com`, `!add`, `!res`, `!upd`].concat(useSetGive ? [] : [`!set`, `!giv`]));
-      } else {
-        setCommand(defaultCommands.Update);
-        setCommandsToNotInclude([`!com`, `!add`, `!res`].concat(useSetGive ? [] : [`!set`, `!giv`]));
       }
     }
 

@@ -17,10 +17,12 @@ import CharacterOption from './CharacterOption';
 import { Characters } from '../common/Characters';
 import Autocomplete from '@mui/material/Autocomplete';
 import { FormEvent, useContext, useRef } from 'react';
-import { Commands, defaultSetParameter } from './Commands';
+import { defaultSetParameters } from './CommandsForm';
+import { autoCloseToastOptions } from '../common/Toasts';
 import { calcPlayerCharacterIcon } from '../common/CharacterIcons';
 import { doc, setDoc, deleteDoc, updateDoc } from 'firebase/firestore';
 import { checkUserRole, getActivePlayers, isInvalid } from './smasherscape';
+import { Commands, defaultCommands, defaultSetParameter } from './Commands';
 import { calcPlayerLossesFromPlays, calcPlayerWinsFromPlays } from './PlayerCard';
 import { calcLevelFromNumber, calcPlayerLevelAndExperience } from '../common/Levels';
 import { calcPlayerDeaths, calcPlayerKDRatio, calcPlayerKills, parseDate, removeTrailingZeroDecimal } from './PlayerRecord';
@@ -302,8 +304,9 @@ export const setParametersWithParameters = (parameters: Parameters) => {
 
     let updatedPlayers: Player[] = [];
     let playerToSet = commandParams[1].toLowerCase();
+    let value = commandParams[commandParams.length - 1];
     let parameter = commandParams[commandParams.length - 2].toLowerCase();
-    let amount = parseFloat(commandParams[commandParams.length - 1]);
+    let amount = typeof value == `string` && value.includes(`,`) ? parseFloat(value.replace(/,/g, ``)) : parseFloat(value);
     let playerToSetDB: Player = players.find(plyr => plyr?.name.toLowerCase() == playerToSet || plyr?.name.toLowerCase().includes(playerToSet));
 
     let playersToSetFromDB: Player[] = [];
@@ -311,47 +314,73 @@ export const setParametersWithParameters = (parameters: Parameters) => {
 
     playersToSet.forEach(player => {
         let playerDB: Player = getActivePlayers(players, true, plays).find(plyr => plyr?.name.toLowerCase() == player.toLowerCase() || plyr?.name.toLowerCase().includes(player.toLowerCase()));
-        if (playerDB) {
-            playersToSetFromDB.push(playerDB);
-        }
+        if (playerDB) playersToSetFromDB.push(playerDB);
     });
 
-    if (isInvalid(parameter) || isInvalid(amount)) {
-        let validParam = parameter != defaultSetParameter.toLowerCase();
-        showAlert(`Please Enter Parameter & Valid Amount`, <h1>
-            {(!playerToSetDB || playersToSetFromDB.length == 0) ? <>Please Select 1 - 3 Player(s)<br /></> : <></>}
-            {validParam ? <>Please Enter Valid Value.<br /></> : <>Please Enter Parameter such as `xp` or `level` or `xpmod`.<br /></>}
-            {isNaN(amount) ? <>
-                For XP: Please Enter Valid Amount such as `100` or `-500`.<br />
-                For Level: Please Enter Valid Amount between `1` and `99`.<br />
-                For XP Mod: Please Enter Valid Amount between `1` and `9`.
-            </> : <></>}
-        </h1>, `65%`, `auto`);
+    const presentRules = () => {
+        // let validParam = parameter != defaultSetParameter.toLowerCase();
+        showAlert(`Please Select 1 - 3 Player(s), Valid Set Parameter, and Valid Amount`, <>
+            <h1>
+                Please Select 1 - 3 Player(s)<br />
+                Please Enter Valid Set Parameter such as `{defaultSetParameters.Level.label}` or `{defaultSetParameters.Experience.label}` or `{defaultSetParameters.XP_Modifier.label}`.<br />
+                For {defaultSetParameters.Level.label}: Please Enter Valid Amount Between {defaultSetParameters.Level.min} and {defaultSetParameters.Level.max}.<br />
+                For {defaultSetParameters.Experience.label}: Please Enter Valid Amount Between {defaultSetParameters.Experience.min} and {defaultSetParameters.Experience.max.toLocaleString()}.<br />
+                For {defaultSetParameters.XP_Modifier.label}: Please Enter Valid Amount Between {defaultSetParameters.XP_Modifier.min} and {defaultSetParameters.XP_Modifier.max}.<br />
+            </h1>
+        </>, `90%`, `auto`);
+    }
+
+    let playersNotSet = playerToSet == `name(s)`;
+    if (playersNotSet || isInvalid(parameter) || isInvalid(amount)) {
+        presentRules();
         return;
     } else {
         if (!playerToSetDB || playersToSetFromDB.length == 0) {
-            showAlert(`Can't Find Players`, <h1>
-                Can't find players with that name.
+            showAlert(`Please Select 1 - 3 Player(s)`, <h1>
+                Can't find players with that name "{playerToSet}".
             </h1>, `65%`, `35%`);
             return;
         } else {
-            let setXPMod = parameter == `xpmod`;
-            let setLevel = parameter == `lv` || parameter == `lvl` || parameter == `level`;
-            let setExperience = parameter == `xp` || parameter == `exp` || parameter == `experience`;
+            let setLevel = defaultSetParameters.Level.shortcuts.includes(parameter);
+            let setXPMod = defaultSetParameters.XP_Modifier.shortcuts.includes(parameter);
+            let setExperience = defaultSetParameters.Experience.shortcuts.includes(parameter);
             if (setXPMod) {
-                updatedPlayers = players.map(plyr => {
-                    if (plyr?.name.toLowerCase() == playerToSetDB?.name?.toLowerCase() || plyr?.name.toLowerCase().includes(playerToSetDB?.name?.toLowerCase())) {
-                        plyr.xpModifier = amount;
-                        return plyr as Player;
-                    } else {
-                        return plyr as Player;
-                    }
-                });
-                updatePlayersLocalStorage(updatedPlayers, plays);
-                setPlayers(updatedPlayers);
+                let validPlayersSelected = playersToSetFromDB && (playersToSetFromDB.length > 0 && playersToSetFromDB.length <= 3);
+                let validXPModAmount = amount >= defaultSetParameters.XP_Modifier.min && amount <= defaultSetParameters.XP_Modifier.max;
+                if (!validXPModAmount) {
+                    showAlert(`Please Enter A Valid Amount`, <h1>
+                        Please Enter An Amount Between {defaultSetParameters.XP_Modifier.min} and {defaultSetParameters.XP_Modifier.max}
+                    </h1>, `65%`, `35%`);
+                    return;
+                } else if (!validPlayersSelected) {
+                    showAlert(`Please Only Update 1 - 3 Player(s) at a time`, <h1>
+                        Please Only Update 1 - 3 Player(s) at a time.<br />
+                    </h1>, `65%`, `35%`);
+                    return;
+                } else {
+                    // updatedPlayers = players.map(plyr => {
+                    //     if (plyr?.name.toLowerCase() == playerToSetDB?.name?.toLowerCase() || plyr?.name.toLowerCase().includes(playerToSetDB?.name?.toLowerCase())) {
+                    //         plyr.xpModifier = amount;
+                    //         return plyr as Player;
+                    //     } else {
+                    //         return plyr as Player;
+                    //     }
+                    // });
+                    // updatePlayersLocalStorage(updatedPlayers, plays);
+                    // setPlayers(updatedPlayers);
+                    console.log(`Set XP Modifier`, {
+                        amount,
+                        parameter,
+                        commandParams,
+                        playersToSetFromDB,
+                    });
+                    toast.info(`XP Set Modifier Is In Development!`, autoCloseToastOptions);
+                    return;
+                }
             } else if (setLevel) {
                 let { experience, level } = calcLevelFromNumber(amount);
-                if (playersToSetFromDB && (playersToSetFromDB.length > 0 && playersToSetFromDB.length <= 3)) {
+                let validPlayersSelected = playersToSetFromDB && (playersToSetFromDB.length > 0 && playersToSetFromDB.length <= 3);
+                if (validPlayersSelected) {
                     playersToSetFromDB.forEach(plyr => {
                         let playerToUpdateTo = { ...plyr, experience, level };
                         updatePlayerInDB(plyr, playerToUpdateTo);
@@ -364,7 +393,14 @@ export const setParametersWithParameters = (parameters: Parameters) => {
                     return;
                 }
             } else if (setExperience) {
-                console.log(`Set Experience`);
+                console.log(`Set Experience`, {
+                    amount,
+                    parameter,
+                    commandParams,
+                    playersToSetFromDB,
+                });
+                toast.info(`Set Experience Is In Development!`, autoCloseToastOptions);
+                return;
             }
         }
     }
@@ -506,7 +542,7 @@ export const showCommandsUndo = (parameters: Parameters) => {
     if (playsToConsider.length > 0) {
         showAlert(`Commands to Undo`, <div className={`alertInner`}>
             <CommandsUndo playsToConsider={playsToConsider} parameters={parameters} />
-        </div>, `85%`, `500px`);
+        </div>, `95%`, `650px`);
     }
 }
 
@@ -677,7 +713,7 @@ export const updatePlayersWithParameters = (parameters: Parameters) => {
 export const processCommandsWithParameters = (parameters: Parameters) => {
     let {
         command,
-        // setLoadingPlayers
+        // setLoadingPlayers,
     } = parameters as Parameters;
 
     // setLoadingPlayers(true);
@@ -686,19 +722,18 @@ export const processCommandsWithParameters = (parameters: Parameters) => {
     let firstCommand = commandParams[0];
     
     if (command != ``) {
-        // dev() && console.log(`Command sent to ${useDB() ? `Database` : `Leaderboard`}`, parameters);
-        if (firstCommand.includes(`!upd`)) {
+        if (firstCommand.includes(defaultCommands.Update.command)) {
             console.log(`Update Parameters`, parameters);
             updatePlayersWithParameters(parameters);
-        } else if (firstCommand.includes(`!add`)) {
+        } else if (firstCommand.includes(defaultCommands.Add.command)) {
             addPlayersWithParameters(parameters);
-        } else if (firstCommand.includes(`!del`)) {
+        } else if (firstCommand.includes(defaultCommands.Delete.command)) {
             deletePlayersWithParameters(parameters);
-        } else if (firstCommand.includes(`!undo`)) {
+        } else if (firstCommand.includes(defaultCommands.Undo.command)) {
             showCommandsUndo(parameters);
-        } else if (firstCommand.includes(`!giv`)) {
+        } else if (firstCommand.includes(defaultCommands.Give.command)) {
             giveParameterWithParameters(parameters);
-        } else if (firstCommand.includes(`!set`)) {
+        } else if (firstCommand.includes(defaultCommands.Set.command)) {
             setParametersWithParameters(parameters);
         } else {
             showCommandsWithParameters(parameters);

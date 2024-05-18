@@ -47,7 +47,7 @@ export default function CodeBlock(props) {
                 <code style={{whiteSpace: `pre-wrap`, lineHeight: 1.3}} className="nx-border-black nx-border-opacity-[0.04] nx-bg-opacity-[0.03] nx-bg-black nx-break-words nx-rounded-md nx-border nx-py-0.5 nx-px-[.25em] nx-text-[.9em] dark:nx-border-white/10 dark:nx-bg-white/10" dir="ltr" data-language={props.language} data-theme="default">
                     <span className="line">
                         {props.codeTitle && <span className="codeTitle">{props.codeTitle}</span>}
-                        <span id={props.id}>{props.children}</span>
+                        <span id={props.id} className={props.className}>{props.children}</span>
                     </span>
                 </code>
             </pre>

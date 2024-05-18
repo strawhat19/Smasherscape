@@ -1,46 +1,53 @@
-import { useState } from "react";
+import { useContext } from "react";
+import { StateContext } from "../pages/_app";
 import { Stack, Slider } from "@mui/material";
 
 interface RangeSliderProps {
     min: number;
     max: number;
-    name?: string;
-    step?: number;
-    marks: boolean;
-    setAmount: any;
-    showMinMax: boolean;
+    name: string;
     defaultValue: number;
+    step?: number;
+    marks?: boolean;
+    setAmount?: any;
+    showName?: boolean;
+    showMinMax?: boolean;
+    contextText?: string;
 }
 
 export default function RangeSlider(props: RangeSliderProps) {
-    let { min, max, name, marks, setAmount, showMinMax, defaultValue } = props;
-    let [value, setValue] = useState<number>(defaultValue);
-
-    const adjustValue = (val) => {
-        setValue(val as number);
-        setAmount(val as number);
-    }
+    let { min, max, name, defaultValue, contextText } = props;
+    let { amount, setAmount } = useContext<any>(StateContext);
 
     return (
         <div className={`rangeContainer bgGrad`}>           
             <div className={`bgGradInner`}>
                 {name ? <>
-                    {name}: {value}
+                    {name}: {amount.toLocaleString()}{contextText ? contextText : <></>}
                 </> : <></>}
-                <Stack className={`rangeSliderContainer`} spacing={2} direction={`row`} alignItems={`center`}>
-                    {showMinMax ? min : <></>}
+                <Stack className={`rangeSliderContainer`} direction={`row`} alignItems={`center`}>
+                    <div style={{ maxWidth: `fit-content`, marginRight: 15 }}>{min.toLocaleString()}</div>
                     <Slider
                         min={min}
                         max={max}
-                        marks={marks}
+                        marks={false}
                         size={`small`}
                         color={`secondary`}
                         aria-label={`Range`}
-                        // valueLabelDisplay={`auto`}
                         defaultValue={defaultValue}
-                        onChange={(_, value) => adjustValue(value)}
+                        // valueLabelDisplay={`auto`}
+                        onChange={(_, value) => setAmount(value)}
                     />
-                    {showMinMax ? max : <></>}
+                    {/* <input 
+                        min={min} 
+                        max={max} 
+                        type={`range`} 
+                        id={`customRangeSlider`} 
+                        defaultValue={defaultValue}
+                        className={`customRangeSlider`} 
+                        onInput={(e: any) => setAmount(parseFloat(e.target.value))}
+                    /> */}
+                    <div style={{ maxWidth: `fit-content`, marginLeft: 15 }}>{max.toLocaleString()}</div>
                 </Stack>
             </div>
         </div>

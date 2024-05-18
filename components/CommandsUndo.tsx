@@ -40,7 +40,7 @@ export default function CommandsUndo(props) {
 
     return (
         <div className={`commandsToUndo recordOfPlayer`}>
-            <ul className="recordList">
+            <ul className={`recordList`}>
                 {playsToConsider?.length > 0 ? playsToConsider.slice(0, 7).map((ply: Play, plyIndex) => {
 
                     let isWinner = true;

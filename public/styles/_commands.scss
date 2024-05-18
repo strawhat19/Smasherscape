@@ -1,0 +1,7 @@
+.commandToRender {
+    &.hasContent {
+        &::after {
+            content: "x Multiplier";
+        }
+    }
+}

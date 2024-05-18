@@ -1,0 +1,1 @@
+export const defaultAmount = `Amount`;

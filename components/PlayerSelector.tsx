@@ -201,8 +201,8 @@ export default function PlayerSelector(props) {
   } = useAutocomplete({
     multiple: true,
     defaultValue: [],
-    id: `players-search-complete`,
     getOptionLabel: (option) => option.label,
+    id: `${props.id}-players-search-complete`,
     options: getActivePlayers(players, true, plays),
     onChange: (e, val: any) => adjustPlayersToSelect(e, val),
     isOptionEqualToValue: (option, value) => option.id === value.id,
