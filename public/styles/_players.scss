@@ -51,7 +51,7 @@ li[aria-selected='true'] {
         position: relative;
         align-items: center;
         justify-content: center;
-        &.strkBadge {
+        &.strkBadge, &.xpModifierBadge {
             .badgeIcon {
                 top: 8px;
                 opacity: 0.4;
@@ -85,6 +85,14 @@ li[aria-selected='true'] {
                         font-size: 15px;
                     }
                 }
+            }
+        }
+        &.xpModifierBadge {
+            .badgeIcon {
+                top: 0px;
+                opacity: 0.4;
+                position: absolute;
+                max-width: 70px !important;
             }
         }
         .badgeContent {

@@ -26,9 +26,9 @@ export const isBigImage = (plyr: Player) => {
 export default function PlayerCard(props) {
     let { plyr } = props;
 
-    let [initialInterval, setInitialInterval] = useState(5);
-    let [loadedInterval, setLoadedInterval] = useState(20);
-    let [paginationAmount, setPaginationAmount] = useState(initialInterval);
+    let [loadedInterval, ] = useState(20);
+    let [initialInterval, ] = useState(5);
+    let [paginationAmount, ] = useState(initialInterval);
     let [paginationEnd, setPaginationEnd] = useState(paginationAmount);
 
     const { user, plays, useDatabase, players, filteredPlayers, setFilteredPlayers, useLazyLoad, setPlayers } = useContext<any>(StateContext);
@@ -104,22 +104,9 @@ export default function PlayerCard(props) {
         } else if (playerNames.includes(value)) {
             e.target.textContent = player?.name;
             toast.error(`Player name is already taken, Please pick a unique name.`);
-            // showAlert(`Player name is already taken`, <div className="alertMessage errorMessage loadingMessage">
-            //     <i style={{color: `var(--smasherscapeYellow)`}} className="fas fa-exclamation-triangle"></i>
-            //     <h3>Player name is already taken</h3>
-            //     <h3>Please pick a unique name</h3>
-            // </div>, `55%`, `50%`);
             return;
         } else {
             changePlayerName(e, player);
-            // showAlert(`Change Player Name?`, <div className="alertMessage confirmMessage loadingMessage">
-            //     <i style={{color: `var(--smasherscapeYellow)`}} className="fas fa-exclamation-triangle"></i>
-            //     <h3>Are you sure you want to change player name?</h3>
-            //     <h3>Saving will update the name</h3>
-            //     <button onClick={(e) => changePlayerName(e, player)}>Save</button>
-            // </div>, `55%`, `50%`);
-            // e.target.textContent = player?.name;
-            // return;
         }
     }
 

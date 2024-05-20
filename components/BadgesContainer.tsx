@@ -27,9 +27,10 @@ export default function BadgesContainer(props: BadgesContainerProps) {
         }
     }
 
-    return <div className={`playerBadgesContainer ${props.className ? props.className : ``}`}>
+    return <div className={`playerBadgesContainer ${streak}-${streakType}-streak ${props.className ? props.className : ``}`}>
         {player?.xpModifier > 1 && <div className={`badgeElement xpModifierBadge`}>
             <div className={`badgeBG`}></div>
+            <Image src={`/assets/GIFs/sparkle-stars.gif`} alt={`Bonus Points Badge`} className={`badgeIcon`} />
             <span className={`badgeContent`}>{player?.xpModifier?.toLocaleString()}x <span className={`innerBadgeContext`}>Pts</span></span>
             <Image src={`/assets/RS_Empty_Blue_Ring_Badge.png`} alt={`Empty Badge`} className={`emptyBadge recordBadge`} />
         </div>}

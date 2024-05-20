@@ -620,6 +620,8 @@ export const updatePlayersWithParameters = (parameters: Parameters) => {
         let loser = winCons.includes(conditionName) ? playerTwoName : playerOneName;
         let winnerDB = (playerOneDB?.name?.toLowerCase() == winner || playerOneDB?.name.toLowerCase().includes(winner)) ? playerOneDB : playerTwoDB;
         let loserDB = (playerTwoDB?.name?.toLowerCase() == loser || playerTwoDB?.name.toLowerCase().includes(loser)) ? playerTwoDB : playerOneDB;
+        let winnerPrevExp = winnerDB?.experience?.arenaXP;
+        let loserPrevExp = loserDB?.experience?.arenaXP;
         let winChar = winCons.includes(conditionName) ? Characters[characterOne] : Characters[characterTwo];
         let loseChar = winCons.includes(conditionName) ? Characters[characterTwo] : Characters[characterOne];
         
@@ -703,9 +705,9 @@ export const updatePlayersWithParameters = (parameters: Parameters) => {
                 showPropertiesWarning(`Critical`, winnerDB, loserDB);
                 return;
             } else {
-                toast.success(`Updating Winner ${updatedWinner?.name} Experience from ${winnerDB?.experience?.arenaXP} to ${updatedWinner?.experience?.arenaXP}`, autoCloseToastOptions);
+                toast.success(`Updating Winner ${updatedWinner?.name} Experience from ${winnerPrevExp} to ${updatedWinner?.experience?.arenaXP}`, autoCloseToastOptions);
                 updatePlayerInDB(winnerDB, updatedWinner);
-                toast.error(`Updating Loser ${updatedloser?.name} Experience from ${loserDB?.experience?.arenaXP} to ${updatedloser?.experience?.arenaXP}`, autoCloseToastOptions);
+                toast.success(`Updating Loser ${updatedloser?.name} Experience from ${loserPrevExp} to ${updatedloser?.experience?.arenaXP}`, autoCloseToastOptions);
                 updatePlayerInDB(loserDB, updatedloser);
                 if (winnerDB.properties >= 19000 || loserDB.properties >= 19000) {
                     showPropertiesWarning(`Warning`, winnerDB, loserDB);
