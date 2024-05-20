@@ -342,8 +342,8 @@ export const getLevelFromNumber = (levelNumber) => {
     return levelInRange;
 }
 
-export const calcPlayerLevelAndExperience = (plyr: Player) => {
-    let xp = plyr.experience.arenaXP;
+export const calcPlayerLevelAndExperience = (plyr: Player, arenaXP?) => {
+    let xp = arenaXP ? arenaXP : plyr.experience.arenaXP;
     if (xp < 83) {
         plyr.level.num = 1;
         plyr.experience.xp = 0;

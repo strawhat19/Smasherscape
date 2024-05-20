@@ -24,9 +24,9 @@ import { doc, setDoc, deleteDoc, updateDoc } from 'firebase/firestore';
 import { checkUserRole, getActivePlayers, isInvalid } from './smasherscape';
 import { Commands, defaultCommands, defaultSetParameter } from './Commands';
 import { calcPlayerLossesFromPlays, calcPlayerWinsFromPlays } from './PlayerCard';
-import { calcLevelFromNumber, calcPlayerLevelAndExperience } from '../common/Levels';
+import { calcLevelFromExperience, calcLevelFromNumber, calcPlayerLevelAndExperience } from '../common/Levels';
 import { calcPlayerDeaths, calcPlayerKDRatio, calcPlayerKills, parseDate, removeTrailingZeroDecimal } from './PlayerRecord';
-import { StateContext, showAlert, formatDate, generateUniqueID, countPropertiesInObject, getActivePlayersJSON, usePlayersDatabase, defaultXPMultiplier, XPGainOnWin, XPGainOnLoserXPForEachStockTaken, winCons, loseCons, dev, usePlaysDatabase } from '../pages/_app';
+import { StateContext, showAlert, formatDate, generateUniqueID, countPropertiesInObject, getActivePlayersJSON, usePlayersDatabase, defaultXPMultiplier, XPGainOnWin, XPGainOnLoserXPForEachStockTaken, winCons, loseCons, dev, usePlaysDatabase, useDB } from '../pages/_app';
 
 export const deletePlayFromDB = async (playID) => await deleteDoc(doc(db, usePlaysDatabase, playID));
 export const addPlayToDB = async (playObj: Play) => await setDoc(doc(db, usePlaysDatabase, playObj?.ID), playObj);
@@ -344,69 +344,58 @@ export const setParametersWithParameters = (parameters: Parameters) => {
             let setLevel = defaultSetParameters.Level.shortcuts.includes(parameter);
             let setXPMod = defaultSetParameters.XP_Modifier.shortcuts.includes(parameter);
             let setExperience = defaultSetParameters.Experience.shortcuts.includes(parameter);
-            if (setXPMod) {
-                let validPlayersSelected = playersToSetFromDB && (playersToSetFromDB.length > 0 && playersToSetFromDB.length <= 3);
-                let validXPModAmount = amount >= defaultSetParameters.XP_Modifier.min && amount <= defaultSetParameters.XP_Modifier.max;
-                if (!validXPModAmount) {
-                    showAlert(`Please Enter A Valid Amount`, <h1>
-                        Please Enter An Amount Between {defaultSetParameters.XP_Modifier.min} and {defaultSetParameters.XP_Modifier.max}
-                    </h1>, `65%`, `35%`);
-                    return;
-                } else if (!validPlayersSelected) {
-                    showAlert(`Please Only Update 1 - 3 Player(s) at a time`, <h1>
-                        Please Only Update 1 - 3 Player(s) at a time.<br />
-                    </h1>, `65%`, `35%`);
-                    return;
-                } else {
-                    playersToSetFromDB.forEach(plyr => {
-                        let playerToUpdateTo = { ...plyr, xpModifier: amount };
-                        let jsonUpdatedPlayer = JSON.parse(JSON.stringify(playerToUpdateTo));
-                        updatePlayerInDB(plyr, jsonUpdatedPlayer);
-                        toast.success(`Updated Player ${plyr?.name} XP Modifier from ${plyr?.xpModifier}x Multiplier to ${amount}x Multiplier`);
-                    })
-                    // updatedPlayers = players.map(plyr => {
-                    //     if (plyr?.name.toLowerCase() == playerToSetDB?.name?.toLowerCase() || plyr?.name.toLowerCase().includes(playerToSetDB?.name?.toLowerCase())) {
-                    //         plyr.xpModifier = amount;
-                    //         return plyr as Player;
-                    //     } else {
-                    //         return plyr as Player;
-                    //     }
-                    // });
-                    // updatePlayersLocalStorage(updatedPlayers, plays);
-                    // setPlayers(updatedPlayers);
-                    
-                    // console.log(`Set XP Modifier`, {
-                    //     amount,
-                    //     parameter,
-                    //     commandParams,
-                    //     playersToSetFromDB,
-                    // });
-                    // toast.info(`XP Set Modifier Is In Development!`, autoCloseToastOptions);
-                    // return;
-                }
-            } else if (setLevel) {
-                let { experience, level } = calcLevelFromNumber(amount);
-                let validPlayersSelected = playersToSetFromDB && (playersToSetFromDB.length > 0 && playersToSetFromDB.length <= 3);
-                if (validPlayersSelected) {
+            let validPlayersSelected = playersToSetFromDB && (playersToSetFromDB.length > 0 && playersToSetFromDB.length <= 3);
+
+            if (validPlayersSelected) {
+                if (setLevel) {
+                    let { experience, level } = calcLevelFromNumber(amount);
                     playersToSetFromDB.forEach(plyr => {
                         let playerToUpdateTo = { ...plyr, experience, level };
                         updatePlayerInDB(plyr, playerToUpdateTo);
                         toast.success(`Updated Player ${plyr?.name} Level from ${plyr?.level?.num} to ${amount}`, autoCloseToastOptions);
                     })
-                } else {
-                    showAlert(`Please Only Update 1 - 3 Player(s) at a time`, <h1>
-                        Please Only Update 1 - 3 Player(s) at a time.<br />
-                    </h1>, `65%`, `35%`);
-                    return;
+                } else if (setExperience) {
+                    let { experience, level } = calcLevelFromExperience(amount);
+                    playersToSetFromDB.forEach(plyr => {
+                        let playerToUpdateTo = { ...plyr, experience, level };
+                        let jsonUpdatedPlayer = JSON.parse(JSON.stringify(playerToUpdateTo));
+                        updatePlayerInDB(plyr, jsonUpdatedPlayer);
+                        toast.success(`Updated Player ${plyr?.name} Experience from ${plyr?.experience?.arenaXP.toLocaleString()} to ${amount.toLocaleString()}`);
+                    })
+                } else if (setXPMod) {
+                    let validXPModAmount = amount >= defaultSetParameters.XP_Modifier.min && amount <= defaultSetParameters.XP_Modifier.max;
+                    if (!validXPModAmount) {
+                        showAlert(`Please Enter A Valid Amount`, <h1>
+                            Please Enter An Amount Between {defaultSetParameters.XP_Modifier.min} and {defaultSetParameters.XP_Modifier.max}
+                        </h1>, `65%`, `35%`);
+                        return;
+                    } else {
+                        if (useDB() == true) {
+                            playersToSetFromDB.forEach(plyr => {
+                                let playerToUpdateTo = { ...plyr, xpModifier: amount };
+                                let jsonUpdatedPlayer = JSON.parse(JSON.stringify(playerToUpdateTo));
+                                updatePlayerInDB(plyr, jsonUpdatedPlayer);
+                                toast.success(`Updated Player ${plyr?.name} XP Modifier from ${plyr?.xpModifier}x Multiplier to ${amount}x Multiplier`);
+                            })
+                        } else {
+                            updatedPlayers = players.map(plyr => {
+                                if (plyr?.name.toLowerCase() == playerToSetDB?.name?.toLowerCase() || plyr?.name.toLowerCase().includes(playerToSetDB?.name?.toLowerCase())) {
+                                    plyr.xpModifier = amount;
+                                    return plyr as Player;
+                                } else {
+                                    return plyr as Player;
+                                }
+                            });
+                            updatePlayersLocalStorage(updatedPlayers, plays);
+                            setPlayers(updatedPlayers);
+                            return;
+                        }
+                    }
                 }
-            } else if (setExperience) {
-                console.log(`Set Experience`, {
-                    amount,
-                    parameter,
-                    commandParams,
-                    playersToSetFromDB,
-                });
-                toast.info(`Set Experience Is In Development!`, autoCloseToastOptions);
+            } else {
+                showAlert(`Please Only Update 1 - 3 Player(s) at a time`, <h1>
+                    Please Only Update 1 - 3 Player(s) at a time.<br />
+                </h1>, `65%`, `35%`);
                 return;
             }
         }
@@ -562,8 +551,8 @@ export const updatePlayersWithParameters = (parameters: Parameters) => {
         setPlayers,
         useDatabase,
         commandParams,
-        setLoadingPlayers,
         setFilteredPlayers,
+        // setLoadingPlayers,
     } = parameters;
 
     let date = moment().format(`h:mm:ss a, MMMM Do YYYY`);
@@ -620,8 +609,6 @@ export const updatePlayersWithParameters = (parameters: Parameters) => {
         let loser = winCons.includes(conditionName) ? playerTwoName : playerOneName;
         let winnerDB = (playerOneDB?.name?.toLowerCase() == winner || playerOneDB?.name.toLowerCase().includes(winner)) ? playerOneDB : playerTwoDB;
         let loserDB = (playerTwoDB?.name?.toLowerCase() == loser || playerTwoDB?.name.toLowerCase().includes(loser)) ? playerTwoDB : playerOneDB;
-        let winnerPrevExp = winnerDB?.experience?.arenaXP;
-        let loserPrevExp = loserDB?.experience?.arenaXP;
         let winChar = winCons.includes(conditionName) ? Characters[characterOne] : Characters[characterTwo];
         let loseChar = winCons.includes(conditionName) ? Characters[characterTwo] : Characters[characterOne];
         
@@ -705,9 +692,9 @@ export const updatePlayersWithParameters = (parameters: Parameters) => {
                 showPropertiesWarning(`Critical`, winnerDB, loserDB);
                 return;
             } else {
-                toast.success(`Updating Winner ${updatedWinner?.name} Experience from ${winnerPrevExp} to ${updatedWinner?.experience?.arenaXP}`, autoCloseToastOptions);
+                toast.success(`Updating Winner ${updatedWinner?.name} Experience from ${winnerDB?.experience?.arenaXP} to ${updatedWinner?.experience?.arenaXP}`, autoCloseToastOptions);
                 updatePlayerInDB(winnerDB, updatedWinner);
-                toast.success(`Updating Loser ${updatedloser?.name} Experience from ${loserPrevExp} to ${updatedloser?.experience?.arenaXP}`, autoCloseToastOptions);
+                toast.error(`Updating Loser ${updatedloser?.name} Experience from ${loserDB?.experience?.arenaXP} to ${updatedloser?.experience?.arenaXP}`, autoCloseToastOptions);
                 updatePlayerInDB(loserDB, updatedloser);
                 if (winnerDB.properties >= 19000 || loserDB.properties >= 19000) {
                     showPropertiesWarning(`Warning`, winnerDB, loserDB);
