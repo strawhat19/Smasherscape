@@ -79,13 +79,28 @@ export default function CommandsUndo(props) {
                         },
                     };
 
+                    console.log(`(${plyIndex + 1}) Play Params`, {
+                        isWinner,
+                        winnerPlayer,
+                        loserPlayer,
+                        winnerXP,
+                        loserXP,
+                        winnerLevel,
+                        loserLevel,
+                        loserNewExperience,
+                        winnerNewExperience,
+                        winnerNewLevel,
+                        loserNewLevel,
+                        updateParams,
+                    })
+
                     return (
                         <li className={`playerPlay commandToUndo`} key={plyIndex}>
-                            <div className="plyIndex">{plyIndex + 1}.</div>
-                            <div className="recordDetails">
+                            <div className={`plyIndex`}>{plyIndex + 1}.</div>
+                            <div className={`recordDetails`}>
                                 <div className={`playMessage`}>{isWinner ? <div>{ply?.winner} <span className={`${isWinner ? `winner` : `loser`}`}>Win</span> over <span className={`loser`}>{ply?.loser}</span></div> : <div><span className={`${isWinner ? `winner` : `loser`}`}>Loss</span> to {ply?.winner}</div>}
-                                    <div className="stocksRow">
-                                        <div className="stocks">
+                                    <div className={`stocksRow`}>
+                                        <div className={`stocks`}>
                                             {isWinner ? ply?.stocks?.length > 0 && ply?.stocks?.map((stok, stkIndex) => {
                                                 return (
                                                     <span key={stkIndex} className={stok?.dead ? `dead x` : `living`}>
@@ -101,7 +116,7 @@ export default function CommandsUndo(props) {
                                             })}
                                         </div>
                                     vs 
-                                        <div className="otherStocks">
+                                        <div className={`otherStocks`}>
                                             {!isWinner ? ply?.stocks?.length > 0 && ply?.stocks?.map((stok, stkIndex) => {
                                                 return (
                                                     <span key={stkIndex} className={stok?.dead ? `dead x` : `living`}>
@@ -119,17 +134,21 @@ export default function CommandsUndo(props) {
                                     </div>
                                 </div>
                                 <div className={`expLevelCompare recordSubDetails ${winnerXP >= 99999 || loserXP >= 99999 ? `largeXP` : ``}`}>
-                                    <div className="playDate expChanges preChanges">
+                                    <div className={`playDate expChanges preChanges`}>
                                         <span className={`winner`}>{ply.winner}</span> Lvl: <span className={`preChange`}>{winnerLevel}</span> & XP: <span className={`preChange`}>{winnerXP.toLocaleString()}</span>, <span>{ply.loser}</span> Lvl: <span className={`preChange`}>{loserLevel}</span> & XP: <span className={`preChange`}>{loserXP.toLocaleString()}</span>
                                     </div>
-                                    <div className="playDate expChanges">{`>>>`}</div>
-                                    <div className="playDate expChanges postChanges">
+                                    <div className={`playDate expChanges midChanges`}>
+                                        <div className={`changeField`}>{`>>>`}</div>
+                                        <div className={`winner changeField expChangeField`}>{winnerNewExperience - winnerXP}</div>
+                                        <div className={`changeField expChangeField`}>{loserNewExperience - loserXP}</div>
+                                    </div>
+                                    <div className={`playDate expChanges postChanges`}>
                                         New <span className={`winner`}>{ply.winner}</span> Lvl: <span className={`postChange`}>{winnerNewLevel}</span> & XP: <span className={`postChange`}>{winnerNewExperience.toLocaleString()}</span>, 
                                         New <span>{ply.loser}</span> Lvl: <span className={`postChange`}>{loserNewLevel}</span> & XP: <span className={`postChange`}>{loserNewExperience.toLocaleString()}</span>
                                     </div>
                                 </div>
-                                <div className="bottomButtonRow recordSubDetails">
-                                    <div className="playDate commandDate">{ply?.date}</div>
+                                <div className={`bottomButtonRow recordSubDetails`}>
+                                    <div className={`playDate commandDate`}>{ply?.date}</div>
                                     <button disabled={false} type={`button`} onClick={(e) => undoPlay(e, ply, updateParams)} className={`buttonLike commandUndoSubmit textShadowThis`}>Undo this Play</button>
                                 </div>
                             </div>
