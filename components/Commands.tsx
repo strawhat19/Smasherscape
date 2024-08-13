@@ -2,10 +2,11 @@ import { useState } from 'react';
 import CodeBlock from './CodeBlock';
 import Command from '../models/Command';
 import { isInvalid } from './smasherscape';
+import { CommandCode } from '../interfaces/interfaces';
 
 export const defaultSetParameter = `([Level_Experience_XP-Modifier])`;
 
-export const defaultCommands = {
+export const defaultCommands: { [key: string]: CommandCode } = {
   List: {
     id: 1,
     name: `List`,
@@ -29,7 +30,7 @@ export const defaultCommands = {
     command: `!del`,
     class: `delCommand`,
     example: `!del name(s) of player(s)`,
-    icon: <i className={`fas fa-trash-alt`}></i>,
+    icon: <i className={`fas fa-trash-alt`} />,
     triggers: [`!del`, `!x`, `!delete`, `!remove`],
     shortDescription: `Delete Player(s) from Board`,
     description: `Delete Player(s) from Board separated by spaces`,
@@ -40,7 +41,7 @@ export const defaultCommands = {
     command: `!upd`,
     class: `updateCommand`,
     description: `Update Player(s) in Board`,
-    icon: <i className={`fas fa-signal`}></i>,
+    icon: <i className={`fas fa-signal`} />,
     shortDescription: `Update Player(s) in Board`,
     triggers: [`!upd`, `!update`, `!game`, `!match`],
     example: `!upd winner vs loser with winChar vs loseChar stocksTakenFromWinner`,
@@ -51,7 +52,7 @@ export const defaultCommands = {
     command: `!set`,
     class: `setCommand`,
     triggers: [`!st`, `!set`, `!change`],
-    icon: <i className={`fas fa-tools`}></i>,
+    icon: <i className={`fas fa-tools`} />,
     description: `Set Parameter for Player(s)`,
     shortDescription: `Set Parameter for Player(s)`,
     example: `!set name(s) of player(s) ${defaultSetParameter} amount`,
@@ -63,7 +64,7 @@ export const defaultCommands = {
     class: `giveCommand`,
     triggers: [`!giv`, `!give`],
     description: `Give Parameter to Player(s)`,
-    icon: <i className={`fas fa-sliders-h`}></i>,
+    icon: <i className={`fas fa-sliders-h`} />,
     shortDescription: `Give Parameter to Player(s)`,
     example: `!giv name(s) of player(s) (xp) amount`,
   },
@@ -73,7 +74,7 @@ export const defaultCommands = {
     command: `!undo`,
     class: `undoCommand`,
     triggers: [`!und`, `!undo`],
-    icon: <i className={`fas fa-undo`}></i>,
+    icon: <i className={`fas fa-undo`} />,
     example: `!undo previous update command(s)`,
     description: `Undo Previous Update Command(s)`,
     shortDescription: `Undo Previous Update Command(s)`,
@@ -81,8 +82,8 @@ export const defaultCommands = {
 };
 
 export function Commands(props) {
-  let { id, commands, devEnv } = props;
-  let [commandsToRender, setCommandsToRender] = useState<Command[]>(Object.values(commands).map((comm: Command) => {
+  let { id, commands } = props;
+  let [commandsToRender, ] = useState<Command[]>(Object.values(commands).map((comm: Command) => {
     let commandObj = new Command(comm);
     Object.keys(commandObj).forEach(key => isInvalid(commandObj[key]) && delete commandObj[key]);
     return commandObj as Command;

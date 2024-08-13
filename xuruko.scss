@@ -672,7 +672,7 @@ li {
 
 nav {
     background: black !important;
-    a.nx-text-sm {
+    a.nx-text-sm, .navIcons a {
         position: relative;
         &::after {
             left: 50%;
@@ -682,8 +682,15 @@ nav {
             height: 1.1px;
             margin: 0 auto;
             position: absolute;
-            transform: translateX(-50%);
+            transform-origin: 0% 100%;
+            transition: var(--transition);
+            transform: translateX(-50%) scale(0, 1);
             background: var(--xurukoGradientGreenBlue);
+        }
+        &:hover {
+            &::after {
+                transform: translateX(-50%) scale(1, 1) !important;
+            }
         }
     }
     h1 {

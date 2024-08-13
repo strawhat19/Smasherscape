@@ -500,6 +500,19 @@ export default function Xuruko({ Component, pageProps, router }) {
       defaultCommands.Give.command,
     ]));
 
+    const setMenuIcons = () => {
+      let homeLink = document.querySelector(`nav a.nx-text-sm[href="/"]`);
+      let xurukoLink = document.querySelector(`nav button.nx-text-sm`);
+      let aboutLink = document.querySelector(`nav a[href="/about"]`);
+      let links = [homeLink, aboutLink, xurukoLink];
+      links.forEach(lnk => lnk.style.display = `none`);
+      console.log(`Nav`, {
+        links,
+        homeLink,
+        aboutLink,
+      });
+    }
+
     const setCommandsToShow = (players) => {
       if (getActivePlayersJSON(players, false, plays).length < 2) {
         setCommand(defaultCommands.Delete);
@@ -597,6 +610,7 @@ export default function Xuruko({ Component, pageProps, router }) {
       setMobile((typeof window.orientation !== `undefined`) || (navigator.userAgent.indexOf(`IEMobile`) !== -1));
       
       setThemeUI();
+      // setMenuIcons();
       setBrowserUI();
       setSideBarUI();
 
