@@ -1,0 +1,18 @@
+.nextra-banner-container {
+    background: var(--xurukoGradientBlueGreen) !important;
+}
+
+.topBanner {
+    font-size: 18px;    
+}
+
+.topNavigation {
+    top: -1px;
+    position: relative;
+    a {
+        max-width: fit-content;
+        &::before {
+            background: black;
+        }
+    }
+}

@@ -3,9 +3,8 @@ import { useDB } from './pages/_app';
 import Form from './components/Form';
 import Footer from './components/footer';
 import NavIcons from './components/NavIcons';
-// import { generateUniqueID } from './pages/_app';
+import TopBanner from './components/TopBanner';
 import { DocsThemeConfig } from 'nextra-theme-docs';
-// import NextraSearch from './components/NextraSearch';
 
 const config: DocsThemeConfig = {
   primaryHue: 195, // Sky Blue
@@ -23,11 +22,13 @@ const config: DocsThemeConfig = {
   toc: {
     component: null,
   },
-  // banner: {
-  //   text: `Hello All`,
-  //   dismissible: true,
-  //   key: `bannerDismissed`,
-  // },
+  banner: {
+    dismissible: false,
+    key: `bannerDismissed`,
+    text: (
+      <TopBanner />
+    ),
+  },
   head: <>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -46,14 +47,13 @@ const config: DocsThemeConfig = {
   logo: <>
     <img width={40} src={`/assets/OSRS_Top_Hat.png`} alt={`Tophat Logo`} /> <h1 style={{marginLeft: 15}}>Xuruko</h1>
   </>,
-  // navbar: {
-    // extraContent: <NextraSearch />
-  // },
   ...(useDB() == false && {
     navbar: {
-      extraContent: <div className={`navIconsContainer`}>
-      <NavIcons />
-    </div>
+      extraContent: <>
+        <div className={`navIconsContainer`}>
+          <NavIcons />
+        </div>
+      </>
     }
   }),
   search: {

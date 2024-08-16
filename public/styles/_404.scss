@@ -1,0 +1,57 @@
+#pageBody {
+    &:has(.next-error-h1) {
+        height: 100%;
+        display: flex;
+        --height: 250px;
+        min-height: 100dvh;
+        align-items: center;
+        justify-content: center;
+        background-size: cover !important;
+        background-repeat: no-repeat !important;
+        background: url(https://kfg6bckb.media.zestyio.com/404-webpage-design-maze.jpg);
+        div {
+            // display: none !important;
+            &:first-child {
+                // &:not:has(.next-error-h1) {
+                //     backdrop-filter: unset !important;
+                // }
+                &:has(.next-error-h1) {
+                    top: 100px;
+                    padding: 0 35px;
+                    position: relative;
+                    height: var(--height);
+                    max-width: fit-content;
+                    min-height: var(--height);
+                    max-height: var(--height);
+                    // backdrop-filter: blur(5px);
+                    background: var(--blackGlass);
+                    border-bottom-left-radius: 15px;
+                    border-bottom-right-radius: 15px;
+                    div {
+                        &:first-child {
+                            top: 100px;
+                            background: none;
+                            position: relative;
+                            &::before {
+                                left: -35px;
+                                top: -350px;
+                                content: "";
+                                height: 100%;
+                                min-height: 270px;
+                                position: absolute;
+                                width: calc(100% + 70px);
+                                border-top-left-radius: 15px;
+                                border-top-right-radius: 15px;
+                                // backdrop-filter: blur(5px);
+                                // background: var(--blackGlass);
+                                background-size: cover !important;
+                                background-repeat: no-repeat !important;
+                                background: url(https://www.creativefabrica.com/wp-content/uploads/2023/06/06/Glitch-Effect-404-PAGE-NOT-FOUND-SVG-Graphics-71467606.jpg);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
