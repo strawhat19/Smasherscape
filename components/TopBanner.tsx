@@ -1,4 +1,5 @@
 import { navFaIcons } from "./NavIcons";
+import Marquee from "react-fast-marquee";
 import { useEffect, useState } from "react";
 
 export default function TopBanner() {
@@ -26,15 +27,7 @@ export default function TopBanner() {
     return <>
         <div className={`topBanner`}>
             <div className={`topNavigation`}>
-                Smasherscape
-                {/* <a href={`/arenas`} className={`hoverLink`}>
-                    <i className={`fas fa-trophy navIcon black`} />
-                    Arenas
-                </a>
-                <a href={`/plays`} className={`hoverLink`}>
-                    <i className={`fas fa-gamepad navIcon black`} />
-                    Plays
-                </a> */}
+                <Marquee speed={75}>Smasherscape | Official Website | Xuruko & Piratechs</Marquee>
             </div>
         </div>
     </>

@@ -51,7 +51,7 @@ const config: DocsThemeConfig = {
     navbar: {
       extraContent: <>
         <div className={`navIconsContainer`}>
-          <NavIcons />
+          <NavIcons className={`navIconsNoDB notUsingDB showNoDB`} />
         </div>
       </>
     }
@@ -63,13 +63,13 @@ const config: DocsThemeConfig = {
     ...(useDB() == true && {
       component: <>
         <div className={`navIconsContainer showWhenNoDB`}>
-          <NavIcons />
+          <NavIcons className={`navIconsSolo usingDB showNoDB`} />
         </div>
         <div className={`navFormDiv`} style={{order: 0, display: `flex`, flexDirection: `row`, gridGap: 15, justifyContent: `space-between`, alignItems: `center`}}>
           <section className={`navFormSection showWhenDB`} style={{margin: 0, position: `relative`}}>
             <Form className={`navForm`} style={{display: `flex`, flexDirection: `row`}} />
           </section>
-          <NavIcons />
+          <NavIcons className={`navIconsWContent usingDB showNoDB`} />
         </div>
       </>
     }),
