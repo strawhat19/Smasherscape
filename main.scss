@@ -143,6 +143,7 @@ $mobileMenuBreakPoint: 697px;
     --secondary: #3c3c3c;
     --piratechs: #2b4261;
     --softBlack2: #636363;
+    --navIconColor: #29bcba;
     --piratechsDark: #10141d;
     --concentration: #58717f;
     --gameBlueInverse: #ff3d00;
@@ -766,19 +767,6 @@ input {
     }
 }
 
-@media (max-width: 768px) {
-    nav {
-        * {
-            &.nx-relative {
-                display: none !important;
-            }
-            &.nx-text-sm {
-                display: none !important;
-            }
-        }
-    }
-}
-
 @media (max-width: 903px) {
     .board {
         &.lists {
@@ -804,12 +792,6 @@ input {
 }
 
 @media (max-width: 992px) {
-    .navFormDiv {
-        // display: none !important;
-        .navIcons {
-            display: none;
-        }
-    }
     .board {
         &.lists {
             overflow-x: scroll;
@@ -818,14 +800,6 @@ input {
                 font-size: 0.85em;
                 min-width: 48.9% !important;
             }
-        }
-    }
-}
-
-@media (max-width: 835px) {
-    nav {
-        .navFormDiv {
-            display: none !important;
         }
     }
 }
@@ -862,8 +836,6 @@ input {
     }
 }
 
-// @media (min-width: 1600px) {
-// @media (min-width: 1420px) {
 @media (min-width: 1367px) {
     .status {
         overflow: hidden;
@@ -883,8 +855,6 @@ input {
    }
 }
 
-// @media (max-width: 1600px) {
-// @media (max-width: 1420px) {
 @media (max-width: 1367px) {
     .completeButton {
         display: none !important;
@@ -896,7 +866,6 @@ input {
         grid-gap: 10px !important;
         justify-content: flex-start;
         .status {
-            // @extend .textOverflow;
             text-align: left;
             overflow: hidden;
             display: inline-block;
@@ -1084,7 +1053,6 @@ section {
             padding: 10px 25px !important;
             font-weight: 600;
             line-height: 1;
-            /* filter: invert(1); */
             border: 0 !important;
             &:hover {
                 color: black !important;
@@ -1172,11 +1140,9 @@ section {
         }
     }
     input {
-        // font-size: 14px;
         outline: none !important;
         border: 3px solid black;
         color: black !important;
-        // border-radius: 8px !important;
         background: rgba(255, 255, 255, 0.65) !important;
     }
     kbd {
@@ -1185,7 +1151,6 @@ section {
         border-color: black;
     }
     @media (min-width: 768px) {
-        // padding-top: 10px;
         margin-right: 10px;
         input {
             max-height: 30px !important;
@@ -1261,14 +1226,10 @@ form {
         font-family: "RuneScape Chat Bold", "Montserrat";
         color: white !important;
         transition: var(--transition);
-        // border-radius: var(--borderRadius);
         background: var(--blackGlass) !important;
-        // box-shadow: 0 0 10px var(--gameBlueSoft),0 0 20px var(--gameBlueSoft);
 
         label {
             padding: 50px !important;
-            // top: -5px;
-            // position: relative;
         }
         
     
@@ -1302,7 +1263,6 @@ form {
                 font-weight: 500;
                 height: 28px;
                 width: 96.5%;
-                // border: solid 2px var(--blackGlass);
                 display: flex;
                 justify-content: center;
                 align-items: center;

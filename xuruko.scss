@@ -1542,18 +1542,7 @@ div[role="presentation"] {
     }
 }
 
-@media (max-width: 835px) {
-    .navIconsContainer {
-        display: flex !important;
-    }
-}
-
 @media (min-width: 768px) {
-    .useDB {
-        .navIconsContainer.showWhenNoDB {
-            display: none;
-        }
-    }
     .formSubmitButton {
         &:not(.commandsFormSubmit) {
             display: none;
@@ -1590,12 +1579,6 @@ div[role="presentation"] {
             &.twitch {
                 top: 2px;
                 position: relative;
-            }
-            @media (max-width: 1075px) and (min-width: 835px) {
-                display: none;
-            }
-            @media (max-width: 430px) {
-                display: none;
             }
         }
     }
