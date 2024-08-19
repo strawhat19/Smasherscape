@@ -1,6 +1,25 @@
+export const navFaIcons = {
+    0: {
+        name: `SmasherScape`,
+        faIconName: `fa-home`,
+    }, 
+    1: {
+        name: `About`,
+        faIconName: `fa-address-card`,
+    }, 
+    2: {
+        name: `Arenas`,
+        faIconName: `fa-trophy`,
+    },
+    3: {
+        name: `Plays`,
+        faIconName: `fa-gamepad`,
+    },
+}
+
 export default function NavIcons(props) {
     return (
-        <div className={`navIcons`}>
+        <div className={`navIcons ${props.className}`}>
             <a href="https://discord.gg/FUXbKfGs29" target="_blank" rel="noreferrer" className="nx-p-2 nx-text-current">
                 <svg width="24" height="24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 5 30.67 23.25">
                     <title>Discord | The Bröthērhoöd</title>

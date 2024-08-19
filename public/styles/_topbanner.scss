@@ -1,18 +1,145 @@
-.nextra-banner-container {
-    background: var(--xurukoGradientBlueGreen) !important;
-}
-
 .topBanner {
     font-size: 18px;    
 }
 
+.navIcon {
+    font-size: 14px;
+}
+
+.black {
+    color: black;
+}
+
+.navIconColor {
+    color: var(--navIconColor);
+}
+
+.nextra-banner-container {
+    padding: 0 !important;
+    background: var(--xurukoGradientBlueGreen) !important;
+    .nx-w-full {
+        padding: 0 !important;
+    }
+}
+
 .topNavigation {
     top: -1px;
+    display: flex;
+    grid-gap: 25px;
     position: relative;
+    align-items: center;
+    justify-content: flex-start;
     a {
         max-width: fit-content;
         &::before {
             background: black;
         }
+    }
+}
+
+.scrolling-text {
+    animation: scroll-left 10s linear infinite;
+}
+  
+@keyframes scroll-left {
+    0% {
+      transform: translateX(1200%);
+    }
+    100% {
+      transform: translateX(-400%);
+    }
+}
+
+nav {
+    a {
+        &.nx-text-sm {
+            cursor: pointer;
+            span {
+                display: flex;
+                align-items: center;
+                padding: 0 20px 0 10px;
+                i {
+                    @extend .navIcon;
+                    padding-right: 5px;
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 1200px) and (min-width: 768px) {
+    .navIconLabel {
+        display: none;
+    }
+}
+
+@media (max-width: 992px) and (min-width: 893px) {
+    nav {
+        .navFormDiv {
+            .navIcons {
+                display: none;
+            }
+        }
+    }
+}
+
+@media (max-width: 892px) {
+    nav {
+        .navFormDiv {
+            .navFormSection {
+                display: none;
+            }
+            @media (min-width: 850px) {
+                .navIconLabel {
+                    display: flex;
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 835px) {
+    .navIconsContainer {
+        display: none !important;
+    }
+}
+
+@media (min-width: 768px) {
+    .useDB {
+        .navIconsContainer.showWhenNoDB {
+            display: none;
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    aside {
+        ul {
+            li {
+                a {
+                    align-items: center;
+                    grid-gap: 10px !important;
+                    padding-left: 32px !important;
+                    i {
+                        top: -1px;
+                        position: relative;
+                        --navIconColor: #31a9e4;
+                    }
+                }
+            }
+        }
+    }
+    nav {
+        a {
+            &.nx-text-sm {
+                display: none !important;
+            }
+        }
+    }
+}
+
+@media (max-width: 467px) {
+    .navIconLabel {
+        display: none;
     }
 }

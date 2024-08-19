@@ -4,14 +4,14 @@ import { useContext } from 'react';
 import Level from '../models/Level';
 import Player from '../models/Player';
 import PlayerForm from './PlayerForm';
-import PlayerCard, { calcPlayerLossesFromPlays, calcPlayerWinsFromPlays } from './PlayerCard';
+import { Levels } from '../common/Levels';
 import CommandsForm from './CommandsForm';
 import { parseDate } from './PlayerRecord';
 import LoadingSpinner from './LoadingSpinner';
 import Experience from '../models/Experience';
 import { Characters } from '../common/Characters';
 import { StateContext, defaultPlayerRoles, getActivePlayersJSON } from '../pages/_app';
-import { Levels } from '../common/Levels';
+import PlayerCard, { calcPlayerLossesFromPlays, calcPlayerWinsFromPlays } from './PlayerCard';
 
 export const calcPlayerCharacterTimesPlayed = (plyr: Player, char, plays: any) => {
     let timesCharPlayed = 0;
@@ -118,22 +118,6 @@ export const calcPlayerLevelImage = (levelName) => {
     let levels = Object.values(Levels);
     let playerLevel: any = levels.find(lvl => lvl?.name == levelName);
     return playerLevel?.altImage || playerLevel?.image;
-    // let smasherscapeImagesURL = `/assets`;
-    // if (levelName == `Bronze Scimitar`) return `${smasherscapeImagesURL}/Bronze_Scimmy.png?raw=true`; 
-    // else if (levelName == `Iron Scimitar`) return `${smasherscapeImagesURL}/Iron_Scimmy.png?raw=true`; 
-    // else if (levelName == `Steel Scimitar`) return `${smasherscapeImagesURL}/Steel_Scimmy.png?raw=true`; 
-    // else if (levelName == `Mithril Scimitar`) return `${smasherscapeImagesURL}/Mithril_Scimmy.png?raw=true`; 
-    // else if (levelName == `Adamantite Scimitar`) return `${smasherscapeImagesURL}/Adamant_Scimmy.png?raw=true`; 
-    // else if (levelName == `Rune Scimitar`) return `${smasherscapeImagesURL}/Rune_Scimmy.png?raw=true`; 
-    // else if (levelName == `Gilded Scimitar`) return `${smasherscapeImagesURL}/Gilded_Scimmy.png?raw=true`;
-    // else if (levelName == `Gomu Gomu`) return `${smasherscapeImagesURL}/Gomu_Gomu.png?raw=true`;
-    // else if (levelName == `Dragon Scimitar`) return `${smasherscapeImagesURL}/Dragon_Scimmy.png?raw=true`;
-    // else if (levelName == `Abyssal Whip`) return `${smasherscapeImagesURL}/Abyssal_Whip.png?raw=true`;
-    // // else if (levelName == `Dragon Hunter Crossbow`) return `${smasherscapeImagesURL}/Abyssal_Whip.png?raw=true`;
-    // // else if (levelName == `Twisted Bow`) return `${smasherscapeImagesURL}/Abyssal_Whip.png?raw=true`;
-    // else if (levelName == `Fish Sack`) return `${smasherscapeImagesURL}/Fish_Sack.png?raw=true`;
-    // else if (levelName == `Golden Tench`) return `${smasherscapeImagesURL}/Golden_Tench.png?raw=true`;
-    // else return `${smasherscapeImagesURL}/OSRS_Top_Hat.png?raw=true`;
 }
 
 export const calcPlayerCharactersPlayed = (plyr: Player, cutOff = true, plays) => {
@@ -240,7 +224,9 @@ export default function Smasherscape(props) {
                 </div>
             </>}
             {!playersLoading ? getActivePlayers(filteredPlayers, true, plays)?.length > 0 && getActivePlayers(filteredPlayers, true, plays)?.map((plyr, plyrIndex) => {
-                return playersLoading ? <LoadingSpinner size={30} override={true} /> : <PlayerCard plyr={plyr} key={plyrIndex} />
+                return playersLoading ? <LoadingSpinner size={30} override={true} /> : (
+                    <PlayerCard plyr={plyr} key={plyrIndex} />
+                )
             }) : <LoadingSpinner size={30} override={true} />}
         </div>
     </Main>
