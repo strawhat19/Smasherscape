@@ -15,18 +15,20 @@
       "layout": "full"
     }
   },
-  "Xuruko": {
-    "title": "Xuruko",
-    "type": "menu",
-    "items": {
-      "twitch": {
-        "title": "Twitch Xuruko",
-        "href": "https://www.twitch.tv/xuruko"
-      },
-      "discord": {
-        "title": "The Bröthērhoöd",
-        "href": "https://discord.gg/FUXbKfGs29"
-      }
+  "arenas": {
+    "title": "Arenas",
+    "type": "page",
+    "theme": {
+      "pagination": false,
+      "layout": "full"
+    }
+  },
+  "plays": {
+    "title": "Plays",
+    "type": "page",
+    "theme": {
+      "pagination": false,
+      "layout": "full"
     }
   }
 }

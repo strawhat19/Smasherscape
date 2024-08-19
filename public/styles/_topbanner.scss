@@ -1,14 +1,47 @@
-.nextra-banner-container {
-    background: var(--xurukoGradientBlueGreen) !important;
-}
-
 .topBanner {
     font-size: 18px;    
 }
 
+.navIcon {
+    font-size: 14px;
+}
+
+.black {
+    color: black;
+}
+
+.navIconColor {
+    color: var(--navIconColor);
+}
+
+.nextra-banner-container {
+    background: var(--xurukoGradientBlueGreen) !important;
+}
+
+nav {
+    a {
+        &.nx-text-sm {
+            cursor: pointer;
+            span {
+                display: flex;
+                align-items: center;
+                padding: 0 20px 0 10px;
+                i {
+                    @extend .navIcon;
+                    padding-right: 5px;
+                }
+            }
+        }
+    }
+}
+
 .topNavigation {
     top: -1px;
+    display: flex;
+    grid-gap: 25px;
     position: relative;
+    align-items: center;
+    justify-content: flex-start;
     a {
         max-width: fit-content;
         &::before {
