@@ -21,22 +21,7 @@
         padding: 0 !important;
     }
 }
-
-.topNavigation {
-    top: -1px;
-    display: flex;
-    grid-gap: 25px;
-    position: relative;
-    align-items: center;
-    justify-content: flex-start;
-    a {
-        max-width: fit-content;
-        &::before {
-            background: black;
-        }
-    }
-}
-
+  
 .scrolling-text {
     animation: scroll-left 10s linear infinite;
 }
@@ -63,6 +48,41 @@ nav {
                     padding-right: 5px;
                 }
             }
+        }
+    }
+}
+
+.navIcon {
+    font-size: 14px;
+}
+
+.black {
+    color: black;
+}
+
+.navIconColor {
+    color: var(--navIconColor);
+}
+
+.nextra-banner-container {
+    padding: 0 !important;
+    background: var(--xurukoGradientBlueGreen) !important;
+    .nx-w-full {
+        padding: 0 !important;
+    }
+}
+
+.topNavigation {
+    top: -1px;
+    display: flex;
+    grid-gap: 25px;
+    position: relative;
+    align-items: center;
+    justify-content: flex-start;
+    a {
+        max-width: fit-content;
+        &::before {
+            background: black;
         }
     }
 }
